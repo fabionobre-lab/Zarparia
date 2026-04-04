@@ -5,133 +5,68 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Edinburgh — Fabio & Liana · April 2026</title>
+<title>Edinburgh 2026 - Fabio & Liana</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --ink:#1a1208;
-  --parchment:#f5f0e8;
-  --stone:#7a6e5f;
-  --heather:#7b4f7a;
-  --thistle:#c49ec4;
-  --tartan:#2b4a2b;
-  --tartan-dk:#1e3520;
-  --gold:#b8860b;
-  --gold-lt:#e8c84a;
-  --cream:#faf6ee;
-  --moss:#3d5a3d;
-  --border:#d8ccb8;
-  --loch:#1e3a5f;
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --ink:#1a1208;--stone:#7a6e5f;--heather:#7b4f7a;
+  --tartan:#2b4a2b;--gold:#b8860b;--gold-lt:#e8c84a;
+  --cream:#faf6ee;--moss:#3d5a3d;--border:#d8ccb8;--loch:#1e3a5f;
+  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--tartan-dk)}
+html,body{height:100%;overflow:hidden;background:#1e3520}
 body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-smoothing:antialiased}
-
-.shell{
-  max-width:430px;
-  margin:0 auto;
-  height:100dvh;
-  display:flex;
-  flex-direction:column;
-  background:var(--cream);
-  overflow:hidden;
-  position:relative;
-}
-
-/* HERO */
-.hero{
-  background:var(--tartan);
-  padding:calc(14px + var(--safe-top)) 18px 0;
-  flex-shrink:0;
-  position:relative;
-  overflow:hidden;
-}
-.hero::before{
-  content:'';position:absolute;inset:0;
-  background:
-    repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.055) 18px,rgba(255,255,255,.055) 19.5px),
-    repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(255,255,255,.055) 18px,rgba(255,255,255,.055) 19.5px),
-    repeating-linear-gradient(0deg,transparent,transparent 54px,rgba(184,134,11,.18) 54px,rgba(184,134,11,.18) 57px),
-    repeating-linear-gradient(90deg,transparent,transparent 54px,rgba(184,134,11,.18) 54px,rgba(184,134,11,.18) 57px);
-  pointer-events:none;
-}
+.shell{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--cream);overflow:hidden}
+.hero{background:var(--tartan);padding:calc(12px + var(--safe-top)) 16px 0;flex-shrink:0;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.05) 18px,rgba(255,255,255,.05) 19.5px),
+  repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(255,255,255,.05) 18px,rgba(255,255,255,.05) 19.5px),
+  repeating-linear-gradient(0deg,transparent,transparent 54px,rgba(184,134,11,.16) 54px,rgba(184,134,11,.16) 57px),
+  repeating-linear-gradient(90deg,transparent,transparent 54px,rgba(184,134,11,.16) 54px,rgba(184,134,11,.16) 57px)}
 .hero-inner{position:relative;z-index:1}
-.trip-eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-lt);opacity:.75;font-weight:300;margin-bottom:3px}
-.trip-title{font-family:'Playfair Display',Georgia,serif;font-size:26px;font-weight:700;color:#fff;line-height:1.05;margin-bottom:2px}
-.trip-sub{font-size:11px;color:rgba(255,255,255,.55);font-weight:300;margin-bottom:12px;letter-spacing:.03em}
-
-/* VERSION TOGGLE */
+.hero-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.trip-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-lt);opacity:.75;font-weight:300}
+.lang-toggle{display:flex;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.18)}
+.lang-btn{padding:4px 12px;border:none;background:rgba(0,0,0,.2);cursor:pointer;font-size:11px;color:rgba(255,255,255,.5);font-family:'Source Serif 4',serif;letter-spacing:.06em;transition:all .2s;font-weight:400}
+.lang-btn.on{background:rgba(255,255,255,.18);color:#fff;font-weight:500}
+.trip-title{font-family:'Playfair Display',Georgia,serif;font-size:25px;font-weight:700;color:#fff;line-height:1.05;margin-bottom:1px}
+.trip-sub{font-size:11px;color:rgba(255,255,255,.5);font-weight:300;margin-bottom:10px;letter-spacing:.02em}
 .vtabs{display:flex;border-radius:10px 10px 0 0;overflow:hidden;gap:1px;background:rgba(0,0,0,.2)}
-.vtab{flex:1;padding:9px 6px;border:none;background:rgba(0,0,0,.22);cursor:pointer;font-size:11px;color:rgba(255,255,255,.55);font-family:'Source Serif 4',serif;font-weight:400;text-align:center;line-height:1.3;transition:all .2s;letter-spacing:.02em}
+.vtab{flex:1;padding:9px 6px;border:none;background:rgba(0,0,0,.22);cursor:pointer;font-size:11px;color:rgba(255,255,255,.5);font-family:'Source Serif 4',serif;font-weight:400;text-align:center;line-height:1.3;transition:all .2s}
 .vtab.on{background:var(--cream);color:var(--ink);font-weight:500}
-
-/* DAY NAV */
-.daynav{
-  display:flex;overflow-x:auto;scrollbar-width:none;
-  background:var(--cream);
-  border-bottom:1px solid var(--border);
-  padding:0 6px;
-  flex-shrink:0;
-}
+.daynav{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--cream);border-bottom:1px solid var(--border);padding:0 4px;flex-shrink:0}
 .daynav::-webkit-scrollbar{display:none}
-.daybtn{
-  flex:1;min-width:0;padding:8px 4px 6px;
-  border:none;background:none;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;gap:1px;
-  border-bottom:2.5px solid transparent;
-  transition:all .15s;
-  position:relative;
-}
+.daybtn{flex:1;min-width:0;padding:7px 3px 5px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;border-bottom:2.5px solid transparent;transition:all .15s}
 .daybtn.on{border-bottom-color:var(--tartan)}
-.daybtn .dow{font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--stone);font-family:'Source Serif 4',serif;transition:color .15s}
-.daybtn .dnum{font-size:16px;font-weight:500;color:var(--stone);font-family:'Playfair Display',serif;line-height:1;transition:color .15s}
+.daybtn .dow{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--stone);font-family:'Source Serif 4',serif;transition:color .15s}
+.daybtn .dnum{font-size:15px;font-weight:500;color:var(--stone);font-family:'Playfair Display',serif;line-height:1;transition:color .15s}
 .daybtn.on .dow,.daybtn.on .dnum{color:var(--tartan)}
-.bday-pip{width:5px;height:5px;border-radius:50%;background:var(--heather);margin-top:1px;opacity:0;transition:opacity .2s}
+.bday-pip{width:5px;height:5px;border-radius:50%;background:var(--heather);margin-top:1px;opacity:0}
 .daybtn.has-bday .bday-pip{opacity:1}
-
-/* SCROLL AREA */
-.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(16px + var(--safe-bottom))}
-
-/* DAY HEADER */
-.day-hdr{
-  margin:14px 14px 0;
-  background:var(--tartan);
-  border-radius:14px;
-  padding:14px 16px 13px;
-  position:relative;overflow:hidden;
-}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(20px + var(--safe-bottom))}
+.day-hdr{margin:12px 13px 0;background:var(--tartan);border-radius:13px;padding:13px 15px 12px;position:relative;overflow:hidden}
 .day-hdr::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 9px,rgba(255,255,255,.025) 9px,rgba(255,255,255,.025) 10px);pointer-events:none}
 .dh-in{position:relative;z-index:1}
-.dh-eye{font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--gold-lt);opacity:.7;font-weight:300;margin-bottom:3px}
-.dh-title{font-family:'Playfair Display',serif;font-size:19px;color:#fff;font-weight:700;line-height:1.2}
-.dh-note{font-size:11px;color:rgba(255,255,255,.58);margin-top:4px;font-weight:300;line-height:1.45}
-.bday-strip{
-  background:var(--heather);
-  border-radius:8px;padding:7px 11px;margin-top:9px;
-  font-family:'Playfair Display',serif;font-style:italic;
-  font-size:12px;color:#fff;
-  display:flex;align-items:center;gap:7px;line-height:1.3;
-}
-.bday-strip::before{content:'';width:14px;height:14px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.85)' stroke-width='1.8'%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3Ccircle cx='12' cy='7' r='4'/%3E%3C/svg%3E") center/contain no-repeat}
-
-/* TIMELINE */
-.tl{padding:6px 14px 0}
+.dh-eye{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-lt);opacity:.7;font-weight:300;margin-bottom:2px}
+.dh-title{font-family:'Playfair Display',serif;font-size:18px;color:#fff;font-weight:700;line-height:1.2}
+.dh-note{font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;font-weight:300;line-height:1.4}
+.bday-strip{background:var(--heather);border-radius:8px;padding:6px 11px;margin-top:8px;font-family:'Playfair Display',serif;font-style:italic;font-size:12px;color:#fff;display:flex;align-items:center;gap:7px;line-height:1.3}
+.bday-strip::before{content:'';width:14px;height:14px;flex-shrink:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.8)' stroke-width='1.8'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E") center/contain no-repeat}
+.tl{padding:5px 13px 0}
 .tb{display:flex;gap:0}
-.tb-left{display:flex;flex-direction:column;align-items:center;width:52px;flex-shrink:0;padding-top:13px}
-.tb-time{font-size:10px;font-weight:500;color:var(--stone);text-align:center;line-height:1.2;font-family:'Source Serif 4',serif;letter-spacing:.01em}
-.tb-dot-col{display:flex;flex-direction:column;align-items:center;margin-top:5px}
-.tb-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;border:2.5px solid var(--cream);box-shadow:0 0 0 1px rgba(0,0,0,.08)}
-.tb-line{width:1.5px;flex:1;min-height:14px;background:var(--border);margin-top:3px}
-.tb-body{flex:1;padding:12px 0 12px 10px;border-bottom:1px solid var(--border)}
+.tb-left{display:flex;flex-direction:column;align-items:center;width:50px;flex-shrink:0;padding-top:12px}
+.tb-time{font-size:10px;font-weight:500;color:var(--stone);text-align:center;line-height:1.2;font-family:'Source Serif 4',serif}
+.tb-dot-col{display:flex;flex-direction:column;align-items:center;margin-top:4px}
+.tb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--cream);box-shadow:0 0 0 1px rgba(0,0,0,.07)}
+.tb-line{width:1.5px;flex:1;min-height:14px;background:var(--border);margin-top:2px}
+.tb-body{flex:1;padding:11px 0 11px 9px;border-bottom:1px solid var(--border)}
 .tb:last-child .tb-body{border-bottom:none}
 .tb:last-child .tb-line{display:none}
-
-.tb-title{font-family:'Playfair Display',serif;font-size:14.5px;font-weight:500;color:var(--ink);line-height:1.3}
-.tb-tags{display:flex;gap:4px;flex-wrap:wrap;margin:5px 0 4px}
-.tb-tag{font-size:10px;padding:2px 8px;border-radius:20px;font-family:'Source Serif 4',serif;letter-spacing:.03em;white-space:nowrap}
+.tb-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;color:var(--ink);line-height:1.3}
+.tb-tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 3px}
+.tb-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-family:'Source Serif 4',serif;white-space:nowrap}
 .tb-tag.s{background:#dce8f5;color:var(--loch)}
 .tb-tag.f{background:#daf0e5;color:var(--moss)}
 .tb-tag.w{background:#ede8e0;color:var(--stone)}
@@ -139,252 +74,465 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .tb-tag.m{background:#ede0f0;color:var(--heather)}
 .tb-tag.b{background:linear-gradient(120deg,#f2d2f0,#dfd0f2);color:#5a2a78;font-weight:500}
 .tb-meta{font-size:12px;color:var(--stone);line-height:1.55;margin-top:2px;font-weight:300}
-.tb-warn{background:#fdf0ee;border-left:2.5px solid #c84040;border-radius:0 7px 7px 0;padding:5px 9px;margin-top:6px;font-size:11px;color:#7a2020;line-height:1.45}
-.tb-note{background:#f0ece4;border-radius:7px;padding:5px 9px;margin-top:5px;font-size:11px;color:var(--stone);line-height:1.45}
-.diff-add{background:#e5f5e8;border-left:2.5px solid var(--moss);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:5px;font-size:11px;color:#1a3a1a;line-height:1.45}
-.diff-chg{background:#fef6de;border-left:2.5px solid var(--gold);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:5px;font-size:11px;color:#5a3a00;line-height:1.45}
-.diff-kp{background:#f0ece4;border-left:2.5px solid var(--tartan);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:5px;font-size:11px;color:var(--stone);line-height:1.45}
-.map-btn{
-  display:inline-flex;align-items:center;gap:5px;
-  margin-top:7px;padding:5px 10px;
-  border:1px solid var(--border);border-radius:20px;
-  font-size:11px;color:var(--loch);text-decoration:none;
-  font-family:'Source Serif 4',serif;letter-spacing:.02em;
-  background:rgba(30,58,95,.04);
-  -webkit-touch-callout:none;
-}
-.map-btn svg{flex-shrink:0}
-
-/* FOOTER */
-.footer{text-align:center;padding:12px 0 4px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.06em}
+.tb-warn{background:#fdf0ee;border-left:2.5px solid #c84040;border-radius:0 7px 7px 0;padding:5px 9px;margin-top:5px;font-size:11px;color:#7a2020;line-height:1.45}
+.tb-note{background:#f0ece4;border-radius:7px;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
+.diff-add{background:#e5f5e8;border-left:2.5px solid var(--moss);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:#1a3a1a;line-height:1.45}
+.diff-chg{background:#fef6de;border-left:2.5px solid var(--gold);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:#5a3a00;line-height:1.45}
+.diff-kp{background:#f0ece4;border-left:2.5px solid var(--tartan);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
+.map-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--loch);text-decoration:none;font-family:'Source Serif 4',serif;background:rgba(30,58,95,.04)}
+.footer{text-align:center;padding:10px 0 3px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.05em}
 </style>
 </head>
 <body>
 <div class="shell">
-
   <div class="hero">
     <div class="hero-inner">
-      <div class="trip-eyebrow">Edinburgh, Scotland</div>
+      <div class="hero-row1">
+        <div class="trip-eyebrow" id="ey">Edinburgh, Scotland</div>
+        <div class="lang-toggle">
+          <button class="lang-btn on" onclick="setL('en')">EN</button>
+          <button class="lang-btn" onclick="setL('pt')">PT</button>
+        </div>
+      </div>
       <div class="trip-title">Fabio &amp; Liana</div>
-      <div class="trip-sub">15 &ndash; 19 April 2026</div>
+      <div class="trip-sub" id="ts">15 &ndash; 19 April 2026</div>
       <div class="vtabs">
-        <button class="vtab on" onclick="setV('liana')">Liana's plan</button>
-        <button class="vtab" onclick="setV('merged')">Merged suggestions</button>
+        <button class="vtab on" id="vt0" onclick="setV('liana')">Liana's plan</button>
+        <button class="vtab" id="vt1" onclick="setV('merged')">Merged suggestions</button>
       </div>
     </div>
   </div>
-
-  <nav class="daynav" id="daynav">
-    <button class="daybtn on" onclick="sd(0)"><span class="dow">Wed</span><span class="dnum">15</span><span class="bday-pip"></span></button>
-    <button class="daybtn" onclick="sd(1)"><span class="dow">Thu</span><span class="dnum">16</span><span class="bday-pip"></span></button>
-    <button class="daybtn" onclick="sd(2)"><span class="dow">Fri</span><span class="dnum">17</span><span class="bday-pip"></span></button>
-    <button class="daybtn has-bday" onclick="sd(3)"><span class="dow">Sat</span><span class="dnum">18</span><span class="bday-pip"></span></button>
-    <button class="daybtn has-bday" onclick="sd(4)"><span class="dow">Sun</span><span class="dnum">19</span><span class="bday-pip"></span></button>
+  <nav class="daynav">
+    <button class="daybtn on" onclick="sd(0)"><span class="dow" id="dw0">Wed</span><span class="dnum">15</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(1)"><span class="dow" id="dw1">Thu</span><span class="dnum">16</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(2)"><span class="dow" id="dw2">Fri</span><span class="dnum">17</span><span class="bday-pip"></span></button>
+    <button class="daybtn has-bday" onclick="sd(3)"><span class="dow" id="dw3">Sat</span><span class="dnum">18</span><span class="bday-pip"></span></button>
+    <button class="daybtn has-bday" onclick="sd(4)"><span class="dow" id="dw4">Sun</span><span class="dnum">19</span><span class="bday-pip"></span></button>
   </nav>
-
   <div class="scroll-area" id="content"></div>
-
 </div>
-
 <script>
-var D={
-  liana:{
-    days:[
-      {
-        dow:"Wednesday",date:"15 April",title:"Arrival & Old Town",
-        note:"Accommodation: 2 Upper Bow, Old Town &bull; Check-in 15:00",
-        bday:false,
-        bl:[
-          {t:"~14:00",dot:"#7a6e5f",ti:"Arrive Edinburgh",tg:[["w","Travel"]],me:"Walk or taxi to 2 Upper Bow."},
-          {t:"15:30",dot:"#3d5a3d",ti:"Late lunch &mdash; Cold Town House",tg:[["f","Lunch"],["c","Book ahead"]],me:"Grassmarket. Craft beer, Neapolitan pizza, rooftop with castle views.",mp:"https://maps.google.com/?q=Cold+Town+House+Edinburgh"},
-          {t:"16:45",dot:"#3d5a3d",ti:"Coffee &mdash; The Elephant House",tg:[["f","Coffee"]],me:"The Harry Potter inspiration cafe. Victoria Street area.",mp:"https://maps.google.com/?q=The+Elephant+House+Edinburgh"},
-          {t:"17:30",dot:"#1e3a5f",ti:"Old Town walk",tg:[["s","Sightseeing"],["s","Free"]],me:"Victoria Street &middot; Grassmarket &middot; Vennel Viewpoint &middot; Greyfriars Bobby",mp:"https://maps.google.com/?q=Victoria+Street+Edinburgh"},
-          {t:"18:30",dot:"#1e3a5f",ti:"St Giles&rsquo; Cathedral",tg:[["s","Sightseeing"],["s","Free"],["w","~30 min"]],me:"Gothic cathedral on the Royal Mile. Thistle Chapel inside.",mp:"https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh"},
-          {t:"19:00",dot:"#1e3a5f",ti:"Royal Mile closes walk",tg:[["s","Sightseeing"],["s","Free"]],me:"Dunbar&rsquo;s Close &middot; Bakehouse Close &middot; White Horse Close",mp:"https://maps.google.com/?q=Royal+Mile+Edinburgh"},
-          {t:"20:00",dot:"#3d5a3d",ti:"Light dinner near hotel",tg:[["f","Dinner"]],me:"Flexible &mdash; options near 2 Upper Bow."}
-        ]
-      },
-      {
-        dow:"Thursday",date:"16 April",title:"Castle + New Town",
-        note:"Skip-the-line pass purchased &bull; Book 09:45 tour slot",
-        bday:false,
-        bl:[
-          {t:"08:00",dot:"#3d5a3d",ti:"Breakfast",tg:[["f","Breakfast"]],me:"Near the hotel."},
-          {t:"10:00",dot:"#1e3a5f",ti:"Edinburgh Castle",tg:[["s","Sightseeing"],["c","Skip line"],["w","~2.5 hrs"]],me:"Great Hall &middot; St Margaret&rsquo;s Chapel &middot; Mons Meg &middot; National War Museum &middot; 1 o&rsquo;clock gun (13:00)",mp:"https://maps.google.com/?q=Edinburgh+Castle",wa:"Crown Room may still be closed April 2026. Check edinburghcastle.scot before visiting."},
-          {t:"12:30",dot:"#1e3a5f",ti:"Princes Street Gardens",tg:[["s","Sightseeing"],["s","Free"],["w","~1 hr"]],me:"Floral Clock &middot; Ross Fountain &middot; Scott Monument",mp:"https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh"},
-          {t:"13:30",dot:"#3d5a3d",ti:"Coffee &mdash; Starbucks Princes Street",tg:[["f","Coffee"]],me:"Castle views from the window.",mp:"https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh"},
-          {t:"14:30",dot:"#3d5a3d",ti:"Lunch",tg:[["f","Lunch"]],me:"Flexible &mdash; New Town area."},
-          {t:"15:30",dot:"#1e3a5f",ti:"National Gallery + Portrait Gallery",tg:[["s","Museum"],["s","Free"],["w","~2 hrs"]],me:"Scottish National Gallery (The Mound) + Portrait Gallery (Queen St). Both free.",mp:"https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh"},
-          {t:"17:45",dot:"#1e3a5f",ti:"Calton Hill sunset",tg:[["s","Viewpoint"],["s","Free"],["w","~45 min"]],me:"Panoramic views across Edinburgh. Easy 10-min climb.",mp:"https://maps.google.com/?q=Calton+Hill+Edinburgh"},
-          {t:"19:30",dot:"#3d5a3d",ti:"Dinner",tg:[["f","Dinner"]],me:"Flexible &mdash; New Town or Old Town."}
-        ]
-      },
-      {
-        dow:"Friday",date:"17 April",title:"Outlander Tour",
-        note:"Full day tour &bull; Departs ~09:00 from Royal Mile",
-        bday:false,
-        bl:[
-          {t:"08:00",dot:"#3d5a3d",ti:"Quick breakfast",tg:[["f","Breakfast"]],me:"Light meal before tour pickup."},
-          {t:"08:45",dot:"#7b4f7a",ti:"Outlander Tour departs",tg:[["m","Full day"],["w","~9 hrs"]],me:"Doune Castle &middot; Blackness Castle &middot; Linlithgow Palace &middot; Jacobite country. Bring layers and waterproof."},
-          {t:"~18:00",dot:"#7b4f7a",ti:"Return to Edinburgh",tg:[["w","Travel"]],me:""},
-          {t:"19:30",dot:"#3d5a3d",ti:"Dinner &mdash; Cold Town House",tg:[["f","Dinner"]],me:"Relaxed dinner at the Grassmarket favourite.",mp:"https://maps.google.com/?q=Cold+Town+House+Edinburgh"}
-        ]
-      },
-      {
-        dow:"Saturday",date:"18 April",title:"Palace + Nature + Art",
-        note:"The most packed day &mdash; start early",
-        bday:true,bdn:"Liana&rsquo;s birthday celebration dinner tonight at The Dome",
-        bl:[
-          {t:"08:00",dot:"#3d5a3d",ti:"Breakfast",tg:[["f","Breakfast"]],me:"Near hotel."},
-          {t:"09:00",dot:"#1e3a5f",ti:"Palace of Holyroodhouse",tg:[["s","Palace"],["c","Book online"],["w","~2 hrs"]],me:"State Apartments &middot; Mary Queen of Scots rooms &middot; Holyrood Abbey ruins &middot; Gardens. Audio guide free.",mp:"https://maps.google.com/?q=Palace+of+Holyroodhouse",no:"Opens 9:30am. Closed Tue/Wed. No photography inside."},
-          {t:"11:00",dot:"#1e3a5f",ti:"Salisbury Crags",tg:[["s","Nature"],["s","Free"],["w","~1 hr"]],me:"Dramatic basalt cliff walk in Holyrood Park. Spectacular views.",mp:"https://maps.google.com/?q=Salisbury+Crags+Edinburgh"},
-          {t:"13:30",dot:"#1e3a5f",ti:"The Meadows",tg:[["s","Park"],["s","Free"],["w","~30 min"]],me:"Cherry blossoms in bloom mid-April.",mp:"https://maps.google.com/?q=The+Meadows+Edinburgh"},
-          {t:"14:30",dot:"#1e3a5f",ti:"Old College &mdash; University of Edinburgh",tg:[["s","Architecture"],["s","Free"],["w","~20 min"]],me:"Robert Adam&rsquo;s neoclassical quad.",mp:"https://maps.google.com/?q=Old+College+University+of+Edinburgh"},
-          {t:"15:15",dot:"#1e3a5f",ti:"St Mary&rsquo;s Episcopal Cathedral",tg:[["s","Sightseeing"],["s","Free"],["w","~20 min"]],me:"Victorian Gothic, West End. Stunning interior.",mp:"https://maps.google.com/?q=St+Marys+Episcopal+Cathedral+Edinburgh"},
-          {t:"16:00",dot:"#1e3a5f",ti:"National Gallery of Modern Art",tg:[["s","Museum"],["s","Free"],["w","~1 hr"]],me:"Modern and contemporary art. Free entry.",mp:"https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh"},
-          {t:"17:00",dot:"#1e3a5f",ti:"Dean Village + Water of Leith",tg:[["s","Sightseeing"],["s","Free"],["w","~45 min"]],me:"Hidden medieval village. Riverside path. Dean Bridge viewpoint.",mp:"https://maps.google.com/?q=Dean+Village+Edinburgh"},
-          {t:"17:45",dot:"#1e3a5f",ti:"Circus Lane",tg:[["s","Sightseeing"],["s","Free"],["w","~15 min"]],me:"Cobbled lane in Stockbridge. Pastel doors, incredibly photogenic.",mp:"https://maps.google.com/?q=Circus+Lane+Edinburgh"},
-          {t:"19:30",dot:"#7b4f7a",ti:"Birthday dinner &mdash; The Dome",tg:[["b","Birthday celebration"],["f","Dinner"],["c","Book well ahead"]],me:"14 George Street. Former bank, grand neoclassical interior. Fixed menu from &pound;19.50.",mp:"https://maps.google.com/?q=The+Dome+Edinburgh"}
-        ]
-      },
-      {
-        dow:"Sunday",date:"19 April",title:"Birthday &amp; Departure",
-        note:"Happy Birthday Liana! &hearts; &bull; Check-out 11:00 &bull; Flight 14:15",
-        bday:true,bdn:"Happy Birthday Liana! &hearts;",
-        bl:[
-          {t:"09:00",dot:"#1e3a5f",ti:"Royal Botanic Garden",tg:[["s","Garden"],["s","Free"],["w","~1.5 hrs"]],me:"World-class garden. Beautiful in April with spring blooms.",mp:"https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh",wa:"Opens 10:00am in April &mdash; adjust timing or arrive at the gates to enter at opening."},
-          {t:"11:00",dot:"#7a6e5f",ti:"Coffee and pack up",tg:[["w","Check-out"]],me:"Check out by 11:00."},
-          {t:"~12:30",dot:"#7a6e5f",ti:"Head to airport",tg:[["w","Travel"]],me:"Allow 30&ndash;40 min to Edinburgh Airport. Flight 14:15 &mdash; aim to arrive by 12:45.",mp:"https://maps.google.com/?q=Edinburgh+Airport"}
-        ]
-      }
-    ]
-  },
-  merged:{
-    days:[
-      {
-        dow:"Wednesday",date:"15 April",title:"Arrival & Old Town",
-        note:"Check-in 15:00 &bull; 2 Upper Bow, Old Town",
-        bday:false,
-        bl:[
-          {t:"~14:30",dot:"#7a6e5f",ti:"Arrive Edinburgh Waverley",tg:[["w","Travel"]],me:"10 min walk uphill to 2 Upper Bow, or taxi ~&pound;5."},
-          {t:"15:30",dot:"#3d5a3d",ti:"Late lunch &mdash; Cold Town House",tg:[["f","Lunch"],["c","Book ahead"]],me:"Grassmarket. Craft beer, pizza, rooftop with castle views. New retractable roof &mdash; best castle view in Edinburgh.",mp:"https://maps.google.com/?q=Cold+Town+House+Edinburgh",df:{k:"kp",tx:"Liana&rsquo;s pick &mdash; excellent, especially with the new all-weather rooftop."}},
-          {t:"16:45",dot:"#1e3a5f",ti:"St Giles&rsquo; Cathedral first",tg:[["s","Sightseeing"],["s","Free"],["w","~30 min"]],me:"Do this before the closes &mdash; it closes around 19:00. Gothic interior, Thistle Chapel.",mp:"https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh",df:{k:"chg",tx:"Moved earlier. Liana had it at 18:30 but it closes ~19:00 &mdash; visit first."}},
-          {t:"17:20",dot:"#1e3a5f",ti:"Old Town walk: closes &amp; Victoria Street",tg:[["s","Sightseeing"],["s","Free"],["w","~1 hr"]],me:"Victoria Street &middot; Grassmarket &middot; Vennel Viewpoint &middot; Greyfriars Bobby &middot; Dunbar&rsquo;s Close &middot; Bakehouse Close &middot; White Horse Close",mp:"https://maps.google.com/?q=Victoria+Street+Edinburgh",df:{k:"chg",tx:"Combined Liana&rsquo;s two separate walks into one flowing route."}},
-          {t:"18:30",dot:"#3d5a3d",ti:"Quick coffee &mdash; The Elephant House",tg:[["f","Coffee"],["w","~20 min"]],me:"Worth a stop for the Harry Potter connection &mdash; treat it as atmosphere rather than a full sit-down.",mp:"https://maps.google.com/?q=The+Elephant+House+Edinburgh",df:{k:"chg",tx:"Kept but shortened. Food unremarkable &mdash; go for the experience not the menu."}},
-          {t:"19:30",dot:"#3d5a3d",ti:"Dinner &mdash; Makars Mash Bar",tg:[["f","Dinner"],["c","Book ahead"]],me:"Best first Scottish dinner in Edinburgh. Haggis, lamb shank, venison. Bank Street, 2 min from Grassmarket.",mp:"https://maps.google.com/?q=Makars+Mash+Bar+Edinburgh",df:{k:"add",tx:"Added: much better than a vague light dinner near the hotel."}}
-        ]
-      },
-      {
-        dow:"Thursday",date:"16 April",title:"Castle + New Town",
-        note:"Skip-the-line pass purchased &bull; Book 09:45 guided tour slot",
-        bday:false,
-        bl:[
-          {t:"08:00",dot:"#3d5a3d",ti:"Breakfast &mdash; near hotel",tg:[["f","Breakfast"]],me:"Early start needed today."},
-          {t:"09:15",dot:"#7a6e5f",ti:"Walk to Edinburgh Castle",tg:[["w","5 min"]],me:"The castle is at the top of the Royal Mile &mdash; your street. Arrive before the tour starts."},
-          {t:"09:30",dot:"#1e3a5f",ti:"Edinburgh Castle",tg:[["s","Sightseeing"],["c","Skip line"],["w","2.5&ndash;3 hrs"]],me:"Great Hall &middot; St Margaret&rsquo;s Chapel &middot; Mons Meg &middot; National War Museum &middot; 1 o&rsquo;clock gun at 13:00. Book 09:45 tour slot.",mp:"https://maps.google.com/?q=Edinburgh+Castle",wa:"Crown Room may still be closed April 2026. Check edinburghcastle.scot.",df:{k:"chg",tx:"Moved from 10:00 to 09:30. With skip-the-line go straight in at opening &mdash; beat the tour groups."}},
-          {t:"12:30",dot:"#1e3a5f",ti:"Princes Street Gardens",tg:[["s","Sightseeing"],["s","Free"],["w","~45 min"]],me:"Floral Clock &middot; Ross Fountain &middot; Scott Monument.",mp:"https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh"},
-          {t:"13:15",dot:"#3d5a3d",ti:"Lunch &mdash; independent cafe",tg:[["f","Lunch"]],me:"Skip the Starbucks. Good options along Princes Street and at the National Gallery cafe.",df:{k:"chg",tx:"Replaced Starbucks with a proper lunch. Same view, much better food."}},
-          {t:"14:30",dot:"#1e3a5f",ti:"National Gallery + Portrait Gallery",tg:[["s","Museum"],["s","Free"],["w","~2 hrs"]],me:"Scottish National Gallery (The Mound) &mdash; Vel&aacute;zquez, Rembrandt, Scottish masters. Portrait Gallery (Queen St).",mp:"https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh"},
-          {t:"19:30",dot:"#1e3a5f",ti:"Calton Hill at sunset",tg:[["s","Viewpoint"],["s","Free"],["w","~45 min"]],me:"Sunset is ~20:15 in mid-April. National Monument, panoramic views of the whole city.",mp:"https://maps.google.com/?q=Calton+Hill+Edinburgh",df:{k:"chg",tx:"Moved from 17:45 to 19:30 for actual golden hour light. Worth the wait."}},
-          {t:"20:30",dot:"#3d5a3d",ti:"Dinner &mdash; Dishoom Edinburgh",tg:[["f","Dinner"],["w","~1.5 hrs"]],me:"St Andrew Square. Bombay cafe-style food. House black daal, chicken ruby, naan wraps.",mp:"https://maps.google.com/?q=Dishoom+Edinburgh",df:{k:"add",tx:"Added: replaces vague dinner with a specific excellent option near Calton Hill."}}
-        ]
-      },
-      {
-        dow:"Friday",date:"17 April",title:"Outlander Tour",
-        note:"No changes from Liana&rsquo;s plan &mdash; perfect as is",
-        bday:false,
-        bl:[
-          {t:"08:00",dot:"#3d5a3d",ti:"Quick breakfast",tg:[["f","Breakfast"]],me:"Light breakfast before tour pickup."},
-          {t:"08:45",dot:"#7b4f7a",ti:"Outlander Tour departs",tg:[["m","Full day"],["w","~9 hrs"]],me:"Doune Castle &middot; Blackness Castle &middot; Linlithgow Palace &middot; Jacobite country. Bring layers and waterproof."},
-          {t:"~18:00",dot:"#7b4f7a",ti:"Return to Edinburgh",tg:[["w","Travel"]],me:""},
-          {t:"19:30",dot:"#3d5a3d",ti:"Dinner &mdash; Cold Town House",tg:[["f","Dinner"]],me:"Perfect relaxed dinner after a long day out.",mp:"https://maps.google.com/?q=Cold+Town+House+Edinburgh",df:{k:"kp",tx:"Liana&rsquo;s pick kept &mdash; ideal wind-down dinner after a full day."}}
-        ]
-      },
-      {
-        dow:"Saturday",date:"18 April",title:"Palace + Nature + Art",
-        note:"Liana&rsquo;s Saturday is excellent &mdash; minor additions only",
-        bday:true,bdn:"Liana&rsquo;s birthday celebration dinner tonight at The Dome",
-        bl:[
-          {t:"08:00",dot:"#3d5a3d",ti:"Breakfast &mdash; The Gruff Goat",tg:[["f","Breakfast"]],me:"19&ndash;20 Teviot Place. Scottish breakfast, fresh ingredients. On the route to Holyrood.",mp:"https://maps.google.com/?q=The+Gruff+Goat+Edinburgh",df:{k:"add",tx:"Added specific breakfast on the way to Holyrood."}},
-          {t:"09:30",dot:"#1e3a5f",ti:"Palace of Holyroodhouse",tg:[["s","Palace"],["c","Book online"],["w","~2 hrs"]],me:"Opens 9:30am. State Apartments &middot; Mary QoS rooms &middot; Holyrood Abbey ruins &middot; Gardens. Audio guide free.",mp:"https://maps.google.com/?q=Palace+of+Holyroodhouse",df:{k:"chg",tx:"Pushed 30 min later to 09:30 &mdash; that is when it actually opens."}},
-          {t:"11:30",dot:"#1e3a5f",ti:"Salisbury Crags",tg:[["s","Nature"],["s","Free"],["w","~1 hr"]],me:"Dramatic basalt cliff path in Holyrood Park, direct from the Palace.",mp:"https://maps.google.com/?q=Salisbury+Crags+Edinburgh"},
-          {t:"13:00",dot:"#1e3a5f",ti:"The Meadows",tg:[["s","Park"],["s","Free"],["w","~30 min"]],me:"Cherry blossoms in bloom mid-April.",mp:"https://maps.google.com/?q=The+Meadows+Edinburgh"},
-          {t:"13:30",dot:"#1e3a5f",ti:"Old College &mdash; University of Edinburgh",tg:[["s","Architecture"],["s","Free"],["w","~20 min"]],me:"Robert Adam&rsquo;s neoclassical quad.",mp:"https://maps.google.com/?q=Old+College+University+Edinburgh"},
-          {t:"14:00",dot:"#3d5a3d",ti:"Lunch &mdash; Saturday Farmers Market",tg:[["f","Lunch"]],me:"Castle Terrace and Grassmarket Saturday markets. Street food and artisan produce.",df:{k:"add",tx:"Added: fits naturally between Old College and the afternoon galleries."}},
-          {t:"15:15",dot:"#1e3a5f",ti:"St Mary&rsquo;s Episcopal Cathedral",tg:[["s","Sightseeing"],["s","Free"],["w","~20 min"]],me:"Victorian Gothic, West End.",mp:"https://maps.google.com/?q=St+Marys+Cathedral+Edinburgh"},
-          {t:"16:00",dot:"#1e3a5f",ti:"National Gallery of Modern Art",tg:[["s","Museum"],["s","Free"],["w","~1 hr"]],me:"Modern and contemporary art. Excellent sculpture grounds.",mp:"https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh"},
-          {t:"17:00",dot:"#1e3a5f",ti:"Dean Village + Water of Leith + Circus Lane",tg:[["s","Sightseeing"],["s","Free"],["w","~1 hr"]],me:"Water of Leith path &rarr; Dean Village &rarr; Dean Bridge &rarr; Circus Lane. Exceptional photography.",mp:"https://maps.google.com/?q=Dean+Village+Edinburgh"},
-          {t:"19:30",dot:"#7b4f7a",ti:"Birthday dinner &mdash; The Dome",tg:[["b","Birthday celebration"],["f","Dinner"],["c","Book well ahead"]],me:"14 George Street. Former bank, grand neoclassical interior. Fixed menu from &pound;19.50.",mp:"https://maps.google.com/?q=The+Dome+Edinburgh",df:{k:"kp",tx:"Liana&rsquo;s pick &mdash; The Dome is perfect for a birthday celebration."}}
-        ]
-      },
-      {
-        dow:"Sunday",date:"19 April",title:"Birthday &amp; Departure",
-        note:"Happy Birthday Liana! &hearts; &bull; Check-out 11:00 &bull; Flight 14:15",
-        bday:true,bdn:"Happy Birthday Liana! &hearts;",
-        bl:[
-          {t:"09:30",dot:"#7a6e5f",ti:"Check out &amp; drop bags at Waverley",tg:[["w","Logistics"]],me:"Walk 10 min to Waverley Station left luggage. ~&pound;10 per bag. Frees you for 2+ hrs.",df:{k:"chg",tx:"Added checkout logistics first so the Botanic Garden is bag-free and relaxed."}},
-          {t:"10:00",dot:"#1e3a5f",ti:"Royal Botanic Garden",tg:[["s","Garden"],["s","Free"],["w","~1.5 hrs"]],me:"Opens 10:00am in April. Free entry. Spring blooms, glasshouses, peaceful walks.",mp:"https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh",df:{k:"chg",tx:"Adjusted to 10:00 &mdash; the garden does not open until 10:00am in April."}},
-          {t:"11:45",dot:"#3d5a3d",ti:"Birthday coffee &mdash; Stockbridge",tg:[["b","Birthday morning"],["f","Coffee"],["w","~20 min"]],me:"5 min walk from the Botanic Garden. The Pantry or Kubo Cafe for Liana&rsquo;s birthday morning coffee.",df:{k:"add",tx:"Added: Stockbridge is lovely on a Sunday morning and on the route back."}},
-          {t:"12:30",dot:"#7a6e5f",ti:"Collect bags &amp; head to airport",tg:[["w","Departure"]],me:"Collect from Waverley left luggage. Tram or taxi to Edinburgh Airport &mdash; 30 min. Flight 14:15.",df:{k:"chg",tx:"Added left luggage step &mdash; Liana&rsquo;s plan did not account for the 11:00 checkout."}}
-        ]
-      }
-    ]
-  }
+var lang='en',cv='liana',cd=0;
+var T={
+  en:{ey:'Edinburgh, Scotland',sub:'15 \u2013 19 April 2026',vt0:"Liana's plan",vt1:'Merged suggestions',
+    dows:['Wed','Thu','Fri','Sat','Sun'],maps:'Open in Maps',
+    da:'+\u00a0',dc:'\u007e\u00a0',dk:"Liana's pick \u2014 ",
+    warn_crown:'Crown Room may still be closed April 2026. Check edinburghcastle.scot.',
+    warn_hol:'Opens 9:30am. Closed Tue/Wed. No photography inside.',
+    warn_bot:'Garden opens at 10:00am in April.',
+    tags:{s:'Sightseeing',fr:'Free',lun:'Lunch',din:'Dinner',bkf:'Breakfast',cof:'Coffee',
+      bkd:'Book ahead',sk:'Skip line',tra:'Travel',log:'Logistics',dep:'Departure',ful:'Full day',
+      bdy:'Birthday',cel:'Birthday dinner',mu:'Museum',nat:'Nature',par:'Park',arc:'Architecture',
+      vpt:'Viewpoint',grd:'Garden',pal:'Palace',rel:'Relaxed dinner',spe:'Special dinner'}},
+  pt:{ey:'Edimburgo, Esc\u00f3cia',sub:'15 \u2013 19 de abril de 2026',vt0:'Plano da Liana',vt1:'Vers\u00e3o combinada',
+    dows:['Qua','Qui','Sex','S\u00e1b','Dom'],maps:'Abrir no Maps',
+    da:'+\u00a0',dc:'\u007e\u00a0',dk:'Escolha da Liana \u2014 ',
+    warn_crown:'A Sala da Coroa pode estar fechada em abril 2026. Confirme em edinburghcastle.scot.',
+    warn_hol:'Abre \u00e0s 9:30. Fechado ter/qua. Fotos n\u00e3o permitidas.',
+    warn_bot:'O jardim abre \u00e0s 10:00 em abril.',
+    tags:{s:'Passeio',fr:'Gr\u00e1tis',lun:'Almo\u00e7o',din:'Jantar',bkf:'Caf\u00e9 da manh\u00e3',cof:'Caf\u00e9',
+      bkd:'Reserve antes',sk:'Fura fila',tra:'Transporte',log:'Log\u00edstica',dep:'Partida',ful:'Dia inteiro',
+      bdy:'Anivers\u00e1rio',cel:'Jantar de anivers\u00e1rio',mu:'Museu',nat:'Natureza',par:'Parque',arc:'Arquitetura',
+      vpt:'Mirante',grd:'Jardim',pal:'Pal\u00e1cio',rel:'Jantar tranquilo',spe:'Jantar especial'}}
 };
 
-var cv='liana',cd=0;
+var D={
+  liana:{days:[
+    {de:'Wednesday, 15 April',dp:'Quarta-feira, 15 de abril',
+     te:'Arrival & Old Town',tp:'Chegada e Cidade Velha',
+     ne:'Accommodation: 2 Upper Bow \u00b7 Check-in 15:00',np:'Hospedagem: 2 Upper Bow \u00b7 Check-in 15:00',
+     bday:false,bl:[
+      {t:'~14:00',dot:'#7a6e5f',ie:'Arrive Edinburgh',ip:'Chegada a Edimburgo',tg:['tra'],
+       me:'Walk or taxi to 2 Upper Bow.',mp:'Taxi ou a p\u00e9 at\u00e9 o 2 Upper Bow.'},
+      {t:'15:30',dot:'#3d5a3d',ie:'Late lunch \u2014 Cold Town House',ip:'Almo\u00e7o tardio \u2014 Cold Town House',tg:['lun','bkd'],
+       me:'Grassmarket. Craft beer, Neapolitan pizza, rooftop with castle views.',
+       mp:'Grassmarket. Cervejas artesanais, pizza napolitana, terraço com vista para o castelo.',
+       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh'},
+      {t:'16:45',dot:'#3d5a3d',ie:'Coffee \u2014 The Elephant House',ip:'Caf\u00e9 \u2014 The Elephant House',tg:['cof'],
+       me:'The Harry Potter inspiration cafe. Victoria Street area.',
+       mp:'O caf\u00e9 que inspirou Harry Potter. Regi\u00e3o da Victoria Street.',
+       url:'https://maps.google.com/?q=The+Elephant+House+Edinburgh'},
+      {t:'17:30',dot:'#1e3a5f',ie:'Old Town walk',ip:'Passeio pela Cidade Velha',tg:['s','fr'],
+       me:"Victoria Street \u00b7 Grassmarket \u00b7 Vennel Viewpoint \u00b7 Greyfriars Bobby",
+       mp:"Victoria Street \u00b7 Grassmarket \u00b7 Mirante do Vennel \u00b7 Greyfriars Bobby",
+       url:'https://maps.google.com/?q=Victoria+Street+Edinburgh'},
+      {t:'18:30',dot:'#1e3a5f',ie:"St Giles' Cathedral",ip:'Catedral de St Giles',tg:['s','fr'],
+       me:'Gothic cathedral on the Royal Mile. Thistle Chapel inside.',
+       mp:'Catedral g\u00f3tica no Royal Mile. Inclui a Capela do Cardo.',
+       url:'https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh'},
+      {t:'19:00',dot:'#1e3a5f',ie:'Royal Mile closes walk',ip:'Closes do Royal Mile',tg:['s','fr'],
+       me:"Dunbar's Close \u00b7 Bakehouse Close \u00b7 White Horse Close",
+       mp:"Dunbar's Close \u00b7 Bakehouse Close \u00b7 White Horse Close",
+       url:'https://maps.google.com/?q=Royal+Mile+Edinburgh'},
+      {t:'20:00',dot:'#3d5a3d',ie:'Dinner \u2014 Petit Paris',ip:'Jantar \u2014 Petit Paris',tg:['din','bkd'],
+       me:'French bistro on the Grassmarket. Beef bourguignon, mussels, creme brulee. No spicy food.',
+       mp:'Bistr\u00f4 franc\u00eas no Grassmarket. Boeuf bourguignon, mexilh\u00f5es, cr\u00e8me br\u00fbl\u00e9e. Sem pimenta.',
+       url:'https://maps.google.com/?q=Petit+Paris+Grassmarket+Edinburgh'}
+    ]},
+    {de:'Thursday, 16 April',dp:'Quinta-feira, 16 de abril',
+     te:'Castle + New Town',tp:'Castelo + Nova Cidade',
+     ne:'Skip-the-line pass purchased \u00b7 Book 09:45 tour slot',
+     np:'Ingresso fura-fila comprado \u00b7 Reserve o tour das 09:45',
+     bday:false,bl:[
+      {t:'08:00',dot:'#3d5a3d',ie:'Breakfast',ip:'Caf\u00e9 da manh\u00e3',tg:['bkf'],
+       me:'Near the hotel.',mp:'Pr\u00f3ximo ao hotel.'},
+      {t:'10:00',dot:'#1e3a5f',ie:'Edinburgh Castle',ip:'Castelo de Edimburgo',tg:['s','sk'],
+       me:"Great Hall \u00b7 St Margaret's Chapel \u00b7 Mons Meg \u00b7 National War Museum \u00b7 1 o'clock gun (13:00)",
+       mp:"Great Hall \u00b7 Capela St Margaret \u00b7 Mons Meg \u00b7 Museu Nacional de Guerra \u00b7 tiro do can\u00e3o (13:00)",
+       url:'https://maps.google.com/?q=Edinburgh+Castle',wa:'warn_crown'},
+      {t:'12:30',dot:'#1e3a5f',ie:'Princes Street Gardens',ip:'Jardins de Princes Street',tg:['s','fr'],
+       me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument',
+       mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott',
+       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh'},
+      {t:'13:30',dot:'#3d5a3d',ie:'Coffee \u2014 Starbucks Princes Street',ip:'Caf\u00e9 \u2014 Starbucks Princes Street',tg:['cof'],
+       me:'Castle views from the window.',mp:'Vista para o castelo pela janela.',
+       url:'https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh'},
+      {t:'14:30',dot:'#3d5a3d',ie:'Lunch',ip:'Almo\u00e7o',tg:['lun'],
+       me:'Flexible \u2014 New Town area.',mp:'Flex\u00edvel \u2014 regi\u00e3o da Nova Cidade.'},
+      {t:'15:30',dot:'#1e3a5f',ie:'National Gallery + Portrait Gallery',ip:'Galeria Nacional + Galeria de Retratos',tg:['mu','fr'],
+       me:'Scottish National Gallery (The Mound) + Portrait Gallery (Queen St). Both free.',
+       mp:'Galeria Nacional Escocesa (The Mound) + Galeria de Retratos (Queen St). Ambas gr\u00e1tis.',
+       url:'https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh'},
+      {t:'17:45',dot:'#1e3a5f',ie:'Calton Hill sunset',ip:'P\u00f4r do sol no Calton Hill',tg:['vpt','fr'],
+       me:'Panoramic views across Edinburgh. Easy 10-min climb.',
+       mp:'Vista panor\u00e2mica de Edimburgo. Subida f\u00e1cil de 10 min.',
+       url:'https://maps.google.com/?q=Calton+Hill+Edinburgh'},
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Under The Table',ip:'Jantar \u2014 Under The Table',tg:['din','bkd'],
+       me:'Dundas Street. Modern European, seasonal Scottish ingredients. 4.9 stars. No spice.',
+       mp:'Dundas Street. Culin\u00e1ria europeia moderna, ingredientes escoceses sazonais. 4.9 estrelas. Sem pimenta.',
+       url:'https://maps.google.com/?q=Under+The+Table+Edinburgh'}
+    ]},
+    {de:'Friday, 17 April',dp:'Sexta-feira, 17 de abril',
+     te:'Outlander Tour',tp:'Tour Outlander',
+     ne:'Full day \u00b7 Departs ~09:00 from Royal Mile',np:'Dia inteiro \u00b7 Sa\u00edda ~09:00 do Royal Mile',
+     bday:false,bl:[
+      {t:'08:00',dot:'#3d5a3d',ie:'Quick breakfast',ip:'Caf\u00e9 da manh\u00e3 r\u00e1pido',tg:['bkf'],
+       me:'Light meal before tour pickup.',mp:'Refei\u00e7\u00e3o leve antes do tour.'},
+      {t:'08:45',dot:'#7b4f7a',ie:'Outlander Tour departs',ip:'Tour Outlander parte',tg:['ful'],
+       me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
+       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.'},
+      {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:''},
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['rel'],
+       me:'Relaxed dinner back at the Grassmarket favourite.',
+       mp:'Jantar tranquilo no favorito do Grassmarket.',
+       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh'}
+    ]},
+    {de:'Saturday, 18 April',dp:'S\u00e1bado, 18 de abril',
+     te:'Palace + Nature + Art',tp:'Pal\u00e1cio + Natureza + Arte',
+     ne:'The most packed day \u2014 start early',np:'O dia mais cheio \u2014 comece cedo',
+     bday:true,
+     bne:"Liana's birthday celebration dinner tonight at The Dome",
+     bnp:'Jantar de anivers\u00e1rio da Liana hoje \u00e0 noite no The Dome',
+     bl:[
+      {t:'08:00',dot:'#3d5a3d',ie:'Breakfast',ip:'Caf\u00e9 da manh\u00e3',tg:['bkf'],me:'Near hotel.',mp:'Pr\u00f3ximo ao hotel.'},
+      {t:'09:00',dot:'#1e3a5f',ie:'Palace of Holyroodhouse',ip:'Pal\u00e1cio de Holyroodhouse',tg:['pal','bkd'],
+       me:"State Apartments \u00b7 Mary Queen of Scots' rooms \u00b7 Holyrood Abbey ruins \u00b7 Gardens. Free audio guide.",
+       mp:"Aposentos de Estado \u00b7 C\u00f2modos de Maria \u00b7 Ru\u00ednas da Abadia de Holyrood \u00b7 Jardins. Audio guia gr\u00e1tis.",
+       url:'https://maps.google.com/?q=Palace+of+Holyroodhouse',no:'warn_hol'},
+      {t:'11:00',dot:'#1e3a5f',ie:'Salisbury Crags',ip:'Penhascos de Salisbury',tg:['nat','fr'],
+       me:'Dramatic basalt cliff walk in Holyrood Park. Spectacular views.',
+       mp:'Caminhada pelos penhascos de basalto no Parque de Holyrood. Vistas espetaculares.',
+       url:'https://maps.google.com/?q=Salisbury+Crags+Edinburgh'},
+      {t:'13:30',dot:'#1e3a5f',ie:'The Meadows',ip:'The Meadows',tg:['par','fr'],
+       me:'Cherry blossoms in bloom mid-April.',mp:'Cerejeiras em flor em meados de abril.',
+       url:'https://maps.google.com/?q=The+Meadows+Edinburgh'},
+      {t:'14:30',dot:'#1e3a5f',ie:'Old College \u2014 University of Edinburgh',ip:'Old College \u2014 Universidade de Edimburgo',tg:['arc','fr'],
+       me:"Robert Adam's neoclassical quad. Free to enter.",
+       mp:'Quadr\u00e2ngulo neocl\u00e1ssico de Robert Adam. Entrada livre.',
+       url:'https://maps.google.com/?q=Old+College+University+of+Edinburgh'},
+      {t:'15:15',dot:'#1e3a5f',ie:"St Mary's Episcopal Cathedral",ip:'Catedral Episcopal de St Mary',tg:['s','fr'],
+       me:'Victorian Gothic cathedral, West End. Stunning interior.',
+       mp:'Catedral g\u00f3tica vitoriana, West End. Interior deslumbrante.',
+       url:"https://maps.google.com/?q=St+Mary+Cathedral+Edinburgh"},
+      {t:'16:00',dot:'#1e3a5f',ie:'National Gallery of Modern Art',ip:'Galeria Nacional de Arte Moderna',tg:['mu','fr'],
+       me:'Modern and contemporary art. Beautiful grounds. Free entry.',
+       mp:'Arte moderna e contempor\u00e2nea. Jardins lindos. Entrada livre.',
+       url:'https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh'},
+      {t:'17:00',dot:'#1e3a5f',ie:'Dean Village + Water of Leith',ip:'Dean Village + Water of Leith',tg:['s','fr'],
+       me:'Hidden medieval village. Riverside path. Dean Bridge viewpoint.',
+       mp:'Vila medieval escondida. Trilha ribeirinha. Mirante da Ponte Dean.',
+       url:'https://maps.google.com/?q=Dean+Village+Edinburgh'},
+      {t:'17:45',dot:'#1e3a5f',ie:'Circus Lane',ip:'Circus Lane',tg:['s','fr'],
+       me:'Cobbled lane in Stockbridge. Pastel doors, incredibly photogenic.',
+       mp:'Rua de paralelepipedos em Stockbridge. Portas coloridas, muito fot\u00f3gena.',
+       url:'https://maps.google.com/?q=Circus+Lane+Edinburgh'},
+      {t:'19:30',dot:'#7b4f7a',ie:'Birthday dinner \u2014 The Dome',ip:'Jantar de anivers\u00e1rio \u2014 The Dome',tg:['cel','bkd'],
+       me:'14 George Street. Former bank, grand neoclassical interior. Fixed menu from \u00a319.50.',
+       mp:'14 George Street. Antigo banco, interior grandioso. Menu fixo a partir de \u00a319.50.',
+       url:'https://maps.google.com/?q=The+Dome+Edinburgh'}
+    ]},
+    {de:'Sunday, 19 April',dp:'Domingo, 19 de abril',
+     te:'Birthday & Departure',tp:'Anivers\u00e1rio e Partida',
+     ne:'Happy Birthday Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Flight 14:15',
+     np:'Feliz Anivers\u00e1rio Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Voo 14:15',
+     bday:true,bne:'Happy Birthday Liana! \u2665',bnp:'Feliz Anivers\u00e1rio Liana! \u2665',
+     bl:[
+      {t:'09:00',dot:'#1e3a5f',ie:'Royal Botanic Garden',ip:'Jardim Bot\u00e2nico',tg:['grd','fr'],
+       me:'World-class garden. Beautiful in April with spring blooms.',
+       mp:'Jardim bot\u00e2nico de classe mundial. Lindo em abril com flores da primavera.',
+       url:'https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh',wa:'warn_bot'},
+      {t:'11:00',dot:'#7a6e5f',ie:'Coffee and pack up',ip:'Caf\u00e9 e arruma\u00e7\u00f5es',tg:['log'],
+       me:'Check out by 11:00.',mp:'Check-out at\u00e9 11:00.'},
+      {t:'~12:30',dot:'#7a6e5f',ie:'Head to airport',ip:'Ir ao aeroporto',tg:['dep'],
+       me:'30-40 min to Edinburgh Airport. Flight 14:15 \u2014 arrive by 12:45.',
+       mp:'30-40 min at\u00e9 o aeroporto. Voo 14:15 \u2014 chegar at\u00e9 12:45.',
+       url:'https://maps.google.com/?q=Edinburgh+Airport'}
+    ]}
+  ]},
+  merged:{days:[
+    {de:'Wednesday, 15 April',dp:'Quarta-feira, 15 de abril',
+     te:'Arrival & Old Town',tp:'Chegada e Cidade Velha',
+     ne:'Check-in 15:00 \u00b7 2 Upper Bow, Old Town',np:'Check-in 15:00 \u00b7 2 Upper Bow, Cidade Velha',
+     bday:false,bl:[
+      {t:'~14:30',dot:'#7a6e5f',ie:'Arrive Edinburgh Waverley',ip:'Chegada na Waverley',tg:['tra'],
+       me:'10 min walk uphill to 2 Upper Bow, or taxi ~\u00a35.',
+       mp:'10 min a p\u00e9 morro acima, ou t\u00e1xi ~\u00a35.'},
+      {t:'15:30',dot:'#3d5a3d',ie:'Late lunch \u2014 Cold Town House',ip:'Almo\u00e7o tardio \u2014 Cold Town House',tg:['lun','bkd'],
+       me:'Grassmarket. Craft beer, pizza, rooftop with castle views. New retractable roof.',
+       mp:'Grassmarket. Cerveja artesanal, pizza, terraço com vista do castelo. Novo telhado retr\u00e1til.',
+       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh',
+       df:{k:'kp',en:"Liana's pick \u2014 excellent, especially with the new all-weather rooftop.",
+           pt:'Escolha da Liana \u2014 \u00f3timo, especialmente com o novo telhado imperme\u00e1vel.'}},
+      {t:'16:45',dot:'#1e3a5f',ie:"St Giles' Cathedral first",ip:'Catedral de St Giles primeiro',tg:['s','fr'],
+       me:"Do this before the closes \u2014 closes around 19:00. Gothic interior, Thistle Chapel.",
+       mp:"Fa\u00e7a isso antes das closes \u2014 fecha ~19:00. Interior g\u00f3tico, Capela do Cardo.",
+       url:'https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh',
+       df:{k:'chg',en:'Moved earlier \u2014 Liana had it at 18:30 but it closes ~19:00.',
+           pt:'Adiantado \u2014 Liana havia marcado para 18:30 mas fecha ~19:00.'}},
+      {t:'17:20',dot:'#1e3a5f',ie:'Old Town walk: closes & Victoria Street',ip:'Passeio: closes e Victoria Street',tg:['s','fr'],
+       me:"Victoria Street \u00b7 Grassmarket \u00b7 Vennel Viewpoint \u00b7 Greyfriars Bobby \u00b7 Dunbar's Close \u00b7 White Horse Close",
+       mp:"Victoria Street \u00b7 Grassmarket \u00b7 Mirante Vennel \u00b7 Greyfriars Bobby \u00b7 Dunbar's Close \u00b7 White Horse Close",
+       url:'https://maps.google.com/?q=Victoria+Street+Edinburgh',
+       df:{k:'chg',en:"Combined Liana's two walks into one flowing route.",
+           pt:'Combinou os dois passeios da Liana em um roteiro \u00fanico.'}},
+      {t:'18:30',dot:'#3d5a3d',ie:'Quick coffee \u2014 The Elephant House',ip:'Caf\u00e9 r\u00e1pido \u2014 The Elephant House',tg:['cof'],
+       me:'Harry Potter connection \u2014 atmosphere and a photo, not a full sit-down.',
+       mp:'Liga\u00e7\u00e3o com Harry Potter \u2014 atmosfera e foto, n\u00e3o uma parada longa.',
+       url:'https://maps.google.com/?q=The+Elephant+House+Edinburgh',
+       df:{k:'chg',en:'Kept but shortened. Food unremarkable \u2014 go for the experience.',
+           pt:'Mantido mas encurtado. Comida sem destaque \u2014 v\u00e1 pela experi\u00eancia.'}},
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Petit Paris',ip:'Jantar \u2014 Petit Paris',tg:['din','bkd'],
+       me:'French bistro, Grassmarket. Beef bourguignon, mussels, creme brulee. No spicy food.',
+       mp:'Bistr\u00f4 franc\u00eas, Grassmarket. Boeuf bourguignon, mexilh\u00f5es, cr\u00e8me br\u00fbl\u00e9e. Sem pimenta.',
+       url:'https://maps.google.com/?q=Petit+Paris+Grassmarket+Edinburgh',
+       df:{k:'add',en:'Best first dinner \u2014 cosy, no spice, great castle location.',
+           pt:'Melhor primeiro jantar \u2014 aconchegante, sem pimenta, perto do castelo.'}}
+    ]},
+    {de:'Thursday, 16 April',dp:'Quinta-feira, 16 de abril',
+     te:'Castle + New Town',tp:'Castelo + Nova Cidade',
+     ne:'Skip-the-line pass \u00b7 Book 09:45 tour slot',np:'Fura-fila \u00b7 Reserve o tour das 09:45',
+     bday:false,bl:[
+      {t:'08:00',dot:'#3d5a3d',ie:'Breakfast \u2014 near hotel',ip:'Caf\u00e9 da manh\u00e3 \u2014 pr\u00f3ximo ao hotel',tg:['bkf'],
+       me:'Early start needed today.',mp:'Sa\u00edda cedo hoje.'},
+      {t:'09:15',dot:'#7a6e5f',ie:'Walk to Edinburgh Castle',ip:'Caminhada at\u00e9 o Castelo',tg:['tra'],
+       me:'Castle is at the top of the Royal Mile \u2014 your street.',
+       mp:'O castelo fica no topo do Royal Mile \u2014 sua rua.'},
+      {t:'09:30',dot:'#1e3a5f',ie:'Edinburgh Castle',ip:'Castelo de Edimburgo',tg:['s','sk'],
+       me:"Great Hall \u00b7 St Margaret's Chapel \u00b7 Mons Meg \u00b7 National War Museum \u00b7 1 o'clock gun at 13:00. Book 09:45 tour.",
+       mp:"Great Hall \u00b7 Capela St Margaret \u00b7 Mons Meg \u00b7 Museu Guerra \u00b7 tiro can\u00e3o \u00e0s 13:00. Reserve tour 09:45.",
+       url:'https://maps.google.com/?q=Edinburgh+Castle',wa:'warn_crown',
+       df:{k:'chg',en:'Moved from 10:00 to 09:30. Skip-the-line means straight in at opening.',
+           pt:'Adiantado de 10:00 para 09:30. Fura-fila significa entrar direto na abertura.'}},
+      {t:'12:30',dot:'#1e3a5f',ie:'Princes Street Gardens',ip:'Jardins de Princes Street',tg:['s','fr'],
+       me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument.',
+       mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott.',
+       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh'},
+      {t:'13:15',dot:'#3d5a3d',ie:'Lunch \u2014 independent cafe',ip:'Almo\u00e7o \u2014 caf\u00e9 independente',tg:['lun'],
+       me:'Skip the Starbucks. Good options along Princes Street and at the National Gallery cafe.',
+       mp:'Pule o Starbucks. Boas op\u00e7\u00f5es na Princes Street e no caf\u00e9 da Galeria Nacional.',
+       df:{k:'chg',en:'Replaced Starbucks. Same view, much better food.',
+           pt:'Substituiu o Starbucks. Mesma vista, comida muito melhor.'}},
+      {t:'14:30',dot:'#1e3a5f',ie:'National Gallery + Portrait Gallery',ip:'Galeria Nacional + Galeria de Retratos',tg:['mu','fr'],
+       me:'Scottish National Gallery (The Mound) \u2014 Vel\u00e1zquez, Rembrandt. Portrait Gallery (Queen St).',
+       mp:'Galeria Nacional Escocesa (The Mound) \u2014 Vel\u00e1zquez, Rembrandt. Galeria de Retratos (Queen St).',
+       url:'https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh'},
+      {t:'19:30',dot:'#1e3a5f',ie:'Calton Hill at sunset',ip:'P\u00f4r do sol no Calton Hill',tg:['vpt','fr'],
+       me:'Sunset ~20:15 in mid-April. National Monument, panoramic city views.',
+       mp:'P\u00f4r do sol ~20:15 em meados de abril. Monumento Nacional, vista panor\u00e2mica.',
+       url:'https://maps.google.com/?q=Calton+Hill+Edinburgh',
+       df:{k:'chg',en:'Moved from 17:45 to 19:30 for actual golden hour. Worth the wait.',
+           pt:'Adiantado de 17:45 para 19:30 para a hora dourada real. Vale a pena.'}},
+      {t:'20:30',dot:'#3d5a3d',ie:'Dinner \u2014 Under The Table',ip:'Jantar \u2014 Under The Table',tg:['din','bkd'],
+       me:'Dundas Street. Modern European. 4.9 stars. No spice. Seasonal Scottish ingredients.',
+       mp:'Dundas Street. Europeia moderna. 4.9 estrelas. Sem pimenta. Ingredientes escoceses sazonais.',
+       url:'https://maps.google.com/?q=Under+The+Table+Edinburgh',
+       df:{k:'add',en:'Replaces Dishoom. No spice, even higher rated, same area.',
+           pt:'Substitui o Dishoom. Sem pimenta, nota ainda mais alta, mesma regi\u00e3o.'}}
+    ]},
+    {de:'Friday, 17 April',dp:'Sexta-feira, 17 de abril',
+     te:'Outlander Tour',tp:'Tour Outlander',
+     ne:"No changes from Liana's plan \u2014 perfect as is",
+     np:'Sem altera\u00e7\u00f5es do plano da Liana \u2014 perfeito assim',
+     bday:false,bl:[
+      {t:'08:00',dot:'#3d5a3d',ie:'Quick breakfast',ip:'Caf\u00e9 da manh\u00e3 r\u00e1pido',tg:['bkf'],
+       me:'Light breakfast before tour pickup.',mp:'Caf\u00e9 leve antes do tour.'},
+      {t:'08:45',dot:'#7b4f7a',ie:'Outlander Tour departs',ip:'Tour Outlander parte',tg:['ful'],
+       me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
+       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.'},
+      {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:''},
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['rel'],
+       me:'Perfect relaxed dinner after a long day out.',mp:'Jantar tranquilo perfeito ap\u00f3s um dia longo.',
+       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh',
+       df:{k:'kp',en:"Liana's pick kept \u2014 ideal after the tour.",pt:'Escolha da Liana mantida \u2014 ideal ap\u00f3s o tour.'}}
+    ]},
+    {de:'Saturday, 18 April',dp:'S\u00e1bado, 18 de abril',
+     te:'Palace + Nature + Art',tp:'Pal\u00e1cio + Natureza + Arte',
+     ne:"Liana's Saturday is excellent \u2014 minor additions only",
+     np:'O s\u00e1bado da Liana \u00e9 excelente \u2014 apenas pequenos acr\u00e9scimos',
+     bday:true,
+     bne:"Liana's birthday celebration dinner tonight at The Dome",
+     bnp:'Jantar de anivers\u00e1rio da Liana hoje \u00e0 noite no The Dome',
+     bl:[
+      {t:'08:00',dot:'#3d5a3d',ie:'Breakfast \u2014 The Gruff Goat',ip:'Caf\u00e9 da manh\u00e3 \u2014 The Gruff Goat',tg:['bkf'],
+       me:'19-20 Teviot Place. Scottish breakfast, fresh ingredients. On the route to Holyrood.',
+       mp:'19-20 Teviot Place. Caf\u00e9 escoces, ingredientes frescos. No caminho para Holyrood.',
+       url:'https://maps.google.com/?q=The+Gruff+Goat+Edinburgh',
+       df:{k:'add',en:'Added specific breakfast on the way to Holyrood.',pt:'Caf\u00e9 espec\u00edfico adicionado no caminho para Holyrood.'}},
+      {t:'09:30',dot:'#1e3a5f',ie:'Palace of Holyroodhouse',ip:'Pal\u00e1cio de Holyroodhouse',tg:['pal','bkd'],
+       me:"Opens 9:30am. State Apartments \u00b7 Mary QoS rooms \u00b7 Holyrood Abbey ruins \u00b7 Gardens. Free audio guide.",
+       mp:"Abre \u00e0s 9:30. Aposentos de Estado \u00b7 C\u00f2modos de Maria \u00b7 Ru\u00ednas da Abadia \u00b7 Jardins. Audio guia gr\u00e1tis.",
+       url:'https://maps.google.com/?q=Palace+of+Holyroodhouse',
+       df:{k:'chg',en:'Pushed 30 min later to 09:30 \u2014 that is when it actually opens.',
+           pt:'Adiantado 30 min para 09:30 \u2014 quando o pal\u00e1cio realmente abre.'}},
+      {t:'11:30',dot:'#1e3a5f',ie:'Salisbury Crags',ip:'Penhascos de Salisbury',tg:['nat','fr'],
+       me:'Dramatic basalt cliff path in Holyrood Park, direct from the Palace.',
+       mp:'Trilha pelos penhascos no Parque de Holyrood, direto do Pal\u00e1cio.',
+       url:'https://maps.google.com/?q=Salisbury+Crags+Edinburgh'},
+      {t:'13:00',dot:'#1e3a5f',ie:'The Meadows',ip:'The Meadows',tg:['par','fr'],
+       me:'Cherry blossoms in bloom mid-April.',mp:'Cerejeiras em flor em meados de abril.',
+       url:'https://maps.google.com/?q=The+Meadows+Edinburgh'},
+      {t:'13:30',dot:'#1e3a5f',ie:'Old College \u2014 University of Edinburgh',ip:'Old College \u2014 Universidade de Edimburgo',tg:['arc','fr'],
+       me:"Robert Adam's neoclassical quad.",mp:'Quadr\u00e2ngulo neocl\u00e1ssico de Robert Adam.',
+       url:'https://maps.google.com/?q=Old+College+University+Edinburgh'},
+      {t:'14:00',dot:'#3d5a3d',ie:'Lunch \u2014 Saturday Farmers Market',ip:'Almo\u00e7o \u2014 Feira do Produtor',tg:['lun'],
+       me:'Castle Terrace and Grassmarket Saturday markets. Street food and artisan produce.',
+       mp:'Feiras do s\u00e1bado no Castle Terrace e Grassmarket. Comida de rua e produtos artesanais.',
+       df:{k:'add',en:'Added: fits naturally between Old College and the galleries.',
+           pt:'Adicionado: encaixa entre o Old College e as galerias.'}},
+      {t:'15:15',dot:'#1e3a5f',ie:"St Mary's Episcopal Cathedral",ip:'Catedral Episcopal de St Mary',tg:['s','fr'],
+       me:'Victorian Gothic, West End.',mp:'G\u00f3tico vitoriano, West End.',
+       url:"https://maps.google.com/?q=St+Mary+Cathedral+Edinburgh"},
+      {t:'16:00',dot:'#1e3a5f',ie:'National Gallery of Modern Art',ip:'Galeria Nacional de Arte Moderna',tg:['mu','fr'],
+       me:'Modern and contemporary art. Excellent sculpture grounds.',
+       mp:'Arte moderna e contempor\u00e2nea. Jardins de escultura excelentes.',
+       url:'https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh'},
+      {t:'17:00',dot:'#1e3a5f',ie:'Dean Village + Water of Leith + Circus Lane',ip:'Dean Village + Water of Leith + Circus Lane',tg:['s','fr'],
+       me:'Water of Leith path \u2192 Dean Village \u2192 Dean Bridge \u2192 Circus Lane. Exceptional photography.',
+       mp:'Trilha Water of Leith \u2192 Dean Village \u2192 Ponte Dean \u2192 Circus Lane. Fotografia excepcional.',
+       url:'https://maps.google.com/?q=Dean+Village+Edinburgh'},
+      {t:'19:30',dot:'#7b4f7a',ie:'Birthday dinner \u2014 The Dome',ip:'Jantar de anivers\u00e1rio \u2014 The Dome',tg:['cel','bkd'],
+       me:'14 George Street. Former bank, grand neoclassical interior. Fixed menu from \u00a319.50.',
+       mp:'14 George Street. Antigo banco, interior grandioso. Menu fixo a partir de \u00a319.50.',
+       url:'https://maps.google.com/?q=The+Dome+Edinburgh',
+       df:{k:'kp',en:"Liana's pick \u2014 The Dome is perfect for a birthday celebration.",
+           pt:'Escolha da Liana \u2014 The Dome \u00e9 perfeito para celebrar o anivers\u00e1rio.'}}
+    ]},
+    {de:'Sunday, 19 April',dp:'Domingo, 19 de abril',
+     te:'Birthday & Departure',tp:'Anivers\u00e1rio e Partida',
+     ne:'Happy Birthday Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Flight 14:15',
+     np:'Feliz Anivers\u00e1rio Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Voo 14:15',
+     bday:true,bne:'Happy Birthday Liana! \u2665',bnp:'Feliz Anivers\u00e1rio Liana! \u2665',
+     bl:[
+      {t:'09:30',dot:'#7a6e5f',ie:'Check out & drop bags at Waverley',ip:'Check-out e guarda-volumes na Waverley',tg:['log'],
+       me:'Walk 10 min to Waverley Station left luggage. ~\u00a310 per bag. Frees you for 2+ hrs.',
+       mp:'10 min a p\u00e9 at\u00e9 a guarda-volumes da Waverley. ~\u00a310 por mala. Libera 2+ horas.',
+       df:{k:'chg',en:'Added checkout logistics first so the Botanic Garden is bag-free.',
+           pt:'Log\u00edstica de check-out primeiro para visitar o jardim sem malas.'}},
+      {t:'10:00',dot:'#1e3a5f',ie:'Royal Botanic Garden',ip:'Jardim Bot\u00e2nico',tg:['grd','fr'],
+       me:'Opens 10:00am in April. Free entry. Spring blooms, glasshouses, peaceful walks.',
+       mp:'Abre \u00e0s 10:00 em abril. Entrada gr\u00e1tis. Flores da primavera, estufas, caminhadas tranquilas.',
+       url:'https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh',
+       df:{k:'chg',en:"Adjusted to 10:00 \u2014 garden doesn't open until 10:00am in April.",
+           pt:'Ajustado para 10:00 \u2014 o jardim n\u00e3o abre antes das 10:00 em abril.'}},
+      {t:'11:45',dot:'#3d5a3d',ie:'Birthday coffee \u2014 Stockbridge',ip:'Caf\u00e9 de anivers\u00e1rio \u2014 Stockbridge',tg:['bdy','cof'],
+       me:"5 min walk from the Botanic Garden. The Pantry or Kubo Cafe for Liana's birthday morning coffee.",
+       mp:'5 min a p\u00e9 do Jardim Bot\u00e2nico. The Pantry ou Kubo Cafe para o caf\u00e9 do anivers\u00e1rio da Liana.',
+       df:{k:'add',en:'Added: Stockbridge is lovely on a Sunday morning.',pt:'Adicionado: Stockbridge \u00e9 lindo numa manh\u00e3 de domingo.'}},
+      {t:'12:30',dot:'#7a6e5f',ie:'Collect bags & head to airport',ip:'Pegar malas e ir ao aeroporto',tg:['dep'],
+       me:'Collect from Waverley left luggage. Tram or taxi \u2014 30 min. Flight 14:15.',
+       mp:'Retirar da guarda-volumes da Waverley. Bonde ou t\u00e1xi \u2014 30 min. Voo 14:15.',
+       url:'https://maps.google.com/?q=Edinburgh+Airport',
+       df:{k:'chg',en:"Added left luggage step \u2014 Liana's plan didn't account for 11:00 checkout.",
+           pt:"Passo da guarda-volumes adicionado \u2014 o plano da Liana n\u00e3o considerava o check-out \u00e0s 11:00."}}
+    ]}
+  ]}
+};
+
+function gtag(key){
+  var tgs=T[lang].tags;
+  var cls={s:'s',fr:'s',lun:'f',din:'f',bkf:'f',cof:'f',rel:'f',spe:'f',cel:'b',bdy:'b',
+    bkd:'c',sk:'c',tra:'w',log:'w',dep:'w',ful:'m',mu:'s',nat:'s',par:'s',arc:'s',vpt:'s',grd:'s',pal:'s'};
+  return{label:tgs[key]||'',cls:cls[key]||'w'};
+}
+
+function setL(l){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(function(b,i){b.classList.toggle('on',(i===0&&l==='en')||(i===1&&l==='pt'));});
+  var t=T[l];
+  document.getElementById('ey').textContent=t.ey;
+  document.getElementById('ts').textContent=t.sub;
+  document.getElementById('vt0').textContent=t.vt0;
+  document.getElementById('vt1').textContent=t.vt1;
+  t.dows.forEach(function(d,i){document.getElementById('dw'+i).textContent=d;});
+  render();
+}
 
 function setV(v){
   cv=v;
   document.querySelectorAll('.vtab').forEach(function(b,i){b.classList.toggle('on',(i===0&&v==='liana')||(i===1&&v==='merged'));});
   render();
 }
+
 function sd(i){
   cd=i;
   document.querySelectorAll('.daybtn').forEach(function(b,j){b.classList.toggle('on',j===i);});
-  var el=document.getElementById('content');
-  el.scrollTop=0;
+  document.getElementById('content').scrollTop=0;
   render();
 }
 
 function render(){
   var day=D[cv].days[cd];
   var isMerged=cv==='merged';
+  var l=lang;
+  var t=T[l];
   var h='';
 
   h+='<div class="day-hdr"><div class="dh-in">';
-  h+='<div class="dh-eye">'+day.dow+' &middot; '+day.date+'</div>';
-  h+='<div class="dh-title">'+day.title+'</div>';
-  h+='<div class="dh-note">'+day.note+'</div>';
-  if(day.bday)h+='<div class="bday-strip">'+day.bdn+'</div>';
-  h+='</div></div>';
+  h+='<div class="dh-eye">'+(l==='en'?day.de:day.dp)+'</div>';
+  h+='<div class="dh-title">'+(l==='en'?day.te:day.tp)+'</div>';
+  h+='<div class="dh-note">'+(l==='en'?day.ne:day.np)+'</div>';
+  if(day.bday) h+='<div class="bday-strip">'+(l==='en'?day.bne:day.bnp)+'</div>';
+  h+='</div></div><div class="tl">';
 
-  h+='<div class="tl">';
   day.bl.forEach(function(b,bi){
     var last=bi===day.bl.length-1;
-    h+='<div class="tb">';
-    h+='<div class="tb-left"><div class="tb-time">'+b.t+'</div><div class="tb-dot-col"><div class="tb-dot" style="background:'+b.dot+'"></div>'+(last?'':'<div class="tb-line"></div>')+'</div></div>';
-    h+='<div class="tb-body">';
-    h+='<div class="tb-title">'+b.ti+'</div>';
-    if(b.tg){h+='<div class="tb-tags">';b.tg.forEach(function(tg){h+='<span class="tb-tag '+tg[0]+'">'+tg[1]+'</span>';});h+='</div>';}
-    if(b.me)h+='<div class="tb-meta">'+b.me+'</div>';
-    if(b.wa)h+='<div class="tb-warn">'+b.wa+'</div>';
-    if(b.no)h+='<div class="tb-note">'+b.no+'</div>';
+    h+='<div class="tb"><div class="tb-left"><div class="tb-time">'+b.t+'</div>';
+    h+='<div class="tb-dot-col"><div class="tb-dot" style="background:'+b.dot+'"></div>';
+    if(!last) h+='<div class="tb-line"></div>';
+    h+='</div></div><div class="tb-body">';
+    h+='<div class="tb-title">'+(l==='en'?b.ie:b.ip)+'</div>';
+    if(b.tg&&b.tg.length){
+      h+='<div class="tb-tags">';
+      b.tg.forEach(function(k){var r=gtag(k);if(r.label)h+='<span class="tb-tag '+r.cls+'">'+r.label+'</span>';});
+      h+='</div>';
+    }
+    var meta=l==='en'?b.me:b.mp;
+    if(meta) h+='<div class="tb-meta">'+meta+'</div>';
+    if(b.wa) h+='<div class="tb-warn">'+t[b.wa]+'</div>';
+    if(b.no) h+='<div class="tb-note">'+t[b.no]+'</div>';
     if(isMerged&&b.df){
       var cls=b.df.k==='add'?'diff-add':b.df.k==='chg'?'diff-chg':'diff-kp';
-      var pfx=b.df.k==='add'?'+ ':b.df.k==='chg'?'~ ':'&#10003; ';
-      h+='<div class="'+cls+'">'+pfx+b.df.tx+'</div>';
+      var pfx=b.df.k==='add'?t.da:b.df.k==='chg'?t.dc:t.dk;
+      h+='<div class="'+cls+'">'+pfx+(l==='en'?b.df.en:b.df.pt)+'</div>';
     }
-    if(b.mp)h+='<a class="map-btn" href="'+b.mp+'" target="_blank"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>Open in Maps</a>';
+    if(b.url) h+='<a class="map-btn" href="'+b.url+'" target="_blank"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'+t.maps+'</a>';
     h+='</div></div>';
   });
-  h+='</div>';
-  h+='<div class="footer">Edinburgh April 2026 &bull; Fabio &amp; Liana</div>';
-
+  h+='</div><div class="footer">Edinburgh April 2026 &bull; Fabio &amp; Liana</div>';
   document.getElementById('content').innerHTML=h;
 }
 
-render();
+setL('en');
 </script>
 </body>
 </html>
