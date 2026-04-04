@@ -81,6 +81,9 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .diff-kp{background:#f0ece4;border-left:2.5px solid var(--tartan);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
 .map-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--loch);text-decoration:none;font-family:'Source Serif 4',serif;background:rgba(30,58,95,.04)}
 .footer{text-align:center;padding:10px 0 3px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.05em}
+.tb-photos{margin-top:6px;font-size:11px;color:#555;line-height:1.7}
+.tb-photos a{color:#1e3a5f;text-decoration:none;border-bottom:1px dotted #1e3a5f55}
+.tb-photos a:hover{color:#3d5a3d;border-bottom-color:#3d5a3d}
 .wx{font-size:9px;color:#888;margin-top:3px;line-height:1.2;text-align:center;letter-spacing:0}
 .wx-hdr{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px 12px 2px;font-size:11px;color:var(--stone)}
 .wx-hdr-item{display:flex;align-items:center;gap:3px}
@@ -169,10 +172,8 @@ var D={
        me:"Dunbar's Close \u00b7 Bakehouse Close \u00b7 White Horse Close",
        mp:"Dunbar's Close \u00b7 Bakehouse Close \u00b7 White Horse Close",
        url:'https://maps.google.com/?q=Royal+Mile+Edinburgh'},
-      {t:'20:00',dot:'#3d5a3d',ie:'Dinner \u2014 Petit Paris',ip:'Jantar \u2014 Petit Paris',tg:['din','bkd'],
-       me:'French bistro on the Grassmarket. Beef bourguignon, mussels, creme brulee. No spicy food.',
-       mp:'Bistr\u00f4 franc\u00eas no Grassmarket. Boeuf bourguignon, mexilh\u00f5es, cr\u00e8me br\u00fbl\u00e9e. Sem pimenta.',
-       url:'https://maps.google.com/?q=Petit+Paris+Grassmarket+Edinburgh'}
+      {t:'20:00',dot:'#3d5a3d',ie:'Light dinner',ip:'Jantar leve',tg:['din'],
+       me:'Flexible \u2014 options near 2 Upper Bow.',mp:'Flex\u00edvel \u2014 op\u00e7\u00f5es perto do 2 Upper Bow.'}
     ]},
     {de:'Thursday, 16 April',dp:'Quinta-feira, 16 de abril',
      te:'Castle + New Town',tp:'Castelo + Nova Cidade',
@@ -188,7 +189,8 @@ var D={
       {t:'12:30',dot:'#1e3a5f',ie:'Princes Street Gardens',ip:'Jardins de Princes Street',tg:['s','fr'],
        me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument',
        mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott',
-       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh'},
+       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh',
+       ps:[{n:'Scott Monument',l:'https://maps.google.com/?q=Scott+Monument+Edinburgh'},{n:'Ross Fountain',l:'https://maps.google.com/?q=Ross+Fountain+Edinburgh'},{n:'Floral Clock',l:'https://maps.google.com/?q=Floral+Clock+Edinburgh'}]},
       {t:'13:30',dot:'#3d5a3d',ie:'Coffee \u2014 Starbucks Princes Street',ip:'Caf\u00e9 \u2014 Starbucks Princes Street',tg:['cof'],
        me:'Castle views from the window.',mp:'Vista para o castelo pela janela.',
        url:'https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh'},
@@ -213,7 +215,8 @@ var D={
        me:'Light meal before tour pickup.',mp:'Refei\u00e7\u00e3o leve antes do tour.'},
       {t:'08:45',dot:'#7b4f7a',ie:'Outlander Tour departs',ip:'Tour Outlander parte',tg:['ful'],
        me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
-       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.'},
+       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.',
+       ps:[{n:'Doune Castle courtyard',l:'https://maps.google.com/?q=Doune+Castle'},{n:'Blackness Castle + Forth',l:'https://maps.google.com/?q=Blackness+Castle'},{n:'Linlithgow Palace ruins',l:'https://maps.google.com/?q=Linlithgow+Palace'}]},
       {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:''},
       {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
        me:'Grassmarket. Booking confirmed 19:30. Craft beer, pizza, rooftop with castle views.',
@@ -235,10 +238,12 @@ var D={
       {t:'11:00',dot:'#1e3a5f',ie:'Salisbury Crags',ip:'Penhascos de Salisbury',tg:['nat','fr'],
        me:'Dramatic basalt cliff walk in Holyrood Park. Spectacular views.',
        mp:'Caminhada pelos penhascos de basalto no Parque de Holyrood. Vistas espetaculares.',
-       url:'https://maps.google.com/?q=Salisbury+Crags+Edinburgh'},
+       url:'https://maps.google.com/?q=Salisbury+Crags+Edinburgh',
+       ps:[{n:'Crags path + Edinburgh panorama',l:'https://maps.google.com/?q=Salisbury+Crags+Edinburgh'},{n:"Arthur's Seat summit",l:'https://maps.google.com/?q=Arthur%27s+Seat+Edinburgh'}]},
       {t:'13:30',dot:'#1e3a5f',ie:'The Meadows',ip:'The Meadows',tg:['par','fr'],
        me:'Cherry blossoms in bloom mid-April.',mp:'Cerejeiras em flor em meados de abril.',
-       url:'https://maps.google.com/?q=The+Meadows+Edinburgh'},
+       url:'https://maps.google.com/?q=The+Meadows+Edinburgh',
+       ps:[{n:'Cherry blossom avenue',l:'https://maps.google.com/?q=The+Meadows+Edinburgh'}]},
       {t:'14:30',dot:'#1e3a5f',ie:'Old College \u2014 University of Edinburgh',ip:'Old College \u2014 Universidade de Edimburgo',tg:['arc','fr'],
        me:"Robert Adam's neoclassical quad. Free to enter.",
        mp:'Quadr\u00e2ngulo neocl\u00e1ssico de Robert Adam. Entrada livre.',
@@ -246,15 +251,18 @@ var D={
       {t:'15:15',dot:'#1e3a5f',ie:"St Mary's Episcopal Cathedral",ip:'Catedral Episcopal de St Mary',tg:['s','fr'],
        me:'Victorian Gothic cathedral, West End. Stunning interior.',
        mp:'Catedral g\u00f3tica vitoriana, West End. Interior deslumbrante.',
-       url:"https://maps.google.com/?q=St+Mary+Cathedral+Edinburgh"},
+       url:"https://maps.google.com/?q=St+Mary+Cathedral+Edinburgh",
+       ps:[{n:'Twin spires from Palmerston Place',l:'https://maps.google.com/?q=St+Mary%27s+Episcopal+Cathedral+Edinburgh'},{n:'Gothic nave interior',l:'https://maps.google.com/?q=St+Mary%27s+Episcopal+Cathedral+Edinburgh'}]},
       {t:'16:00',dot:'#1e3a5f',ie:'National Gallery of Modern Art',ip:'Galeria Nacional de Arte Moderna',tg:['mu','fr'],
        me:'Modern and contemporary art. Beautiful grounds. Free entry.',
        mp:'Arte moderna e contempor\u00e2nea. Jardins lindos. Entrada livre.',
-       url:'https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh'},
+       url:'https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh',
+       ps:[{n:'Landform sculpture (Charles Jencks)',l:'https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh'},{n:'Gallery facade',l:'https://maps.google.com/?q=Scottish+National+Gallery+Modern+Art+Edinburgh'}]},
       {t:'17:00',dot:'#1e3a5f',ie:'Dean Village + Water of Leith',ip:'Dean Village + Water of Leith',tg:['s','fr'],
        me:'Hidden medieval village. Riverside path. Dean Bridge viewpoint.',
        mp:'Vila medieval escondida. Trilha ribeirinha. Mirante da Ponte Dean.',
-       url:'https://maps.google.com/?q=Dean+Village+Edinburgh'},
+       url:'https://maps.google.com/?q=Dean+Village+Edinburgh',
+       ps:[{n:'Dean Bridge from riverbank',l:'https://maps.google.com/?q=Dean+Bridge+Edinburgh'},{n:'Water of Leith reflections',l:'https://maps.google.com/?q=Water+of+Leith+Edinburgh'},{n:'Circus Lane cobblestones',l:'https://maps.google.com/?q=Circus+Lane+Edinburgh'}]},
       {t:'17:45',dot:'#1e3a5f',ie:'Circus Lane',ip:'Circus Lane',tg:['s','fr'],
        me:'Cobbled lane in Stockbridge. Pastel doors, incredibly photogenic.',
        mp:'Rua de paralelepipedos em Stockbridge. Portas coloridas, muito fot\u00f3gena.',
@@ -301,19 +309,22 @@ var D={
        mp:"Fa\u00e7a isso antes das closes \u2014 fecha ~19:00. Interior g\u00f3tico, Capela do Cardo.",
        url:'https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh',
        df:{k:'chg',en:'Moved earlier \u2014 Liana had it at 18:30 but it closes ~19:00.',
-           pt:'Adiantado \u2014 Liana havia marcado para 18:30 mas fecha ~19:00.'}},
+           pt:'Adiantado \u2014 Liana havia marcado para 18:30 mas fecha ~19:00.'},
+       ps:[{n:'Cathedral facade',l:'https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh'},{n:'Thistle Chapel interior',l:'https://maps.google.com/?q=Thistle+Chapel+St+Giles+Edinburgh'}]},
       {t:'17:20',dot:'#1e3a5f',ie:'Old Town walk: closes & Victoria Street',ip:'Passeio: closes e Victoria Street',tg:['s','fr'],
        me:"Victoria Street \u00b7 Grassmarket \u00b7 Vennel Viewpoint \u00b7 Greyfriars Bobby \u00b7 Dunbar's Close \u00b7 White Horse Close",
        mp:"Victoria Street \u00b7 Grassmarket \u00b7 Mirante Vennel \u00b7 Greyfriars Bobby \u00b7 Dunbar's Close \u00b7 White Horse Close",
        url:'https://maps.google.com/?q=Victoria+Street+Edinburgh',
        df:{k:'chg',en:"Combined Liana's two walks into one flowing route.",
-           pt:'Combinou os dois passeios da Liana em um roteiro \u00fanico.'}},
+           pt:'Combinou os dois passeios da Liana em um roteiro \u00fanico.'},
+       ps:[{n:'Victoria Street curved view',l:'https://maps.google.com/?q=Victoria+Street+Edinburgh'},{n:'Vennel Steps viewpoint',l:'https://maps.google.com/?q=The+Vennel+Edinburgh'},{n:'White Horse Close',l:'https://maps.google.com/?q=White+Horse+Close+Edinburgh'},{n:'Greyfriars Bobby statue',l:'https://maps.google.com/?q=Greyfriars+Bobby+Edinburgh'}]},
       {t:'18:30',dot:'#3d5a3d',ie:'Quick coffee \u2014 The Elephant House',ip:'Caf\u00e9 r\u00e1pido \u2014 The Elephant House',tg:['cof'],
        me:'Harry Potter connection \u2014 atmosphere and a photo, not a full sit-down.',
        mp:'Liga\u00e7\u00e3o com Harry Potter \u2014 atmosfera e foto, n\u00e3o uma parada longa.',
        url:'https://maps.google.com/?q=The+Elephant+House+Edinburgh',
        df:{k:'chg',en:'Kept but shortened. Food unremarkable \u2014 go for the experience.',
-           pt:'Mantido mas encurtado. Comida sem destaque \u2014 v\u00e1 pela experi\u00eancia.'}},
+           pt:'Mantido mas encurtado. Comida sem destaque \u2014 v\u00e1 pela experi\u00eancia.'},
+       ps:[{n:'Greyfriars Kirkyard',l:'https://maps.google.com/?q=Greyfriars+Kirkyard+Edinburgh'},{n:'Elephant House exterior',l:'https://maps.google.com/?q=The+Elephant+House+Edinburgh'}]},
       {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Petit Paris',ip:'Jantar \u2014 Petit Paris',tg:['din','bkd'],
        me:'French bistro, Grassmarket. Beef bourguignon, mussels, creme brulee. No spicy food.',
        mp:'Bistr\u00f4 franc\u00eas, Grassmarket. Boeuf bourguignon, mexilh\u00f5es, cr\u00e8me br\u00fbl\u00e9e. Sem pimenta.',
@@ -335,7 +346,8 @@ var D={
        mp:"Great Hall \u00b7 Capela St Margaret \u00b7 Mons Meg \u00b7 Museu Guerra \u00b7 tiro can\u00e3o \u00e0s 13:00. Reserve tour 09:45.",
        url:'https://maps.google.com/?q=Edinburgh+Castle',wa:'warn_crown',
        df:{k:'chg',en:'Moved from 10:00 to 09:30. Skip-the-line means straight in at opening.',
-           pt:'Adiantado de 10:00 para 09:30. Fura-fila significa entrar direto na abertura.'}},
+           pt:'Adiantado de 10:00 para 09:30. Fura-fila significa entrar direto na abertura.'},
+       ps:[{n:'Castle Esplanade approach',l:'https://maps.google.com/?q=Edinburgh+Castle+Esplanade'},{n:'Half Moon Battery',l:'https://maps.google.com/?q=Half+Moon+Battery+Edinburgh'},{n:'View from Crown Square',l:'https://maps.google.com/?q=Crown+Square+Edinburgh+Castle'}]},
       {t:'12:30',dot:'#1e3a5f',ie:'Princes Street Gardens',ip:'Jardins de Princes Street',tg:['s','fr'],
        me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument.',
        mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott.',
@@ -356,7 +368,8 @@ var D={
        mp:'Vista panor\u00e2mica de Edimburgo. Subida f\u00e1cil de 10 min.',
        url:'https://maps.google.com/?q=Calton+Hill+Edinburgh',
        df:{k:'kp',en:'Arrive at 17:45 to explore. Caf\u00e9 Calton on site from 18:30 for drinks and the sunset \u2014 no rush.',
-           pt:'Chegue \u00e0s 17:45 para explorar. Caf\u00e9 Calton no local a partir das 18:30 para drinks e o p\u00f4r do sol.'}},
+           pt:'Chegue \u00e0s 17:45 para explorar. Caf\u00e9 Calton no local a partir das 18:30 para drinks e o p\u00f4r do sol.'},
+       ps:[{n:'National Monument',l:'https://maps.google.com/?q=National+Monument+of+Scotland+Edinburgh'},{n:'Nelson Monument',l:'https://maps.google.com/?q=Nelson+Monument+Calton+Hill'},{n:'Dugald Stewart Monument',l:'https://maps.google.com/?q=Dugald+Stewart+Monument+Edinburgh'},{n:'Panorama west to castle',l:'https://maps.google.com/?q=Calton+Hill+Edinburgh'}]},
       {t:'18:30',dot:'#3d5a3d',ie:'Drinks \u2014 Caf\u00e9 Calton',ip:'Drinks \u2014 Caf\u00e9 Calton',tg:['cof'],
        me:"On top of Calton Hill, inside the old City Observatory. Liana's pick \u2014 panoramic terrace views. Stay for the sunset.",
        mp:"No topo do Calton Hill, dentro do antigo Observat\u00f3rio. Escolha da Liana \u2014 terraço com vista panor\u00e2mica. Ficar para o p\u00f4r do sol.",
@@ -386,7 +399,8 @@ var D={
        mp:'Grassmarket. Reserva confirmada 19:30. Cerveja artesanal, pizza, terra\u00e7o com vista do castelo.',
        url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh',
        df:{k:'chg',en:'Moved from Thursday. Confirmed booking 19:30 \u2014 natural gap after Outlander tour return (~18:00).',
-           pt:'Movido da quinta. Reserva confirmada 19:30 \u2014 encaixe natural ap\u00f3s o retorno do tour Outlander (~18:00).'}}
+           pt:'Movido da quinta. Reserva confirmada 19:30 \u2014 encaixe natural ap\u00f3s o retorno do tour Outlander (~18:00).'},
+       ps:[{n:'Rooftop terrace with castle view',l:'https://maps.google.com/?q=Cold+Town+House+Edinburgh'},{n:'Grassmarket at night',l:'https://maps.google.com/?q=Grassmarket+Edinburgh'}]}
     ]},
     {de:'Saturday, 18 April',dp:'S\u00e1bado, 18 de abril',
      te:'Palace + Nature + Art',tp:'Pal\u00e1cio + Natureza + Arte',
@@ -406,7 +420,8 @@ var D={
        mp:"Abre \u00e0s 9:30. Aposentos de Estado \u00b7 C\u00f2modos de Maria \u00b7 Ru\u00ednas da Abadia \u00b7 Jardins. Audio guia gr\u00e1tis.",
        url:'https://maps.google.com/?q=Palace+of+Holyroodhouse',
        df:{k:'chg',en:'Pushed 30 min later to 09:30 \u2014 that is when it actually opens.',
-           pt:'Adiantado 30 min para 09:30 \u2014 quando o pal\u00e1cio realmente abre.'}},
+           pt:'Adiantado 30 min para 09:30 \u2014 quando o pal\u00e1cio realmente abre.'},
+       ps:[{n:'Holyrood Abbey ruins',l:'https://maps.google.com/?q=Holyrood+Abbey+Edinburgh'},{n:'Palace facade from forecourt',l:'https://maps.google.com/?q=Palace+of+Holyroodhouse'}]},
       {t:'11:30',dot:'#1e3a5f',ie:'Salisbury Crags',ip:'Penhascos de Salisbury',tg:['nat','fr'],
        me:'Dramatic basalt cliff path in Holyrood Park, direct from the Palace.',
        mp:'Trilha pelos penhascos no Parque de Holyrood, direto do Pal\u00e1cio.',
@@ -416,7 +431,8 @@ var D={
        url:'https://maps.google.com/?q=The+Meadows+Edinburgh'},
       {t:'13:30',dot:'#1e3a5f',ie:'Old College \u2014 University of Edinburgh',ip:'Old College \u2014 Universidade de Edimburgo',tg:['arc','fr'],
        me:"Robert Adam's neoclassical quad.",mp:'Quadr\u00e2ngulo neocl\u00e1ssico de Robert Adam.',
-       url:'https://maps.google.com/?q=Old+College+University+Edinburgh'},
+       url:'https://maps.google.com/?q=Old+College+University+Edinburgh',
+       ps:[{n:'Neoclassical quadrangle arch',l:'https://maps.google.com/?q=Old+College+University+Edinburgh'}]},
       {t:'14:00',dot:'#3d5a3d',ie:'Lunch \u2014 Saturday Farmers Market',ip:'Almo\u00e7o \u2014 Feira do Produtor',tg:['lun'],
        me:'Castle Terrace and Grassmarket Saturday markets. Street food and artisan produce.',
        mp:'Feiras do s\u00e1bado no Castle Terrace e Grassmarket. Comida de rua e produtos artesanais.',
@@ -438,7 +454,8 @@ var D={
        mp:'14 George Street. Antigo banco, interior grandioso. Menu fixo a partir de \u00a319.50.',
        url:'https://maps.google.com/?q=The+Dome+Edinburgh',
        df:{k:'kp',en:"Liana's pick \u2014 The Dome is perfect for a birthday celebration.",
-           pt:'Escolha da Liana \u2014 The Dome \u00e9 perfeito para celebrar o anivers\u00e1rio.'}}
+           pt:'Escolha da Liana \u2014 The Dome \u00e9 perfeito para celebrar o anivers\u00e1rio.'},
+       ps:[{n:'Grand neoclassical interior',l:'https://maps.google.com/?q=The+Dome+Edinburgh'}]}
     ]},
     {de:'Sunday, 19 April',dp:'Domingo, 19 de abril',
      te:'Birthday & Departure',tp:'Anivers\u00e1rio e Partida',
@@ -456,7 +473,8 @@ var D={
        mp:'Abre \u00e0s 10:00 em abril. Entrada gr\u00e1tis. Flores da primavera, estufas, caminhadas tranquilas.',
        url:'https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh',
        df:{k:'chg',en:"Adjusted to 10:00 \u2014 garden doesn't open until 10:00am in April.",
-           pt:'Ajustado para 10:00 \u2014 o jardim n\u00e3o abre antes das 10:00 em abril.'}},
+           pt:'Ajustado para 10:00 \u2014 o jardim n\u00e3o abre antes das 10:00 em abril.'},
+       ps:[{n:'Glasshouse complex',l:'https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh'},{n:'Spring borders + pond',l:'https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh'},{n:'City skyline from upper garden',l:'https://maps.google.com/?q=Royal+Botanic+Garden+Edinburgh'}]},
       {t:'11:45',dot:'#3d5a3d',ie:'Birthday coffee \u2014 Stockbridge',ip:'Caf\u00e9 de anivers\u00e1rio \u2014 Stockbridge',tg:['bdy','cof'],
        me:"5 min walk from the Botanic Garden. The Pantry or Kubo Cafe for Liana's birthday morning coffee.",
        mp:'5 min a p\u00e9 do Jardim Bot\u00e2nico. The Pantry ou Kubo Cafe para o caf\u00e9 do anivers\u00e1rio da Liana.',
@@ -596,6 +614,7 @@ function render(){
     if(meta) h+='<div class="tb-meta">'+meta+'</div>';
     if(b.wa) h+='<div class="tb-warn">'+t[b.wa]+'</div>';
     if(b.no) h+='<div class="tb-note">'+t[b.no]+'</div>';
+    if(b.ps&&b.ps.length){h+='<div class="tb-photos">📷 ';h+=b.ps.map(function(p){return'<a href="'+p.l+'" target="_blank">'+p.n+'</a>';}).join(' &middot; ');h+='</div>';}
     if(isMerged&&b.df){
       var cls=b.df.k==='add'?'diff-add':b.df.k==='chg'?'diff-chg':'diff-kp';
       var pfx=b.df.k==='add'?t.da:b.df.k==='chg'?t.dc:t.dk;
