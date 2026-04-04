@@ -559,7 +559,7 @@ function wxDaySummary(dayIdx){
 }
 async function fetchWeather(){
   try{
-    var r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.9533&longitude=-3.1883&hourly=temperature_2m,weathercode,precipitation_probability&timezone=Europe%2FLondon&start_date=2026-04-15&end_date=2026-04-19&forecast_days=16');
+    var r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.9533&longitude=-3.1883&hourly=temperature_2m,weathercode,precipitation_probability&timezone=Europe%2FLondon&start_date=2026-04-15&end_date=2026-04-19');
     var d=await r.json();
     d.hourly.time.forEach(function(t,i){
       var p=t.split('T');
