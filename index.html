@@ -81,6 +81,9 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .diff-kp{background:#f0ece4;border-left:2.5px solid var(--tartan);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
 .map-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--loch);text-decoration:none;font-family:'Source Serif 4',serif;background:rgba(30,58,95,.04)}
 .footer{text-align:center;padding:10px 0 3px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.05em}
+.wx{font-size:9px;color:#888;margin-top:3px;line-height:1.2;text-align:center;letter-spacing:0}
+.wx-hdr{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px 12px 2px;font-size:11px;color:var(--stone)}
+.wx-hdr-item{display:flex;align-items:center;gap:3px}
 </style>
 </head>
 <body>
@@ -199,14 +202,14 @@ var D={
        me:'Panoramic views across Edinburgh. Easy 10-min climb.',
        mp:'Vista panor\u00e2mica de Edimburgo. Subida f\u00e1cil de 10 min.',
        url:'https://maps.google.com/?q=Calton+Hill+Edinburgh'},
-      {t:'18:30',dot:'#3d5a3d',ie:'Drinks \u2014 Caf\u00e9 Hilton Carlton',ip:'Drinks \u2014 Caf\u00e9 Hilton Carlton',tg:['cof'],
-       me:"North Bridge. Short walk from Calton Hill. Liana's suggestion \u2014 great views, relax before dinner.",
-       mp:"North Bridge. Curta caminhada do Calton Hill. Sugest\u00e3o da Liana \u2014 ótimas vistas, relaxar antes do jantar.",
-       url:'https://maps.google.com/?q=Hilton+Edinburgh+Carlton'},
-      {t:'19:15',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
-       me:'Grassmarket. Booking confirmed 19:15. Craft beer, pizza, rooftop with castle views.',
-       mp:'Grassmarket. Reserva confirmada 19:15. Cerveja artesanal, pizza, terra\u00e7o com vista do castelo.',
-       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh'}
+      {t:'18:30',dot:'#3d5a3d',ie:'Drinks \u2014 Caf\u00e9 Calton',ip:'Drinks \u2014 Caf\u00e9 Calton',tg:['cof'],
+       me:"On top of Calton Hill, inside the old City Observatory. Liana's pick \u2014 panoramic terrace views. Stay for the sunset.",
+       mp:"No topo do Calton Hill, dentro do antigo Observat\u00f3rio. Escolha da Liana \u2014 terraço com vista panor\u00e2mica. Ficar para o p\u00f4r do sol.",
+       url:'https://maps.google.com/?q=Cafe+Calton+Edinburgh'},
+      {t:'20:30',dot:'#3d5a3d',ie:'Dinner \u2014 Under The Table',ip:'Jantar \u2014 Under The Table',tg:['din','bkd'],
+       me:'Dundas Street. Modern European, seasonal Scottish ingredients. 4.9 stars. No spice. Late dinner after the sunset.',
+       mp:'Dundas Street. Culin\u00e1ria europeia moderna, ingredientes escoceses sazonais. 4.9 estrelas. Sem pimenta. Jantar tardio ap\u00f3s o p\u00f4r do sol.',
+       url:'https://maps.google.com/?q=Under+The+Table+Edinburgh'}
     ]},
     {de:'Friday, 17 April',dp:'Sexta-feira, 17 de abril',
      te:'Outlander Tour',tp:'Tour Outlander',
@@ -218,10 +221,10 @@ var D={
        me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
        mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.'},
       {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:''},
-      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Under The Table',ip:'Jantar \u2014 Under The Table',tg:['din','bkd'],
-       me:'Dundas Street. Modern European, seasonal Scottish ingredients. 4.9 stars. No spice.',
-       mp:'Dundas Street. Culin\u00e1ria europeia moderna, ingredientes escoceses sazonais. 4.9 estrelas. Sem pimenta.',
-       url:'https://maps.google.com/?q=Under+The+Table+Edinburgh'}
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
+       me:'Grassmarket. Booking confirmed 19:30. Craft beer, pizza, rooftop with castle views.',
+       mp:'Grassmarket. Reserva confirmada 19:30. Cerveja artesanal, pizza, terra\u00e7o com vista do castelo.',
+       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh'}
     ]},
     {de:'Saturday, 18 April',dp:'S\u00e1bado, 18 de abril',
      te:'Palace + Nature + Art',tp:'Pal\u00e1cio + Natureza + Arte',
@@ -358,20 +361,20 @@ var D={
        me:'Panoramic views across Edinburgh. Easy 10-min climb.',
        mp:'Vista panor\u00e2mica de Edimburgo. Subida f\u00e1cil de 10 min.',
        url:'https://maps.google.com/?q=Calton+Hill+Edinburgh',
-       df:{k:'chg',en:'Moved back to 17:45 to fit confirmed 19:15 Cold Town House booking.',
-           pt:'Voltou para 17:45 para encaixar na reserva confirmada no Cold Town House \u00e0s 19:15.'}},
-      {t:'18:30',dot:'#3d5a3d',ie:'Drinks \u2014 Caf\u00e9 Hilton Carlton',ip:'Drinks \u2014 Caf\u00e9 Hilton Carlton',tg:['cof'],
-       me:"North Bridge. Short walk from Calton Hill. Liana's suggestion \u2014 great views, relax before dinner.",
-       mp:"North Bridge. Curta caminhada do Calton Hill. Sugest\u00e3o da Liana \u2014 ótimas vistas, relaxar antes do jantar.",
-       url:'https://maps.google.com/?q=Hilton+Edinburgh+Carlton',
-       df:{k:'add',en:"Liana's suggestion \u2014 added between Calton Hill and dinner.",
-           pt:'Sugest\u00e3o da Liana \u2014 adicionado entre o Calton Hill e o jantar.'}},
-      {t:'19:15',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
-       me:'Grassmarket. Booking confirmed 19:15. Craft beer, pizza, rooftop with castle views.',
-       mp:'Grassmarket. Reserva confirmada 19:15. Cerveja artesanal, pizza, terra\u00e7o com vista do castelo.',
-       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh',
-       df:{k:'chg',en:'Confirmed booking Thu 19:15. Moved from Friday \u2014 better fit before the Outlander day.',
-           pt:'Reserva confirmada qui 19:15. Movido da sexta \u2014 melhor encaixe antes do dia Outlander.'}}
+       df:{k:'kp',en:'Arrive at 17:45 to explore. Caf\u00e9 Calton on site from 18:30 for drinks and the sunset \u2014 no rush.',
+           pt:'Chegue \u00e0s 17:45 para explorar. Caf\u00e9 Calton no local a partir das 18:30 para drinks e o p\u00f4r do sol.'}},
+      {t:'18:30',dot:'#3d5a3d',ie:'Drinks \u2014 Caf\u00e9 Calton',ip:'Drinks \u2014 Caf\u00e9 Calton',tg:['cof'],
+       me:"On top of Calton Hill, inside the old City Observatory. Liana's pick \u2014 panoramic terrace views. Stay for the sunset.",
+       mp:"No topo do Calton Hill, dentro do antigo Observat\u00f3rio. Escolha da Liana \u2014 terraço com vista panor\u00e2mica. Ficar para o p\u00f4r do sol.",
+       url:'https://maps.google.com/?q=Cafe+Calton+Edinburgh',
+       df:{k:'add',en:"Liana's pick \u2014 Caf\u00e9 Calton is on top of the hill. Drinks and sunset in one spot.",
+           pt:'Escolha da Liana \u2014 Caf\u00e9 Calton fica no topo do Calton Hill. Drinks e p\u00f4r do sol no mesmo lugar.'}},
+      {t:'20:30',dot:'#3d5a3d',ie:'Dinner \u2014 Under The Table',ip:'Jantar \u2014 Under The Table',tg:['din','bkd'],
+       me:'Dundas Street. Modern European, seasonal Scottish ingredients. 4.9 stars. No spice. Late dinner after the sunset.',
+       mp:'Dundas Street. Culin\u00e1ria europeia moderna, ingredientes escoceses sazonais. 4.9 estrelas. Sem pimenta. Jantar tardio ap\u00f3s o p\u00f4r do sol.',
+       url:'https://maps.google.com/?q=Under+The+Table+Edinburgh',
+       df:{k:'chg',en:'Moved from Friday. Dinner at 20:30 after sunset on Calton Hill \u2014 Under The Table seats late.',
+           pt:'Movido da sexta. Jantar \u00e0s 20:30 ap\u00f3s o p\u00f4r do sol no Calton Hill \u2014 Under The Table recebe tarde.'}}
     ]},
     {de:'Friday, 17 April',dp:'Sexta-feira, 17 de abril',
      te:'Outlander Tour',tp:'Tour Outlander',
@@ -384,12 +387,12 @@ var D={
        me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
        mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.'},
       {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:''},
-      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Under The Table',ip:'Jantar \u2014 Under The Table',tg:['din','bkd'],
-       me:'Dundas Street. Modern European. 4.9 stars. No spice. Seasonal Scottish ingredients.',
-       mp:'Dundas Street. Europeia moderna. 4.9 estrelas. Sem pimenta. Ingredientes escoceses sazonais.',
-       url:'https://maps.google.com/?q=Under+The+Table+Edinburgh',
-       df:{k:'chg',en:'Cold Town House moved to Thursday (confirmed booking). Under The Table here instead.',
-           pt:'Cold Town House movido para quinta (reserva confirmada). Under The Table no lugar.'}}
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
+       me:'Grassmarket. Booking confirmed 19:30. Craft beer, pizza, rooftop with castle views.',
+       mp:'Grassmarket. Reserva confirmada 19:30. Cerveja artesanal, pizza, terra\u00e7o com vista do castelo.',
+       url:'https://maps.google.com/?q=Cold+Town+House+Edinburgh',
+       df:{k:'chg',en:'Moved from Thursday. Confirmed booking 19:30 \u2014 natural gap after Outlander tour return (~18:00).',
+           pt:'Movido da quinta. Reserva confirmada 19:30 \u2014 encaixe natural ap\u00f3s o retorno do tour Outlander (~18:00).'}}
     ]},
     {de:'Saturday, 18 April',dp:'S\u00e1bado, 18 de abril',
      te:'Palace + Nature + Art',tp:'Pal\u00e1cio + Natureza + Arte',
@@ -506,6 +509,68 @@ function sd(i){
   render();
 }
 
+// ── Weather ──────────────────────────────────────────────
+var TRIP_DATES=['2026-04-15','2026-04-16','2026-04-17','2026-04-18','2026-04-19'];
+var wx={},wxLoaded=false;
+function wxEmoji(code){
+  if(code===0)return'☀️';
+  if(code<=2)return'🌤️';
+  if(code===3)return'☁️';
+  if(code<=48)return'🌫️';
+  if(code<=55)return'🌦️';
+  if(code<=65)return'🌧️';
+  if(code<=77)return'❄️';
+  if(code<=82)return'🌦️';
+  return'⛈️';
+}
+function wxBadge(dayIdx,timeStr){
+  if(!wxLoaded)return'';
+  var date=TRIP_DATES[dayIdx];
+  if(!date)return'';
+  var clean=timeStr.replace(/[^0-9:]/g,'');
+  var p=clean.split(':');
+  if(!p[0])return'';
+  var h=parseInt(p[0]),m=p[1]?parseInt(p[1]):0;
+  if(m>=30)h=Math.min(h+1,23);
+  var key=date+'-'+String(h).padStart(2,'0');
+  var w=wx[key];
+  if(!w)return'';
+  return'<div class="wx">'+wxEmoji(w.code)+' '+Math.round(w.temp)+'°C</div>';
+}
+function wxDaySummary(dayIdx){
+  if(!wxLoaded)return'';
+  var date=TRIP_DATES[dayIdx];
+  if(!date)return'';
+  var temps=[],codes=[];
+  for(var h=7;h<=22;h++){
+    var key=date+'-'+String(h).padStart(2,'0');
+    if(wx[key]){temps.push(wx[key].temp);codes.push(wx[key].code);}
+  }
+  if(!temps.length)return'';
+  var hi=Math.round(Math.max.apply(null,temps));
+  var lo=Math.round(Math.min.apply(null,temps));
+  // most frequent code
+  var freq={};
+  codes.forEach(function(x){freq[x]=(freq[x]||0)+1;});
+  var dom=Object.keys(freq).reduce(function(a,b){return freq[a]>freq[b]?a:b;});
+  return'<div class="wx-hdr"><div class="wx-hdr-item">'+wxEmoji(parseInt(dom))+'</div>'
+    +'<div class="wx-hdr-item">↑'+hi+'°C</div>'
+    +'<div class="wx-hdr-item">↓'+lo+'°C</div></div>';
+}
+async function fetchWeather(){
+  try{
+    var r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=55.9533&longitude=-3.1883&hourly=temperature_2m,weathercode,precipitation_probability&timezone=Europe%2FLondon&start_date=2026-04-15&end_date=2026-04-19&forecast_days=16');
+    var d=await r.json();
+    d.hourly.time.forEach(function(t,i){
+      var p=t.split('T');
+      var hr=p[1].slice(0,2);
+      wx[p[0]+'-'+hr]={temp:d.hourly.temperature_2m[i],code:d.hourly.weathercode[i],precip:d.hourly.precipitation_probability[i]};
+    });
+    wxLoaded=true;
+    render();
+  }catch(e){}
+}
+// ─────────────────────────────────────────────────────────
 function render(){
   var day=D[cv].days[cd];
   var isMerged=cv==='merged';
@@ -517,12 +582,13 @@ function render(){
   h+='<div class="dh-eye">'+(l==='en'?day.de:day.dp)+'</div>';
   h+='<div class="dh-title">'+(l==='en'?day.te:day.tp)+'</div>';
   h+='<div class="dh-note">'+(l==='en'?day.ne:day.np)+'</div>';
+  h+=wxDaySummary(cd);
   if(day.bday) h+='<div class="bday-strip">'+(l==='en'?day.bne:day.bnp)+'</div>';
   h+='</div></div><div class="tl">';
 
   day.bl.forEach(function(b,bi){
     var last=bi===day.bl.length-1;
-    h+='<div class="tb"><div class="tb-left"><div class="tb-time">'+b.t+'</div>';
+    h+='<div class="tb"><div class="tb-left"><div class="tb-time">'+b.t+wxBadge(cd,b.t)+'</div>';
     h+='<div class="tb-dot-col"><div class="tb-dot" style="background:'+b.dot+'"></div>';
     if(!last) h+='<div class="tb-line"></div>';
     h+='</div></div><div class="tb-body">';
@@ -549,6 +615,7 @@ function render(){
 }
 
 setL('en');
+fetchWeather();
 </script>
 </body>
 </html>
