@@ -98,7 +98,7 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
       <div class="trip-sub" id="ts">15 &ndash; 19 April 2026</div>
       <div class="vtabs">
         <button class="vtab on" id="vt0" onclick="setV('liana')">Liana's plan</button>
-        <button class="vtab" id="vt1" onclick="setV('merged')">Merged suggestions</button>
+        <button class="vtab" id="vt1" onclick="setV('merged')">Alternative Plan</button>
       </div>
     </div>
   </div>
@@ -114,22 +114,24 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 <script>
 var lang='en',cv='liana',cd=0;
 var T={
-  en:{ey:'Edinburgh, Scotland',sub:'15 \u2013 19 April 2026',vt0:"Liana's plan",vt1:'Merged suggestions',
+  en:{ey:'Edinburgh, Scotland',sub:'15 \u2013 19 April 2026',vt0:"Liana's plan",vt1:'Alternative Plan',
     dows:['Wed','Thu','Fri','Sat','Sun'],maps:'Open in Maps',
     da:'+\u00a0',dc:'\u007e\u00a0',dk:"Liana's pick \u2014 ",
     warn_crown:'Crown Room may still be closed April 2026. Check edinburghcastle.scot.',
     warn_hol:'Opens 9:30am. Closed Tue/Wed. No photography inside.',
     warn_bot:'Garden opens at 10:00am in April.',
+    note_bookshop:'Alternative nearby: Waterstones Princes Street \u2014 top floor has equally stunning castle views and a great atmosphere.',
     tags:{s:'Sightseeing',fr:'Free',lun:'Lunch',din:'Dinner',bkf:'Breakfast',cof:'Coffee',
       bkd:'Book ahead',sk:'Skip line',tra:'Travel',log:'Logistics',dep:'Departure',ful:'Full day',
       bdy:'Birthday',cel:'Birthday dinner',mu:'Museum',nat:'Nature',par:'Park',arc:'Architecture',
       vpt:'Viewpoint',grd:'Garden',pal:'Palace',rel:'Relaxed dinner',spe:'Special dinner'}},
-  pt:{ey:'Edimburgo, Esc\u00f3cia',sub:'15 \u2013 19 de abril de 2026',vt0:'Plano da Liana',vt1:'Vers\u00e3o combinada',
+  pt:{ey:'Edimburgo, Esc\u00f3cia',sub:'15 \u2013 19 de abril de 2026',vt0:'Plano da Liana',vt1:'Plano Alternativo',
     dows:['Qua','Qui','Sex','S\u00e1b','Dom'],maps:'Abrir no Maps',
     da:'+\u00a0',dc:'\u007e\u00a0',dk:'Escolha da Liana \u2014 ',
     warn_crown:'A Sala da Coroa pode estar fechada em abril 2026. Confirme em edinburghcastle.scot.',
     warn_hol:'Abre \u00e0s 9:30. Fechado ter/qua. Fotos n\u00e3o permitidas.',
     warn_bot:'O jardim abre \u00e0s 10:00 em abril.',
+    note_bookshop:'Alternativa pr\u00f3xima: livraria Waterstones na Princes Street \u2014 o andar de cima tem vista igualmente incr\u00edvel para o castelo e \u00f3timo ambiente.',
     tags:{s:'Passeio',fr:'Gr\u00e1tis',lun:'Almo\u00e7o',din:'Jantar',bkf:'Caf\u00e9 da manh\u00e3',cof:'Caf\u00e9',
       bkd:'Reserve antes',sk:'Fura fila',tra:'Transporte',log:'Log\u00edstica',dep:'Partida',ful:'Dia inteiro',
       bdy:'Anivers\u00e1rio',cel:'Jantar de anivers\u00e1rio',mu:'Museu',nat:'Natureza',par:'Parque',arc:'Arquitetura',
@@ -337,11 +339,13 @@ var D={
        me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument.',
        mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott.',
        url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh'},
-      {t:'13:15',dot:'#3d5a3d',ie:'Lunch \u2014 independent cafe',ip:'Almo\u00e7o \u2014 caf\u00e9 independente',tg:['lun'],
-       me:'Skip the Starbucks. Good options along Princes Street and at the National Gallery cafe.',
-       mp:'Pule o Starbucks. Boas op\u00e7\u00f5es na Princes Street e no caf\u00e9 da Galeria Nacional.',
-       df:{k:'chg',en:'Replaced Starbucks. Same view, much better food.',
-           pt:'Substituiu o Starbucks. Mesma vista, comida muito melhor.'}},
+      {t:'13:15',dot:'#3d5a3d',ie:'Coffee \u2014 Starbucks Princes Street',ip:'Caf\u00e9 \u2014 Starbucks Princes Street',tg:['cof'],
+       me:'Castle views from the window. Great spot to rest after the castle.',
+       mp:'Vista para o castelo pela janela. \u00d3timo para descansar ap\u00f3s o castelo.',
+       url:'https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh',
+       no:'note_bookshop',
+       df:{k:'kp',en:'Starbucks kept \u2014 great castle views. Waterstones bookshop nearby is a charming alternative with the same views.',
+           pt:'Starbucks mantido \u2014 \u00f3tima vista para o castelo. A livraria Waterstones pr\u00f3xima \u00e9 uma alternativa charmosa com a mesma vista.'}},
       {t:'14:30',dot:'#1e3a5f',ie:'National Gallery + Portrait Gallery',ip:'Galeria Nacional + Galeria de Retratos',tg:['mu','fr'],
        me:'Scottish National Gallery (The Mound) \u2014 Vel\u00e1zquez, Rembrandt. Portrait Gallery (Queen St).',
        mp:'Galeria Nacional Escocesa (The Mound) \u2014 Vel\u00e1zquez, Rembrandt. Galeria de Retratos (Queen St).',
