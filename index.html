@@ -82,7 +82,7 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .map-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--loch);text-decoration:none;font-family:'Source Serif 4',serif;background:rgba(30,58,95,.04)}
 .footer{text-align:center;padding:10px 0 3px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.05em}
 .km-tag{display:inline-block;margin-top:5px;font-size:10px;color:#888;background:#f4f1ec;border-radius:10px;padding:1px 7px}
-.km-day{font-size:11px;color:#9caf88;font-weight:600;margin-top:4px;letter-spacing:.02em}
+.wx-km{color:#9caf88;font-weight:600;padding-left:8px;border-left:1px solid rgba(255,255,255,.25);margin-left:4px}
 .tb-photos{margin-top:8px;display:flex;flex-wrap:wrap;gap:7px}
 .ps-card{display:flex;flex-direction:column;align-items:center;text-decoration:none;width:80px;flex-shrink:0}
 .ps-thumb{width:80px;height:55px;object-fit:cover;border-radius:5px;display:block}
@@ -545,8 +545,9 @@ function wxBadge(dayIdx,timeStr){
   if(!w)return'';
   return'<div class="wx">'+wxEmoji(w.code)+' '+Math.round(w.temp)+'°C</div>';
 }
-function wxDaySummary(dayIdx){
-  if(!wxLoaded)return'';
+function wxDaySummary(dayIdx,km){
+  var kmItem=km?'<div class="wx-hdr-item wx-km">🦶 ~'+km.toFixed(1)+' km</div>':'';
+  if(!wxLoaded)return kmItem?'<div class="wx-hdr">'+kmItem+'</div>':'';
   var date=TRIP_DATES[dayIdx];
   if(!date)return'';
   var temps=[],codes=[];
@@ -554,7 +555,7 @@ function wxDaySummary(dayIdx){
     var key=date+'-'+String(h).padStart(2,'0');
     if(wx[key]){temps.push(wx[key].temp);codes.push(wx[key].code);}
   }
-  if(!temps.length)return'';
+  if(!temps.length)return kmItem?'<div class="wx-hdr">'+kmItem+'</div>':'';
   var hi=Math.round(Math.max.apply(null,temps));
   var lo=Math.round(Math.min.apply(null,temps));
   // most frequent code
@@ -563,7 +564,8 @@ function wxDaySummary(dayIdx){
   var dom=Object.keys(freq).reduce(function(a,b){return freq[a]>freq[b]?a:b;});
   return'<div class="wx-hdr"><div class="wx-hdr-item">'+wxEmoji(parseInt(dom))+'</div>'
     +'<div class="wx-hdr-item">↑'+hi+'°C</div>'
-    +'<div class="wx-hdr-item">↓'+lo+'°C</div></div>';
+    +'<div class="wx-hdr-item">↓'+lo+'°C</div>'
+    +kmItem+'</div>';
 }
 async function fetchWeather(){
   try{
@@ -590,8 +592,8 @@ function render(){
   h+='<div class="dh-eye">'+(l==='en'?day.de:day.dp)+'</div>';
   h+='<div class="dh-title">'+(l==='en'?day.te:day.tp)+'</div>';
   h+='<div class="dh-note">'+(l==='en'?day.ne:day.np)+'</div>';
-  h+=wxDaySummary(cd);
-  if(isMerged){var dayKm=day.bl.reduce(function(s,b){return s+(b.km||0);},0);if(dayKm>0)h+='<div class="km-day">🦶 ~'+dayKm.toFixed(1)+' km total</div>';}
+  var dayKm=isMerged?day.bl.reduce(function(s,b){return s+(b.km||0);},0):0;
+  h+=wxDaySummary(cd,dayKm||null);
   if(day.bday) h+='<div class="bday-strip">'+(l==='en'?day.bne:day.bnp)+'</div>';
   h+='</div></div><div class="tl">';
 
