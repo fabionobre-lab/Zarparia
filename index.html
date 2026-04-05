@@ -591,6 +591,7 @@ function render(){
   h+='<div class="dh-title">'+(l==='en'?day.te:day.tp)+'</div>';
   h+='<div class="dh-note">'+(l==='en'?day.ne:day.np)+'</div>';
   h+=wxDaySummary(cd);
+  if(isMerged){var dayKm=day.bl.reduce(function(s,b){return s+(b.km||0);},0);if(dayKm>0)h+='<div class="km-day">🦶 ~'+dayKm.toFixed(1)+' km total</div>';}
   if(day.bday) h+='<div class="bday-strip">'+(l==='en'?day.bne:day.bnp)+'</div>';
   h+='</div></div><div class="tl">';
 
