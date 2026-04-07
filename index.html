@@ -186,6 +186,10 @@ var D={
      te:'Arrival & Old Town',tp:'Chegada e Cidade Velha',
      ne:'Accommodation: 2 Upper Bow \u00b7 Check-in 15:00',np:'Hospedagem: 2 Upper Bow \u00b7 Check-in 15:00',
      bday:false,bl:[
+      {t:'~10:00',dot:'#7a6e5f',ie:'Leave home \u2014 NW6 to King\u2019s Cross',ip:'Sair de casa \u2014 NW6 para King\u2019s Cross',tg:['tra'],
+       me:'Jubilee line to King\u2019s Cross. Train to Edinburgh ~4h.',
+       mp:'Jubilee line at\u00e9 King\u2019s Cross. Trem para Edimburgo ~4h.',
+       url:'https://maps.google.com/?q=King%27s+Cross+Station+London',km:0},
       {t:'~14:00',dot:'#7a6e5f',ie:'Arrive Edinburgh',ip:'Chegada a Edimburgo',tg:['tra'],
        me:'Walk or taxi to 2 Upper Bow.',mp:'Taxi ou a p\u00e9 at\u00e9 o 2 Upper Bow.'},
       {t:'15:30',dot:'#3d5a3d',ie:'Late lunch \u2014 Cold Town House',ip:'Almo\u00e7o tardio \u2014 Cold Town House',tg:['lun'],
@@ -327,7 +331,9 @@ var D={
       {t:'21:00',dot:'#d4a574',ie:'Birthday dinner \u2014 Bacchanalia',ip:'Jantar de anivers\u00e1rio \u2014 Bacchanalia',tg:['din','bdy'],
        me:'Reservation at 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Mediterranean fine dining by Richard Caring.',
        mp:'Reserva \u00e0s 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Alta gastronomia mediterr\u00e2nea por Richard Caring.',
-       url:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London'}
+       url:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London'},
+      {t:'~23:00',dot:'#7a6e5f',ie:'Return home \u2014 NW6',ip:'Volta para casa \u2014 NW6',tg:['tra'],
+       me:'Taxi from Mayfair to Kilburn. ~20 min.',mp:'T\u00e1xi de Mayfair at\u00e9 Kilburn. ~20 min.',km:0}
     ]}
   ]},
   merged:{days:[
@@ -335,6 +341,11 @@ var D={
      te:'Arrival & Old Town',tp:'Chegada e Cidade Velha',
      ne:'Check-in 15:00 \u00b7 2 Upper Bow, Old Town',np:'Check-in 15:00 \u00b7 2 Upper Bow, Cidade Velha',
      bday:false,bl:[
+      {t:'~10:00',dot:'#7a6e5f',ie:'Leave home \u2014 NW6 to King\u2019s Cross',ip:'Sair de casa \u2014 NW6 para King\u2019s Cross',tg:['tra'],
+       me:'Jubilee line to King\u2019s Cross. Train to Edinburgh ~4h.',
+       mp:'Jubilee line at\u00e9 King\u2019s Cross. Trem para Edimburgo ~4h.',
+       url:'https://maps.google.com/?q=King%27s+Cross+Station+London',
+       df:{k:'add',en:'Added: departure from home.',pt:'Adicionado: sa\u00edda de casa.'},km:0},
       {t:'~14:30',dot:'#7a6e5f',ie:'Arrive Edinburgh Waverley',ip:'Chegada na Waverley',tg:['tra'],
        me:'10 min walk uphill to 2 Upper Bow, or taxi ~\u00a35.',
        mp:'10 min a p\u00e9 morro acima, ou t\u00e1xi ~\u00a35.',km:0.2},
@@ -537,7 +548,10 @@ var D={
        mp:'Reserva \u00e0s 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Alta gastronomia mediterr\u00e2nea por Richard Caring.',
        url:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London',
        ps:[{n:'Bacchanalia entrance',l:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London',wiki:'Bacchanalia (restaurant)'}],
-       df:{k:'add',en:'Added: Birthday dinner reservation.',pt:'Adicionado: reserva para jantar de anivers\u00e1rio.'},km:0.3}
+       df:{k:'add',en:'Added: Birthday dinner reservation.',pt:'Adicionado: reserva para jantar de anivers\u00e1rio.'},km:0.3},
+      {t:'~23:00',dot:'#7a6e5f',ie:'Return home \u2014 NW6',ip:'Volta para casa \u2014 NW6',tg:['tra'],
+       me:'Taxi from Mayfair to Kilburn. ~20 min.',mp:'T\u00e1xi de Mayfair at\u00e9 Kilburn. ~20 min.',
+       df:{k:'add',en:'Added.',pt:'Adicionado.'},km:0}
     ]}
   ]},
   london:{days:[
@@ -545,6 +559,9 @@ var D={
      te:'Windsor \u00b7 Stonehenge \u00b7 Bath',tp:'Windsor \u00b7 Stonehenge \u00b7 Bath',
      ne:'Car pickup 8am NW1 5AR \u00b7 Overnight in Bath',np:'Retirada do carro 8h NW1 5AR \u00b7 Pernoite em Bath',
      bday:false,wx:{hi:12,lo:3,emoji:'\ud83c\udf26\ufe0f'},kmTotal:7.5,bl:[
+      {t:'07:30',dot:'#7a6e5f',ie:'Leave home \u2014 NW6',ip:'Sair de casa \u2014 NW6',tg:['tra'],
+       me:'Walk or bus to car pickup at NW1 5AR. ~20 min.',
+       mp:'A p\u00e9 ou \u00f4nibus at\u00e9 retirada do carro em NW1 5AR. ~20 min.',km:0},
       {t:'08:00',dot:'#7a6e5f',ie:'Car pickup',ip:'Retirada do carro',tg:['log'],
        me:'NW1 5AR, near Regent\'s Park. Docs: license, passport, credit card.',
        mp:'NW1 5AR, pr\u00f3ximo a Regent\'s Park. Docs: CNH, passaporte, cart\u00e3o.',km:0.1},
@@ -616,7 +633,9 @@ var D={
        me:'Radcliffe Camera (photo) \u00b7 G&D\'s (artisan ice cream) or The Grand Caf\u00e9.',
        mp:'Radcliffe Camera (foto) \u00b7 G&D\'s (sorvete artesanal) ou The Grand Caf\u00e9.',km:0.5},
       {t:'19:00',dot:'#7a6e5f',ie:'Drive back to London',ip:'Volta para Londres',tg:['drv'],
-       me:'~1h30 via M40. Arrive NW6 ~20:30.',mp:'~1h30 pela M40. Chegada em NW6 ~20:30.',km:0}
+       me:'~1h30 via M40.',mp:'~1h30 pela M40.',km:0},
+      {t:'~20:30',dot:'#7a6e5f',ie:'Arrive home \u2014 NW6',ip:'Chegada em casa \u2014 NW6',tg:['tra'],
+       me:'Drop off the car and walk home. Trip complete!',mp:'Devolver o carro e ir para casa. Viagem completa!',km:0.2}
     ]}
   ]},
   london_pre:{days:[
@@ -641,12 +660,17 @@ var D={
        url:'https://maps.google.com/?q=Hyde+Park+London',km:2.5},
       {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Jacuzzi',ip:'Jantar \u2014 Jacuzzi',tg:['din','bkd'],
        me:'Reservation 19:30.',mp:'Reserva \u00e0s 19:30.',
-       url:'https://maps.google.com/?q=Jacuzzi+Restaurant+London',km:1.0}
+       url:'https://maps.google.com/?q=Jacuzzi+Restaurant+London',km:1.0},
+      {t:'~21:30',dot:'#7a6e5f',ie:'Return home \u2014 NW6',ip:'Volta para casa \u2014 NW6',tg:['tra'],
+       me:'Tube or taxi back to Kilburn.',mp:'Metr\u00f4 ou t\u00e1xi de volta para Kilburn.',km:0}
     ]},
     {de:'Saturday, 11 April',dp:'S\u00e1bado, 11 de abril',
      te:'Sky Garden \u00b7 Tower \u00b7 Greenwich',tp:'Sky Garden \u00b7 Torre \u00b7 Greenwich',
      ne:'Breakfast 8:15 Sky Garden \u00b7 Tower of London 10am \u00b7 Boat to Greenwich',np:'Caf\u00e9 8:15 Sky Garden \u00b7 Torre de Londres 10h \u00b7 Barco para Greenwich',
      bday:false,wx:{hi:14,lo:6,emoji:'\ud83c\udf24\ufe0f'},kmTotal:9.0,bl:[
+      {t:'07:15',dot:'#7a6e5f',ie:'Leave home \u2014 NW6',ip:'Sair de casa \u2014 NW6',tg:['tra'],
+       me:'Jubilee to Westminster, District/Circle to Monument. ~45 min.',
+       mp:'Jubilee at\u00e9 Westminster, District/Circle at\u00e9 Monument. ~45 min.',km:0},
       {t:'08:15',dot:'#3d5a3d',ie:'Breakfast \u2014 Sky Garden',ip:'Caf\u00e9 da manh\u00e3 \u2014 Sky Garden',tg:['bkf','bkd'],
        me:'20 Fenchurch Street. Free entry, booking required. 360\u00b0 views of London from the 35th floor.',
        mp:'20 Fenchurch Street. Entrada gratuita, reserva obrigat\u00f3ria. Vista 360\u00b0 de Londres do 35\u00ba andar.',
@@ -682,17 +706,21 @@ var D={
        me:'Covered market with street food, crafts, antiques. Good spot for a coffee break.',
        mp:'Mercado coberto com comida de rua, artesanato, antiguidades. Bom para um caf\u00e9.',
        url:'https://maps.google.com/?q=Greenwich+Market',km:0.5},
-      {t:'17:30',dot:'#7a6e5f',ie:'Return to central London',ip:'Retorno ao centro de Londres',tg:['tra'],
-       me:'DLR from Cutty Sark station, or Thames Clipper back.',
-       mp:'DLR da esta\u00e7\u00e3o Cutty Sark, ou barco Thames Clipper de volta.',km:0},
-      {t:'19:00',dot:'#3d5a3d',ie:'Dinner \u2014 flexible',ip:'Jantar \u2014 flex\u00edvel',tg:['din'],
-       me:'Choose based on energy. Suggestions: Dishoom (King\u2019s Cross), Padella (Borough), or local NW6.',
-       mp:'Escolha conforme a energia. Sugest\u00f5es: Dishoom (King\u2019s Cross), Padella (Borough) ou perto de NW6.',km:0.5}
+      {t:'17:30',dot:'#3d5a3d',ie:'Drinks & dinner \u2014 The Trafalgar Tavern',ip:'Drinks e jantar \u2014 The Trafalgar Tavern',tg:['din'],
+       me:'Historic riverside pub in Greenwich. Thames views, traditional British food, great ales. Take your time and enjoy the evening.',
+       mp:'Pub hist\u00f3rico \u00e0 beira do T\u00e2misa em Greenwich. Vista do rio, comida brit\u00e2nica tradicional, \u00f3timas cervejas. Aproveitem a noite com calma.',
+       url:'https://maps.google.com/?q=Trafalgar+Tavern+Greenwich+London',km:0.5},
+      {t:'~20:00',dot:'#7a6e5f',ie:'Return home \u2014 NW6',ip:'Volta para casa \u2014 NW6',tg:['tra'],
+       me:'DLR from Cutty Sark to Bank, Jubilee line to Kilburn. ~50 min.',
+       mp:'DLR de Cutty Sark at\u00e9 Bank, Jubilee line at\u00e9 Kilburn. ~50 min.',km:0}
     ]},
     {de:'Sunday, 12 April',dp:'Domingo, 12 de abril',
      te:'Cotswolds Day Tour',tp:'Tour pelos Cotswolds',
      ne:'Full-day guided bus tour \u00b7 Departs ~08:00',np:'Tour guiado de dia inteiro \u00b7 Sa\u00edda ~08:00',
      bday:false,wx:{hi:13,lo:5,emoji:'\ud83c\udf24\ufe0f'},kmTotal:8.0,bl:[
+      {t:'~07:00',dot:'#7a6e5f',ie:'Leave home \u2014 NW6',ip:'Sair de casa \u2014 NW6',tg:['tra'],
+       me:'Jubilee to Green Park, Victoria line to Victoria. ~35 min.',
+       mp:'Jubilee at\u00e9 Green Park, Victoria line at\u00e9 Victoria. ~35 min.',km:0},
       {t:'~08:00',dot:'#7a6e5f',ie:'Tour departs \u2014 Lite Bite Cafe Bar',ip:'Sa\u00edda do tour \u2014 Lite Bite Cafe Bar',tg:['tra'],
        me:'Meeting point near Victoria Coach Station. 2h coach ride to the Cotswolds.',
        mp:'Ponto de encontro perto de Victoria Coach Station. 2h de \u00f4nibus at\u00e9 os Cotswolds.',
@@ -732,7 +760,9 @@ var D={
        me:'Back at Lite Bite Cafe Bar, Victoria area.',mp:'De volta no Lite Bite Cafe Bar, regi\u00e3o de Victoria.',km:0},
       {t:'19:00',dot:'#3d5a3d',ie:'Dinner \u2014 flexible',ip:'Jantar \u2014 flex\u00edvel',tg:['din'],
        me:'Rest day after the tour. Casual dinner near home or Soho.',
-       mp:'Dia de descanso ap\u00f3s o tour. Jantar casual perto de casa ou em Soho.',km:0.5}
+       mp:'Dia de descanso ap\u00f3s o tour. Jantar casual perto de casa ou em Soho.',km:0.5},
+      {t:'~21:00',dot:'#7a6e5f',ie:'Return home \u2014 NW6',ip:'Volta para casa \u2014 NW6',tg:['tra'],
+       me:'Tube back to Kilburn.',mp:'Metr\u00f4 de volta para Kilburn.',km:0}
     ]}
   ]}
 };
