@@ -91,6 +91,19 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .diff-kp{background:#f0ece4;border-left:2.5px solid var(--tartan);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
 .map-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--loch);text-decoration:none;font-family:'Source Serif 4',serif;background:rgba(30,58,95,.04)}
 .footer{text-align:center;padding:10px 0 3px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.05em}
+.route-card{display:block;margin:10px 13px 4px;background:linear-gradient(135deg,#f7f4ee 0%,#eee9df 100%);border:1px solid var(--border);border-radius:12px;padding:12px 14px 10px;text-decoration:none;color:var(--ink);transition:all .2s}
+.route-card:active{transform:scale(.98);background:#eee9df}
+.route-hdr{display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--tartan);margin-bottom:8px}
+.shell.london-active .route-hdr{color:var(--london-hero)}
+.route-stops{display:flex;align-items:center;gap:0;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}
+.route-stops::-webkit-scrollbar{display:none}
+.route-stop{display:flex;flex-direction:column;align-items:center;min-width:0;flex-shrink:0;position:relative}
+.route-num{width:22px;height:22px;border-radius:50%;background:var(--tartan);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;flex-shrink:0}
+.shell.london-active .route-num{background:var(--london-hero)}
+.route-name{font-size:9px;color:var(--stone);text-align:center;max-width:58px;line-height:1.2;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.route-connector{width:20px;height:2px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 4px,transparent 4px,transparent 7px);margin:0 1px;flex-shrink:0;align-self:flex-start;margin-top:10px}
+.route-open{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;color:var(--loch);font-family:'Source Serif 4',serif;padding-top:4px;border-top:1px solid rgba(0,0,0,.06);margin-top:2px}
+.route-open svg{flex-shrink:0}
 .km-tag{display:inline-block;margin-top:5px;font-size:10px;color:#888;background:#f4f1ec;border-radius:10px;padding:1px 7px}
 .wx-km{color:#9caf88;font-weight:600;padding-left:8px;border-left:1px solid rgba(255,255,255,.25);margin-left:4px}
 .tb-photos{margin-top:8px;display:flex;flex-wrap:wrap;gap:7px}
@@ -712,6 +725,28 @@ async function fetchWeather(){
   londonWx['2026-04-26']={hi:12,lo:5,emoji:'\ud83c\udf24\ufe0f'};
 }
 // ─────────────────────────────────────────────────────────
+function buildRouteUrl(blocks){
+  var places=[];
+  blocks.forEach(function(b){
+    if(b.url){var m=b.url.match(/[?&]q=([^&]+)/);if(m)places.push(m[1]);}
+  });
+  if(places.length<2)return null;
+  return'https://www.google.com/maps/dir/'+places.map(function(p){return p;}).join('/')+'/';
+}
+function getRouteStops(blocks,l){
+  var stops=[];
+  blocks.forEach(function(b){
+    if(b.url){
+      var m=b.url.match(/[?&]q=([^&]+)/);
+      if(m){
+        var name=l==='en'?b.ie:b.ip;
+        if(name.length>20)name=name.substring(0,18)+'…';
+        stops.push(name);
+      }
+    }
+  });
+  return stops;
+}
 function render(){
   var isLondon=currentTrip==='london';
   var dayData;
@@ -736,7 +771,22 @@ function render(){
   var dayKm=isLondon?(dayData.kmTotal||0):isMerged?dayData.bl.reduce(function(s,b){return s+(b.km||0);},0):0;
   h+=wxDaySummary(cd,dayKm||null);
   if(dayData.bday) h+='<div class="bday-strip">'+(l==='en'?dayData.bne:dayData.bnp)+'</div>';
-  h+='</div></div><div class="tl">';
+  h+='</div></div>';
+  var _rUrl=buildRouteUrl(dayData.bl);
+  if(_rUrl){
+    var _rStops=getRouteStops(dayData.bl,l);
+    h+='<a href="'+_rUrl+'" target="_blank" class="route-card">';
+    h+='<div class="route-hdr"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>'+(l==='en'?'Day Route':'Rota do Dia')+'</div>';
+    h+='<div class="route-stops">';
+    _rStops.forEach(function(s,i){
+      if(i>0)h+='<div class="route-connector"></div>';
+      h+='<div class="route-stop"><div class="route-num">'+(i+1)+'</div><div class="route-name">'+s+'</div></div>';
+    });
+    h+='</div>';
+    h+='<div class="route-open"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'+(l==='en'?'Open route in Google Maps →':'Abrir rota no Google Maps →')+'</div>';
+    h+='</a>';
+  }
+  h+='<div class="tl">';
 
   dayData.bl.forEach(function(b,bi){
     var last=bi===dayData.bl.length-1;
