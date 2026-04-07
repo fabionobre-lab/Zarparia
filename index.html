@@ -134,24 +134,28 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
     </div>
   </div>
   <nav class="daynav">
-    <button class="daybtn on" onclick="sd(0)"><span class="dow" id="dw0">Wed</span><span class="dnum">15</span><span class="bday-pip"></span></button>
-    <button class="daybtn" onclick="sd(1)"><span class="dow" id="dw1">Thu</span><span class="dnum">16</span><span class="bday-pip"></span></button>
-    <button class="daybtn" onclick="sd(2)"><span class="dow" id="dw2">Fri</span><span class="dnum">17</span><span class="bday-pip"></span></button>
-    <button class="daybtn has-bday" onclick="sd(3)"><span class="dow" id="dw3">Sat</span><span class="dnum">18</span><span class="bday-pip"></span></button>
-    <button class="daybtn has-bday" onclick="sd(4)"><span class="dow" id="dw4">Sun</span><span class="dnum">19</span><span class="bday-pip"></span></button>
+    <button class="daybtn on" onclick="sd(0)"><span class="dow" id="dw0">Fri</span><span class="dnum">10</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(1)"><span class="dow" id="dw1">Sat</span><span class="dnum">11</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(2)"><span class="dow" id="dw2">Sun</span><span class="dnum">12</span><span class="bday-pip"></span></button>
     <div class="daybtn-separator"></div>
-    <button class="daybtn" id="londay5" onclick="sd(5)"><span class="dow" id="dw5">Sat</span><span class="dnum">25</span><span class="bday-pip"></span></button>
-    <button class="daybtn" id="londay6" onclick="sd(6)"><span class="dow" id="dw6">Sun</span><span class="dnum">26</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(3)"><span class="dow" id="dw3">Wed</span><span class="dnum">15</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(4)"><span class="dow" id="dw4">Thu</span><span class="dnum">16</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(5)"><span class="dow" id="dw5">Fri</span><span class="dnum">17</span><span class="bday-pip"></span></button>
+    <button class="daybtn has-bday" onclick="sd(6)"><span class="dow" id="dw6">Sat</span><span class="dnum">18</span><span class="bday-pip"></span></button>
+    <button class="daybtn has-bday" onclick="sd(7)"><span class="dow" id="dw7">Sun</span><span class="dnum">19</span><span class="bday-pip"></span></button>
+    <div class="daybtn-separator"></div>
+    <button class="daybtn" onclick="sd(8)"><span class="dow" id="dw8">Sat</span><span class="dnum">25</span><span class="bday-pip"></span></button>
+    <button class="daybtn" onclick="sd(9)"><span class="dow" id="dw9">Sun</span><span class="dnum">26</span><span class="bday-pip"></span></button>
   </nav>
   <div class="scroll-area" id="content"></div>
 </div>
 <script>
-var lang='en',cv='merged',cd=0,currentTrip='edinburgh';
+var lang='en',cv='merged',cd=0,currentTrip='london_pre';
 var T={
   en:{ey:'April 2026',sub:'15 \u2013 19 April 2026',
-    tt_edin:'Edinburgh Trip (Fabio & Liana)',tt_london:'Road Trip from London',
-    sub_london:'25 \u2013 26 April 2026',
-    dows:['Wed','Thu','Fri','Sat','Sun'],dows_london:['Sat','Sun'],maps:'Open in Maps',
+    tt_edin:'Edinburgh Trip (Fabio & Liana)',tt_london:'Road Trip from London',tt_lonpre:'London (Fabio & Liana)',
+    sub_london:'25 \u2013 26 April 2026',sub_lonpre:'10 \u2013 12 April 2026',
+    dows:['Wed','Thu','Fri','Sat','Sun'],dows_london:['Sat','Sun'],dows_lonpre:['Fri','Sat','Sun'],maps:'Open in Maps',
     da:'+\u00a0',dc:'\u007e\u00a0',dk:"Liana's pick \u2014 ",
     warn_crown:'Crown Room may still be closed April 2026. Check edinburghcastle.scot.',
     warn_hol:'Opens 9:30am. Closed Tue/Wed. No photography inside.',
@@ -162,9 +166,9 @@ var T={
       bdy:'Birthday',cel:'Birthday dinner',mu:'Museum',nat:'Nature',par:'Park',arc:'Architecture',
       vpt:'Viewpoint',grd:'Garden',pal:'Palace',rel:'Relaxed dinner',spe:'Special dinner',drv:'Drive'}},
   pt:{ey:'Abril 2026',sub:'15 \u2013 19 de abril de 2026',
-    tt_edin:'Viagem a Edimburgo (Fabio & Liana)',tt_london:'Road Trip de Londres',
-    sub_london:'25 \u2013 26 de abril de 2026',
-    dows:['Qua','Qui','Sex','S\u00e1b','Dom'],dows_london:['S\u00e1b','Dom'],maps:'Abrir no Maps',
+    tt_edin:'Viagem a Edimburgo (Fabio & Liana)',tt_london:'Road Trip de Londres',tt_lonpre:'Londres (Fabio & Liana)',
+    sub_london:'25 \u2013 26 de abril de 2026',sub_lonpre:'10 \u2013 12 de abril de 2026',
+    dows:['Qua','Qui','Sex','S\u00e1b','Dom'],dows_london:['S\u00e1b','Dom'],dows_lonpre:['Sex','S\u00e1b','Dom'],maps:'Abrir no Maps',
     da:'+\u00a0',dc:'\u007e\u00a0',dk:'Escolha da Liana \u2014 ',
     warn_crown:'A Sala da Coroa pode estar fechada em abril 2026. Confirme em edinburghcastle.scot.',
     warn_hol:'Abre \u00e0s 9:30. Fechado ter/qua. Fotos n\u00e3o permitidas.',
@@ -299,8 +303,8 @@ var D={
     ]},
     {de:'Sunday, 19 April',dp:'Domingo, 19 de abril',
      te:'Birthday & Departure',tp:'Anivers\u00e1rio e Partida',
-     ne:'Happy Birthday Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Flight 14:15',
-     np:'Feliz Anivers\u00e1rio Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Voo 14:15',
+     ne:'Happy Birthday Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Train 14:26 \u00b7 Dinner at Bacchanalia',
+     np:'Feliz Anivers\u00e1rio Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Trem 14:26 \u00b7 Jantar no Bacchanalia',
      bday:true,bne:'Happy Birthday Liana! \u2665',bnp:'Feliz Anivers\u00e1rio Liana! \u2665',
      bl:[
       {t:'09:00',dot:'#1e3a5f',ie:'Royal Botanic Garden',ip:'Jardim Bot\u00e2nico',tg:['grd','fr'],
@@ -312,7 +316,18 @@ var D={
       {t:'~12:30',dot:'#7a6e5f',ie:'Head to Waverley',ip:'Ir para Waverley',tg:['dep'],
        me:'Train from Edinburgh Waverley at 14:26.',
        mp:'Trem da Estação Waverley às 14:26.',
-       url:'https://maps.google.com/?q=Edinburgh+Waverley+Station'}
+       url:'https://maps.google.com/?q=Edinburgh+Waverley+Station'},
+      {t:'18:44',dot:'#7a6e5f',ie:'Arrive London King\u2019s Cross',ip:'Chegada em Londres King\u2019s Cross',tg:['tra'],
+       me:'Train arrives 18:44. Jubilee line to Kilburn (NW6).',
+       mp:'Trem chega 18:44. Jubilee line at\u00e9 Kilburn (NW6).',
+       url:'https://maps.google.com/?q=King%27s+Cross+Station+London'},
+      {t:'~19:30',dot:'#7a6e5f',ie:'Home \u2014 freshen up',ip:'Casa \u2014 se arrumar',tg:['rel'],
+       me:'Quick shower and change before dinner.',
+       mp:'Banho r\u00e1pido e trocar de roupa antes do jantar.'},
+      {t:'21:00',dot:'#d4a574',ie:'Birthday dinner \u2014 Bacchanalia',ip:'Jantar de anivers\u00e1rio \u2014 Bacchanalia',tg:['din','bdy'],
+       me:'Reservation at 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Mediterranean fine dining by Richard Caring.',
+       mp:'Reserva \u00e0s 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Alta gastronomia mediterr\u00e2nea por Richard Caring.',
+       url:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London'}
     ]}
   ]},
   merged:{days:[
@@ -484,8 +499,8 @@ var D={
     ]},
     {de:'Sunday, 19 April',dp:'Domingo, 19 de abril',
      te:'Birthday & Departure',tp:'Anivers\u00e1rio e Partida',
-     ne:'Happy Birthday Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Flight 14:15',
-     np:'Feliz Anivers\u00e1rio Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Voo 14:15',
+     ne:'Happy Birthday Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Train 14:26 \u00b7 Dinner at Bacchanalia',
+     np:'Feliz Anivers\u00e1rio Liana! \u2665 \u00b7 Check-out 11:00 \u00b7 Trem 14:26 \u00b7 Jantar no Bacchanalia',
      bday:true,bne:'Happy Birthday Liana! \u2665',bnp:'Feliz Anivers\u00e1rio Liana! \u2665',
      bl:[
       {t:'09:30',dot:'#7a6e5f',ie:'Check out & drop bags at Waverley',ip:'Check-out e guarda-volumes na Waverley',tg:['log'],
@@ -507,7 +522,22 @@ var D={
       {t:'12:30',dot:'#7a6e5f',ie:'Collect bags & head to Waverley',ip:'Pegar malas e ir para Waverley',tg:['dep'],
        me:'Collect bags from Waverley left luggage. Train departs 14:26.',
        mp:'Retirar malas da guarda-volumes da Waverley. Trem parte às 14:26.',
-       url:'https://maps.google.com/?q=Edinburgh+Waverley+Station',km:0.6}
+       url:'https://maps.google.com/?q=Edinburgh+Waverley+Station',km:0.6},
+      {t:'18:44',dot:'#7a6e5f',ie:'Arrive London King\u2019s Cross',ip:'Chegada em Londres King\u2019s Cross',tg:['tra'],
+       me:'Train arrives 18:44. Jubilee line to Kilburn (NW6).',
+       mp:'Trem chega 18:44. Jubilee line at\u00e9 Kilburn (NW6).',
+       url:'https://maps.google.com/?q=King%27s+Cross+Station+London',
+       df:{k:'add',en:'Added: London evening after Edinburgh departure.',pt:'Adicionado: noite em Londres ap\u00f3s partida de Edimburgo.'},km:0.2},
+      {t:'~19:30',dot:'#7a6e5f',ie:'Home \u2014 freshen up',ip:'Casa \u2014 se arrumar',tg:['rel'],
+       me:'Quick shower and change before dinner.',
+       mp:'Banho r\u00e1pido e trocar de roupa antes do jantar.',
+       df:{k:'add',en:'Added.',pt:'Adicionado.'},km:0},
+      {t:'21:00',dot:'#d4a574',ie:'Birthday dinner \u2014 Bacchanalia',ip:'Jantar de anivers\u00e1rio \u2014 Bacchanalia',tg:['din','bdy'],
+       me:'Reservation at 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Mediterranean fine dining by Richard Caring.',
+       mp:'Reserva \u00e0s 21:00. Bacchanalia, 1 Mount Street, Mayfair W1K 3NB. Alta gastronomia mediterr\u00e2nea por Richard Caring.',
+       url:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London',
+       ps:[{n:'Bacchanalia entrance',l:'https://maps.google.com/?q=Bacchanalia+Restaurant+Mount+Street+London',wiki:'Bacchanalia (restaurant)'}],
+       df:{k:'add',en:'Added: Birthday dinner reservation.',pt:'Adicionado: reserva para jantar de anivers\u00e1rio.'},km:0.3}
     ]}
   ]},
   london:{days:[
@@ -588,6 +618,122 @@ var D={
       {t:'19:00',dot:'#7a6e5f',ie:'Drive back to London',ip:'Volta para Londres',tg:['drv'],
        me:'~1h30 via M40. Arrive NW6 ~20:30.',mp:'~1h30 pela M40. Chegada em NW6 ~20:30.',km:0}
     ]}
+  ]},
+  london_pre:{days:[
+    {de:'Friday, 10 April',dp:'Sexta-feira, 10 de abril',
+     te:'Liana Arrives',tp:'Chegada da Liana',
+     ne:'LHR 11:45 \u00b7 Elizabeth Line to NW6 \u00b7 Harrods \u00b7 Hyde Park',np:'LHR 11:45 \u00b7 Elizabeth Line at\u00e9 NW6 \u00b7 Harrods \u00b7 Hyde Park',
+     bday:false,wx:{hi:14,lo:7,emoji:'\ud83c\udf24\ufe0f'},kmTotal:5.0,bl:[
+      {t:'11:45',dot:'#7a6e5f',ie:'Liana lands at Heathrow',ip:'Liana pousa em Heathrow',tg:['tra'],
+       me:'Terminal arrival. Immigration + baggage ~45 min.',mp:'Chegada no terminal. Imigra\u00e7\u00e3o + bagagem ~45 min.',km:0},
+      {t:'~12:30',dot:'#7a6e5f',ie:'Elizabeth Line to NW6',ip:'Elizabeth Line at\u00e9 NW6',tg:['tra'],
+       me:'Elizabeth Line to Bond Street, Jubilee to Kilburn. ~1h door to door.',
+       mp:'Elizabeth Line at\u00e9 Bond Street, Jubilee at\u00e9 Kilburn. ~1h porta a porta.',km:0},
+      {t:'~13:30',dot:'#7a6e5f',ie:'Arrive home \u00b7 Quick lunch',ip:'Chegar em casa \u00b7 Almo\u00e7o r\u00e1pido',tg:['log'],
+       me:'NW6 3RS. Quick meal, shower, get dressed.',mp:'NW6 3RS. Refei\u00e7\u00e3o r\u00e1pida, banho, trocar de roupa.',km:0},
+      {t:'15:30',dot:'#1e3054',ie:'Harrods',ip:'Harrods',tg:['s'],
+       me:'Iconic luxury department store. Egyptian escalator, food halls, window displays.',
+       mp:'Loja de departamentos ic\u00f4nica. Escada rolante eg\u00edpcia, food halls, vitrines.',
+       url:'https://maps.google.com/?q=Harrods+Knightsbridge+London',km:1.5},
+      {t:'17:30',dot:'#1e3054',ie:'Hyde Park walk',ip:'Passeio pelo Hyde Park',tg:['par','fr'],
+       me:'Serpentine Lake \u00b7 Italian Gardens \u00b7 Diana Memorial Fountain. Golden hour light.',
+       mp:'Lago Serpentine \u00b7 Jardins Italianos \u00b7 Fonte Memorial Diana. Luz dourada.',
+       url:'https://maps.google.com/?q=Hyde+Park+London',km:2.5},
+      {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Jacuzzi',ip:'Jantar \u2014 Jacuzzi',tg:['din','bkd'],
+       me:'Reservation 19:30.',mp:'Reserva \u00e0s 19:30.',
+       url:'https://maps.google.com/?q=Jacuzzi+Restaurant+London',km:1.0}
+    ]},
+    {de:'Saturday, 11 April',dp:'S\u00e1bado, 11 de abril',
+     te:'Sky Garden \u00b7 Tower \u00b7 Greenwich',tp:'Sky Garden \u00b7 Torre \u00b7 Greenwich',
+     ne:'Breakfast 8:15 Sky Garden \u00b7 Tower of London 10am \u00b7 Boat to Greenwich',np:'Caf\u00e9 8:15 Sky Garden \u00b7 Torre de Londres 10h \u00b7 Barco para Greenwich',
+     bday:false,wx:{hi:14,lo:6,emoji:'\ud83c\udf24\ufe0f'},kmTotal:9.0,bl:[
+      {t:'08:15',dot:'#3d5a3d',ie:'Breakfast \u2014 Sky Garden',ip:'Caf\u00e9 da manh\u00e3 \u2014 Sky Garden',tg:['bkf','bkd'],
+       me:'20 Fenchurch Street. Free entry, booking required. 360\u00b0 views of London from the 35th floor.',
+       mp:'20 Fenchurch Street. Entrada gratuita, reserva obrigat\u00f3ria. Vista 360\u00b0 de Londres do 35\u00ba andar.',
+       url:'https://maps.google.com/?q=Sky+Garden+London',km:0.5},
+      {t:'09:30',dot:'#1e3054',ie:'The Monument',ip:'O Monumento',tg:['s'],
+       me:'Monument to the Great Fire of London. 311 steps to the top. Spectacular City views. On the walk to the Tower.',
+       mp:'Monumento ao Grande Inc\u00eandio de Londres. 311 degraus at\u00e9 o topo. Vista espetacular. No caminho para a Torre.',
+       url:'https://maps.google.com/?q=The+Monument+London',km:0.5},
+      {t:'10:00',dot:'#1e3054',ie:'Tower of London',ip:'Torre de Londres',tg:['s','bkd'],
+       me:'Crown Jewels \u00b7 White Tower \u00b7 Beefeater tours \u00b7 Ravens. Allow 2\u20133 hours.',
+       mp:'J\u00f3ias da Coroa \u00b7 Torre Branca \u00b7 Tours dos Beefeaters \u00b7 Corvos. Reserve 2\u20133 horas.',
+       url:'https://maps.google.com/?q=Tower+of+London',km:2.0},
+      {t:'12:30',dot:'#3d5a3d',ie:'Lunch near Tower Pier',ip:'Almo\u00e7o perto de Tower Pier',tg:['lun'],
+       me:'Quick lunch before the boat. Options at St Katharine Docks or Tower Hill.',
+       mp:'Almo\u00e7o r\u00e1pido antes do barco. Op\u00e7\u00f5es em St Katharine Docks ou Tower Hill.',km:0.3},
+      {t:'13:15',dot:'#7a6e5f',ie:'Thames Clipper to Greenwich',ip:'Barco Thames Clipper para Greenwich',tg:['tra'],
+       me:'Uber Boat from Tower Pier to Greenwich Pier. ~30 min. Great views of Canary Wharf and the Thames.',
+       mp:'Uber Boat de Tower Pier a Greenwich Pier. ~30 min. Vistas de Canary Wharf e do T\u00e2misa.',
+       url:'https://maps.google.com/?q=Tower+Pier+London',km:0},
+      {t:'13:45',dot:'#1e3054',ie:'Cutty Sark',ip:'Cutty Sark',tg:['s'],
+       me:'Iconic 19th-century clipper ship. Walk under the glass-lifted hull.',
+       mp:'Navio clipper ic\u00f4nico do s\u00e9culo XIX. Caminhe sob o casco de vidro.',
+       url:'https://maps.google.com/?q=Cutty+Sark+Greenwich',km:0.5},
+      {t:'14:30',dot:'#1e3054',ie:'Painted Hall \u2014 Old Royal Naval College',ip:'Painted Hall \u2014 Old Royal Naval College',tg:['s','bkd'],
+       me:'The \u201cSistine Chapel of the UK.\u201d Tickets already booked. Stunning Baroque ceiling by Thornhill.',
+       mp:'A \u201cCapela Sistina do Reino Unido.\u201d Ingressos j\u00e1 comprados. Teto barroco deslumbrante por Thornhill.',
+       url:'https://maps.google.com/?q=Painted+Hall+Greenwich',km:0.5},
+      {t:'15:30',dot:'#1e3054',ie:'Greenwich Park + Royal Observatory',ip:'Greenwich Park + Observat\u00f3rio Real',tg:['vpt','fr'],
+       me:'Walk uphill to the Prime Meridian line. Panoramic view of Canary Wharf and the Thames.',
+       mp:'Subida at\u00e9 a linha do Meridiano de Greenwich. Vista panor\u00e2mica de Canary Wharf e do T\u00e2misa.',
+       url:'https://maps.google.com/?q=Royal+Observatory+Greenwich',km:1.5},
+      {t:'16:30',dot:'#1e3054',ie:'Greenwich Market',ip:'Mercado de Greenwich',tg:['s','cof'],
+       me:'Covered market with street food, crafts, antiques. Good spot for a coffee break.',
+       mp:'Mercado coberto com comida de rua, artesanato, antiguidades. Bom para um caf\u00e9.',
+       url:'https://maps.google.com/?q=Greenwich+Market',km:0.5},
+      {t:'17:30',dot:'#7a6e5f',ie:'Return to central London',ip:'Retorno ao centro de Londres',tg:['tra'],
+       me:'DLR from Cutty Sark station, or Thames Clipper back.',
+       mp:'DLR da esta\u00e7\u00e3o Cutty Sark, ou barco Thames Clipper de volta.',km:0},
+      {t:'19:00',dot:'#3d5a3d',ie:'Dinner \u2014 flexible',ip:'Jantar \u2014 flex\u00edvel',tg:['din'],
+       me:'Choose based on energy. Suggestions: Dishoom (King\u2019s Cross), Padella (Borough), or local NW6.',
+       mp:'Escolha conforme a energia. Sugest\u00f5es: Dishoom (King\u2019s Cross), Padella (Borough) ou perto de NW6.',km:0.5}
+    ]},
+    {de:'Sunday, 12 April',dp:'Domingo, 12 de abril',
+     te:'Cotswolds Day Tour',tp:'Tour pelos Cotswolds',
+     ne:'Full-day guided bus tour \u00b7 Departs ~08:00',np:'Tour guiado de dia inteiro \u00b7 Sa\u00edda ~08:00',
+     bday:false,wx:{hi:13,lo:5,emoji:'\ud83c\udf24\ufe0f'},kmTotal:8.0,bl:[
+      {t:'~08:00',dot:'#7a6e5f',ie:'Tour departs \u2014 Lite Bite Cafe Bar',ip:'Sa\u00edda do tour \u2014 Lite Bite Cafe Bar',tg:['tra'],
+       me:'Meeting point near Victoria Coach Station. 2h coach ride to the Cotswolds.',
+       mp:'Ponto de encontro perto de Victoria Coach Station. 2h de \u00f4nibus at\u00e9 os Cotswolds.',
+       url:'https://maps.google.com/?q=Victoria+Coach+Station+London',km:0},
+      {t:'~10:00',dot:'#1e3054',ie:'Chipping Campden',ip:'Chipping Campden',tg:['s'],
+       me:'Honey-stone High Street, medieval market hall, thatched cottages. Self-guided, 50 min.',
+       mp:'High Street em pedra cor de mel, mercado medieval, casas de colmo. Autoguiado, 50 min.',
+       url:'https://maps.google.com/?q=Chipping+Campden',km:1.0},
+      {t:'~11:00',dot:'#1e3054',ie:'Broadway Tower',ip:'Broadway Tower',tg:['vpt'],
+       me:'Iconic folly tower on a hilltop. Views across 16 counties on a clear day. Guided tour, 10 min.',
+       mp:'Torre fol\u00e9rica ic\u00f4nica no topo de uma colina. Vista de 16 condados em dia claro. Tour guiado, 10 min.',
+       url:'https://maps.google.com/?q=Broadway+Tower+Cotswolds',km:0.5},
+      {t:'~11:20',dot:'#1e3054',ie:'Cotswold Lavender',ip:'Cotswold Lavender',tg:['s'],
+       me:'Lavender fields and farm shop. Self-guided, 10 min. Best in June\u2013August but the shop is open year-round.',
+       mp:'Campos de lavanda e loja da fazenda. Autoguiado, 10 min. Melhor de junho a agosto, mas a loja abre o ano todo.',
+       url:'https://maps.google.com/?q=Cotswold+Lavender',km:0.3},
+      {t:'~11:40',dot:'#1e3054',ie:'Snowshill',ip:'Snowshill',tg:['s'],
+       me:'Tiny Cotswold hamlet. Snowshill Manor (National Trust) if time allows. Scenic drive, 20 min.',
+       mp:'Pequeno vilarejo dos Cotswolds. Snowshill Manor (National Trust) se houver tempo. Passeio c\u00eanico, 20 min.',
+       url:'https://maps.google.com/?q=Snowshill+Cotswolds',km:0.5},
+      {t:'~12:15',dot:'#1e3054',ie:'Stow-on-the-Wold',ip:'Stow-on-the-Wold',tg:['s'],
+       me:'Charming market town. Famous wooden door at St Edward\u2019s Church. Antique shops. 30 min.',
+       mp:'Cidade de mercado charmosa. Porta de madeira famosa na Igreja St Edward. Lojas de antiguidades. 30 min.',
+       url:'https://maps.google.com/?q=Stow+on+the+Wold',km:0.8},
+      {t:'~13:00',dot:'#1e3054',ie:'Bourton-on-the-Water',ip:'Bourton-on-the-Water',tg:['s','lun'],
+       me:'\u201cVenice of the Cotswolds.\u201d Low stone bridges over River Windrush. Lunch stop \u2014 1 hour.',
+       mp:'\u201cVeneza dos Cotswolds.\u201d Pontes de pedra sobre o Rio Windrush. Parada para almo\u00e7o \u2014 1 hora.',
+       url:'https://maps.google.com/?q=Bourton+on+the+Water',km:1.5},
+      {t:'~14:15',dot:'#1e3054',ie:'Bibury + Arlington Row',ip:'Bibury + Arlington Row',tg:['s'],
+       me:'Arlington Row \u2014 the most photographed cottages in England. Bibury trout farm. 25 min.',
+       mp:'Arlington Row \u2014 as casas mais fotografadas da Inglaterra. Truiticultura de Bibury. 25 min.',
+       url:'https://maps.google.com/?q=Arlington+Row+Bibury',km:1.0},
+      {t:'~15:00',dot:'#7a6e5f',ie:'Scenic drive + return',ip:'Passeio c\u00eanico + retorno',tg:['drv'],
+       me:'Final Cotswolds scenic drive, then 2h coach back to London.',
+       mp:'\u00daltimo passeio c\u00eanico pelos Cotswolds, depois 2h de \u00f4nibus de volta a Londres.',km:0},
+      {t:'~17:00',dot:'#7a6e5f',ie:'Arrive London',ip:'Chegada em Londres',tg:['tra'],
+       me:'Back at Lite Bite Cafe Bar, Victoria area.',mp:'De volta no Lite Bite Cafe Bar, regi\u00e3o de Victoria.',km:0},
+      {t:'19:00',dot:'#3d5a3d',ie:'Dinner \u2014 flexible',ip:'Jantar \u2014 flex\u00edvel',tg:['din'],
+       me:'Rest day after the tour. Casual dinner near home or Soho.',
+       mp:'Dia de descanso ap\u00f3s o tour. Jantar casual perto de casa ou em Soho.',km:0.5}
+    ]}
   ]}
 };
 
@@ -603,12 +749,14 @@ function setL(l){
   document.querySelectorAll('.lang-btn').forEach(function(b,i){b.classList.toggle('on',(i===0&&l==='en')||(i===1&&l==='pt'));});
   var t=T[l];
   document.getElementById('ey').textContent=t.ey;
-  document.getElementById('tt').textContent=currentTrip==='london'?t.tt_london:t.tt_edin;
-  document.getElementById('ts').textContent=currentTrip==='london'?t.sub_london:t.sub;
-  if(currentTrip==='edinburgh'){
-    t.dows.forEach(function(d,i){if(i<5) document.getElementById('dw'+i).textContent=d;});
+  document.getElementById('tt').textContent=currentTrip==='london_pre'?t.tt_lonpre:currentTrip==='london'?t.tt_london:t.tt_edin;
+  document.getElementById('ts').textContent=currentTrip==='london_pre'?t.sub_lonpre:currentTrip==='london'?t.sub_london:t.sub;
+  if(currentTrip==='london_pre'){
+    t.dows_lonpre.forEach(function(d,i){document.getElementById('dw'+i).textContent=d;});
+  } else if(currentTrip==='edinburgh'){
+    t.dows.forEach(function(d,i){document.getElementById('dw'+(i+3)).textContent=d;});
   } else {
-    t.dows_london.forEach(function(d,i){document.getElementById('dw'+(i+5)).textContent=d;});
+    t.dows_london.forEach(function(d,i){document.getElementById('dw'+(i+8)).textContent=d;});
   }
   render();
 }
@@ -621,9 +769,8 @@ function setV(v){
 
 function sd(i){
   cd=i;
-  var isLondon=i>=5;
-  if(currentTrip==='edinburgh'&&isLondon){currentTrip='london';updateTriipTheme();}
-  else if(currentTrip==='london'&&!isLondon){currentTrip='edinburgh';updateTriipTheme();}
+  var newTrip=i<=2?'london_pre':i<=7?'edinburgh':'london';
+  if(newTrip!==currentTrip){currentTrip=newTrip;updateTriipTheme();}
   document.querySelectorAll('.daybtn').forEach(function(b,j){b.classList.toggle('on',j===i);});
   document.getElementById('content').scrollTop=0;
   render();
@@ -632,21 +779,30 @@ function sd(i){
 function updateTriipTheme(){
   var shell=document.querySelector('.shell');
   var t=T[lang];
-  if(currentTrip==='london'){
+  if(currentTrip==='london'||currentTrip==='london_pre'){
     shell.classList.add('london-active');
-    document.getElementById('tt').textContent=t.tt_london;
-    document.getElementById('ts').textContent=t.sub_london;
+    document.getElementById('tt').textContent=currentTrip==='london_pre'?t.tt_lonpre:t.tt_london;
+    document.getElementById('ts').textContent=currentTrip==='london_pre'?t.sub_lonpre:t.sub_london;
   } else {
     shell.classList.remove('london-active');
     document.getElementById('tt').textContent=t.tt_edin;
     document.getElementById('ts').textContent=t.sub;
+  }
+  // Update day-of-week labels
+  if(currentTrip==='london_pre'){
+    t.dows_lonpre.forEach(function(d,i){document.getElementById('dw'+i).textContent=d;});
+  } else if(currentTrip==='edinburgh'){
+    t.dows.forEach(function(d,i){document.getElementById('dw'+(i+3)).textContent=d;});
+  } else {
+    t.dows_london.forEach(function(d,i){document.getElementById('dw'+(i+8)).textContent=d;});
   }
 }
 
 // ── Weather ──────────────────────────────────────────────
 var TRIP_DATES=['2026-04-15','2026-04-16','2026-04-17','2026-04-18','2026-04-19'];
 var LONDON_DATES=['2026-04-25','2026-04-26'];
-var wx={},wxLoaded=false,londonWx={};
+var LONPRE_DATES=['2026-04-10','2026-04-11','2026-04-12'];
+var wx={},wxLoaded=false,londonWx={},lonPreWx={},lonPreWxLoaded=false;
 function wxEmoji(code){
   if(code===0)return'\u2600\ufe0f';
   if(code<=2)return'\ud83c\udf24\ufe0f';
@@ -659,14 +815,20 @@ function wxEmoji(code){
   return'\u26c8\ufe0f';
 }
 function wxBadge(dayIdx,timeStr){
-  var isLondon=dayIdx>=5;
+  var isLonPre=dayIdx<=2;
+  var isLondon=dayIdx>=8;
+  if(isLonPre){
+    if(!lonPreWx[LONPRE_DATES[dayIdx]])return'';
+    var dp=lonPreWx[LONPRE_DATES[dayIdx]];
+    return'<div class="wx">'+dp.emoji+' '+Math.round(dp.hi)+'°C</div>';
+  }
   if(isLondon){
-    if(!londonWx['2026-04-'+(dayIdx===5?'25':'26')])return'';
-    var d=londonWx['2026-04-'+(dayIdx===5?'25':'26')];
+    if(!londonWx['2026-04-'+(dayIdx===8?'25':'26')])return'';
+    var d=londonWx['2026-04-'+(dayIdx===8?'25':'26')];
     return'<div class="wx">'+d.emoji+' '+Math.round(d.hi)+'°C</div>';
   }
   if(!wxLoaded)return'';
-  var date=TRIP_DATES[dayIdx];
+  var date=TRIP_DATES[dayIdx-3];
   if(!date)return'';
   var clean=timeStr.replace(/[^0-9:]/g,'');
   var p=clean.split(':');
@@ -679,10 +841,19 @@ function wxBadge(dayIdx,timeStr){
   return'<div class="wx">'+wxEmoji(w.code)+' '+Math.round(w.temp)+'\u00b0C</div>';
 }
 function wxDaySummary(dayIdx,km){
-  var isLondon=dayIdx>=5;
+  var isLonPre=dayIdx<=2;
+  var isLondon=dayIdx>=8;
   var kmItem=km?'<div class="wx-hdr-item wx-km">\ud83e\uddb6 ~'+km.toFixed(1)+' km</div>':'';
+  if(isLonPre){
+    if(!lonPreWx[LONPRE_DATES[dayIdx]])return kmItem?'<div class="wx-hdr">'+kmItem+'</div>':'';
+    var dp=lonPreWx[LONPRE_DATES[dayIdx]];
+    return'<div class="wx-hdr"><div class="wx-hdr-item">'+dp.emoji+'</div>'
+      +'<div class="wx-hdr-item">\u2191'+dp.hi+'\u00b0C</div>'
+      +'<div class="wx-hdr-item">\u2193'+dp.lo+'\u00b0C</div>'
+      +kmItem+'</div>';
+  }
   if(isLondon){
-    var date='2026-04-'+(dayIdx===5?'25':'26');
+    var date='2026-04-'+(dayIdx===8?'25':'26');
     if(!londonWx[date])return kmItem?'<div class="wx-hdr">'+kmItem+'</div>':'';
     var d=londonWx[date];
     return'<div class="wx-hdr"><div class="wx-hdr-item">'+d.emoji+'</div>'
@@ -691,7 +862,7 @@ function wxDaySummary(dayIdx,km){
       +kmItem+'</div>';
   }
   if(!wxLoaded)return kmItem?'<div class="wx-hdr">'+kmItem+'</div>':'';
-  var date=TRIP_DATES[dayIdx];
+  var date=TRIP_DATES[dayIdx-3];
   if(!date)return'';
   var temps=[],codes=[];
   for(var h=7;h<=22;h++){
@@ -721,8 +892,28 @@ async function fetchWeather(){
     wxLoaded=true;
     render();
   }catch(e){}
-  londonWx['2026-04-25']={hi:12,lo:3,emoji:'\ud83c\udf26\ufe0f'};
-  londonWx['2026-04-26']={hi:12,lo:5,emoji:'\ud83c\udf24\ufe0f'};
+  // London pre-trip weather (Apr 10-12)
+  try{
+    var r2=await fetch('https://api.open-meteo.com/v1/forecast?latitude=51.5074&longitude=-0.1278&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Europe%2FLondon&start_date=2026-04-10&end_date=2026-04-12');
+    var d2=await r2.json();
+    d2.daily.time.forEach(function(t,i){
+      lonPreWx[t]={hi:Math.round(d2.daily.temperature_2m_max[i]),lo:Math.round(d2.daily.temperature_2m_min[i]),emoji:wxEmoji(d2.daily.weathercode[i])};
+    });
+    lonPreWxLoaded=true;
+    render();
+  }catch(e){}
+  // London road-trip weather (Apr 25-26)
+  try{
+    var r3=await fetch('https://api.open-meteo.com/v1/forecast?latitude=51.5074&longitude=-0.1278&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Europe%2FLondon&start_date=2026-04-25&end_date=2026-04-26');
+    var d3=await r3.json();
+    d3.daily.time.forEach(function(t,i){
+      londonWx[t]={hi:Math.round(d3.daily.temperature_2m_max[i]),lo:Math.round(d3.daily.temperature_2m_min[i]),emoji:wxEmoji(d3.daily.weathercode[i])};
+    });
+    render();
+  }catch(e){
+    londonWx['2026-04-25']={hi:12,lo:3,emoji:'\ud83c\udf26\ufe0f'};
+    londonWx['2026-04-26']={hi:12,lo:5,emoji:'\ud83c\udf24\ufe0f'};
+  }
 }
 // ─────────────────────────────────────────────────────────
 function buildRouteUrl(blocks){
@@ -749,13 +940,16 @@ function getRouteStops(blocks,l){
 }
 function render(){
   var isLondon=currentTrip==='london';
+  var isLonPre=currentTrip==='london_pre';
   var dayData;
-  if(isLondon){
-    dayData=D.london.days[cd-5];
+  if(isLonPre){
+    dayData=D.london_pre.days[cd];
+  } else if(isLondon){
+    dayData=D.london.days[cd-8];
   } else {
-    dayData=D[cv].days[cd];
+    dayData=D[cv].days[cd-3];
   }
-  var isMerged=!isLondon&&cv==='merged';
+  var isMerged=!isLondon&&!isLonPre&&cv==='merged';
   var l=lang;
   var t=T[l];
   var h='';
@@ -768,7 +962,7 @@ function render(){
   }
   h+='<div class="dh-title">'+(l==='en'?dayData.te:dayData.tp)+'</div>';
   h+='<div class="dh-note">'+(l==='en'?dayData.ne:dayData.np)+'</div>';
-  var dayKm=isLondon?(dayData.kmTotal||0):isMerged?dayData.bl.reduce(function(s,b){return s+(b.km||0);},0):0;
+  var dayKm=(isLondon||isLonPre)?(dayData.kmTotal||dayData.bl.reduce(function(s,b){return s+(b.km||0);},0)):isMerged?dayData.bl.reduce(function(s,b){return s+(b.km||0);},0):0;
   h+=wxDaySummary(cd,dayKm||null);
   if(dayData.bday) h+='<div class="bday-strip">'+(l==='en'?dayData.bne:dayData.bnp)+'</div>';
   h+='</div></div>';
@@ -822,7 +1016,7 @@ function render(){
     if(b.url) h+='<a class="map-btn" href="'+b.url+'" target="_blank"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>'+t.maps+'</a>';
     h+='</div></div>';
   });
-  var footerText=isLondon?'Edinburgh &amp; London \u00b7 April 2026':'Edinburgh April 2026 \u00b7 Fabio &amp; Liana';
+  var footerText=isLonPre?'London \u00b7 April 2026 \u00b7 Fabio &amp; Liana':isLondon?'Edinburgh &amp; London \u00b7 April 2026':'Edinburgh April 2026 \u00b7 Fabio &amp; Liana';
   h+='</div><div class="footer">'+footerText+'</div>';
   document.getElementById('content').innerHTML=h;
 }
