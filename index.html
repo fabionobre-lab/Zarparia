@@ -203,7 +203,8 @@ var D={
       {t:'17:30',dot:'#1e3a5f',ie:'Old Town walk',ip:'Passeio pela Cidade Velha',tg:['s','fr'],
        me:"Victoria Street \u00b7 Grassmarket \u00b7 Vennel Viewpoint \u00b7 Greyfriars Bobby",
        mp:"Victoria Street \u00b7 Grassmarket \u00b7 Mirante do Vennel \u00b7 Greyfriars Bobby",
-       url:'https://maps.google.com/?q=Victoria+Street+Edinburgh'},
+       url:'https://maps.google.com/?q=Victoria+Street+Edinburgh',
+       wp:[{q:'Grassmarket+Edinburgh',ne:'Grassmarket',np:'Grassmarket'},{q:'The+Vennel+Edinburgh',ne:'Vennel Viewpoint',np:'Mirante do Vennel'},{q:'Greyfriars+Bobby+Statue+Edinburgh',ne:'Greyfriars Bobby',np:'Greyfriars Bobby'}]},
       {t:'18:30',dot:'#1e3a5f',ie:"St Giles' Cathedral",ip:'Catedral de St Giles',tg:['s','fr'],
        me:'Gothic cathedral on the Royal Mile. Thistle Chapel inside.',
        mp:'Catedral g\u00f3tica no Royal Mile. Inclui a Capela do Cardo.',
@@ -211,7 +212,8 @@ var D={
       {t:'19:00',dot:'#1e3a5f',ie:'Royal Mile closes walk',ip:'Closes do Royal Mile',tg:['s','fr'],
        me:"Dunbar's Close \u00b7 Bakehouse Close \u00b7 White Horse Close",
        mp:"Dunbar's Close \u00b7 Bakehouse Close \u00b7 White Horse Close",
-       url:'https://maps.google.com/?q=Royal+Mile+Edinburgh'},
+       url:'https://maps.google.com/?q=Royal+Mile+Edinburgh',
+       wp:[{q:'Dunbar%27s+Close+Garden+Edinburgh',ne:"Dunbar's Close",np:"Dunbar's Close"},{q:'Bakehouse+Close+Edinburgh',ne:'Bakehouse Close',np:'Bakehouse Close'},{q:'White+Horse+Close+Edinburgh',ne:'White Horse Close',np:'White Horse Close'}]},
       {t:'20:00',dot:'#3d5a3d',ie:'Light dinner',ip:'Jantar leve',tg:['din'],
        me:'Flexible \u2014 options near 2 Upper Bow.',mp:'Flex\u00edvel \u2014 op\u00e7\u00f5es perto do 2 Upper Bow.'}
     ]},
@@ -225,11 +227,13 @@ var D={
       {t:'10:00',dot:'#1e3a5f',ie:'Edinburgh Castle',ip:'Castelo de Edimburgo',tg:['s','sk'],
        me:"Great Hall \u00b7 St Margaret's Chapel \u00b7 Mons Meg \u00b7 National War Museum \u00b7 1 o'clock gun (13:00)",
        mp:"Great Hall \u00b7 Capela St Margaret \u00b7 Mons Meg \u00b7 Museu Nacional de Guerra \u00b7 tiro do can\u00e3o (13:00)",
-       url:'https://maps.google.com/?q=Edinburgh+Castle',wa:'warn_crown'},
+       url:'https://maps.google.com/?q=Edinburgh+Castle',wa:'warn_crown',
+       wp:[{q:'Great+Hall+Edinburgh+Castle',ne:'Great Hall',np:'Great Hall'},{q:'St+Margaret%27s+Chapel+Edinburgh+Castle',ne:"St Margaret's Chapel",np:'Capela St Margaret'},{q:'Mons+Meg+Edinburgh+Castle',ne:'Mons Meg',np:'Mons Meg'}]},
       {t:'12:30',dot:'#1e3a5f',ie:'Princes Street Gardens',ip:'Jardins de Princes Street',tg:['s','fr'],
        me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument',
        mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott',
-       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh'},
+       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh',
+       wp:[{q:'Floral+Clock+Edinburgh',ne:'Floral Clock',np:'Rel\u00f3gio Floral'},{q:'Ross+Fountain+Edinburgh',ne:'Ross Fountain',np:'Fonte Ross'},{q:'Scott+Monument+Edinburgh',ne:'Scott Monument',np:'Monumento Scott'}]},
       {t:'13:30',dot:'#3d5a3d',ie:'Coffee \u2014 Starbucks Princes Street',ip:'Caf\u00e9 \u2014 Starbucks Princes Street',tg:['cof'],
        me:'Castle views from the window.',mp:'Vista para o castelo pela janela.',
        url:'https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh'},
@@ -254,7 +258,8 @@ var D={
        me:'Light meal before tour pickup.',mp:'Refei\u00e7\u00e3o leve antes do tour.'},
       {t:'08:45',dot:'#7b4f7a',ie:'Outlander Tour departs',ip:'Tour Outlander parte',tg:['ful'],
        me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
-       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.'},
+       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.',
+       wp:[{q:'Doune+Castle+Scotland',ne:'Doune Castle',np:'Castelo Doune'},{q:'Blackness+Castle+Scotland',ne:'Blackness Castle',np:'Castelo Blackness'},{q:'Linlithgow+Palace+Scotland',ne:'Linlithgow Palace',np:'Pal\u00e1cio Linlithgow'}]},
       {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:''},
       {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
        me:'Grassmarket. Booking confirmed 19:30. Craft beer, pizza, rooftop with castle views.',
@@ -272,7 +277,8 @@ var D={
       {t:'09:00',dot:'#1e3a5f',ie:'Palace of Holyroodhouse',ip:'Pal\u00e1cio de Holyroodhouse',tg:['pal','bkd'],
        me:"State Apartments \u00b7 Mary Queen of Scots' rooms \u00b7 Holyrood Abbey ruins \u00b7 Gardens. Free audio guide.",
        mp:"Aposentos de Estado \u00b7 C\u00f2modos de Maria \u00b7 Ru\u00ednas da Abadia de Holyrood \u00b7 Jardins. Audio guia gr\u00e1tis.",
-       url:'https://maps.google.com/?q=Palace+of+Holyroodhouse',no:'warn_hol'},
+       url:'https://maps.google.com/?q=Palace+of+Holyroodhouse',no:'warn_hol',
+       wp:[{q:'Holyrood+Abbey+Edinburgh',ne:'Holyrood Abbey ruins',np:'Ru\u00ednas da Abadia'},{q:'Holyrood+Palace+Gardens+Edinburgh',ne:'Palace Gardens',np:'Jardins do Pal\u00e1cio'}]},
       {t:'11:00',dot:'#1e3a5f',ie:'Salisbury Crags',ip:'Penhascos de Salisbury',tg:['nat','fr'],
        me:'Dramatic basalt cliff walk in Holyrood Park. Spectacular views.',
        mp:'Caminhada pelos penhascos de basalto no Parque de Holyrood. Vistas espetaculares.',
@@ -366,6 +372,7 @@ var D={
        me:"Victoria Street \u00b7 Grassmarket \u00b7 Vennel Viewpoint \u00b7 Greyfriars Bobby \u00b7 Dunbar's Close \u00b7 White Horse Close",
        mp:"Victoria Street \u00b7 Grassmarket \u00b7 Mirante Vennel \u00b7 Greyfriars Bobby \u00b7 Dunbar's Close \u00b7 White Horse Close",
        url:'https://maps.google.com/?q=Victoria+Street+Edinburgh',
+       wp:[{q:'Grassmarket+Edinburgh',ne:'Grassmarket',np:'Grassmarket'},{q:'The+Vennel+Edinburgh',ne:'Vennel Viewpoint',np:'Mirante Vennel'},{q:'Greyfriars+Bobby+Statue+Edinburgh',ne:'Greyfriars Bobby',np:'Greyfriars Bobby'},{q:'Dunbar%27s+Close+Garden+Edinburgh',ne:"Dunbar's Close",np:"Dunbar's Close"},{q:'White+Horse+Close+Edinburgh',ne:'White Horse Close',np:'White Horse Close'}],
        df:{k:'chg',en:"Combined Liana's two walks into one flowing route.",
            pt:'Combinou os dois passeios da Liana em um roteiro \u00fanico.'},
        ps:[{n:'Victoria Street curved view',l:'https://maps.google.com/?q=Victoria+Street+Edinburgh',wiki:'Victoria Street, Edinburgh',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Victoria_Street%2C_Edinburgh_-_geograph.org.uk_-_5964385.jpg/330px-Victoria_Street%2C_Edinburgh_-_geograph.org.uk_-_5964385.jpg'},{n:'Vennel Steps viewpoint',l:'https://maps.google.com/?q=The+Vennel+Edinburgh',wiki:'The Vennel',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Edinburgh_Castle_from_the_Vennel_-_geograph.org.uk_-_2367375.jpg/330px-Edinburgh_Castle_from_the_Vennel_-_geograph.org.uk_-_2367375.jpg'},{n:'White Horse Close',l:'https://maps.google.com/?q=White+Horse+Close+Edinburgh',wiki:'White Horse Close'},{n:'Greyfriars Bobby statue',l:'https://maps.google.com/?q=Greyfriars+Bobby+Statue+Edinburgh',wiki:'Greyfriars Bobby'}],km:1.5},
@@ -395,14 +402,16 @@ var D={
       {t:'09:30',dot:'#1e3a5f',ie:'Edinburgh Castle',ip:'Castelo de Edimburgo',tg:['s','sk'],
        me:"Great Hall \u00b7 St Margaret's Chapel \u00b7 Mons Meg \u00b7 National War Museum \u00b7 1 o'clock gun at 13:00. Book 09:45 tour.",
        mp:"Great Hall \u00b7 Capela St Margaret \u00b7 Mons Meg \u00b7 Museu Guerra \u00b7 tiro can\u00e3o \u00e0s 13:00. Reserve tour 09:45.",
-       url:'https://maps.google.com/?q=Edinburgh+Castle',wa:'warn_crown',
+       url:'https://maps.google.com/?q=Edinburgh+Castle',
+       wp:[{q:'Great+Hall+Edinburgh+Castle',ne:'Great Hall',np:'Great Hall'},{q:'St+Margaret%27s+Chapel+Edinburgh+Castle',ne:"St Margaret's Chapel",np:'Capela St Margaret'},{q:'Mons+Meg+Edinburgh+Castle',ne:'Mons Meg',np:'Mons Meg'}],wa:'warn_crown',
        df:{k:'chg',en:'Moved from 10:00 to 09:30. Skip-the-line means straight in at opening.',
            pt:'Adiantado de 10:00 para 09:30. Fura-fila significa entrar direto na abertura.'},
        ps:[{n:'Castle Esplanade approach',l:'https://maps.google.com/?q=Edinburgh+Castle+Esplanade',wiki:'Edinburgh Castle'},{n:'Half Moon Battery',l:'https://maps.google.com/?q=Half+Moon+Battery+Edinburgh+Castle',wiki:'Edinburgh Castle'},{n:'View from Crown Square',l:'https://maps.google.com/?q=Crown+Square+Edinburgh+Castle',wiki:'Edinburgh Castle'}],km:1},
       {t:'12:30',dot:'#1e3a5f',ie:'Princes Street Gardens',ip:'Jardins de Princes Street',tg:['s','fr'],
        me:'Floral Clock \u00b7 Ross Fountain \u00b7 Scott Monument.',
        mp:'Rel\u00f3gio Floral \u00b7 Fonte Ross \u00b7 Monumento Scott.',
-       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh',ps:[{n:'Scott Monument',l:'https://maps.google.com/?q=Scott+Monument+Edinburgh',wiki:'Scott Monument'},{n:'Ross Fountain',l:'https://maps.google.com/?q=Ross+Fountain+Edinburgh',wiki:'Ross Fountain'},{n:'Castle from gardens',l:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh',wiki:'Princes Street Gardens'}],km:0.8},
+       url:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh',
+       wp:[{q:'Floral+Clock+Edinburgh',ne:'Floral Clock',np:'Rel\u00f3gio Floral'},{q:'Ross+Fountain+Edinburgh',ne:'Ross Fountain',np:'Fonte Ross'},{q:'Scott+Monument+Edinburgh',ne:'Scott Monument',np:'Monumento Scott'}],ps:[{n:'Scott Monument',l:'https://maps.google.com/?q=Scott+Monument+Edinburgh',wiki:'Scott Monument'},{n:'Ross Fountain',l:'https://maps.google.com/?q=Ross+Fountain+Edinburgh',wiki:'Ross Fountain'},{n:'Castle from gardens',l:'https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh',wiki:'Princes Street Gardens'}],km:0.8},
       {t:'13:15',dot:'#3d5a3d',ie:'Coffee \u2014 Starbucks Princes Street',ip:'Caf\u00e9 \u2014 Starbucks Princes Street',tg:['cof'],
        me:'Castle views from the window. Great spot to rest after the castle.',
        mp:'Vista para o castelo pela janela. \u00d3timo para descansar ap\u00f3s o castelo.',
@@ -443,7 +452,8 @@ var D={
        me:'Light breakfast before tour pickup.',mp:'Caf\u00e9 leve antes do tour.',km:0.2},
       {t:'08:45',dot:'#7b4f7a',ie:'Outlander Tour departs',ip:'Tour Outlander parte',tg:['ful'],
        me:'Doune Castle \u00b7 Blackness Castle \u00b7 Linlithgow Palace \u00b7 Jacobite country. Bring layers.',
-       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.',ps:[{n:'Doune Castle courtyard',l:'https://maps.google.com/?q=Doune+Castle+Scotland',wiki:'Doune Castle'},{n:'Blackness Castle + Forth',l:'https://maps.google.com/?q=Blackness+Castle+Scotland',wiki:'Blackness Castle'},{n:'Highland cows at Lallybroch',l:'https://maps.google.com/?q=Midhope+Castle+Scotland',wiki:'Midhope Castle'}],km:2.5},
+       mp:'Castelo Doune \u00b7 Castelo Blackness \u00b7 Pal\u00e1cio Linlithgow \u00b7 Pa\u00eds jacobita. Leve casaco.',
+       wp:[{q:'Doune+Castle+Scotland',ne:'Doune Castle',np:'Castelo Doune'},{q:'Blackness+Castle+Scotland',ne:'Blackness Castle',np:'Castelo Blackness'},{q:'Linlithgow+Palace+Scotland',ne:'Linlithgow Palace',np:'Pal\u00e1cio Linlithgow'}],ps:[{n:'Doune Castle courtyard',l:'https://maps.google.com/?q=Doune+Castle+Scotland',wiki:'Doune Castle'},{n:'Blackness Castle + Forth',l:'https://maps.google.com/?q=Blackness+Castle+Scotland',wiki:'Blackness Castle'},{n:'Highland cows at Lallybroch',l:'https://maps.google.com/?q=Midhope+Castle+Scotland',wiki:'Midhope Castle'}],km:2.5},
       {t:'~18:00',dot:'#7b4f7a',ie:'Return to Edinburgh',ip:'Retorno a Edimburgo',tg:['tra'],me:'',mp:'',km:0.3},
       {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Cold Town House',ip:'Jantar \u2014 Cold Town House',tg:['din','bkd'],
        me:'Grassmarket. Booking confirmed 19:30. Craft beer, pizza, rooftop with castle views.',
@@ -470,6 +480,7 @@ var D={
        me:"Opens 9:30am. State Apartments \u00b7 Mary QoS rooms \u00b7 Holyrood Abbey ruins \u00b7 Gardens. Free audio guide.",
        mp:"Abre \u00e0s 9:30. Aposentos de Estado \u00b7 C\u00f2modos de Maria \u00b7 Ru\u00ednas da Abadia \u00b7 Jardins. Audio guia gr\u00e1tis.",
        url:'https://maps.google.com/?q=Palace+of+Holyroodhouse',
+       wp:[{q:'Holyrood+Abbey+Edinburgh',ne:'Holyrood Abbey ruins',np:'Ru\u00ednas da Abadia'},{q:'Holyrood+Palace+Gardens+Edinburgh',ne:'Palace Gardens',np:'Jardins do Pal\u00e1cio'}],
        df:{k:'chg',en:'Pushed 30 min later to 09:30 \u2014 that is when it actually opens.',
            pt:'Adiantado 30 min para 09:30 \u2014 quando o pal\u00e1cio realmente abre.'},
        ps:[{n:'Holyrood Abbey ruins',l:'https://maps.google.com/?q=Holyrood+Abbey+Edinburgh',wiki:'Holyrood Abbey'},{n:'Palace facade from forecourt',l:'https://maps.google.com/?q=Palace+of+Holyroodhouse+Edinburgh',wiki:'Palace of Holyroodhouse'}],km:1},
@@ -570,7 +581,8 @@ var D={
       {t:'09:15',dot:'#1e3054',ie:'Windsor Castle',ip:'Castelo de Windsor',tg:['s','bkd'],
        me:"State Apartments \u00b7 St George's Chapel (Harry & Meghan's wedding) \u00b7 Guard change. ~2h30.",
        mp:"State Apartments \u00b7 Capela de S\u00e3o Jorge (casamento de Harry e Meghan) \u00b7 Troca da guarda. ~2h30.",
-       url:'https://maps.google.com/?q=Windsor+Castle',km:2.5,ps:[{n:'Long Walk avenue',l:'https://maps.google.com/?q=The+Long+Walk+Windsor',wiki:'Windsor Great Park',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Windsor_Castle_from_the_Long_Walk.jpg/330px-Windsor_Castle_from_the_Long_Walk.jpg'},{n:"St George's Chapel",l:'https://maps.google.com/?q=St+Georges+Chapel+Windsor+Castle',wiki:"St George's Chapel, Windsor Castle"}]},
+       url:'https://maps.google.com/?q=Windsor+Castle',km:2.5,
+       wp:[{q:'St+George%27s+Chapel+Windsor+Castle',ne:"St George's Chapel",np:'Capela de S\u00e3o Jorge'},{q:'The+Long+Walk+Windsor',ne:'The Long Walk',np:'The Long Walk'}],ps:[{n:'Long Walk avenue',l:'https://maps.google.com/?q=The+Long+Walk+Windsor',wiki:'Windsor Great Park',img:'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Windsor_Castle_from_the_Long_Walk.jpg/330px-Windsor_Castle_from_the_Long_Walk.jpg'},{n:"St George's Chapel",l:'https://maps.google.com/?q=St+Georges+Chapel+Windsor+Castle',wiki:"St George's Chapel, Windsor Castle"}]},
       {t:'12:00',dot:'#3d5a3d',ie:'Lunch in Windsor',ip:'Almo\u00e7o em Windsor',tg:['lun'],
        me:'The Duchess of Cambridge (pub), Meimo (Japanese), or quick bite.',
        mp:'The Duchess of Cambridge (pub), Meimo (japon\u00eas) ou lanche r\u00e1pido.',km:0.3},
@@ -587,7 +599,8 @@ var D={
       {t:'18:00',dot:'#1e3054',ie:'Bath evening walk',ip:'Passeio por Bath',tg:['s','fr'],
        me:'Royal Crescent \u00b7 The Circus \u00b7 Pulteney Bridge. All walkable in the historic centre.',
        mp:'Royal Crescent \u00b7 The Circus \u00b7 Pulteney Bridge. Tudo a p\u00e9 no centro hist\u00f3rico.',
-       url:'https://maps.google.com/?q=Royal+Crescent+Bath',km:3.0,ps:[{n:'Royal Crescent',l:'https://maps.google.com/?q=Royal+Crescent+Bath',wiki:'Royal Crescent'},{n:'Pulteney Bridge',l:'https://maps.google.com/?q=Pulteney+Bridge+Bath',wiki:'Pulteney Bridge'},{n:'The Circus',l:'https://maps.google.com/?q=The+Circus+Bath',wiki:'The Circus, Bath'}]},
+       url:'https://maps.google.com/?q=Royal+Crescent+Bath',km:3.0,
+       wp:[{q:'The+Circus+Bath',ne:'The Circus',np:'The Circus'},{q:'Pulteney+Bridge+Bath',ne:'Pulteney Bridge',np:'Pulteney Bridge'}],ps:[{n:'Royal Crescent',l:'https://maps.google.com/?q=Royal+Crescent+Bath',wiki:'Royal Crescent'},{n:'Pulteney Bridge',l:'https://maps.google.com/?q=Pulteney+Bridge+Bath',wiki:'Pulteney Bridge'},{n:'The Circus',l:'https://maps.google.com/?q=The+Circus+Bath',wiki:'The Circus, Bath'}]},
       {t:'20:00',dot:'#3d5a3d',ie:'Dinner in Bath',ip:'Jantar em Bath',tg:['din'],
        me:'Sally Lunn\'s (historic), The Ivy Bath Brasserie, or Sotto Sotto (Italian).',
        mp:'Sally Lunn\'s (hist\u00f3rico), The Ivy Bath Brasserie, ou Sotto Sotto (italiano).',km:0.3}
@@ -612,7 +625,8 @@ var D={
       {t:'11:45',dot:'#1e3054',ie:'Lacock',ip:'Lacock',tg:['s','fr'],
        me:'Medieval village preserved by National Trust. Lacock Abbey = Hogwarts corridors in Harry Potter. Free village entry (Abbey ~\u00a315).',
        mp:'Vilarejo medieval preservado pelo National Trust. Lacock Abbey = corredores de Hogwarts em Harry Potter. Vilarejo gratuito (Abbey ~\u00a315).',
-       url:'https://maps.google.com/?q=Lacock+Wiltshire',km:1.5,ps:[{n:'Church Street',l:'https://maps.google.com/?q=Church+Street+Lacock+Wiltshire',wiki:'Lacock'},{n:'Abbey cloisters',l:'https://maps.google.com/?q=Lacock+Abbey+Wiltshire',wiki:'Lacock Abbey'}]},
+       url:'https://maps.google.com/?q=Lacock+Wiltshire',km:1.5,
+       wp:[{q:'Lacock+Abbey+Wiltshire',ne:'Lacock Abbey',np:'Lacock Abbey'}],ps:[{n:'Church Street',l:'https://maps.google.com/?q=Church+Street+Lacock+Wiltshire',wiki:'Lacock'},{n:'Abbey cloisters',l:'https://maps.google.com/?q=Lacock+Abbey+Wiltshire',wiki:'Lacock Abbey'}]},
       {t:'12:40',dot:'#7a6e5f',ie:'Drive to Burford',ip:'Sa\u00edda para Burford',tg:['drv'],
        me:'~1h via A40. Beautiful countryside.',mp:'~1h pela A40. Estrada bonita.',km:0},
       {t:'13:40',dot:'#1e3054',ie:'Burford + Lunch',ip:'Burford + Almo\u00e7o',tg:['s','lun'],
@@ -628,7 +642,8 @@ var D={
       {t:'16:00',dot:'#7b4f7a',ie:'Guided University Tour',ip:'Tour guiado pela Universidade',tg:['s','bkd'],
        me:'1h30 tour. Historic college + Bodleian Library. \u00a329/person. Meeting: Trinity College gates, Broad Street.',
        mp:'Tour de 1h30. College hist\u00f3rico + Biblioteca Bodleiana. \u00a329/pessoa. Ponto: port\u00f5es do Trinity College, Broad Street.',
-       url:'https://maps.google.com/?q=Trinity+College+Oxford',km:2.0,ps:[{n:'Radcliffe Camera',l:'https://maps.google.com/?q=Radcliffe+Camera+Oxford',wiki:'Radcliffe Camera'},{n:'Bridge of Sighs',l:'https://maps.google.com/?q=Bridge+of+Sighs+Oxford',wiki:'Bridge of Sighs (Oxford)'},{n:'Bodleian Library quad',l:'https://maps.google.com/?q=Bodleian+Library+Oxford',wiki:'Bodleian Library'}]},
+       url:'https://maps.google.com/?q=Trinity+College+Oxford',km:2.0,
+       wp:[{q:'Bodleian+Library+Oxford',ne:'Bodleian Library',np:'Biblioteca Bodleiana'},{q:'Radcliffe+Camera+Oxford',ne:'Radcliffe Camera',np:'Radcliffe Camera'},{q:'Bridge+of+Sighs+Oxford',ne:'Bridge of Sighs',np:'Ponte dos Suspiros'}],ps:[{n:'Radcliffe Camera',l:'https://maps.google.com/?q=Radcliffe+Camera+Oxford',wiki:'Radcliffe Camera'},{n:'Bridge of Sighs',l:'https://maps.google.com/?q=Bridge+of+Sighs+Oxford',wiki:'Bridge of Sighs (Oxford)'},{n:'Bodleian Library quad',l:'https://maps.google.com/?q=Bodleian+Library+Oxford',wiki:'Bodleian Library'}]},
       {t:'17:30',dot:'#3d5a3d',ie:'Post-tour free time',ip:'Tempo livre p\u00f3s-tour',tg:['cof'],
        me:'Radcliffe Camera (photo) \u00b7 G&D\'s (artisan ice cream) or The Grand Caf\u00e9.',
        mp:'Radcliffe Camera (foto) \u00b7 G&D\'s (sorvete artesanal) ou The Grand Caf\u00e9.',km:0.5},
@@ -657,7 +672,8 @@ var D={
       {t:'17:30',dot:'#1e3054',ie:'Hyde Park walk',ip:'Passeio pelo Hyde Park',tg:['par','fr'],
        me:'Serpentine Lake \u00b7 Italian Gardens \u00b7 Diana Memorial Fountain. Golden hour light.',
        mp:'Lago Serpentine \u00b7 Jardins Italianos \u00b7 Fonte Memorial Diana. Luz dourada.',
-       url:'https://maps.google.com/?q=Hyde+Park+London',km:2.5},
+       url:'https://maps.google.com/?q=Hyde+Park+London',km:2.5,
+       wp:[{q:'Serpentine+Lake+Hyde+Park+London',ne:'Serpentine Lake',np:'Lago Serpentine'},{q:'Italian+Gardens+Hyde+Park+London',ne:'Italian Gardens',np:'Jardins Italianos'},{q:'Diana+Memorial+Fountain+Hyde+Park',ne:'Diana Fountain',np:'Fonte Memorial Diana'}]},
       {t:'19:30',dot:'#3d5a3d',ie:'Dinner \u2014 Jacuzzi',ip:'Jantar \u2014 Jacuzzi',tg:['din','bkd'],
        me:'Reservation 19:30.',mp:'Reserva \u00e0s 19:30.',
        url:'https://maps.google.com/?q=Jacuzzi+Restaurant+London',km:1.0},
@@ -682,7 +698,8 @@ var D={
       {t:'10:00',dot:'#1e3054',ie:'Tower of London',ip:'Torre de Londres',tg:['s','bkd'],
        me:'Crown Jewels \u00b7 White Tower \u00b7 Beefeater tours \u00b7 Ravens. Allow 2\u20133 hours.',
        mp:'J\u00f3ias da Coroa \u00b7 Torre Branca \u00b7 Tours dos Beefeaters \u00b7 Corvos. Reserve 2\u20133 horas.',
-       url:'https://maps.google.com/?q=Tower+of+London',km:2.0},
+       url:'https://maps.google.com/?q=Tower+of+London',km:2.0,
+       wp:[{q:'Crown+Jewels+Tower+of+London',ne:'Crown Jewels',np:'J\u00f3ias da Coroa'},{q:'White+Tower+London',ne:'White Tower',np:'Torre Branca'}]},
       {t:'12:30',dot:'#3d5a3d',ie:'Lunch near Tower Pier',ip:'Almo\u00e7o perto de Tower Pier',tg:['lun'],
        me:'Quick lunch before the boat. Options at St Katharine Docks or Tower Hill.',
        mp:'Almo\u00e7o r\u00e1pido antes do barco. Op\u00e7\u00f5es em St Katharine Docks ou Tower Hill.',km:0.3},
@@ -701,7 +718,8 @@ var D={
       {t:'15:30',dot:'#1e3054',ie:'Greenwich Park + Royal Observatory',ip:'Greenwich Park + Observat\u00f3rio Real',tg:['vpt','fr'],
        me:'Walk uphill to the Prime Meridian line. Panoramic view of Canary Wharf and the Thames.',
        mp:'Subida at\u00e9 a linha do Meridiano de Greenwich. Vista panor\u00e2mica de Canary Wharf e do T\u00e2misa.',
-       url:'https://maps.google.com/?q=Royal+Observatory+Greenwich',km:1.5},
+       url:'https://maps.google.com/?q=Royal+Observatory+Greenwich',km:1.5,
+       wp:[{q:'Prime+Meridian+Line+Greenwich',ne:'Prime Meridian Line',np:'Linha do Meridiano'},{q:'Greenwich+Park+Viewpoint',ne:'Greenwich Park viewpoint',np:'Mirante Greenwich Park'}]},
       {t:'16:30',dot:'#1e3054',ie:'Greenwich Market',ip:'Mercado de Greenwich',tg:['s','cof'],
        me:'Covered market with street food, crafts, antiques. Good spot for a coffee break.',
        mp:'Mercado coberto com comida de rua, artesanato, antiguidades. Bom para um caf\u00e9.',
@@ -950,9 +968,10 @@ function buildRouteUrl(blocks){
   var places=[];
   blocks.forEach(function(b){
     if(b.url){var m=b.url.match(/[?&]q=([^&]+)/);if(m)places.push(m[1]);}
+    if(b.wp){b.wp.forEach(function(w){places.push(w.q);});}
   });
   if(places.length<2)return null;
-  return'https://www.google.com/maps/dir/'+places.map(function(p){return p;}).join('/')+'/';
+  return'https://www.google.com/maps/dir/'+places.join('/')+'/';
 }
 function getRouteStops(blocks,l){
   var stops=[];
@@ -965,6 +984,11 @@ function getRouteStops(blocks,l){
         stops.push(name);
       }
     }
+    if(b.wp){b.wp.forEach(function(w){
+      var wn=l==='en'?w.ne:w.np;
+      if(wn.length>20)wn=wn.substring(0,18)+'…';
+      stops.push(wn);
+    });}
   });
   return stops;
 }
