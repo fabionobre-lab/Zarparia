@@ -1,0 +1,165 @@
+{
+  "id": "rome-2026",
+  "title": { "en": "Rome — Autumn Weekend" },
+  "eyebrow": { "en": "October 2026" },
+  "languages": ["en"],
+  "defaultLanguage": "en",
+  "locales": { "en": "en-GB" },
+  "home": { "name": "Hotel near Piazza Navona", "lat": 41.8992, "lon": 12.4731 },
+  "tags": {
+    "s": { "label": { "en": "Sightseeing" }, "style": "sight" },
+    "fr": { "label": { "en": "Free" }, "style": "sight" },
+    "lun": { "label": { "en": "Lunch" }, "style": "food" },
+    "din": { "label": { "en": "Dinner" }, "style": "food" },
+    "cof": { "label": { "en": "Coffee" }, "style": "food" },
+    "bkd": { "label": { "en": "Book ahead" }, "style": "booking" },
+    "tra": { "label": { "en": "Travel" }, "style": "logistics" }
+  },
+  "segments": [
+    {
+      "id": "rome",
+      "title": { "en": "Rome (Fabio & Liana)" },
+      "subtitle": { "en": "9 – 11 October 2026" },
+      "theme": "navy",
+      "weather": { "lat": 41.8933, "lon": 12.4829, "granularity": "daily", "timezone": "Europe/Rome" },
+      "footer": { "en": "Rome · October 2026 · Fabio & Liana" },
+      "plans": [
+        {
+          "id": "main",
+          "days": [
+            {
+              "date": "2026-10-09",
+              "title": { "en": "Arrival & Centro Storico" },
+              "note": { "en": "FCO → hotel by Leonardo Express + taxi · Check-in 15:00" },
+              "routeMode": "walking",
+              "blocks": [
+                {
+                  "time": "~13:00",
+                  "dotColor": "#7a6e5f",
+                  "title": { "en": "Land at Fiumicino" },
+                  "tags": ["tra"],
+                  "description": { "en": "Leonardo Express to Termini (32 min), taxi to hotel." }
+                },
+                {
+                  "time": "16:00",
+                  "dotColor": "#1e3a5f",
+                  "title": { "en": "Pantheon" },
+                  "tags": ["s"],
+                  "description": { "en": "The dome. Go late afternoon for softer light and thinner crowds." },
+                  "mapsUrl": "https://maps.google.com/?q=Pantheon+Rome",
+                  "km": 0.6,
+                  "photoSpots": [
+                    { "name": "Oculus from inside", "mapsUrl": "https://maps.google.com/?q=Pantheon+Rome", "wiki": "Pantheon, Rome" }
+                  ]
+                },
+                {
+                  "time": "17:30",
+                  "dotColor": "#1e3a5f",
+                  "title": { "en": "Piazza Navona & Trevi walk" },
+                  "tags": ["s", "fr"],
+                  "description": { "en": "Bernini fountains, then toss the coin at Trevi." },
+                  "mapsUrl": "https://maps.google.com/?q=Piazza+Navona+Rome",
+                  "km": 1.4,
+                  "waypoints": [
+                    { "query": "Trevi+Fountain+Rome", "name": { "en": "Trevi Fountain" } }
+                  ],
+                  "photoSpots": [
+                    { "name": "Trevi Fountain", "mapsUrl": "https://maps.google.com/?q=Trevi+Fountain+Rome", "wiki": "Trevi Fountain" }
+                  ]
+                },
+                {
+                  "time": "20:00",
+                  "dotColor": "#3d5a3d",
+                  "title": { "en": "Dinner — Trastevere" },
+                  "tags": ["din", "bkd"],
+                  "description": { "en": "Da Enzo al 29 — book ahead, tiny room, worth it." },
+                  "mapsUrl": "https://maps.google.com/?q=Da+Enzo+al+29+Rome",
+                  "warning": { "en": "No reservation = 45+ min queue. Book the 19:30 seating." }
+                }
+              ]
+            },
+            {
+              "date": "2026-10-10",
+              "title": { "en": "Ancient Rome" },
+              "note": { "en": "Colosseum 09:00 slot booked · Comfortable shoes" },
+              "routeMode": "walking",
+              "kmTotal": 6.5,
+              "blocks": [
+                {
+                  "time": "09:00",
+                  "dotColor": "#1e3a5f",
+                  "title": { "en": "Colosseum" },
+                  "tags": ["s", "bkd"],
+                  "description": { "en": "Timed entry. Underground + arena floor add-on." },
+                  "mapsUrl": "https://maps.google.com/?q=Colosseum+Rome",
+                  "photoSpots": [
+                    { "name": "Arena from upper tier", "mapsUrl": "https://maps.google.com/?q=Colosseum+Rome", "wiki": "Colosseum" }
+                  ]
+                },
+                {
+                  "time": "11:30",
+                  "dotColor": "#1e3a5f",
+                  "title": { "en": "Roman Forum & Palatine Hill" },
+                  "tags": ["s"],
+                  "description": { "en": "Same ticket. Via Sacra, House of Augustus, orange garden views." },
+                  "mapsUrl": "https://maps.google.com/?q=Roman+Forum",
+                  "waypoints": [
+                    { "query": "Palatine+Hill+Rome", "name": { "en": "Palatine Hill" } }
+                  ]
+                },
+                {
+                  "time": "14:00",
+                  "dotColor": "#3d5a3d",
+                  "title": { "en": "Lunch — Monti" },
+                  "tags": ["lun"],
+                  "description": { "en": "La Taverna dei Fori Imperiali or street pizza al taglio." }
+                },
+                {
+                  "time": "19:30",
+                  "dotColor": "#3d5a3d",
+                  "title": { "en": "Aperitivo & dinner" },
+                  "tags": ["din"],
+                  "description": { "en": "Campo de' Fiori area. Flexible." }
+                }
+              ]
+            },
+            {
+              "date": "2026-10-11",
+              "title": { "en": "Vatican & Departure" },
+              "note": { "en": "Museums 08:00 early entry · Flight 19:40" },
+              "routeMode": "transit",
+              "blocks": [
+                {
+                  "time": "08:00",
+                  "dotColor": "#1e3a5f",
+                  "title": { "en": "Vatican Museums & Sistine Chapel" },
+                  "tags": ["s", "bkd"],
+                  "description": { "en": "Early-entry slot. Raphael Rooms → Sistine Chapel, then shortcut door to St Peter's." },
+                  "mapsUrl": "https://maps.google.com/?q=Vatican+Museums",
+                  "warning": { "en": "Dress code: covered shoulders and knees." },
+                  "photoSpots": [
+                    { "name": "St Peter's from the dome", "mapsUrl": "https://maps.google.com/?q=St+Peters+Basilica", "wiki": "St. Peter's Basilica" }
+                  ]
+                },
+                {
+                  "time": "13:00",
+                  "dotColor": "#3d5a3d",
+                  "title": { "en": "Last carbonara" },
+                  "tags": ["lun"],
+                  "description": { "en": "Borgo Pio, near the Vatican walls." }
+                },
+                {
+                  "time": "~16:00",
+                  "dotColor": "#7a6e5f",
+                  "title": { "en": "To Fiumicino" },
+                  "tags": ["tra"],
+                  "description": { "en": "Taxi to Termini, Leonardo Express 16:38. Airport by 17:15." }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
