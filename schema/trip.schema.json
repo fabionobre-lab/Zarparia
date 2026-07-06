@@ -25,6 +25,11 @@
       "description": "UI hides the language toggle when only one language"
     },
     "defaultLanguage": { "type": "string" },
+    "locales": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Optional BCP 47 locale per language code for date formatting, e.g. {\"en\": \"en-GB\"}; defaults to the language code itself"
+    },
     "home": {
       "type": "object",
       "required": ["name"],

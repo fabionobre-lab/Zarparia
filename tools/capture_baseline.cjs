@@ -17,15 +17,19 @@
  * capturing the new engine.
  *
  * Usage (playwright installed elsewhere, e.g. a scratch dir):
- *   NODE_PATH=/path/to/scratch/node_modules node tools/capture_baseline.cjs [htmlFile] [outDir]
- * Defaults: htmlFile = ../index.html, outDir = ../baseline
+ *   NODE_PATH=/path/to/scratch/node_modules node tools/capture_baseline.cjs [htmlFileOrUrl] [outDir]
+ * Defaults: htmlFileOrUrl = ../index.html, outDir = ../baseline
+ * The target may be an http(s) URL — required for the generic engine, whose
+ * fetch() of the trip JSON does not work from file:// (serve the repo with
+ * `python -m http.server` first).
  */
 const path = require('path');
 const fs = require('fs');
 const { pathToFileURL } = require('url');
 const { chromium } = require('playwright');
 
-const htmlFile = path.resolve(process.argv[2] || path.join(__dirname, '..', 'index.html'));
+const target = process.argv[2] || path.join(__dirname, '..', 'index.html');
+const url = /^https?:/.test(target) ? target : pathToFileURL(path.resolve(target)).href;
 const outDir = path.resolve(process.argv[3] || path.join(__dirname, '..', 'baseline'));
 
 const BLOCKED_HOSTS = ['open-meteo.com', 'wikipedia.org', 'wikimedia.org'];
@@ -44,7 +48,8 @@ const PLANS = ['liana', 'merged'];
     return route.continue();
   });
 
-  await page.goto(pathToFileURL(htmlFile).href, { waitUntil: 'load' });
+  await page.goto(url, { waitUntil: 'load' });
+  await page.waitForSelector('.tb', { timeout: 15000 }); // first day rendered
   await page.evaluate(() => document.fonts.ready);
   await page.addStyleTag({
     content:
