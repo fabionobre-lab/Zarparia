@@ -1,0 +1,16 @@
+[
+  {
+    "id": "uk-spring-2026",
+    "title": { "en": "UK Spring 2026", "pt": "Reino Unido – Primavera 2026" },
+    "dates": { "start": "2026-04-10", "end": "2026-04-26" },
+    "status": "past",
+    "cover": "🏴󠁧󠁢󠁳󠁣󠁴󠁿"
+  },
+  {
+    "id": "rome-2026",
+    "title": { "en": "Rome — Autumn Weekend" },
+    "dates": { "start": "2026-10-09", "end": "2026-10-11" },
+    "status": "upcoming",
+    "cover": "🏛️"
+  }
+]
