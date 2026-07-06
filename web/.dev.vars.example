@@ -1,0 +1,8 @@
+# Copy to `.dev.vars` (gitignored) for local development.
+# Create a Google OAuth *Web application* client and paste its values here.
+# Authorized redirect URI to register: http://localhost:5173/auth/callback/google
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+# Enables the dev-only /auth/dev-login route (session without Google).
+# NEVER set this in production.
+DEV_AUTH=1

@@ -25,9 +25,12 @@ Every trip query is scoped to owner or an accepted share.
 
 - **A — Backend skeleton** ✅ SvelteKit+Workers+D1, schema, `/api/health`,
   session hook + `/api/me` stubs. Verified locally.
-- **B — Auth**: Google OAuth (Arctic), session create/verify/destroy in D1,
-  `hooks.server.ts` resolves the cookie to `locals.user`, login/logout routes,
-  route guards.
+- **B — Auth** ✅ Google OAuth (Arctic) with PKCE, D1-backed sessions
+  (token hashed at rest, sliding renewal), `hooks.server.ts` resolves the
+  cookie to `locals.user`, login/logout routes, `requireUser` guard. A
+  **dev-only** `/auth/dev-login` route (gated on `DEV_AUTH=1` in `.dev.vars`)
+  establishes a session without Google so Phases C–E are buildable locally
+  before OAuth credentials exist. Verified end-to-end against local D1.
 - **C — Trips API**: CRUD scoped to owner/shares; server-side schema validation;
   seed the existing `trips/*.json` to the first account; engine renders from the
   API; offline caching.
