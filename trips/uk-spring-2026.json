@@ -13,6 +13,10 @@
     "pt"
   ],
   "defaultLanguage": "en",
+  "locales": {
+    "en": "en-GB",
+    "pt": "pt-BR"
+  },
   "home": {
     "name": "Home (South Hampstead)",
     "postcode": "NW6 3RS",
