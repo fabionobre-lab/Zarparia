@@ -40,7 +40,10 @@ const PLANS = ['liana', 'merged'];
 (async () => {
   fs.mkdirSync(outDir, { recursive: true });
   const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  // serviceWorkers:'block' — SW-mediated fetches bypass page.route(), which
+  // would let live weather/thumbnails through and break determinism.
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: 'block' });
+  const page = await ctx.newPage();
 
   await page.route('**/*', (route) => {
     const host = new URL(route.request().url()).hostname;
