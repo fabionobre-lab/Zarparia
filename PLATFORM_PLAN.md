@@ -31,9 +31,13 @@ Every trip query is scoped to owner or an accepted share.
   **dev-only** `/auth/dev-login` route (gated on `DEV_AUTH=1` in `.dev.vars`)
   establishes a session without Google so Phases C–E are buildable locally
   before OAuth credentials exist. Verified end-to-end against local D1.
-- **C — Trips API**: CRUD scoped to owner/shares; server-side schema validation;
-  seed the existing `trips/*.json` to the first account; engine renders from the
-  API; offline caching.
+- **C — Trips API + engine** ✅ Owner/share-scoped CRUD with server-side schema
+  validation; dev seed of the example trips; the render engine ported to a Svelte
+  component (`TripView.svelte`, escaped text — no innerHTML/XSS on shared trips)
+  with a home trip-list and `/trips/[id]` view. Verified locally: multi-tenant
+  isolation, and faithful rendering of both trips incl. plan tabs, diffs, bilingual
+  text, birthday banner, weather, and Wikipedia thumbnails. (Offline SW caching
+  deferred to Phase F.)
 - **D — Editor**: full form UI, live preview via the engine, client-side
   validation.
 - **E — Sharing**: share by email, permission levels, "shared with me".
