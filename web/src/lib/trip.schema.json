@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "trip.schema.json",
+  "title": "Trip",
+  "description": "A trip config rendered by the generic trip engine (app.html). Every user-visible string is a localized object keyed by language code; the trip's languages array declares which keys must be present.",
+  "type": "object",
+  "required": ["id", "title", "languages", "defaultLanguage", "segments"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "URL-safe id, matches the filename (trips/<id>.json) and manifest entry"
+    },
+    "title": { "$ref": "#/$defs/localized" },
+    "eyebrow": {
+      "$ref": "#/$defs/localized",
+      "description": "Small label above the segment title in the hero, e.g. 'April 2026'"
+    },
+    "languages": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 2 },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "UI hides the language toggle when only one language"
+    },
+    "defaultLanguage": { "type": "string" },
+    "locales": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "description": "Optional BCP 47 locale per language code for date formatting, e.g. {\"en\": \"en-GB\"}; defaults to the language code itself"
+    },
+    "home": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "postcode": { "type": "string" },
+        "lat": { "type": "number" },
+        "lon": { "type": "number" }
+      }
+    },
+    "tags": {
+      "description": "Tag vocabulary: block tag keys resolve here for label + chip style",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label"],
+        "additionalProperties": false,
+        "properties": {
+          "label": { "$ref": "#/$defs/localized" },
+          "style": {
+            "enum": ["sight", "food", "birthday", "booking", "logistics", "fullday"],
+            "description": "Named chip style mapped to colors by the engine"
+          }
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/segment" }
+    }
+  },
+  "$defs": {
+    "localized": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "string" },
+      "description": "Map of language code to string, e.g. {\"en\": ..., \"pt\": ...}"
+    },
+    "segment": {
+      "type": "object",
+      "required": ["id", "title", "plans"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+        "title": { "$ref": "#/$defs/localized" },
+        "subtitle": { "$ref": "#/$defs/localized" },
+        "theme": {
+          "type": "string",
+          "description": "Named theme resolved to CSS custom properties by the engine, e.g. 'tartan', 'navy'"
+        },
+        "weather": {
+          "type": "object",
+          "required": ["lat", "lon", "granularity"],
+          "additionalProperties": false,
+          "properties": {
+            "lat": { "type": "number" },
+            "lon": { "type": "number" },
+            "granularity": { "enum": ["hourly", "daily"] },
+            "timezone": { "type": "string" }
+          }
+        },
+        "footer": { "$ref": "#/$defs/localized" },
+        "defaultPlan": {
+          "type": "string",
+          "description": "Plan id selected on load; defaults to the first plan"
+        },
+        "plans": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/plan" },
+          "description": "UI shows plan tabs only when more than one plan"
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "required": ["id", "days"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$" },
+        "label": { "$ref": "#/$defs/localized" },
+        "diffLabels": {
+          "description": "Prefixes for block diff annotations, shown only on this plan",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "added": { "$ref": "#/$defs/localized" },
+            "changed": { "$ref": "#/$defs/localized" },
+            "kept": { "$ref": "#/$defs/localized" }
+          }
+        },
+        "days": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/day" }
+        }
+      }
+    },
+    "day": {
+      "type": "object",
+      "required": ["date", "title", "blocks"],
+      "additionalProperties": false,
+      "properties": {
+        "date": { "type": "string", "format": "date", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "title": { "$ref": "#/$defs/localized" },
+        "note": { "$ref": "#/$defs/localized" },
+        "routeMode": {
+          "enum": ["walking", "driving", "transit", "bicycling"],
+          "description": "travelmode appended to the Google Maps day-route URL"
+        },
+        "banner": {
+          "$ref": "#/$defs/localized",
+          "description": "Celebration strip under the day header; presence also marks the day-nav pip"
+        },
+        "kmTotal": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Explicit walking-distance total for the day header; overrides the sum of block km"
+        },
+        "staticWeather": {
+          "description": "Displayed instead of live weather for past trips",
+          "type": "object",
+          "required": ["hi", "lo"],
+          "additionalProperties": false,
+          "properties": {
+            "hi": { "type": "number" },
+            "lo": { "type": "number" },
+            "emoji": { "type": "string" }
+          }
+        },
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/block" }
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["time", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "time": { "type": "string" },
+        "dotColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+        "title": { "$ref": "#/$defs/localized" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Keys into the trip-level tags vocabulary"
+        },
+        "description": { "$ref": "#/$defs/localized" },
+        "mapsUrl": { "type": "string", "format": "uri" },
+        "km": { "type": "number", "exclusiveMinimum": 0 },
+        "warning": { "$ref": "#/$defs/localized" },
+        "note": { "$ref": "#/$defs/localized" },
+        "waypoints": {
+          "description": "Intermediate stops merged into the day-route URL and stop list",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["query", "name"],
+            "additionalProperties": false,
+            "properties": {
+              "query": { "type": "string", "description": "URL-encoded Google Maps place query" },
+              "name": { "$ref": "#/$defs/localized" }
+            }
+          }
+        },
+        "photoSpots": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "mapsUrl"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string" },
+              "mapsUrl": { "type": "string", "format": "uri" },
+              "wiki": { "type": "string", "description": "Wikipedia page title for thumbnail lookup" },
+              "fallbackImg": { "type": "string", "format": "uri" }
+            }
+          }
+        },
+        "diff": {
+          "description": "Annotation vs the other plan, rendered only on plans with diffLabels",
+          "type": "object",
+          "required": ["kind", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["added", "changed", "kept"] },
+            "reason": { "$ref": "#/$defs/localized" }
+          }
+        }
+      }
+    }
+  }
+}
