@@ -1,23 +1,26 @@
 <script lang="ts">
-	let health = $state<string>('checking…');
-	$effect(() => {
-		fetch('/api/health')
-			.then((r) => r.json() as Promise<{ tables: string[] }>)
-			.then((d) => (health = `ok — tables: ${d.tables.join(', ')}`))
-			.catch((e) => (health = `error: ${e}`));
-	});
+	let { data } = $props();
 </script>
 
 <main>
 	<h1>Trips</h1>
-	<p>Backend skeleton (Phase A). Database health: <code>{health}</code></p>
+	{#if data.user}
+		<p>Signed in as <strong>{data.user.email}</strong>.</p>
+		<p>Your trips will appear here (Phase C).</p>
+	{:else}
+		<p>A place for your travel itineraries.</p>
+		<p><a href="/auth/login/google">Sign in with Google</a> to get started.</p>
+	{/if}
 </main>
 
 <style>
 	main {
 		font-family: system-ui, sans-serif;
 		max-width: 40rem;
-		margin: 4rem auto;
-		padding: 0 1rem;
+		margin: 3rem auto;
+		padding: 0 1.25rem;
+	}
+	h1 {
+		font-size: 1.6rem;
 	}
 </style>
