@@ -203,6 +203,7 @@ def main():
         "eyebrow": loc(T["en"]["ey"], T["pt"]["ey"]),
         "languages": ["en", "pt"],
         "defaultLanguage": "en",
+        "locales": {"en": "en-GB", "pt": "pt-BR"},
         "home": {"name": "Home (South Hampstead)", "postcode": "NW6 3RS", "lat": 51.543, "lon": -0.183},
         "tags": tags,
         "segments": [
