@@ -14,9 +14,7 @@
 		{
 			"binding": "DB",
 			"database_name": "trips",
-			// Placeholder until `wrangler d1 create trips` — replace with the
-			// real database_id it prints. Local dev (--local) ignores this value.
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			"database_id": "92ea4a9d-25c9-4039-912b-b711af1da8a6",
 			"migrations_dir": "./migrations"
 		}
 	]
