@@ -80,12 +80,16 @@ function dateUTC(iso: string): Date {
 	const [y, m, d] = iso.split('-').map(Number);
 	return new Date(Date.UTC(y, m - 1, d));
 }
+function isValidDate(iso: string): boolean {
+	return /^\d{4}-\d{2}-\d{2}$/.test(iso) && !Number.isNaN(dateUTC(iso).getTime());
+}
 function cap(s: string): string {
 	return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /** "Friday, 10 April" / "Sexta-feira, 10 de abril" — weekday + ', ' + rest. */
 export function dayLabel(iso: string, locale: string): string {
+	if (!isValidDate(iso)) return iso || '';
 	const parts = new Intl.DateTimeFormat(locale, {
 		weekday: 'long',
 		day: 'numeric',
@@ -100,12 +104,14 @@ export function dayLabel(iso: string, locale: string): string {
 }
 
 export function dowShort(iso: string, locale: string): string {
+	if (!isValidDate(iso)) return '';
 	const wd = new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' }).format(dateUTC(iso));
 	return cap(wd.slice(0, 3));
 }
 
 export function dayNum(iso: string): string {
-	return String(Number(iso.slice(8, 10)));
+	const n = Number(iso.slice(8, 10));
+	return Number.isNaN(n) ? '–' : String(n);
 }
 
 export function wxEmoji(code: number): string {
@@ -174,7 +180,8 @@ interface DailyResponse {
 export async function fetchSegmentWeather(seg: Segment): Promise<SegWeather | null> {
 	const w = seg.weather;
 	if (!w) return null;
-	const days = seg.plans[0].days;
+	const days = seg.plans[0]?.days ?? [];
+	if (days.length === 0 || !days[0].date) return null;
 	const start = days[0].date;
 	const end = days[days.length - 1].date;
 	const tz = encodeURIComponent(w.timezone || 'UTC');

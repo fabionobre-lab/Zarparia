@@ -1,0 +1,81 @@
+<script lang="ts">
+	import type { Localized } from '$lib/trip-engine';
+
+	let {
+		value = $bindable(),
+		langs,
+		label,
+		multiline = false,
+		placeholder = ''
+	}: {
+		value: Localized;
+		langs: string[];
+		label: string;
+		multiline?: boolean;
+		placeholder?: string;
+	} = $props();
+
+	// Optional localized fields arrive as undefined; create the object (writes
+	// back through the binding) so the template and per-language bindings work
+	// on both server and client.
+	if (!value) value = {};
+
+	// Fill a key for each language so inputs render (client-side).
+	$effect(() => {
+		for (const l of langs) if (value[l] === undefined) value[l] = '';
+	});
+</script>
+
+<div class="loc">
+	<span class="lbl">{label}</span>
+	{#each langs as l (l)}
+		<div class="row">
+			{#if langs.length > 1}<span class="tag">{l}</span>{/if}
+			{#if multiline}
+				<textarea bind:value={value[l]} {placeholder} rows="2"></textarea>
+			{:else}
+				<input type="text" bind:value={value[l]} {placeholder} />
+			{/if}
+		</div>
+	{/each}
+</div>
+
+<style>
+	.loc {
+		margin-bottom: 0.5rem;
+	}
+	.lbl {
+		display: block;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+		color: #7a6e5f;
+		margin-bottom: 0.2rem;
+	}
+	.row {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.35rem;
+		margin-bottom: 0.25rem;
+	}
+	.tag {
+		font-size: 0.6rem;
+		text-transform: uppercase;
+		color: #999;
+		background: #f0ece4;
+		border-radius: 4px;
+		padding: 0.25rem 0.35rem;
+		margin-top: 0.35rem;
+	}
+	input,
+	textarea {
+		flex: 1;
+		font: inherit;
+		font-size: 0.85rem;
+		padding: 0.35rem 0.5rem;
+		border: 1px solid #d8ccb8;
+		border-radius: 6px;
+		background: #fff;
+		resize: vertical;
+	}
+</style>

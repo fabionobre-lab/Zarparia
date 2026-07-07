@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { requireUser } from '$lib/server/guards';
 import { getTripForUser, updateTrip, deleteTrip } from '$lib/server/trips';
-import type { TripDoc } from '$lib/server/validateTrip';
+import type { TripDoc } from '$lib/validateTrip';
 
 export const GET: RequestHandler = async ({ platform, locals, params }) => {
 	const user = requireUser(locals);

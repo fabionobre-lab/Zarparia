@@ -1,4 +1,4 @@
-import { validateTripDoc, type TripDoc } from './validateTrip';
+import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
 
 export type Role = 'owner' | 'editor' | 'viewer';
 

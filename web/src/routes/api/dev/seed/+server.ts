@@ -4,7 +4,7 @@ import { getDb } from '$lib/server/db';
 import { getAuthEnv } from '$lib/server/authenv';
 import { requireUser } from '$lib/server/guards';
 import { createTrip } from '$lib/server/trips';
-import type { TripDoc } from '$lib/server/validateTrip';
+import type { TripDoc } from '$lib/validateTrip';
 import uk from '$lib/seed/uk-spring-2026.json';
 import rome from '$lib/seed/rome-2026.json';
 

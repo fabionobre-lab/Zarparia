@@ -38,8 +38,12 @@ Every trip query is scoped to owner or an accepted share.
   isolation, and faithful rendering of both trips incl. plan tabs, diffs, bilingual
   text, birthday banner, weather, and Wikipedia thumbnails. (Offline SW caching
   deferred to Phase F.)
-- **D — Editor**: full form UI, live preview via the engine, client-side
-  validation.
+- **D — Editor** ✅ Full nested structured-form editor (trip → segments → plans
+  → days → blocks) with per-language inputs, add/remove/reorder at every level,
+  tag-vocabulary editing, a **live preview** using TripView, and client-side
+  schema validation before save. `/trips/new` and `/trips/[id]/edit`; empty
+  fields pruned before POST/PUT. Verified: render, live reactivity, validation
+  errors on empty save, and valid save→redirect.
 - **E — Sharing**: share by email, permission levels, "shared with me".
 - **F — Polish**: custom per-trip theme colors, offline editor, migration
   cleanup, cutover.
