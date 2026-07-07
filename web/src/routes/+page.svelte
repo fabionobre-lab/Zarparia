@@ -11,7 +11,21 @@
 		return `${f(start)} – ${f(end)}`;
 	}
 	const statusLabel: Record<string, string> = { past: 'Past', active: 'Now', upcoming: 'Upcoming' };
+
+	const owned = $derived(data.trips.filter((t) => t.role === 'owner'));
+	const shared = $derived(data.trips.filter((t) => t.role !== 'owner'));
 </script>
+
+{#snippet card(t: (typeof data.trips)[number])}
+	<a class="card" href="/trips/{t.id}">
+		<div class="card-main">
+			<div class="card-title">{t.title ?? t.id}</div>
+			<div class="card-dates">{fmtRange(t.startDate, t.endDate)}</div>
+		</div>
+		{#if t.role !== 'owner'}<span class="role">{t.role === 'editor' ? 'can edit' : 'view only'}</span>{/if}
+		<span class="chip {t.status}">{statusLabel[t.status] ?? t.status}</span>
+	</a>
+{/snippet}
 
 <main>
 	{#if data.user}
@@ -19,20 +33,18 @@
 			<h1>Your trips</h1>
 			<a class="new" href="/trips/new">+ New trip</a>
 		</div>
-		{#if data.trips.length === 0}
+		{#if owned.length === 0}
 			<p class="empty">No trips yet. <a href="/trips/new">Create your first one.</a></p>
 		{:else}
 			<div class="cards">
-				{#each data.trips as t (t.id)}
-					<a class="card" href="/trips/{t.id}">
-						<div class="card-main">
-							<div class="card-title">{t.title ?? t.id}</div>
-							<div class="card-dates">{fmtRange(t.startDate, t.endDate)}</div>
-						</div>
-						{#if t.role !== 'owner'}<span class="role">{t.role}</span>{/if}
-						<span class="chip {t.status}">{statusLabel[t.status] ?? t.status}</span>
-					</a>
-				{/each}
+				{#each owned as t (t.id)}{@render card(t)}{/each}
+			</div>
+		{/if}
+
+		{#if shared.length > 0}
+			<h2 class="shared-hd">Shared with you</h2>
+			<div class="cards">
+				{#each shared as t (t.id)}{@render card(t)}{/each}
 			</div>
 		{/if}
 	{:else}
@@ -56,6 +68,11 @@
 	}
 	h1 {
 		font-size: 1.5rem;
+	}
+	.shared-hd {
+		font-size: 1.1rem;
+		margin: 1.75rem 0 0.25rem;
+		color: #444;
 	}
 	.new {
 		font-size: 0.85rem;
