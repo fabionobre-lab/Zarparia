@@ -1,24 +1,48 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, beforeNavigate } from '$app/navigation';
 	import type { Trip } from '$lib/trip-engine';
 	import TripView from '$lib/TripView.svelte';
 	import SegmentEditor from './SegmentEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
-	import { blankTrip, blankSegment, move, removeAt, pruneEmpty } from './factories';
+	import { blankTrip, blankSegment, move, removeAt, pruneEmpty, nextId } from './factories';
 	import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
 
 	let {
 		initial,
 		mode,
-		tripId
-	}: { initial: Trip | null; mode: 'new' | 'edit'; tripId?: string } = $props();
+		tripId,
+		baseUpdatedAt
+	}: { initial: Trip | null; mode: 'new' | 'edit'; tripId?: string; baseUpdatedAt?: string } =
+		$props();
 
 	let draft = $state<Trip>(
 		untrack(() => (initial ? (structuredClone($state.snapshot(initial)) as Trip) : blankTrip()))
 	);
 	let errors = $state<string[]>([]);
 	let saving = $state(false);
+
+	// Optimistic-concurrency base version, rebased after each successful save.
+	let base = $state<string | undefined>(untrack(() => baseUpdatedAt));
+
+	// ── Dirty guard: warn before losing unsaved edits ──
+	// Serialize the same way save() does so cosmetic differences don't read as dirty.
+	function serialize(): string {
+		return JSON.stringify(pruneEmpty($state.snapshot(draft)) ?? null);
+	}
+	let savedSnapshot = $state(untrack(serialize));
+	let justSaved = $state(false);
+	const dirty = $derived(!justSaved && serialize() !== savedSnapshot);
+
+	beforeNavigate((nav) => {
+		if (dirty && !confirm('Discard unsaved changes?')) nav.cancel();
+	});
+	$effect(() => {
+		if (!dirty) return;
+		const handler = (e: BeforeUnloadEvent) => e.preventDefault();
+		window.addEventListener('beforeunload', handler);
+		return () => window.removeEventListener('beforeunload', handler);
+	});
 
 	const langs = $derived(draft.languages);
 
@@ -32,7 +56,7 @@
 		if (draft.defaultLanguage === code) draft.defaultLanguage = draft.languages[0];
 	}
 	function addSegment() {
-		draft.segments.push(blankSegment(langs, 'segment-' + (draft.segments.length + 1)));
+		draft.segments.push(blankSegment(langs, nextId('segment', draft.segments.map((s) => s.id))));
 	}
 
 	// Trip-level tags vocabulary
@@ -58,13 +82,20 @@
 		}
 		saving = true;
 		try {
+			const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+			if (mode === 'edit' && base) headers['x-base-updated-at'] = base;
 			const res = await fetch(mode === 'new' ? '/api/trips' : `/api/trips/${tripId}`, {
 				method: mode === 'new' ? 'POST' : 'PUT',
-				headers: { 'Content-Type': 'application/json' },
+				headers,
 				body: JSON.stringify(clean)
 			});
 			if (res.ok) {
-				const data = (await res.json()) as { id: string };
+				const data = (await res.json()) as { id: string; updatedAt?: string };
+				// Rebase the version and snapshot so consecutive saves work and the
+				// dirty guard doesn't prompt on the post-save navigation.
+				if (data.updatedAt) base = data.updatedAt;
+				savedSnapshot = serialize();
+				justSaved = true;
 				await goto(`/trips/${data.id}`);
 			} else {
 				const e = (await res.json()) as { error?: string; details?: string[] };

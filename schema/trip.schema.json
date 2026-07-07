@@ -82,6 +82,16 @@
           "type": "string",
           "description": "Named theme resolved to CSS custom properties by the engine, e.g. 'tartan', 'navy'"
         },
+        "themeColors": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Custom colors overriding the named theme; hex strings",
+          "properties": {
+            "heroBg": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+            "accent": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+            "eyebrow": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" }
+          }
+        },
         "weather": {
           "type": "object",
           "required": ["lat", "lon", "granularity"],
@@ -183,7 +193,7 @@
           "description": "Keys into the trip-level tags vocabulary"
         },
         "description": { "$ref": "#/$defs/localized" },
-        "mapsUrl": { "type": "string", "format": "uri" },
+        "mapsUrl": { "type": "string", "format": "uri", "pattern": "^https?://" },
         "km": { "type": "number", "exclusiveMinimum": 0 },
         "warning": { "$ref": "#/$defs/localized" },
         "note": { "$ref": "#/$defs/localized" },
@@ -208,9 +218,9 @@
             "additionalProperties": false,
             "properties": {
               "name": { "type": "string" },
-              "mapsUrl": { "type": "string", "format": "uri" },
+              "mapsUrl": { "type": "string", "format": "uri", "pattern": "^https?://" },
               "wiki": { "type": "string", "description": "Wikipedia page title for thumbnail lookup" },
-              "fallbackImg": { "type": "string", "format": "uri" }
+              "fallbackImg": { "type": "string", "format": "uri", "pattern": "^https?://" }
             }
           }
         },

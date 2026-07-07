@@ -14,10 +14,11 @@ export interface TripListItem {
 
 /** Result of a write: either the trip, or a typed failure. */
 export type WriteResult =
-	| { ok: true; id: string; doc: TripDoc }
+	| { ok: true; id: string; doc: TripDoc; updatedAt: string }
 	| { ok: false; reason: 'invalid'; errors: string[] }
 	| { ok: false; reason: 'not_found' }
-	| { ok: false; reason: 'forbidden' };
+	| { ok: false; reason: 'forbidden' }
+	| { ok: false; reason: 'conflict' };
 
 function allDates(doc: TripDoc): string[] {
 	const dates: string[] = [];
@@ -32,12 +33,18 @@ function deriveMeta(doc: TripDoc) {
 	const dates = allDates(doc);
 	const start = dates[0] ?? null;
 	const end = dates[dates.length - 1] ?? null;
-	const today = new Date().toISOString().slice(0, 10);
-	let status = 'upcoming';
-	if (end && end < today) status = 'past';
-	else if (start && start <= today && end && today <= end) status = 'active';
+	const status = statusFor(start, end);
 	const title = doc.title?.[doc.defaultLanguage] ?? Object.values(doc.title ?? {})[0] ?? doc.id;
 	return { title, status, start, end };
+}
+
+/** Derive a trip's status from its date range, same rules as deriveMeta.
+ *  Computed at read time so a stored 'upcoming' can't go stale. */
+function statusFor(start: string | null, end: string | null): string {
+	const today = new Date().toISOString().slice(0, 10);
+	if (end && end < today) return 'past';
+	if (start && start <= today && end && today <= end) return 'active';
+	return 'upcoming';
 }
 
 function slugify(s: string): string {
@@ -91,19 +98,24 @@ export async function listTripsForUser(db: D1Database, userId: string): Promise<
 		)
 		.bind(userId)
 		.all<TripListItem>();
-	return rows.results;
+	// status/start_date/end_date are denormalized at write time and never
+	// refreshed, so recompute status from the dates on read.
+	return rows.results.map((r) => ({ ...r, status: statusFor(r.startDate, r.endDate) }));
 }
 
 export async function getTripForUser(
 	db: D1Database,
 	userId: string,
 	tripId: string
-): Promise<{ doc: TripDoc; role: Role } | null> {
+): Promise<{ doc: TripDoc; role: Role; updatedAt: string } | null> {
 	const role = await roleFor(db, userId, tripId);
 	if (!role) return null;
-	const row = await db.prepare('SELECT doc FROM trips WHERE id = ?').bind(tripId).first<{ doc: string }>();
+	const row = await db
+		.prepare('SELECT doc, updated_at AS updatedAt FROM trips WHERE id = ?')
+		.bind(tripId)
+		.first<{ doc: string; updatedAt: string }>();
 	if (!row) return null;
-	return { doc: JSON.parse(row.doc) as TripDoc, role };
+	return { doc: JSON.parse(row.doc) as TripDoc, role, updatedAt: row.updatedAt };
 }
 
 export async function createTrip(
@@ -119,25 +131,38 @@ export async function createTrip(
 		desiredId && /^[a-z0-9][a-z0-9-]*$/.test(desiredId)
 			? desiredId
 			: slugify(doc.title?.[doc.defaultLanguage] ?? 'trip');
-	const id = await uniqueId(db, base);
-	doc.id = id;
 	const meta = deriveMeta(doc);
 	const now = new Date().toISOString();
-	await db
-		.prepare(
-			`INSERT INTO trips (id, owner_id, doc, title, status, start_date, end_date, created_at, updated_at)
-			 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-		)
-		.bind(id, userId, JSON.stringify(doc), meta.title, meta.status, meta.start, meta.end, now, now)
-		.run();
-	return { ok: true, id, doc };
+
+	// Two concurrent creates can pick the same id between uniqueId's SELECT and
+	// the INSERT, tripping the PK constraint — retry with a fresh id on collision.
+	for (let attempt = 0; attempt < 5; attempt++) {
+		const id = await uniqueId(db, base);
+		doc.id = id;
+		try {
+			await db
+				.prepare(
+					`INSERT INTO trips (id, owner_id, doc, title, status, start_date, end_date, created_at, updated_at)
+					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+				)
+				.bind(id, userId, JSON.stringify(doc), meta.title, meta.status, meta.start, meta.end, now, now)
+				.run();
+			return { ok: true, id, doc, updatedAt: now };
+		} catch (e) {
+			if (attempt < 4 && e instanceof Error && /UNIQUE/i.test(e.message)) continue;
+			throw e;
+		}
+	}
+	// Unreachable: the loop either returns or throws.
+	throw new Error('Could not allocate a unique trip id.');
 }
 
 export async function updateTrip(
 	db: D1Database,
 	userId: string,
 	tripId: string,
-	doc: TripDoc
+	doc: TripDoc,
+	baseUpdatedAt?: string
 ): Promise<WriteResult> {
 	const role = await roleFor(db, userId, tripId);
 	if (!role) return { ok: false, reason: 'not_found' };
@@ -147,13 +172,20 @@ export async function updateTrip(
 
 	doc.id = tripId; // id is immutable
 	const meta = deriveMeta(doc);
-	await db
-		.prepare(
-			`UPDATE trips SET doc = ?, title = ?, status = ?, start_date = ?, end_date = ?, updated_at = ? WHERE id = ?`
-		)
-		.bind(JSON.stringify(doc), meta.title, meta.status, meta.start, meta.end, new Date().toISOString(), tripId)
-		.run();
-	return { ok: true, id: tripId, doc };
+	const now = new Date().toISOString();
+	// Optimistic concurrency: when the caller passes the updated_at it loaded,
+	// only write if the row hasn't changed since — otherwise report a conflict
+	// so two editors don't silently clobber each other.
+	const sql = baseUpdatedAt
+		? `UPDATE trips SET doc = ?, title = ?, status = ?, start_date = ?, end_date = ?, updated_at = ? WHERE id = ? AND updated_at = ?`
+		: `UPDATE trips SET doc = ?, title = ?, status = ?, start_date = ?, end_date = ?, updated_at = ? WHERE id = ?`;
+	const stmt = db.prepare(sql);
+	const bound = baseUpdatedAt
+		? stmt.bind(JSON.stringify(doc), meta.title, meta.status, meta.start, meta.end, now, tripId, baseUpdatedAt)
+		: stmt.bind(JSON.stringify(doc), meta.title, meta.status, meta.start, meta.end, now, tripId);
+	const res = await bound.run();
+	if (baseUpdatedAt && res.meta.changes === 0) return { ok: false, reason: 'conflict' };
+	return { ok: true, id: tripId, doc, updatedAt: now };
 }
 
 export async function deleteTrip(

@@ -49,6 +49,11 @@ function dateObj(iso) {
 function cap(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
+/* Local (not UTC) YYYY-MM-DD, so "today" flips at local midnight (e.g. BST). */
+function todayLocal() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 /* "Friday, 10 April" / "Sexta-feira, 10 de abril": weekday + ', ' + rest */
 function dayLabel(iso) {
   const parts = new Intl.DateTimeFormat(locale(), {
@@ -98,8 +103,7 @@ function wxEmoji(code) {
 function tripIsPast() {
   let last = '';
   trip.segments.forEach((s) => s.plans.forEach((p) => p.days.forEach((d) => { if (d.date > last) last = d.date; })));
-  const today = new Date().toISOString().slice(0, 10);
-  return last < today;
+  return last < todayLocal();
 }
 async function fetchWeather() {
   if (isPast) return; // archive trip: staticWeather only
@@ -345,6 +349,7 @@ window.setV = function (planId) {
     if (seg.plans.some((p) => p.id === planId)) planBySeg[seg.id] = planId;
   });
   rebuildFlatDays();
+  dayIdx = Math.max(0, Math.min(dayIdx, flatDays.length - 1)); // plan may have fewer days
   renderAll();
 };
 window.sd = function (i) {

@@ -36,11 +36,13 @@ export async function createSession(db: D1Database, token: string, userId: strin
 }
 
 /** Returns the user for a valid, unexpired session; renews near expiry.
+ *  `renewed` is true when the DB expiry was extended, so the caller can
+ *  re-issue the cookie (whose `expires` was fixed at login otherwise).
  *  Deletes and returns null for expired/unknown sessions. */
 export async function validateSessionToken(
 	db: D1Database,
 	token: string
-): Promise<SessionUser | null> {
+): Promise<{ user: SessionUser; renewed: boolean } | null> {
 	const id = await hashToken(token);
 	const row = await db
 		.prepare(
@@ -56,11 +58,21 @@ export async function validateSessionToken(
 		await db.prepare('DELETE FROM sessions WHERE id = ?').bind(id).run();
 		return null;
 	}
+	let renewed = false;
 	if (expiresMs - Date.now() < RENEW_WITHIN_MS) {
-		const newExpiry = new Date(Date.now() + SESSION_TTL_MS).toISOString();
+		const now = Date.now();
+		const newExpiry = new Date(now + SESSION_TTL_MS).toISOString();
 		await db.prepare('UPDATE sessions SET expires_at = ? WHERE id = ?').bind(newExpiry, id).run();
+		renewed = true;
+		// Opportunistic cleanup — renewals are cheap and infrequent, so piggyback
+		// a sweep of expired rows here to keep the table from growing unbounded.
+		await db
+			.prepare('DELETE FROM sessions WHERE expires_at < ?')
+			.bind(new Date(now).toISOString())
+			.run();
 	}
-	return { id: row.id, email: row.email, name: row.name, avatarUrl: row.avatarUrl };
+	const user = { id: row.id, email: row.email, name: row.name, avatarUrl: row.avatarUrl };
+	return { user, renewed };
 }
 
 export async function invalidateSession(db: D1Database, token: string): Promise<void> {

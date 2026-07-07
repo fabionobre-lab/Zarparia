@@ -4,4 +4,4 @@
 	let { data } = $props();
 </script>
 
-<TripEditor initial={data.trip as unknown as Trip} mode="edit" tripId={data.tripId} />
+<TripEditor initial={data.trip as unknown as Trip} mode="edit" tripId={data.tripId} baseUpdatedAt={data.updatedAt} />

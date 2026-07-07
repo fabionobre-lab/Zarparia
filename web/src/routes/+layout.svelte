@@ -1,7 +1,29 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
+	import { browser } from '$app/environment';
+	import { onMount } from 'svelte';
 
 	let { children, data } = $props();
+
+	onMount(() => {
+		if (!('serviceWorker' in navigator)) return;
+		// When a new SW takes control after a deploy, hashed route chunks the open
+		// tab lazily loads have vanished (404). Reload to pick up the new build.
+		// Guard: only reload if a SW already controlled this page at setup, so the
+		// first install doesn't trigger a reload loop.
+		const hadController = !!navigator.serviceWorker.controller;
+		const onChange = () => {
+			if (hadController) location.reload();
+		};
+		navigator.serviceWorker.addEventListener('controllerchange', onChange);
+		return () => navigator.serviceWorker.removeEventListener('controllerchange', onChange);
+	});
+
+	// Cached pages hold the previous user's data; drop the runtime cache on logout.
+	function onLogout() {
+		if (browser && 'caches' in window) caches.delete('runtime');
+		// no preventDefault: the normal POST to /auth/logout still proceeds.
+	}
 </script>
 
 <svelte:head>
@@ -13,7 +35,7 @@
 	<nav>
 		{#if data.user}
 			<span class="who">{data.user.name ?? data.user.email}</span>
-			<form method="POST" action="/auth/logout">
+			<form method="POST" action="/auth/logout" onsubmit={onLogout}>
 				<button type="submit">Sign out</button>
 			</form>
 		{:else}

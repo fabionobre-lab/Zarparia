@@ -1,9 +1,12 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
+import { requireUser } from '$lib/server/guards';
 
 // Smoke check: confirms the D1 binding works and lists the migrated tables.
-export const GET: RequestHandler = async ({ platform }) => {
+// Requires a signed-in user so table names aren't exposed unauthenticated.
+export const GET: RequestHandler = async ({ platform, locals }) => {
+	requireUser(locals);
 	const db = getDb(platform);
 	const tables = await db
 		.prepare(

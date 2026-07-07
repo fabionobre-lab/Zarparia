@@ -9,5 +9,5 @@ export const load: PageServerLoad = async ({ locals, platform, params }) => {
 	const trip = await getTripForUser(db, locals.user.id, params.id);
 	if (!trip) throw error(404, 'Trip not found');
 	if (trip.role === 'viewer') throw error(403, 'You have view-only access to this trip');
-	return { trip: trip.doc, tripId: params.id };
+	return { trip: trip.doc, tripId: params.id, updatedAt: trip.updatedAt };
 };

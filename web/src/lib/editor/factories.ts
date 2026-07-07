@@ -27,6 +27,15 @@ export function blankTrip(langs: string[] = ['en']): Trip {
 	};
 }
 
+/** Smallest `${prefix}-N` (N ≥ 1) not already in `existing`, so adding items
+ *  never mints a duplicate id (length-based ids collide after a remove). */
+export function nextId(prefix: string, existing: string[]): string {
+	const taken = new Set(existing);
+	let n = 1;
+	while (taken.has(`${prefix}-${n}`)) n++;
+	return `${prefix}-${n}`;
+}
+
 /** Move item at index i by dir (-1 up, +1 down), in place. */
 export function move<T>(arr: T[], i: number, dir: -1 | 1): void {
 	const j = i + dir;
