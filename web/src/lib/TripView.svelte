@@ -17,7 +17,8 @@
 		routeUrl,
 		truncStop,
 		dayKmTotal,
-		fetchSegmentWeather
+		fetchSegmentWeather,
+		safeUrl
 	} from './trip-engine';
 
 	let { trip }: { trip: Trip } = $props();
@@ -29,7 +30,7 @@
 		untrack(() => Object.fromEntries(trip.segments.map((s) => [s.id, s.defaultPlan ?? s.plans[0].id])))
 	);
 	let dayIdx = $state(0);
-	let wxBySeg = $state<Record<string, SegWeather>>({});
+	let wxBySeg = $state<Record<string, SegWeather | null>>({});
 	let wikiImgs = $state<Record<string, string | null>>({});
 
 	const isPast = untrack(() => tripIsPast(trip));
@@ -67,12 +68,22 @@
 	}
 
 	// ── Weather (client-side, skipped for past trips) ──
+	// Cache keyed by (segment id + coords + granularity) so changing coordinates
+	// in the editor refetches instead of reusing a stale (e.g. 0/0) result.
+	// A `null` entry marks an in-flight request so we don't refetch it while
+	// pending — the O(N²) refetch storm this $effect used to cause.
+	function wxKey(seg: Segment): string | null {
+		const w = seg.weather;
+		return w ? `${seg.id}|${w.lat}|${w.lon}|${w.granularity}` : null;
+	}
 	$effect(() => {
 		if (isPast) return;
 		for (const seg of trip.segments) {
-			if (wxBySeg[seg.id]) continue;
+			const key = wxKey(seg);
+			if (!key || wxBySeg[key] !== undefined) continue;
+			wxBySeg = { ...wxBySeg, [key]: null }; // mark in-flight
 			fetchSegmentWeather(seg).then((w) => {
-				if (w) wxBySeg = { ...wxBySeg, [seg.id]: w };
+				if (w) wxBySeg = { ...wxBySeg, [key]: w };
 			});
 		}
 	});
@@ -83,7 +94,8 @@
 		lo: number;
 	}
 	function daySummary(seg: Segment, day: Day): DayWx | null {
-		const w = wxBySeg[seg.id];
+		const key = wxKey(seg);
+		const w = key ? wxBySeg[key] : null;
 		if (w?.hourly) {
 			const temps: number[] = [];
 			const codes: number[] = [];
@@ -111,7 +123,8 @@
 	}
 
 	function blockBadge(seg: Segment, day: Day, time: string): { emoji: string; temp: number } | null {
-		const w = wxBySeg[seg.id];
+		const key = wxKey(seg);
+		const w = key ? wxBySeg[key] : null;
 		if (w?.hourly) {
 			const clean = time.replace(/[^0-9:]/g, '');
 			const p = clean.split(':');
@@ -207,7 +220,7 @@
 	<nav class="daynav">
 		{#each trip.segments as seg, si (seg.id)}
 			{#if si > 0}<div class="daybtn-separator"></div>{/if}
-			{#each planOf(seg).days as day (day.date)}
+			{#each planOf(seg).days as day (day)}
 				{@const gi = flatDays.findIndex((f) => f.seg === seg && f.day === day)}
 				<button class="daybtn" class:on={gi === clampedIdx} class:has-bday={!!L(day.banner)} onclick={() => (dayIdx = gi)}>
 					<span class="dow">{dowShort(day.date, localeFor(trip, lang))}</span>
@@ -296,11 +309,11 @@
 							{#if L(b.note)}<div class="tb-note">{L(b.note)}</div>{/if}
 							{#if b.photoSpots?.length}
 								<div class="tb-photos">
-									{#each b.photoSpots as sp (sp.name)}
+									{#each b.photoSpots as sp (sp)}
 										{@const key = spotKey(sp)}
-										<a href={sp.mapsUrl} target="_blank" rel="noreferrer" class="ps-card">
-											{#if key && wikiImgs[key]}
-												<img src={wikiImgs[key]} class="ps-thumb" alt="" />
+										<a href={safeUrl(sp.mapsUrl)} target="_blank" rel="noreferrer" class="ps-card">
+											{#if key && safeUrl(wikiImgs[key] ?? undefined)}
+												<img src={safeUrl(wikiImgs[key] ?? undefined)} class="ps-thumb" alt="" />
 											{:else}
 												<div class="ps-thumb ps-placeholder"></div>
 											{/if}
@@ -313,7 +326,7 @@
 								<div class="diff-{b.diff.kind}">{L(plan.diffLabels[b.diff.kind])}{L(b.diff.reason)}</div>
 							{/if}
 							{#if b.mapsUrl}
-								<a class="map-btn" href={b.mapsUrl} target="_blank" rel="noreferrer">
+								<a class="map-btn" href={safeUrl(b.mapsUrl)} target="_blank" rel="noreferrer">
 									<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
 									{uiText.maps}
 								</a>

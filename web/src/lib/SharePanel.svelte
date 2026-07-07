@@ -12,9 +12,13 @@
 
 	async function load() {
 		loading = true;
+		error = '';
 		try {
 			const res = await fetch(`/api/trips/${tripId}/shares`);
 			if (res.ok) shares = ((await res.json()) as { shares: ShareRow[] }).shares;
+			else error = 'Could not load sharing info.';
+		} catch {
+			error = 'Could not load sharing info.';
 		} finally {
 			loading = false;
 		}
@@ -49,9 +53,13 @@
 
 	async function remove(userId: string) {
 		busy = true;
+		error = '';
 		try {
-			await fetch(`/api/trips/${tripId}/shares/${userId}`, { method: 'DELETE' });
-			await load();
+			const res = await fetch(`/api/trips/${tripId}/shares/${userId}`, { method: 'DELETE' });
+			if (res.ok) await load();
+			else error = 'Could not remove this person.';
+		} catch {
+			error = 'Could not remove this person.';
 		} finally {
 			busy = false;
 		}

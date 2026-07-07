@@ -73,6 +73,13 @@ export interface Trip {
 	segments: Segment[];
 }
 
+/** Defense-in-depth: only pass through http(s) URLs for hrefs/srcs derived
+ *  from trip data, so a stored `javascript:` URL can't execute even if it
+ *  slipped past schema validation. */
+export function safeUrl(u: string | undefined): string | undefined {
+	return u && /^https?:\/\//i.test(u) ? u : undefined;
+}
+
 export function loc(trip: Trip, obj: Localized | undefined, lang: string): string {
 	if (!obj) return '';
 	return obj[lang] !== undefined ? obj[lang] : (obj[trip.defaultLanguage] ?? '');

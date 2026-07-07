@@ -28,6 +28,9 @@ export const GET: RequestHandler = async ({ platform, url, cookies }) => {
 
 	const profile = await fetchGoogleProfile(accessToken);
 	if (!profile.email) throw error(400, 'Google account has no email address.');
+	// Reject explicitly-unverified emails (undefined passes — some responses omit the claim).
+	if (profile.email_verified === false)
+		throw error(403, 'Your Google account email is unverified. Verify it with Google and try again.');
 
 	const db = getDb(platform);
 	const user = await upsertGoogleUser(db, profile);

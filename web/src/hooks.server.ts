@@ -2,6 +2,7 @@ import type { Handle } from '@sveltejs/kit';
 import {
 	SESSION_COOKIE,
 	validateSessionToken,
+	setSessionCookie,
 	deleteSessionCookie
 } from '$lib/server/session';
 
@@ -11,9 +12,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const db = event.platform?.env?.DB;
 
 	if (token && db) {
-		const user = await validateSessionToken(db, token);
-		if (user) {
-			event.locals.user = user;
+		const result = await validateSessionToken(db, token);
+		if (result) {
+			event.locals.user = result.user;
+			// Re-issue the cookie with a fresh 30-day expiry when the DB session
+			// was renewed, so the sliding window actually slides (the browser
+			// otherwise deletes the cookie 30 days after login).
+			if (result.renewed) setSessionCookie(event.cookies, token);
 		} else {
 			event.locals.user = null;
 			deleteSessionCookie(event.cookies);

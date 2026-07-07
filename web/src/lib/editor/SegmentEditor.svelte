@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Segment, Trip } from '$lib/trip-engine';
-	import { move, removeAt, blankPlan, emptyLocalized } from './factories';
+	import { move, removeAt, blankPlan, emptyLocalized, nextId } from './factories';
 	import PlanEditor from './PlanEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
 
@@ -32,7 +32,7 @@
 		segment.themeColors = on ? { heroBg: '#2b4a2b', accent: '#2b4a2b', eyebrow: '#e8c84a' } : undefined;
 	}
 	function addPlan() {
-		segment.plans.push(blankPlan(langs, 'plan-' + (segment.plans.length + 1)));
+		segment.plans.push(blankPlan(langs, nextId('plan', segment.plans.map((p) => p.id))));
 	}
 </script>
 

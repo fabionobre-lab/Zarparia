@@ -20,10 +20,19 @@ export const PUT: RequestHandler = async ({ platform, locals, params, request })
 	if (!body || typeof body !== 'object') {
 		return json({ error: 'Request body must be a trip JSON object.' }, { status: 400 });
 	}
-	const result = await updateTrip(db, user.id, params.id, body);
-	if (result.ok) return json({ id: result.id, doc: result.doc });
+	const baseUpdatedAt = request.headers.get('x-base-updated-at') ?? undefined;
+	const result = await updateTrip(db, user.id, params.id, body, baseUpdatedAt);
+	if (result.ok) return json({ id: result.id, doc: result.doc, updatedAt: result.updatedAt });
 	if (result.reason === 'not_found') return json({ error: 'Trip not found.' }, { status: 404 });
 	if (result.reason === 'forbidden') return json({ error: 'You cannot edit this trip.' }, { status: 403 });
+	if (result.reason === 'conflict')
+		return json(
+			{
+				error:
+					'This trip was changed by someone else since you opened it. Copy any recent edits, then reload to get the latest version.'
+			},
+			{ status: 409 }
+		);
 	return json({ error: 'Trip failed validation.', details: result.errors }, { status: 422 });
 	// (result.reason === 'invalid' narrows to include errors here)
 };

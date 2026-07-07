@@ -26,7 +26,9 @@
 		<SharePanel tripId={data.trip.id} />
 	{/if}
 
-	<TripView trip={data.trip as unknown as Trip} />
+	{#key data.trip.id}
+		<TripView trip={data.trip as unknown as Trip} />
+	{/key}
 </div>
 
 <style>

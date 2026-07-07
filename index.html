@@ -63,8 +63,13 @@ document.getElementById('legacy').textContent = S.legacy;
 document.title = S.title + ' — Fabio & Liana';
 document.documentElement.lang = lang;
 
+/* Local (not UTC) YYYY-MM-DD, so status chips flip at local midnight (e.g. BST). */
+function todayLocal() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 function status(t) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayLocal();
   const start = t.dates && t.dates.start, end = t.dates && t.dates.end;
   if (end && end < today) return 'past';
   if (start && start <= today && end && today <= end) return 'active';
