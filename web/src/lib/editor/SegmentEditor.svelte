@@ -26,6 +26,11 @@
 	function toggleWeather(on: boolean) {
 		segment.weather = on ? { lat: 0, lon: 0, granularity: 'daily', timezone: 'Europe/London' } : undefined;
 	}
+
+	const hasColors = $derived(!!segment.themeColors);
+	function toggleColors(on: boolean) {
+		segment.themeColors = on ? { heroBg: '#2b4a2b', accent: '#2b4a2b', eyebrow: '#e8c84a' } : undefined;
+	}
 	function addPlan() {
 		segment.plans.push(blankPlan(langs, 'plan-' + (segment.plans.length + 1)));
 	}
@@ -53,6 +58,15 @@
 		<LocalizedInput bind:value={segment.title} {langs} label="Segment title" />
 		<LocalizedInput bind:value={segment.subtitle as never} {langs} label="Subtitle" />
 		<LocalizedInput bind:value={segment.footer as never} {langs} label="Footer" />
+
+		<label class="check"><input type="checkbox" checked={hasColors} onchange={(e) => toggleColors(e.currentTarget.checked)} /> Custom colors (override theme)</label>
+		{#if segment.themeColors}
+			<div class="grid3">
+				<label class="f">Header bg<input type="color" bind:value={segment.themeColors.heroBg} /></label>
+				<label class="f">Accent<input type="color" bind:value={segment.themeColors.accent} /></label>
+				<label class="f">Eyebrow<input type="color" bind:value={segment.themeColors.eyebrow} /></label>
+			</div>
+		{/if}
 
 		<label class="check"><input type="checkbox" checked={hasWeather} onchange={(e) => toggleWeather(e.currentTarget.checked)} /> Live weather</label>
 		{#if segment.weather}
@@ -132,6 +146,11 @@
 	.grid2 {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+	}
+	.grid3 {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
 		gap: 0.5rem;
 	}
 	.grid4 {

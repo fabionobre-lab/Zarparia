@@ -46,11 +46,17 @@ export interface Plan {
 	diffLabels?: Partial<Record<'added' | 'changed' | 'kept', Localized>>;
 	days: Day[];
 }
+export interface ThemeColors {
+	heroBg?: string;
+	accent?: string;
+	eyebrow?: string;
+}
 export interface Segment {
 	id: string;
 	title: Localized;
 	subtitle?: Localized;
 	theme?: string;
+	themeColors?: ThemeColors;
 	weather?: { lat: number; lon: number; granularity: 'hourly' | 'daily'; timezone?: string };
 	footer?: Localized;
 	defaultPlan?: string;

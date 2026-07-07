@@ -155,6 +155,17 @@
 		}
 	});
 
+	// Inline CSS-variable overrides from a segment's custom themeColors.
+	const themeStyle = $derived.by(() => {
+		const c = current?.seg.themeColors;
+		if (!c) return '';
+		const parts: string[] = [];
+		if (c.heroBg) parts.push(`--hero-bg:${c.heroBg}`);
+		if (c.accent) parts.push(`--accent:${c.accent}`);
+		if (c.eyebrow) parts.push(`--hero-eyebrow:${c.eyebrow}`);
+		return parts.join(';');
+	});
+
 	// Route places for the current day
 	const routeForDay = $derived.by(() => {
 		if (!current) return null;
@@ -164,7 +175,7 @@
 	});
 </script>
 
-<div class="shell" class:theme-navy={current?.seg.theme === 'navy'}>
+<div class="shell" class:theme-navy={current?.seg.theme === 'navy'} style={themeStyle}>
 	<div class="hero">
 		<div class="hero-inner">
 			<div class="hero-row1">
