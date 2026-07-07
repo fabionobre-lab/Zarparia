@@ -44,11 +44,22 @@ Every trip query is scoped to owner or an accepted share.
   schema validation before save. `/trips/new` and `/trips/[id]/edit`; empty
   fields pruned before POST/PUT. Verified: render, live reactivity, validation
   errors on empty save, and valid save→redirect.
-- **E — Sharing**: share by email, permission levels, "shared with me".
+- **E — Sharing** ✅ Owner shares a trip by email (viewer/editor); share
+  management API + SharePanel on the trip page; home splits "Your trips" vs
+  "Shared with you". Permission boundaries enforced (viewer can't edit,
+  non-owner can't manage shares). Target must have signed in once (pending
+  email invites are a future enhancement). Verified with two users locally.
 - **F — Polish**: custom per-trip theme colors, offline editor, migration
   cleanup, cutover.
 
-## What Fabio must provision (blocks Phase B deploy)
+## Deployment status
+
+**Live at https://trips.fabionobre-ai.workers.dev** (Cloudflare Workers + D1
+`trips`, West Europe, account fabionobre.ai@gmail.com). Verified: remote D1
+health, home page, dev-login correctly disabled in prod. **Google login is not
+yet functional** — it needs the OAuth client + secrets below.
+
+## What Fabio must provision (blocks Google login in production)
 
 1. **Cloudflare account** + CLI login: from `web/`, run `npx wrangler login`.
 2. **Create the D1 database**: `npx wrangler d1 create trips`, then paste the
