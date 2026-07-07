@@ -198,7 +198,7 @@
 			{#if si > 0}<div class="daybtn-separator"></div>{/if}
 			{#each planOf(seg).days as day (day.date)}
 				{@const gi = flatDays.findIndex((f) => f.seg === seg && f.day === day)}
-				<button class="daybtn" class:on={gi === clampedIdx} class:has-bday={!!day.banner} onclick={() => (dayIdx = gi)}>
+				<button class="daybtn" class:on={gi === clampedIdx} class:has-bday={!!L(day.banner)} onclick={() => (dayIdx = gi)}>
 					<span class="dow">{dowShort(day.date, localeFor(trip, lang))}</span>
 					<span class="dnum">{dayNum(day.date)}</span>
 					<span class="bday-pip"></span>
@@ -229,7 +229,7 @@
 							{#if km}<div class="wx-hdr-item wx-km">🦶 ~{km.toFixed(1)} km</div>{/if}
 						</div>
 					{/if}
-					{#if day.banner}<div class="bday-strip">{L(day.banner)}</div>{/if}
+					{#if L(day.banner)}<div class="bday-strip">{L(day.banner)}</div>{/if}
 				</div>
 			</div>
 
