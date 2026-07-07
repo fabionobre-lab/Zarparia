@@ -49,8 +49,12 @@ Every trip query is scoped to owner or an accepted share.
   "Shared with you". Permission boundaries enforced (viewer can't edit,
   non-owner can't manage shares). Target must have signed in once (pending
   email invites are a future enhancement). Verified with two users locally.
-- **F — Polish**: custom per-trip theme colors, offline editor, migration
-  cleanup, cutover.
+- **F — Polish** ✅ Custom per-trip theme colors (segment `themeColors`,
+  editor color pickers, applied as CSS-var overrides in TripView); PWA —
+  web manifest + icons + a SvelteKit service worker (precache app shell,
+  network-first-with-cache-fallback for pages/API). Verified: colors live-update
+  the preview; offline reload serves both the logged-out shell and a
+  previously-viewed trip. Cutover: platform branch merged to `main`.
 
 ## Deployment status
 

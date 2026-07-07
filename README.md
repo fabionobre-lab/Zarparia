@@ -1,5 +1,22 @@
 # Trips — Fabio & Liana
 
+This repo now contains **two apps**:
+
+1. **The multi-user platform** (`web/`) — the going-forward product. A SvelteKit
+   app on Cloudflare Workers + D1 with Google sign-in, a full in-app trip
+   editor, per-user sharing, and offline PWA support.
+   **Live:** https://trips.fabionobre-ai.workers.dev · build/run/deploy docs in
+   [`web/README.md`](web/README.md) · architecture in [`PLATFORM_PLAN.md`](PLATFORM_PLAN.md).
+   *(Google login needs OAuth secrets set — see PLATFORM_PLAN.)*
+
+2. **The original static engine** (below) — the archived, dependency-free
+   single-file-derived app that renders the UK Spring 2026 trip from static
+   JSON, served on GitHub Pages. Kept as the trip's archive.
+
+---
+
+## Static engine (archive)
+
 A dependency-free, offline-capable travel itinerary PWA. One generic engine
 renders any trip from a JSON config file. No npm, no build step: GitHub Pages
 serves the repo as-is.
