@@ -43,6 +43,14 @@
 		else block.diff = { kind: kind as 'added' | 'changed' | 'kept', reason: block.diff?.reason ?? emptyLocalized(langs) };
 	}
 
+	// Lat/lon are optional and independent of each other while typing; a
+	// partial pair is pruned before save (see pruneEmpty in factories.ts).
+	function setCoord(key: 'lat' | 'lon', raw: string) {
+		const v = raw === '' ? undefined : Number(raw);
+		const next = { ...(block.coords ?? {}), [key]: v };
+		block.coords = next.lat === undefined && next.lon === undefined ? undefined : (next as never);
+	}
+
 	function addWaypoint() {
 		(block.waypoints ??= []).push({ query: '', name: emptyLocalized(langs) });
 	}
@@ -97,6 +105,11 @@
 		<div class="grid2">
 			<label class="f">Maps URL<input type="text" bind:value={block.mapsUrl} placeholder="https://maps.google.com/?q=..." /></label>
 			<label class="f">Walk (km)<input type="number" step="0.1" min="0" bind:value={block.km} /></label>
+		</div>
+
+		<div class="grid2">
+			<label class="f">Lat<input type="number" step="any" value={block.coords?.lat ?? ''} oninput={(e) => setCoord('lat', e.currentTarget.value)} /></label>
+			<label class="f">Lon<input type="number" step="any" value={block.coords?.lon ?? ''} oninput={(e) => setCoord('lon', e.currentTarget.value)} /></label>
 		</div>
 
 		<LocalizedInput bind:value={block.warning as never} {langs} label="Warning" multiline />

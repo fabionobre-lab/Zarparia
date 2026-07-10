@@ -297,7 +297,11 @@
                     "pt": "Loja de departamentos icônica. Escada rolante egípcia, food halls, vitrines."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Harrods+Knightsbridge+London",
-                  "km": 1.5
+                  "km": 1.5,
+                  "coords": {
+                    "lat": 51.49921,
+                    "lon": -0.16299
+                  }
                 },
                 {
                   "time": "17:30",
@@ -345,7 +349,11 @@
                         "pt": "Jardim Afundado da Diana"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.50749,
+                    "lon": -0.16221
+                  }
                 },
                 {
                   "time": "19:30",
@@ -363,7 +371,11 @@
                     "pt": "Reserva às 19:30."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Jacuzzi+Restaurant+London",
-                  "km": 1
+                  "km": 1,
+                  "coords": {
+                    "lat": 51.50171,
+                    "lon": -0.19191
+                  }
                 },
                 {
                   "time": "~21:30",
@@ -431,7 +443,11 @@
                     "pt": "20 Fenchurch Street. Entrada gratuita, reserva obrigatória. Vista 360° de Londres do 35º andar."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Sky+Garden+London",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 51.51127,
+                    "lon": -0.08354
+                  }
                 },
                 {
                   "time": "09:45",
@@ -448,7 +464,11 @@
                     "pt": "Impressionante mercado coberto vitoriano. Usado como Beco Diagonal no Harry Potter. Teto pintado e caminhos de paralelepípedo. 2 min a pé do Sky Garden."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Leadenhall+Market+London",
-                  "km": 0.2
+                  "km": 0.2,
+                  "coords": {
+                    "lat": 51.51273,
+                    "lon": -0.0834
+                  }
                 },
                 {
                   "time": "10:05",
@@ -465,7 +485,11 @@
                     "pt": "Monumento ao Grande Incêndio de Londres. 311 degraus até o topo. Vista espetacular. 5 min a pé de Leadenhall."
                   },
                   "mapsUrl": "https://maps.google.com/?q=The+Monument+London",
-                  "km": 0.4
+                  "km": 0.4,
+                  "coords": {
+                    "lat": 51.51014,
+                    "lon": -0.08595
+                  }
                 },
                 {
                   "time": "10:30",
@@ -490,7 +514,11 @@
                       "mapsUrl": "https://maps.google.com/?q=St+Dunstan+in+the+East+London",
                       "wiki": "St Dunstan-in-the-East"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.50968,
+                    "lon": -0.0825
+                  }
                 },
                 {
                   "time": "11:00",
@@ -524,7 +552,11 @@
                         "pt": "Torre Branca"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.50822,
+                    "lon": -0.07619
+                  }
                 },
                 {
                   "time": "12:30",
@@ -556,7 +588,11 @@
                     "en": "Uber Boat from Tower Pier to Greenwich Pier. ~30 min. Great views of Canary Wharf and the Thames.",
                     "pt": "Uber Boat de Tower Pier a Greenwich Pier. ~30 min. Vistas de Canary Wharf e do Tâmisa."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Tower+Pier+London"
+                  "mapsUrl": "https://maps.google.com/?q=Tower+Pier+London",
+                  "coords": {
+                    "lat": 51.50752,
+                    "lon": -0.07969
+                  }
                 },
                 {
                   "time": "13:45",
@@ -573,7 +609,11 @@
                     "pt": "Navio clipper icônico do século XIX. Caminhe sob o casco de vidro."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Cutty+Sark+Greenwich",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 51.48293,
+                    "lon": -0.00961
+                  }
                 },
                 {
                   "time": "14:30",
@@ -591,7 +631,11 @@
                     "pt": "A “Capela Sistina do Reino Unido.” Ingressos já comprados. Teto barroco deslumbrante por Thornhill."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Painted+Hall+Greenwich",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 51.48291,
+                    "lon": -0.00609
+                  }
                 },
                 {
                   "time": "15:30",
@@ -625,7 +669,11 @@
                         "pt": "Mirante Greenwich Park"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.47736,
+                    "lon": -0.00085
+                  }
                 },
                 {
                   "time": "16:30",
@@ -643,7 +691,11 @@
                     "pt": "Mercado coberto com comida de rua, artesanato, antiguidades. Bom para um café."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Greenwich+Market",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 51.48158,
+                    "lon": -0.00904
+                  }
                 },
                 {
                   "time": "17:30",
@@ -660,7 +712,11 @@
                     "pt": "Pub histórico à beira do Tâmisa em Greenwich. Vista do rio, comida britânica tradicional, ótimas cervejas. Aproveitem a noite com calma."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Trafalgar+Tavern+Greenwich+London",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 51.48459,
+                    "lon": -0.00417
+                  }
                 },
                 {
                   "time": "~20:00",
@@ -726,7 +782,11 @@
                     "en": "Meeting point near Victoria Coach Station. 2h coach ride to the Cotswolds.",
                     "pt": "Ponto de encontro perto de Victoria Coach Station. 2h de ônibus até os Cotswolds."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Victoria+Coach+Station+London"
+                  "mapsUrl": "https://maps.google.com/?q=Victoria+Coach+Station+London",
+                  "coords": {
+                    "lat": 51.49336,
+                    "lon": -0.14915
+                  }
                 },
                 {
                   "time": "~10:00",
@@ -743,7 +803,11 @@
                     "pt": "High Street em pedra cor de mel, mercado medieval, casas de colmo. Autoguiado, 50 min."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Chipping+Campden",
-                  "km": 1
+                  "km": 1,
+                  "coords": {
+                    "lat": 52.04967,
+                    "lon": -1.78139
+                  }
                 },
                 {
                   "time": "~11:00",
@@ -777,7 +841,11 @@
                     "pt": "Campos de lavanda e loja da fazenda. Autoguiado, 10 min. Melhor de junho a agosto, mas a loja abre o ano todo."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Cotswold+Lavender",
-                  "km": 0.3
+                  "km": 0.3,
+                  "coords": {
+                    "lat": 52.00458,
+                    "lon": -1.84821
+                  }
                 },
                 {
                   "time": "~11:40",
@@ -811,7 +879,11 @@
                     "pt": "Cidade de mercado charmosa. Porta de madeira famosa na Igreja St Edward. Lojas de antiguidades. 30 min."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Stow+on+the+Wold",
-                  "km": 0.8
+                  "km": 0.8,
+                  "coords": {
+                    "lat": 51.93034,
+                    "lon": -1.72302
+                  }
                 },
                 {
                   "time": "~13:00",
@@ -829,7 +901,11 @@
                     "pt": "“Veneza dos Cotswolds.” Pontes de pedra sobre o Rio Windrush. Parada para almoço — 1 hora."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Bourton+on+the+Water",
-                  "km": 1.5
+                  "km": 1.5,
+                  "coords": {
+                    "lat": 51.88407,
+                    "lon": -1.75731
+                  }
                 },
                 {
                   "time": "~14:15",
@@ -846,7 +922,11 @@
                     "pt": "Arlington Row — as casas mais fotografadas da Inglaterra. Truiticultura de Bibury. 25 min."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Arlington+Row+Bibury",
-                  "km": 1
+                  "km": 1,
+                  "coords": {
+                    "lat": 51.7585,
+                    "lon": -1.8348
+                  }
                 },
                 {
                   "time": "~15:00",
@@ -970,7 +1050,11 @@
                     "en": "Jubilee line to King’s Cross. Train to Edinburgh ~4h.",
                     "pt": "Jubilee line até King’s Cross. Trem para Edimburgo ~4h."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=King%27s+Cross+Station+London"
+                  "mapsUrl": "https://maps.google.com/?q=King%27s+Cross+Station+London",
+                  "coords": {
+                    "lat": 51.53046,
+                    "lon": -0.12326
+                  }
                 },
                 {
                   "time": "~14:00",
@@ -1001,7 +1085,11 @@
                     "en": "Grassmarket. Craft beer, Neapolitan pizza, rooftop with castle views.",
                     "pt": "Grassmarket. Cerveja artesanal, pizza napolitana, terraço com vista do castelo."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Cold+Town+House+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Cold+Town+House+Edinburgh",
+                  "coords": {
+                    "lat": 55.94737,
+                    "lon": -3.19778
+                  }
                 },
                 {
                   "time": "16:45",
@@ -1017,7 +1105,11 @@
                     "en": "The Harry Potter inspiration cafe. Victoria Street area.",
                     "pt": "O café que inspirou Harry Potter. Região da Victoria Street."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=The+Elephant+House+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=The+Elephant+House+Edinburgh",
+                  "coords": {
+                    "lat": 55.94757,
+                    "lon": -3.19179
+                  }
                 },
                 {
                   "time": "17:30",
@@ -1057,7 +1149,11 @@
                         "pt": "Greyfriars Bobby"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.94865,
+                    "lon": -3.19377
+                  }
                 },
                 {
                   "time": "18:30",
@@ -1074,7 +1170,11 @@
                     "en": "Gothic cathedral on the Royal Mile. Thistle Chapel inside.",
                     "pt": "Catedral gótica no Royal Mile. Inclui a Capela do Cardo."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh",
+                  "coords": {
+                    "lat": 55.94948,
+                    "lon": -3.19085
+                  }
                 },
                 {
                   "time": "19:00",
@@ -1114,7 +1214,11 @@
                         "pt": "White Horse Close"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.95153,
+                    "lon": -3.1792
+                  }
                 },
                 {
                   "time": "20:00",
@@ -1202,7 +1306,11 @@
                         "pt": "Mons Meg"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.94869,
+                    "lon": -3.20042
+                  }
                 },
                 {
                   "time": "12:30",
@@ -1242,7 +1350,11 @@
                         "pt": "Monumento Scott"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.95025,
+                    "lon": -3.19949
+                  }
                 },
                 {
                   "time": "13:30",
@@ -1258,7 +1370,11 @@
                     "en": "Castle views from the window.",
                     "pt": "Vista para o castelo pela janela."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Starbucks+Princes+Street+Edinburgh",
+                  "coords": {
+                    "lat": 55.9511,
+                    "lon": -3.20314
+                  }
                 },
                 {
                   "time": "14:30",
@@ -1290,7 +1406,11 @@
                     "en": "Scottish National Gallery (The Mound) + Portrait Gallery (Queen St). Both free.",
                     "pt": "Galeria Nacional Escocesa (The Mound) + Galeria de Retratos (Queen St). Ambas grátis."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh",
+                  "coords": {
+                    "lat": 55.95088,
+                    "lon": -3.19561
+                  }
                 },
                 {
                   "time": "17:45",
@@ -1307,7 +1427,11 @@
                     "en": "Panoramic views across Edinburgh. Easy 10-min climb.",
                     "pt": "Vista panorâmica de Edimburgo. Subida fácil de 10 min."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Calton+Hill+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Calton+Hill+Edinburgh",
+                  "coords": {
+                    "lat": 55.95525,
+                    "lon": -3.1828
+                  }
                 },
                 {
                   "time": "19:30",
@@ -1417,7 +1541,11 @@
                     "en": "Grassmarket. Booking confirmed 19:30. Craft beer, pizza, rooftop with castle views.",
                     "pt": "Grassmarket. Reserva confirmada 19:30. Cerveja artesanal, pizza, terraço com vista do castelo."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Cold+Town+House+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Cold+Town+House+Edinburgh",
+                  "coords": {
+                    "lat": 55.94737,
+                    "lon": -3.19778
+                  }
                 }
               ]
             },
@@ -1487,7 +1615,11 @@
                         "pt": "Jardins do Palácio"
                       }
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.95269,
+                    "lon": -3.17161
+                  }
                 },
                 {
                   "time": "11:00",
@@ -1504,7 +1636,11 @@
                     "en": "Dramatic basalt cliff walk in Holyrood Park. Spectacular views.",
                     "pt": "Caminhada pelos penhascos de basalto no Parque de Holyrood. Vistas espetaculares."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Salisbury+Crags+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Salisbury+Crags+Edinburgh",
+                  "coords": {
+                    "lat": 55.94604,
+                    "lon": -3.17388
+                  }
                 },
                 {
                   "time": "13:30",
@@ -1521,7 +1657,11 @@
                     "en": "Cherry blossoms in bloom mid-April.",
                     "pt": "Cerejeiras em flor em meados de abril."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=The+Meadows+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=The+Meadows+Edinburgh",
+                  "coords": {
+                    "lat": 55.94234,
+                    "lon": -3.19429
+                  }
                 },
                 {
                   "time": "14:30",
@@ -1538,7 +1678,11 @@
                     "en": "Robert Adam's neoclassical quad. Free to enter.",
                     "pt": "Quadrângulo neoclássico de Robert Adam. Entrada livre."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Old+College+University+of+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Old+College+University+of+Edinburgh",
+                  "coords": {
+                    "lat": 55.94742,
+                    "lon": -3.18726
+                  }
                 },
                 {
                   "time": "15:15",
@@ -1555,7 +1699,11 @@
                     "en": "Victorian Gothic cathedral, West End. Stunning interior.",
                     "pt": "Catedral gótica vitoriana, West End. Interior deslumbrante."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=St+Mary+Cathedral+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=St+Mary+Cathedral+Edinburgh",
+                  "coords": {
+                    "lat": 55.94861,
+                    "lon": -3.21615
+                  }
                 },
                 {
                   "time": "16:00",
@@ -1589,7 +1737,11 @@
                     "en": "Hidden medieval village. Riverside path. Dean Bridge viewpoint.",
                     "pt": "Vila medieval escondida. Trilha ribeirinha. Mirante da Ponte Dean."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Dean+Village+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Dean+Village+Edinburgh",
+                  "coords": {
+                    "lat": 55.95226,
+                    "lon": -3.21822
+                  }
                 },
                 {
                   "time": "17:45",
@@ -1606,7 +1758,11 @@
                     "en": "Cobbled lane in Stockbridge. Pastel doors, incredibly photogenic.",
                     "pt": "Rua de paralelepipedos em Stockbridge. Portas coloridas, muito fotógena."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Circus+Lane+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=Circus+Lane+Edinburgh",
+                  "coords": {
+                    "lat": 55.95811,
+                    "lon": -3.20499
+                  }
                 },
                 {
                   "time": "20:15",
@@ -1623,7 +1779,11 @@
                     "en": "14 George Street. Former bank, grand neoclassical interior. Fixed menu from £19.50.",
                     "pt": "14 George Street. Antigo banco, interior grandioso. Menu fixo a partir de £19.50."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=The+Dome+Edinburgh"
+                  "mapsUrl": "https://maps.google.com/?q=The+Dome+Edinburgh",
+                  "coords": {
+                    "lat": 55.95344,
+                    "lon": -3.19552
+                  }
                 }
               ]
             },
@@ -1662,6 +1822,10 @@
                   "warning": {
                     "en": "Garden opens at 10:00am in April.",
                     "pt": "O jardim abre às 10:00 em abril."
+                  },
+                  "coords": {
+                    "lat": 55.96529,
+                    "lon": -3.20886
                   }
                 },
                 {
@@ -1693,7 +1857,11 @@
                     "en": "Train from Edinburgh Waverley at 14:26.",
                     "pt": "Trem da Estação Waverley às 14:26."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=Edinburgh+Waverley+Station"
+                  "mapsUrl": "https://maps.google.com/?q=Edinburgh+Waverley+Station",
+                  "coords": {
+                    "lat": 55.9519,
+                    "lon": -3.19042
+                  }
                 },
                 {
                   "time": "18:44",
@@ -1709,7 +1877,11 @@
                     "en": "Train arrives 18:44. Jubilee line to South Hampstead (NW6).",
                     "pt": "Trem chega 18:44. Jubilee line até South Hampstead (NW6)."
                   },
-                  "mapsUrl": "https://maps.google.com/?q=King%27s+Cross+Station+London"
+                  "mapsUrl": "https://maps.google.com/?q=King%27s+Cross+Station+London",
+                  "coords": {
+                    "lat": 51.53046,
+                    "lon": -0.12326
+                  }
                 },
                 {
                   "time": "~19:30",
@@ -1816,6 +1988,10 @@
                       "en": "Added: departure from home.",
                       "pt": "Adicionado: saída de casa."
                     }
+                  },
+                  "coords": {
+                    "lat": 51.53046,
+                    "lon": -0.12326
                   }
                 },
                 {
@@ -1893,6 +2069,10 @@
                       "en": "Moved earlier — Liana had it at 18:30 but it closes ~19:00.",
                       "pt": "Adiantado — Liana havia marcado para 18:30 mas fecha ~19:00."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94948,
+                    "lon": -3.19085
                   }
                 },
                 {
@@ -1979,6 +2159,10 @@
                       "en": "Combined Liana's two walks into one flowing route.",
                       "pt": "Combinou os dois passeios da Liana em um roteiro único."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94865,
+                    "lon": -3.19377
                   }
                 },
                 {
@@ -2015,6 +2199,10 @@
                       "en": "Kept but shortened. Food unremarkable — go for the experience.",
                       "pt": "Mantido mas encurtado. Comida sem destaque — vá pela experiência."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94757,
+                    "lon": -3.19179
                   }
                 },
                 {
@@ -2040,6 +2228,10 @@
                       "en": "Best first dinner — cosy, no spice, great castle location.",
                       "pt": "Melhor primeiro jantar — aconchegante, sem pimenta, perto do castelo."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94755,
+                    "lon": -3.19658
                   }
                 }
               ]
@@ -2155,6 +2347,10 @@
                       "en": "Moved from 10:00 to 09:30. Skip-the-line means straight in at opening.",
                       "pt": "Adiantado de 10:00 para 09:30. Fura-fila significa entrar direto na abertura."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94869,
+                    "lon": -3.20042
                   }
                 },
                 {
@@ -2213,7 +2409,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh",
                       "wiki": "Princes Street Gardens"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.95025,
+                    "lon": -3.19949
+                  }
                 },
                 {
                   "time": "13:15",
@@ -2241,6 +2441,10 @@
                       "en": "Starbucks kept — great castle views. Waterstones bookshop nearby is a charming alternative with the same views.",
                       "pt": "Starbucks mantido — ótima vista para o castelo. A livraria Waterstones próxima é uma alternativa charmosa com a mesma vista."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.9511,
+                    "lon": -3.20314
                   }
                 },
                 {
@@ -2259,7 +2463,11 @@
                     "pt": "Galeria Nacional Escocesa (The Mound) — Velázquez, Rembrandt. Galeria de Retratos (Queen St)."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Scottish+National+Gallery+Edinburgh",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 55.95088,
+                    "lon": -3.19561
+                  }
                 },
                 {
                   "time": "17:45",
@@ -2306,6 +2514,10 @@
                       "en": "Arrive at 17:45 to explore. Café Calton on site from 18:30 for drinks and the sunset — no rush.",
                       "pt": "Chegue às 17:45 para explorar. Café Calton no local a partir das 18:30 para drinks e o pôr do sol."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.95525,
+                    "lon": -3.1828
                   }
                 },
                 {
@@ -2330,6 +2542,10 @@
                       "en": "Liana's pick — Café Calton is on top of the hill. Drinks and sunset in one spot.",
                       "pt": "Escolha da Liana — Café Calton fica no topo do Calton Hill. Drinks e pôr do sol no mesmo lugar."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.9552,
+                    "lon": -3.18381
                   }
                 },
                 {
@@ -2491,6 +2707,10 @@
                       "en": "Moved from Thursday. Confirmed booking 19:30 — natural gap after Outlander tour return (~18:00).",
                       "pt": "Movido da quinta. Reserva confirmada 19:30 — encaixe natural após o retorno do tour Outlander (~18:00)."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94737,
+                    "lon": -3.19778
                   }
                 }
               ]
@@ -2533,6 +2753,10 @@
                       "en": "Added specific breakfast on the way to Holyrood.",
                       "pt": "Café específico adicionado no caminho para Holyrood."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.94556,
+                    "lon": -3.19069
                   }
                 },
                 {
@@ -2586,6 +2810,10 @@
                       "en": "Pushed 30 min later to 09:30 — that is when it actually opens.",
                       "pt": "Adiantado 30 min para 09:30 — quando o palácio realmente abre."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.95269,
+                    "lon": -3.17161
                   }
                 },
                 {
@@ -2616,7 +2844,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Arthurs+Seat+Edinburgh",
                       "wiki": "Arthur's Seat"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.94604,
+                    "lon": -3.17388
+                  }
                 },
                 {
                   "time": "13:00",
@@ -2641,7 +2873,11 @@
                       "mapsUrl": "https://maps.google.com/?q=The+Meadows+Edinburgh",
                       "wiki": "The Meadows, Edinburgh"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.94234,
+                    "lon": -3.19429
+                  }
                 },
                 {
                   "time": "13:30",
@@ -2666,7 +2902,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Old+College+University+of+Edinburgh",
                       "wiki": "Old College, University of Edinburgh"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.94742,
+                    "lon": -3.18726
+                  }
                 },
                 {
                   "time": "14:00",
@@ -2721,7 +2961,11 @@
                       "wiki": "St Mary's Cathedral, Edinburgh",
                       "fallbackImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/St_Marys_Cathedral_Nave_Edinburgh.jpg/330px-St_Marys_Cathedral_Nave_Edinburgh.jpg"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.94861,
+                    "lon": -3.21615
+                  }
                 },
                 {
                   "time": "16:00",
@@ -2787,7 +3031,11 @@
                       "wiki": "Circus Lane, Edinburgh",
                       "fallbackImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Circus_Lane%2C_Edinburgh_-_geograph.org.uk_-_6639538.jpg/330px-Circus_Lane%2C_Edinburgh_-_geograph.org.uk_-_6639538.jpg"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 55.95226,
+                    "lon": -3.21822
+                  }
                 },
                 {
                   "time": "20:15",
@@ -2819,6 +3067,10 @@
                       "en": "Liana's pick — The Dome is perfect for a birthday celebration.",
                       "pt": "Escolha da Liana — The Dome é perfeito para celebrar o aniversário."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.95344,
+                    "lon": -3.19552
                   }
                 }
               ]
@@ -2902,6 +3154,10 @@
                       "en": "Adjusted to 10:00 — garden doesn't open until 10:00am in April.",
                       "pt": "Ajustado para 10:00 — o jardim não abre antes das 10:00 em abril."
                     }
+                  },
+                  "coords": {
+                    "lat": 55.96529,
+                    "lon": -3.20886
                   }
                 },
                 {
@@ -2943,7 +3199,11 @@
                     "pt": "Retirar malas da guarda-volumes da Waverley. Trem parte às 14:26."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Edinburgh+Waverley+Station",
-                  "km": 0.6
+                  "km": 0.6,
+                  "coords": {
+                    "lat": 55.9519,
+                    "lon": -3.19042
+                  }
                 },
                 {
                   "time": "18:44",
@@ -2967,6 +3227,10 @@
                       "en": "Added: London evening after Edinburgh departure.",
                       "pt": "Adicionado: noite em Londres após partida de Edimburgo."
                     }
+                  },
+                  "coords": {
+                    "lat": 51.53046,
+                    "lon": -0.12326
                   }
                 },
                 {
@@ -3186,7 +3450,11 @@
                       "mapsUrl": "https://maps.google.com/?q=St+Georges+Chapel+Windsor+Castle",
                       "wiki": "St George's Chapel, Windsor Castle"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.48379,
+                    "lon": -0.60404
+                  }
                 },
                 {
                   "time": "12:00",
@@ -3247,7 +3515,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Heel+Stone+Stonehenge",
                       "wiki": "Stonehenge"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.17883,
+                    "lon": -1.82618
+                  }
                 },
                 {
                   "time": "16:15",
@@ -3328,7 +3600,11 @@
                       "mapsUrl": "https://maps.google.com/?q=The+Circus+Bath",
                       "wiki": "The Circus, Bath"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.38727,
+                    "lon": -2.36823
+                  }
                 },
                 {
                   "time": "20:00",
@@ -3449,7 +3725,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Market+Cross+Castle+Combe",
                       "wiki": "Castle Combe"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.49337,
+                    "lon": -2.22897
+                  }
                 },
                 {
                   "time": "11:20",
@@ -3503,7 +3783,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Lacock+Abbey+Wiltshire",
                       "wiki": "Lacock Abbey"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.42142,
+                    "lon": -2.11934
+                  }
                 },
                 {
                   "time": "12:40",
@@ -3543,7 +3827,11 @@
                       "mapsUrl": "https://maps.google.com/?q=High+Street+Burford+Oxfordshire",
                       "wiki": "Burford"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.80819,
+                    "lon": -1.63582
+                  }
                 },
                 {
                   "time": "14:50",
@@ -3575,7 +3863,11 @@
                     "pt": "Park & Ride (Pear Tree ou Seacourt). Covered Market, Broad Street."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Broad+Street+Oxford",
-                  "km": 0.5
+                  "km": 0.5,
+                  "coords": {
+                    "lat": 51.75468,
+                    "lon": -1.25496
+                  }
                 },
                 {
                   "time": "16:00",
@@ -3633,7 +3925,11 @@
                       "mapsUrl": "https://maps.google.com/?q=Bodleian+Library+Oxford",
                       "wiki": "Bodleian Library"
                     }
-                  ]
+                  ],
+                  "coords": {
+                    "lat": 51.75535,
+                    "lon": -1.25645
+                  }
                 },
                 {
                   "time": "17:30",

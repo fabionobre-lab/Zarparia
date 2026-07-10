@@ -50,7 +50,8 @@
                   "km": 0.6,
                   "photoSpots": [
                     { "name": "Oculus from inside", "mapsUrl": "https://maps.google.com/?q=Pantheon+Rome", "wiki": "Pantheon, Rome" }
-                  ]
+                  ],
+                  "coords": { "lat": 41.89862, "lon": 12.47683 }
                 },
                 {
                   "time": "17:30",
@@ -65,7 +66,8 @@
                   ],
                   "photoSpots": [
                     { "name": "Trevi Fountain", "mapsUrl": "https://maps.google.com/?q=Trevi+Fountain+Rome", "wiki": "Trevi Fountain" }
-                  ]
+                  ],
+                  "coords": { "lat": 41.89893, "lon": 12.47312 }
                 },
                 {
                   "time": "20:00",
@@ -74,7 +76,8 @@
                   "tags": ["din", "bkd"],
                   "description": { "en": "Da Enzo al 29 — book ahead, tiny room, worth it." },
                   "mapsUrl": "https://maps.google.com/?q=Da+Enzo+al+29+Rome",
-                  "warning": { "en": "No reservation = 45+ min queue. Book the 19:30 seating." }
+                  "warning": { "en": "No reservation = 45+ min queue. Book the 19:30 seating." },
+                  "coords": { "lat": 41.88809, "lon": 12.47781 }
                 }
               ]
             },
@@ -94,7 +97,8 @@
                   "mapsUrl": "https://maps.google.com/?q=Colosseum+Rome",
                   "photoSpots": [
                     { "name": "Arena from upper tier", "mapsUrl": "https://maps.google.com/?q=Colosseum+Rome", "wiki": "Colosseum" }
-                  ]
+                  ],
+                  "coords": { "lat": 41.89094, "lon": 12.4919 }
                 },
                 {
                   "time": "11:30",
@@ -105,7 +109,8 @@
                   "mapsUrl": "https://maps.google.com/?q=Roman+Forum",
                   "waypoints": [
                     { "query": "Palatine+Hill+Rome", "name": { "en": "Palatine Hill" } }
-                  ]
+                  ],
+                  "coords": { "lat": 41.89164, "lon": 12.48673 }
                 },
                 {
                   "time": "14:00",
@@ -139,7 +144,8 @@
                   "warning": { "en": "Dress code: covered shoulders and knees." },
                   "photoSpots": [
                     { "name": "St Peter's from the dome", "mapsUrl": "https://maps.google.com/?q=St+Peters+Basilica", "wiki": "St. Peter's Basilica" }
-                  ]
+                  ],
+                  "coords": { "lat": 41.90496, "lon": 12.45466 }
                 },
                 {
                   "time": "13:00",

@@ -1,0 +1,245 @@
+{
+  "Harrods Knightsbridge London": {
+    "lat": 51.49921,
+    "lon": -0.16299
+  },
+  "Hyde Park London": {
+    "lat": 51.50749,
+    "lon": -0.16221
+  },
+  "Jacuzzi Restaurant London": {
+    "lat": 51.50171,
+    "lon": -0.19191
+  },
+  "Sky Garden London": {
+    "lat": 51.51127,
+    "lon": -0.08354
+  },
+  "Leadenhall Market London": {
+    "lat": 51.51273,
+    "lon": -0.0834
+  },
+  "The Monument London": {
+    "lat": 51.51014,
+    "lon": -0.08595
+  },
+  "St Dunstan in the East London": {
+    "lat": 51.50968,
+    "lon": -0.0825
+  },
+  "Tower of London": {
+    "lat": 51.50822,
+    "lon": -0.07619
+  },
+  "Tower Pier London": {
+    "lat": 51.50752,
+    "lon": -0.07969
+  },
+  "Cutty Sark Greenwich": {
+    "lat": 51.48293,
+    "lon": -0.00961
+  },
+  "Painted Hall Greenwich": {
+    "lat": 51.48291,
+    "lon": -0.00609
+  },
+  "Royal Observatory Greenwich": {
+    "lat": 51.47736,
+    "lon": -0.00085
+  },
+  "Greenwich Market": {
+    "lat": 51.48158,
+    "lon": -0.00904
+  },
+  "Trafalgar Tavern Greenwich London": {
+    "lat": 51.48459,
+    "lon": -0.00417
+  },
+  "Victoria Coach Station London": {
+    "lat": 51.49336,
+    "lon": -0.14915
+  },
+  "Chipping Campden": {
+    "lat": 52.04967,
+    "lon": -1.78139
+  },
+  "Broadway Tower Cotswolds": null,
+  "Cotswold Lavender": {
+    "lat": 52.00458,
+    "lon": -1.84821
+  },
+  "Snowshill Cotswolds": null,
+  "Stow on the Wold": {
+    "lat": 51.93034,
+    "lon": -1.72302
+  },
+  "Bourton on the Water": {
+    "lat": 51.88407,
+    "lon": -1.75731
+  },
+  "Arlington Row Bibury": {
+    "lat": 51.7585,
+    "lon": -1.8348
+  },
+  "King's Cross Station London": {
+    "lat": 51.53046,
+    "lon": -0.12326
+  },
+  "Cold Town House Edinburgh": {
+    "lat": 55.94737,
+    "lon": -3.19778
+  },
+  "The Elephant House Edinburgh": {
+    "lat": 55.94757,
+    "lon": -3.19179
+  },
+  "Victoria Street Edinburgh": {
+    "lat": 55.94865,
+    "lon": -3.19377
+  },
+  "St Giles Cathedral Edinburgh": {
+    "lat": 55.94948,
+    "lon": -3.19085
+  },
+  "Royal Mile Edinburgh": {
+    "lat": 55.95153,
+    "lon": -3.1792
+  },
+  "Edinburgh Castle": {
+    "lat": 55.94869,
+    "lon": -3.20042
+  },
+  "Princes Street Gardens Edinburgh": {
+    "lat": 55.95025,
+    "lon": -3.19949
+  },
+  "Starbucks Princes Street Edinburgh": {
+    "lat": 55.9511,
+    "lon": -3.20314
+  },
+  "Scottish National Gallery Edinburgh": {
+    "lat": 55.95088,
+    "lon": -3.19561
+  },
+  "Calton Hill Edinburgh": {
+    "lat": 55.95525,
+    "lon": -3.1828
+  },
+  "Palace of Holyroodhouse": {
+    "lat": 55.95269,
+    "lon": -3.17161
+  },
+  "Salisbury Crags Edinburgh": {
+    "lat": 55.94604,
+    "lon": -3.17388
+  },
+  "The Meadows Edinburgh": {
+    "lat": 55.94234,
+    "lon": -3.19429
+  },
+  "Old College University of Edinburgh": {
+    "lat": 55.94742,
+    "lon": -3.18726
+  },
+  "St Mary Cathedral Edinburgh": {
+    "lat": 55.94861,
+    "lon": -3.21615
+  },
+  "Scottish National Gallery Modern Art Edinburgh": null,
+  "Dean Village Edinburgh": {
+    "lat": 55.95226,
+    "lon": -3.21822
+  },
+  "Circus Lane Edinburgh": {
+    "lat": 55.95811,
+    "lon": -3.20499
+  },
+  "The Dome Edinburgh": {
+    "lat": 55.95344,
+    "lon": -3.19552
+  },
+  "Royal Botanic Garden Edinburgh": {
+    "lat": 55.96529,
+    "lon": -3.20886
+  },
+  "Edinburgh Waverley Station": {
+    "lat": 55.9519,
+    "lon": -3.19042
+  },
+  "Bacchanalia Restaurant Mount Street London": null,
+  "Berties Restaurant Edinburgh": null,
+  "Petit Paris Grassmarket Edinburgh": {
+    "lat": 55.94755,
+    "lon": -3.19658
+  },
+  "Cafe Calton Edinburgh": {
+    "lat": 55.9552,
+    "lon": -3.18381
+  },
+  "Under The Table Edinburgh": null,
+  "The Gruff Goat Edinburgh": {
+    "lat": 55.94556,
+    "lon": -3.19069
+  },
+  "Old College University Edinburgh": {
+    "lat": 55.94742,
+    "lon": -3.18726
+  },
+  "Windsor Castle": {
+    "lat": 51.48379,
+    "lon": -0.60404
+  },
+  "Stonehenge": {
+    "lat": 51.17883,
+    "lon": -1.82618
+  },
+  "Royal Crescent Bath": {
+    "lat": 51.38727,
+    "lon": -2.36823
+  },
+  "Roman Baths Bath": null,
+  "Castle Combe Wiltshire": {
+    "lat": 51.49337,
+    "lon": -2.22897
+  },
+  "Lacock Wiltshire": {
+    "lat": 51.42142,
+    "lon": -2.11934
+  },
+  "Burford Oxfordshire": {
+    "lat": 51.80819,
+    "lon": -1.63582
+  },
+  "Broad Street Oxford": {
+    "lat": 51.75468,
+    "lon": -1.25496
+  },
+  "Trinity College Oxford": {
+    "lat": 51.75535,
+    "lon": -1.25645
+  },
+  "Pantheon Rome": {
+    "lat": 41.89862,
+    "lon": 12.47683
+  },
+  "Piazza Navona Rome": {
+    "lat": 41.89893,
+    "lon": 12.47312
+  },
+  "Da Enzo al 29 Rome": {
+    "lat": 41.88809,
+    "lon": 12.47781
+  },
+  "Colosseum Rome": {
+    "lat": 41.89094,
+    "lon": 12.4919
+  },
+  "Roman Forum": {
+    "lat": 41.89164,
+    "lon": 12.48673
+  },
+  "Vatican Museums": {
+    "lat": 41.90496,
+    "lon": 12.45466
+  }
+}
