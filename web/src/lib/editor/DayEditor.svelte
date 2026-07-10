@@ -1,8 +1,12 @@
 <script lang="ts">
-	import type { Day, Trip } from '$lib/trip-engine';
+	import { untrack } from 'svelte';
+	import type { Day, Block, Trip } from '$lib/trip-engine';
 	import { move, removeAt, blankBlock } from './factories';
+	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import BlockEditor from './BlockEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
+
+	type BlockItem = { id: string; item: Block };
 
 	let {
 		day = $bindable(),
@@ -10,6 +14,7 @@
 		tags,
 		onRemove,
 		onMove,
+		onGrab,
 		canUp,
 		canDown
 	}: {
@@ -18,9 +23,13 @@
 		tags: Trip['tags'];
 		onRemove: () => void;
 		onMove: (dir: -1 | 1) => void;
+		onGrab?: (e: Event) => void;
 		canUp: boolean;
 		canDown: boolean;
 	} = $props();
+
+	// Lazy body: heavy block editors render only while the day is expanded.
+	let open = $state(false);
 
 	const hasStaticWx = $derived(!!day.staticWeather);
 	function toggleStaticWx(on: boolean) {
@@ -29,18 +38,56 @@
 	function addBlock() {
 		day.blocks.push(blankBlock(langs));
 	}
+
+	// ── Drag reorder for blocks within this day (handle-initiated) ──
+	// svelte-dnd-action owns the list identity during a drag (it injects a shadow
+	// placeholder item), so we hold the wrapped list in state and only mirror it
+	// back into the model on consider/finalize. An effect re-syncs the list when
+	// the model changes from elsewhere (add / remove / ↑↓), skipping mid-drag.
+	let blockDragDisabled = $state(true);
+	const wrap = (b: Block): BlockItem => ({ id: dndId(b), item: b });
+	let blockItems = $state<BlockItem[]>(day.blocks.map(wrap));
+	$effect(() => {
+		const modelIds = day.blocks.map(dndId).join('|');
+		untrack(() => {
+			if (blockItems.map((w) => w.id).join('|') !== modelIds) blockItems = day.blocks.map(wrap);
+		});
+	});
+	function considerBlocks(e: CustomEvent<{ items: BlockItem[] }>) {
+		blockItems = e.detail.items;
+	}
+	function finalizeBlocks(e: CustomEvent<{ items: BlockItem[] }>) {
+		blockItems = e.detail.items;
+		day.blocks = fromItems(e.detail.items);
+		blockDragDisabled = true;
+	}
+	function grabBlock() {
+		grabHandle((v) => (blockDragDisabled = v));
+	}
+	function blockIdx(b: Block): number {
+		return day.blocks.indexOf(b);
+	}
 </script>
 
-<details class="day">
+<details class="day" bind:open>
 	<summary>
+		<span
+			class="grip"
+			aria-hidden="true"
+			title="Drag to reorder day"
+			onpointerdown={onGrab}
+			ontouchstart={onGrab}
+			onclick={(e) => e.preventDefault()}
+		>⠿</span>
 		<span class="date">{day.date || 'no date'}</span>
 		<span class="title">{day.title?.[langs[0]] || '(untitled day)'}</span>
 		<span class="controls">
-			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))}>↑</button>
-			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))}>↓</button>
-			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())}>✕</button>
+			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move day up">↑</button>
+			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move day down">↓</button>
+			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label="Remove day">✕</button>
 		</span>
 	</summary>
+	{#if open}
 	<div class="body">
 		<div class="grid2">
 			<label class="f">Date (ISO)<input type="date" bind:value={day.date} /></label>
@@ -70,19 +117,28 @@
 
 		<div class="blocks">
 			<div class="blocks-hd"><span class="lbl">Blocks</span><button type="button" onclick={addBlock}>+ Add block</button></div>
-			{#each day.blocks as block, i (block)}
-				<BlockEditor
-					bind:block={day.blocks[i]}
-					{langs}
-					{tags}
-					canUp={i > 0}
-					canDown={i < day.blocks.length - 1}
-					onMove={(dir) => move(day.blocks, i, dir)}
-					onRemove={() => removeAt(day.blocks, i)}
-				/>
-			{/each}
+			<div
+				class="dndlist"
+				use:dndzone={{ items: blockItems, flipDurationMs: FLIP_MS, dragDisabled: blockDragDisabled, dropTargetStyle: {} }}
+				onconsider={considerBlocks}
+				onfinalize={finalizeBlocks}
+			>
+				{#each blockItems as w (w.id)}
+					<BlockEditor
+						bind:block={w.item}
+						{langs}
+						{tags}
+						canUp={blockIdx(w.item) > 0}
+						canDown={blockIdx(w.item) < day.blocks.length - 1}
+						onMove={(dir) => move(day.blocks, blockIdx(w.item), dir)}
+						onRemove={() => removeAt(day.blocks, blockIdx(w.item))}
+						onGrab={grabBlock}
+					/>
+				{/each}
+			</div>
 		</div>
 	</div>
+	{/if}
 </details>
 
 <style>
@@ -102,6 +158,18 @@
 	}
 	summary::-webkit-details-marker {
 		display: none;
+	}
+	.grip {
+		cursor: grab;
+		color: #b3a892;
+		font-size: 1rem;
+		line-height: 1;
+		flex-shrink: 0;
+		touch-action: none;
+		user-select: none;
+	}
+	.grip:active {
+		cursor: grabbing;
 	}
 	.date {
 		font-size: 0.75rem;

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { goto, beforeNavigate } from '$app/navigation';
-	import type { Trip } from '$lib/trip-engine';
+	import type { Trip, Segment } from '$lib/trip-engine';
 	import TripView from '$lib/TripView.svelte';
 	import SegmentEditor from './SegmentEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
 	import { blankTrip, blankSegment, move, removeAt, pruneEmpty, nextId } from './factories';
+	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
 
 	let {
@@ -57,6 +58,33 @@
 	}
 	function addSegment() {
 		draft.segments.push(blankSegment(langs, nextId('segment', draft.segments.map((s) => s.id))));
+	}
+
+	// ── Drag reorder for segments within the trip (handle-initiated) ──
+	// See DayEditor for the state/effect rationale.
+	type SegItem = { id: string; item: Segment };
+	let segDragDisabled = $state(true);
+	const wrapSeg = (s: Segment): SegItem => ({ id: dndId(s), item: s });
+	let segItems = $state<SegItem[]>(untrack(() => draft.segments.map(wrapSeg)));
+	$effect(() => {
+		const modelIds = draft.segments.map(dndId).join('|');
+		untrack(() => {
+			if (segItems.map((w) => w.id).join('|') !== modelIds) segItems = draft.segments.map(wrapSeg);
+		});
+	});
+	function considerSegs(e: CustomEvent<{ items: SegItem[] }>) {
+		segItems = e.detail.items;
+	}
+	function finalizeSegs(e: CustomEvent<{ items: SegItem[] }>) {
+		segItems = e.detail.items;
+		draft.segments = fromItems(e.detail.items);
+		segDragDisabled = true;
+	}
+	function grabSeg() {
+		grabHandle((v) => (segDragDisabled = v));
+	}
+	function segIdx(s: Segment): number {
+		return draft.segments.indexOf(s);
 	}
 
 	const hasHome = $derived(!!draft.home);
@@ -169,7 +197,7 @@
 						<div class="tagrow">
 							<span class="tkey">{key}</span>
 							<LocalizedInput bind:value={draft.tags![key].label} {langs} label="Label" />
-							<select bind:value={draft.tags![key].style}>
+							<select bind:value={draft.tags![key].style} aria-label="Tag style">
 								{#each ['sight', 'food', 'birthday', 'booking', 'logistics', 'fullday'] as s (s)}<option value={s}>{s}</option>{/each}
 							</select>
 							<button type="button" class="del" onclick={() => delete draft.tags![key]}>✕</button>
@@ -180,17 +208,25 @@
 		</details>
 
 		<div class="segs-hd"><h2>Segments</h2><button type="button" onclick={addSegment}>+ Add segment</button></div>
-		{#each draft.segments as segment, i (segment)}
-			<SegmentEditor
-				bind:segment={draft.segments[i]}
-				{langs}
-				tags={draft.tags}
-				canUp={i > 0}
-				canDown={i < draft.segments.length - 1}
-				onMove={(dir) => move(draft.segments, i, dir)}
-				onRemove={() => removeAt(draft.segments, i)}
-			/>
-		{/each}
+		<div
+			class="dndlist"
+			use:dndzone={{ items: segItems, flipDurationMs: FLIP_MS, dragDisabled: segDragDisabled, dropTargetStyle: {} }}
+			onconsider={considerSegs}
+			onfinalize={finalizeSegs}
+		>
+			{#each segItems as w (w.id)}
+				<SegmentEditor
+					bind:segment={w.item}
+					{langs}
+					tags={draft.tags}
+					canUp={segIdx(w.item) > 0}
+					canDown={segIdx(w.item) < draft.segments.length - 1}
+					onMove={(dir) => move(draft.segments, segIdx(w.item), dir)}
+					onRemove={() => removeAt(draft.segments, segIdx(w.item))}
+					onGrab={grabSeg}
+				/>
+			{/each}
+		</div>
 	</div>
 
 	<div class="preview">

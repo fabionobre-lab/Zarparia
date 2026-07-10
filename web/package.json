@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"@cfworker/json-schema": "^4.1.1",
-		"arctic": "^3.7.0"
+		"arctic": "^3.7.0",
+		"svelte-dnd-action": "0.9.70"
 	}
 }
