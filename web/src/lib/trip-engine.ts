@@ -69,6 +69,7 @@ export interface Trip {
 	languages: string[];
 	defaultLanguage: string;
 	locales?: Record<string, string>;
+	home?: { name: string; postcode?: string; lat?: number; lon?: number };
 	tags?: Record<string, { label: Localized; style?: string }>;
 	segments: Segment[];
 }
