@@ -26,6 +26,7 @@ export interface Block {
 	km?: number;
 	warning?: Localized;
 	note?: Localized;
+	coords?: { lat: number; lon: number };
 	waypoints?: Waypoint[];
 	photoSpots?: PhotoSpot[];
 	diff?: { kind: 'added' | 'changed' | 'kept'; reason: Localized };
@@ -170,10 +171,6 @@ export function routeUrl(places: RoutePlace[], routeMode?: string): string {
 	let url = 'https://www.google.com/maps/dir/' + places.map((p) => p.q).join('/') + '/';
 	if (routeMode) url += '?travelmode=' + routeMode;
 	return url;
-}
-
-export function truncStop(name: string): string {
-	return name.length > 20 ? name.substring(0, 18) + '…' : name;
 }
 
 export function dayKmTotal(day: Day): number {
