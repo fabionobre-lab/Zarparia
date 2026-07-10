@@ -59,6 +59,11 @@
 		draft.segments.push(blankSegment(langs, nextId('segment', draft.segments.map((s) => s.id))));
 	}
 
+	const hasHome = $derived(!!draft.home);
+	function toggleHome(on: boolean) {
+		draft.home = on ? { name: '', postcode: '', lat: 0, lon: 0 } : undefined;
+	}
+
 	// Trip-level tags vocabulary
 	function addTag() {
 		const key = prompt('Tag key (short, e.g. "mu")')?.trim();
@@ -142,6 +147,20 @@
 							{#each draft.languages as l (l)}<option value={l}>{l}</option>{/each}
 						</select>
 					</label>
+				</div>
+
+				<LocalizedInput bind:value={draft.locales as never} {langs} label="Locale (date format, e.g. en-GB)" placeholder="en-GB" />
+
+				<div class="homebase">
+					<label class="check"><input type="checkbox" checked={hasHome} onchange={(e) => toggleHome(e.currentTarget.checked)} /> Home base</label>
+					{#if draft.home}
+						<div class="grid4">
+							<label class="f">Name<input type="text" bind:value={draft.home.name} /></label>
+							<label class="f">Postcode<input type="text" bind:value={draft.home.postcode} /></label>
+							<label class="f">Lat<input type="number" step="0.0001" bind:value={draft.home.lat} /></label>
+							<label class="f">Lon<input type="number" step="0.0001" bind:value={draft.home.lon} /></label>
+						</div>
+					{/if}
 				</div>
 
 				<div class="tagsvocab">
@@ -297,6 +316,35 @@
 		align-items: center;
 		gap: 0.4rem;
 		margin-top: 0.3rem;
+	}
+	.f input,
+	.f select {
+		font: inherit;
+		font-size: 0.85rem;
+		text-transform: none;
+		letter-spacing: normal;
+		color: #1a1208;
+		padding: 0.35rem 0.5rem;
+		border: 1px solid #d8ccb8;
+		border-radius: 6px;
+	}
+	.homebase {
+		margin-top: 0.75rem;
+		padding-top: 0.5rem;
+		border-top: 1px dashed #eee5d6;
+	}
+	.check {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.8rem;
+		color: #555;
+		margin: 0.3rem 0 0.5rem;
+	}
+	.grid4 {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+		gap: 0.5rem;
 	}
 	select {
 		font: inherit;
