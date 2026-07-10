@@ -44,6 +44,12 @@
 		color: #fff;
 		font-weight: 600;
 	}
+	@media (max-width: 520px) {
+		.ls-btn {
+			min-height: 40px;
+			padding: 0.2rem 0.6rem;
+		}
+	}
 	.ls-btn:not(.on):hover {
 		color: #2b4a2b;
 	}

@@ -75,9 +75,30 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 0.75rem;
 	}
 	h1 {
 		font-size: 1.5rem;
+	}
+	/* Below ~520px stack: heading on its own row, actions side by side below it,
+	   so the buttons never squeeze the heading into a mid-word wrap. */
+	@media (max-width: 520px) {
+		.head {
+			flex-direction: column;
+			align-items: stretch;
+			gap: 0.75rem;
+		}
+		.actions {
+			width: 100%;
+		}
+		.import-btn,
+		.new {
+			flex: 1;
+			min-height: 40px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+		}
 	}
 	.shared-hd {
 		font-size: 1.1rem;
