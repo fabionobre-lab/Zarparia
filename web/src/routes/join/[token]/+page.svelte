@@ -1,17 +1,19 @@
 <script lang="ts">
+	import { t } from '$lib/i18n/store.svelte';
+
 	let { data }: { data: { state: 'dev-login'; devLoginUrl: string } | { state: 'invalid' } } =
 		$props();
 </script>
 
 <div class="panel">
 	{#if data.state === 'dev-login'}
-		<h1>Sign in to open this invite</h1>
-		<p>You need to sign in before you can join this trip.</p>
-		<a class="btn" href={data.devLoginUrl}>Sign in (dev)</a>
+		<h1>{t('join.signInHeading')}</h1>
+		<p>{t('join.signInBody')}</p>
+		<a class="btn" href={data.devLoginUrl}>{t('join.signInDev')}</a>
 	{:else}
-		<h1>This invite link is no longer valid</h1>
-		<p>The link may have been revoked or the trip removed.</p>
-		<a class="btn" href="/">Go to my trips</a>
+		<h1>{t('join.invalidHeading')}</h1>
+		<p>{t('join.invalidBody')}</p>
+		<a class="btn" href="/">{t('join.goToTrips')}</a>
 	{/if}
 </div>
 

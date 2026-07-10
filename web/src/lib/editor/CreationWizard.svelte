@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Trip } from '$lib/trip-engine';
 	import { scaffoldTrip, slugifyId, isoAddDays, move, removeAt, type WizardStop } from './factories';
+	import { t } from '$lib/i18n/store.svelte';
 
 	let { onCreate, onBlank }: { onCreate: (trip: Trip) => void; onBlank: () => void } = $props();
 
@@ -48,8 +49,8 @@
 	let langErr = $state('');
 	function submitLanguage() {
 		const code = langInput.trim().toLowerCase();
-		if (code.length < 2) return (langErr = 'Use a 2+ letter code, e.g. "it".');
-		if (languages.includes(code)) return (langErr = `"${code}" is already added.`);
+		if (code.length < 2) return (langErr = t('wizard.errLangCode'));
+		if (languages.includes(code)) return (langErr = t('wizard.errLangDup', { code }));
 		languages.push(code);
 		langInput = '';
 		langErr = '';
@@ -74,8 +75,8 @@
 
 	let step1Err = $state('');
 	function goStep2() {
-		if (!title.trim()) return (step1Err = 'Give the trip a title.');
-		if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return (step1Err = 'Pick a start date.');
+		if (!title.trim()) return (step1Err = t('wizard.errTitle'));
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return (step1Err = t('wizard.errStartDate'));
 		step1Err = '';
 		step = 2;
 	}
@@ -102,7 +103,7 @@
 	}
 
 	async function create() {
-		if (validStops.length === 0) return (createErr = 'Add at least one stop.');
+		if (validStops.length === 0) return (createErr = t('wizard.errAddStop'));
 		createErr = '';
 		creating = true;
 		const trip = scaffoldTrip({
@@ -137,49 +138,49 @@
 
 <div class="wizard">
 	<div class="head">
-		<h1>New trip</h1>
-		<a class="blanklink" href="#blank" onclick={(e) => (e.preventDefault(), onBlank())}>Start from a blank trip →</a>
+		<h1>{t('wizard.newTrip')}</h1>
+		<a class="blanklink" href="#blank" onclick={(e) => (e.preventDefault(), onBlank())}>{t('wizard.startBlank')}</a>
 	</div>
 	<div class="steps">
-		<span class="stepdot" class:on={step === 1}>1 · Trip</span>
-		<span class="stepdot" class:on={step === 2}>2 · Stops</span>
+		<span class="stepdot" class:on={step === 1}>{t('wizard.step1')}</span>
+		<span class="stepdot" class:on={step === 2}>{t('wizard.step2')}</span>
 	</div>
 
 	{#if step === 1}
 		<div class="card">
-			<label class="f">Trip title
-				<input type="text" bind:value={title} placeholder="e.g. Italy — September 2026" />
+			<label class="f">{t('wizard.tripTitle')}
+				<input type="text" bind:value={title} placeholder={t('wizard.tripTitlePlaceholder')} />
 			</label>
-			<label class="f">Start date
+			<label class="f">{t('wizard.startDate')}
 				<input type="date" bind:value={startDate} />
 			</label>
 
 			<div class="f">
-				<span class="lbl">Languages</span>
+				<span class="lbl">{t('wizard.languages')}</span>
 				<div class="chips">
 					{#each languages as l (l)}
 						<span class="chip">{l}{#if languages.length > 1}<button type="button" onclick={() => removeLanguage(l)}>✕</button>{/if}</span>
 					{/each}
 					{#if !langFormOpen}
-						<button type="button" class="add" onclick={() => { langFormOpen = true; langErr = ''; }}>+ Language</button>
+						<button type="button" class="add" onclick={() => { langFormOpen = true; langErr = ''; }}>{t('wizard.addLanguage')}</button>
 					{/if}
 				</div>
 				{#if langFormOpen}
 					<div class="miniform">
 						<input
 							type="text"
-							placeholder="Code, e.g. it"
+							placeholder={t('wizard.langCodePlaceholder')}
 							bind:value={langInput}
 							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), submitLanguage())}
-							aria-label="New language code"
+							aria-label={t('wizard.newLangCodeAria')}
 						/>
-						<button type="button" class="add" onclick={submitLanguage}>Add</button>
-						<button type="button" onclick={() => { langFormOpen = false; langInput = ''; langErr = ''; }}>Cancel</button>
+						<button type="button" class="add" onclick={submitLanguage}>{t('common.add')}</button>
+						<button type="button" onclick={() => { langFormOpen = false; langInput = ''; langErr = ''; }}>{t('common.cancel')}</button>
 						{#if langErr}<span class="err">{langErr}</span>{/if}
 					</div>
 				{/if}
 				{#if languages.length > 1}
-					<label class="inline">Default
+					<label class="inline">{t('wizard.default')}
 						<select bind:value={defaultLanguage}>
 							{#each languages as l (l)}<option value={l}>{l}</option>{/each}
 						</select>
@@ -187,55 +188,55 @@
 				{/if}
 			</div>
 
-			<label class="f">Timezone <span class="lblhint">applied to all stops</span>
+			<label class="f">{t('wizard.timezone')} <span class="lblhint">{t('wizard.appliedAllStops')}</span>
 				<select bind:value={timezone}>
 					{#each TIMEZONES as tz (tz)}<option value={tz}>{tz}</option>{/each}
 				</select>
 			</label>
 
-			<label class="f">Home base <span class="lblhint">optional</span>
-				<input type="text" bind:value={homeName} placeholder="e.g. Home (South Hampstead)" />
+			<label class="f">{t('wizard.homeBase')} <span class="lblhint">{t('wizard.optional')}</span>
+				<input type="text" bind:value={homeName} placeholder={t('wizard.homePlaceholder')} />
 			</label>
 
 			{#if step1Err}<div class="err">{step1Err}</div>{/if}
 			<div class="actions">
-				<button type="button" class="primary" disabled={!step1Valid} onclick={goStep2}>Next: Stops →</button>
+				<button type="button" class="primary" disabled={!step1Valid} onclick={goStep2}>{t('wizard.nextStops')}</button>
 			</div>
 		</div>
 	{:else}
 		<div class="card">
-			<div class="stops-hd"><span class="lbl">Stops</span><button type="button" onclick={addStop}>+ Add stop</button></div>
+			<div class="stops-hd"><span class="lbl">{t('wizard.stops')}</span><button type="button" onclick={addStop}>{t('wizard.addStop')}</button></div>
 			{#each stops as stop, i (i)}
 				<div class="stoprow">
-					<input class="sname" type="text" bind:value={stop.name} placeholder="Place name, e.g. Rome" aria-label="Stop name" />
-					<label class="nights">Nights
-						<input type="number" min="1" step="1" bind:value={stop.nights} aria-label="Nights" />
+					<input class="sname" type="text" bind:value={stop.name} placeholder={t('wizard.stopNamePlaceholder')} aria-label={t('wizard.stopNameAria')} />
+					<label class="nights">{t('wizard.nights')}
+						<input type="number" min="1" step="1" bind:value={stop.nights} aria-label={t('wizard.nights')} />
 					</label>
 					<div class="rowctl">
-						<button type="button" disabled={i === 0} onclick={() => move(stops, i, -1)} aria-label="Move stop up">↑</button>
-						<button type="button" disabled={i === stops.length - 1} onclick={() => move(stops, i, 1)} aria-label="Move stop down">↓</button>
-						<button type="button" class="del" disabled={stops.length <= 1} onclick={() => removeAt(stops, i)} aria-label="Remove stop">✕</button>
+						<button type="button" disabled={i === 0} onclick={() => move(stops, i, -1)} aria-label={t('wizard.moveStopUp')}>↑</button>
+						<button type="button" disabled={i === stops.length - 1} onclick={() => move(stops, i, 1)} aria-label={t('wizard.moveStopDown')}>↓</button>
+						<button type="button" class="del" disabled={stops.length <= 1} onclick={() => removeAt(stops, i)} aria-label={t('wizard.removeStop')}>✕</button>
 					</div>
 				</div>
 			{/each}
 
 			<div class="footer">
 				{#if totalNights}
-					<span><strong>{totalNights}</strong> nights · <strong>{totalNights + 1}</strong> days</span>
+					<span><strong>{totalNights}</strong> {t('wizard.nightsWord')} · <strong>{totalNights + 1}</strong> {t('wizard.daysWord')}</span>
 					{#if endDate}<span>{startDate} → {endDate}</span>{/if}
 				{:else}
-					<span class="muted">Add a stop with nights to see the end date.</span>
+					<span class="muted">{t('wizard.addStopHint')}</span>
 				{/if}
 			</div>
 
 			{#if createErr}<div class="err">{createErr}</div>{/if}
 			<div class="actions">
-				<button type="button" onclick={() => (step = 1)}>← Back</button>
+				<button type="button" onclick={() => (step = 1)}>{t('wizard.back')}</button>
 				<button type="button" class="primary" disabled={validStops.length === 0 || creating} onclick={create}>
-					{creating ? 'Creating…' : 'Create trip'}
+					{creating ? t('wizard.creating') : t('wizard.createTrip')}
 				</button>
 			</div>
-			{#if creating}<div class="muted geo">Looking up coordinates for each stop…</div>{/if}
+			{#if creating}<div class="muted geo">{t('wizard.lookingUpCoords')}</div>{/if}
 		</div>
 	{/if}
 </div>

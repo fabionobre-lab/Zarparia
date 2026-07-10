@@ -1,64 +1,66 @@
 <script lang="ts">
+	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
+	import { t, formatDateRange } from '$lib/i18n/store.svelte';
+	import type { Messages } from '$lib/i18n';
+
 	let { data } = $props();
 
-	const locale = 'en-GB';
-	function fmtRange(start: string | null, end: string | null): string {
-		if (!start || !end) return '';
-		const f = (iso: string) =>
-			new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(
-				new Date(iso + 'T00:00:00Z')
-			);
-		return `${f(start)} – ${f(end)}`;
-	}
-	const statusLabel: Record<string, string> = { past: 'Past', active: 'Now', upcoming: 'Upcoming' };
+	const statusKey: Record<string, keyof Messages> = {
+		past: 'home.statusPast',
+		active: 'home.statusNow',
+		upcoming: 'home.statusUpcoming'
+	};
 
-	const owned = $derived(data.trips.filter((t) => t.role === 'owner'));
-	const shared = $derived(data.trips.filter((t) => t.role !== 'owner'));
+	const owned = $derived(data.trips.filter((tr) => tr.role === 'owner'));
+	const shared = $derived(data.trips.filter((tr) => tr.role !== 'owner'));
 </script>
 
-<svelte:head>
-	<title>Trips</title>
-</svelte:head>
-
-{#snippet card(t: (typeof data.trips)[number])}
-	<a class="card" href="/trips/{t.id}">
-		{#if t.cover}<div class="cover" aria-hidden="true">{t.cover}</div>{/if}
+{#snippet card(trip: (typeof data.trips)[number])}
+	<a class="card" href="/trips/{trip.id}">
+		{#if trip.cover}<div class="cover" aria-hidden="true">{trip.cover}</div>{/if}
 		<div class="card-main">
-			<div class="card-title">{t.title ?? t.id}</div>
-			<div class="card-dates">{fmtRange(t.startDate, t.endDate)}</div>
+			<div class="card-title">{trip.title ?? trip.id}</div>
+			<div class="card-dates">{formatDateRange(trip.startDate, trip.endDate)}</div>
 		</div>
-		{#if t.role !== 'owner'}<span class="role">{t.role === 'editor' ? 'can edit' : 'view only'}</span>{/if}
-		<span class="chip {t.status}">{statusLabel[t.status] ?? t.status}</span>
+		{#if trip.role !== 'owner'}<span class="role">{trip.role === 'editor' ? t('role.canEdit') : t('role.viewOnly')}</span>{/if}
+		<span class="chip {trip.status}">{t(statusKey[trip.status] ?? 'home.statusUpcoming')}</span>
 	</a>
 {/snippet}
+
+<svelte:head>
+	<title>{t('home.pageTitle')}</title>
+</svelte:head>
 
 <main>
 	{#if data.user}
 		<div class="head">
-			<h1>Your trips</h1>
+			<h1>{t('home.yourTrips')}</h1>
 			<div class="actions">
-				<a class="import-btn" href="/trips/import">Import itinerary</a>
-				<a class="new" href="/trips/new">+ New trip</a>
+				<a class="import-btn" href="/trips/import">{t('home.importItinerary')}</a>
+				<a class="new" href="/trips/new">{t('home.newTrip')}</a>
 			</div>
 		</div>
 		{#if owned.length === 0}
-			<p class="empty">No trips yet. <a href="/trips/new">Create your first one.</a></p>
+			<p class="empty">{t('home.noTrips')} <a href="/trips/new">{t('home.createFirst')}</a></p>
 		{:else}
 			<div class="cards">
-				{#each owned as t (t.id)}{@render card(t)}{/each}
+				{#each owned as trip (trip.id)}{@render card(trip)}{/each}
 			</div>
 		{/if}
 
 		{#if shared.length > 0}
-			<h2 class="shared-hd">Shared with you</h2>
+			<h2 class="shared-hd">{t('home.sharedWithYou')}</h2>
 			<div class="cards">
-				{#each shared as t (t.id)}{@render card(t)}{/each}
+				{#each shared as trip (trip.id)}{@render card(trip)}{/each}
 			</div>
 		{/if}
 	{:else}
 		<h1>Trips</h1>
-		<p>A place for your travel itineraries.</p>
-		<p><a href="/auth/login/google">Sign in with Google</a> to get started.</p>
+		<p>{t('landing.tagline')}</p>
+		<p><a href="/auth/login/google">{t('header.signInGoogle')}</a> {t('landing.toGetStarted')}</p>
+		<div class="landing-lang">
+			<LocaleSwitcher />
+		</div>
 	{/if}
 </main>
 
@@ -105,6 +107,9 @@
 	}
 	.empty {
 		color: #666;
+		margin-top: 1.5rem;
+	}
+	.landing-lang {
 		margin-top: 1.5rem;
 	}
 	.cards {

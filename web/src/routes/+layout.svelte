@@ -2,8 +2,18 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
+	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
+	import { initLocale, t } from '$lib/i18n/store.svelte';
 
 	let { children, data } = $props();
+
+	// Seed the UI locale synchronously (SSR + client) before children render, so
+	// the first paint is in the right language and there is no flash of English.
+	// Intentionally reads the initial value only — after this, setLocale() from
+	// the switcher is the client-side source of truth (the cookie keeps SSR in
+	// sync on the next request).
+	// svelte-ignore state_referenced_locally
+	initLocale(data.locale);
 
 	onMount(() => {
 		if (!('serviceWorker' in navigator)) return;
@@ -34,13 +44,14 @@
 	<div class="bar">
 		<a class="brand" href="/">Trips</a>
 		<nav>
+			<LocaleSwitcher />
 			{#if data.user}
 				<span class="who">{data.user.name ?? data.user.email}</span>
 				<form method="POST" action="/auth/logout" onsubmit={onLogout}>
-					<button type="submit">Sign out</button>
+					<button type="submit">{t('header.signOut')}</button>
 				</form>
 			{:else}
-				<a class="signin" href="/auth/login/google">Sign in with Google</a>
+				<a class="signin" href="/auth/login/google">{t('header.signInGoogle')}</a>
 			{/if}
 		</nav>
 	</div>

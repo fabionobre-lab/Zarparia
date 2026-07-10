@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { t } from '$lib/i18n/store.svelte';
 
 	const MAX = 20000;
 	const PLACEHOLDER =
@@ -32,12 +33,18 @@
 				return;
 			}
 			const e = (await res.json().catch(() => ({}))) as { error?: string };
-			error = e.error ?? `Import failed (${res.status}).`;
+			// The API's error strings are English; map the known statuses to the
+			// active UI language and fall back to the server text for the rest.
+			if (res.status === 501) error = t('import.errNotConfigured');
+			else if (res.status === 400) error = t('import.errEmpty');
+			else if (res.status === 413) error = t('import.errTooLong');
+			else if (res.status === 422) error = e.error ?? t('import.err422');
+			else error = e.error ?? t('import.errFailed', { status: res.status });
 			if (res.status === 422) {
-				hint = 'Try adding explicit dates (e.g. "arriving 5 September 2026") and importing again.';
+				hint = t('import.hint422');
 			}
 		} catch {
-			error = 'Network error. Please check your connection and try again.';
+			error = t('import.errNetwork');
 		} finally {
 			busy = false;
 		}
@@ -45,15 +52,14 @@
 </script>
 
 <svelte:head>
-	<title>Import an itinerary</title>
+	<title>{t('import.pageTitle')}</title>
 </svelte:head>
 
 <main>
-	<a class="back" href="/">&larr; Trips</a>
-	<h1>Import an itinerary</h1>
+	<a class="back" href="/">{t('import.back')}</a>
+	<h1>{t('import.heading')}</h1>
 	<p class="lede">
-		Paste a rough itinerary in any form and we'll turn it into a draft trip you can refine in the
-		editor.
+		{t('import.lede')}
 	</p>
 
 	<textarea
@@ -61,18 +67,18 @@
 		placeholder={PLACEHOLDER}
 		rows="12"
 		disabled={busy}
-		aria-label="Itinerary text"
+		aria-label={t('import.textareaAria')}
 	></textarea>
 
 	<div class="row">
 		<span class="counter" class:over={tooLong}>{text.length.toLocaleString()} / {MAX.toLocaleString()}</span>
 		<button class="import" onclick={submit} disabled={!canSubmit}>
-			{busy ? 'Reading your itinerary…' : 'Import'}
+			{busy ? t('import.reading') : t('import.importBtn')}
 		</button>
 	</div>
 
 	{#if busy}
-		<p class="working">Reading your itinerary… this takes ~30–60s.</p>
+		<p class="working">{t('import.readingLong')}</p>
 	{/if}
 
 	{#if error}

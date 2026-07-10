@@ -5,6 +5,7 @@
 	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import DayEditor from './DayEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
+	import { t } from '$lib/i18n/store.svelte';
 
 	type DayItem = { id: string; item: Day };
 
@@ -96,25 +97,25 @@
 <div class="plan">
 	{#if multiPlan}
 		<div class="plan-hd">
-			<input class="pid" type="text" bind:value={plan.id} placeholder="plan-id" aria-label="Plan id" />
+			<input class="pid" type="text" bind:value={plan.id} placeholder="plan-id" aria-label={t('plan.idAria')} />
 			<span class="controls">
-				<button type="button" disabled={!canUp} onclick={() => onMove(-1)} aria-label="Move plan up">↑</button>
-				<button type="button" disabled={!canDown} onclick={() => onMove(1)} aria-label="Move plan down">↓</button>
-				<button type="button" class="del" onclick={onRemove}>Remove plan</button>
+				<button type="button" disabled={!canUp} onclick={() => onMove(-1)} aria-label={t('plan.moveUp')}>↑</button>
+				<button type="button" disabled={!canDown} onclick={() => onMove(1)} aria-label={t('plan.moveDown')}>↓</button>
+				<button type="button" class="del" onclick={onRemove}>{t('plan.remove')}</button>
 			</span>
 		</div>
-		<LocalizedInput bind:value={plan.label as never} {langs} label="Plan label (tab)" />
-		<label class="check"><input type="checkbox" checked={hasDiffLabels} onchange={(e) => toggleDiffLabels(e.currentTarget.checked)} /> Diff annotations (prefix labels)</label>
+		<LocalizedInput bind:value={plan.label as never} {langs} label={t('plan.label')} />
+		<label class="check"><input type="checkbox" checked={hasDiffLabels} onchange={(e) => toggleDiffLabels(e.currentTarget.checked)} /> {t('plan.diffAnnotations')}</label>
 		{#if plan.diffLabels}
 			<div class="difflabels">
-				<LocalizedInput bind:value={plan.diffLabels.added as never} {langs} label="Added prefix" />
-				<LocalizedInput bind:value={plan.diffLabels.changed as never} {langs} label="Changed prefix" />
-				<LocalizedInput bind:value={plan.diffLabels.kept as never} {langs} label="Kept prefix" />
+				<LocalizedInput bind:value={plan.diffLabels.added as never} {langs} label={t('plan.addedPrefix')} />
+				<LocalizedInput bind:value={plan.diffLabels.changed as never} {langs} label={t('plan.changedPrefix')} />
+				<LocalizedInput bind:value={plan.diffLabels.kept as never} {langs} label={t('plan.keptPrefix')} />
 			</div>
 		{/if}
 	{/if}
 
-	<div class="days-hd"><span class="lbl">Days</span><button type="button" onclick={addDay}>+ Add day</button></div>
+	<div class="days-hd"><span class="lbl">{t('plan.days')}</span><button type="button" onclick={addDay}>{t('plan.addDay')}</button></div>
 	<div
 		class="dndlist"
 		use:dndzone={{ items: dayItems, flipDurationMs: FLIP_MS, dragDisabled: dayDragDisabled, dropTargetStyle: {} }}

@@ -4,6 +4,7 @@
 	import { move, removeAt, emptyLocalized } from './factories';
 	import LocalizedInput from './LocalizedInput.svelte';
 	import PlaceSearch from './PlaceSearch.svelte';
+	import { t } from '$lib/i18n/store.svelte';
 
 	let {
 		block = $bindable(),
@@ -39,7 +40,7 @@
 	});
 
 	const tagKeys = $derived(tags ? Object.keys(tags) : []);
-	const summary = $derived(block.title?.[langs[0]] || '(untitled block)');
+	const summary = $derived(block.title?.[langs[0]] || t('block.untitled'));
 
 	function toggleTag(key: string) {
 		// Assign first, then read `block.tags` back as the reactive proxy — mutating
@@ -90,7 +91,7 @@
 		<span
 			class="grip"
 			aria-hidden="true"
-			title="Drag to reorder block"
+			title={t('block.dragReorder')}
 			onpointerdown={onGrab}
 			ontouchstart={onGrab}
 			onclick={(e) => e.preventDefault()}
@@ -98,24 +99,24 @@
 		<span class="time">{block.time || '—'}</span>
 		<span class="title">{summary}</span>
 		<span class="controls">
-			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move block up">↑</button>
-			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move block down">↓</button>
-			{#if onDuplicate}<button type="button" onclick={(e) => (e.preventDefault(), onDuplicate())} aria-label="Duplicate block">Duplicate</button>{/if}
-			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label="Remove block">✕</button>
+			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label={t('block.moveUp')}>↑</button>
+			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label={t('block.moveDown')}>↓</button>
+			{#if onDuplicate}<button type="button" onclick={(e) => (e.preventDefault(), onDuplicate())} aria-label={t('block.duplicateAria')}>{t('day.duplicate')}</button>{/if}
+			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label={t('block.removeAria')}>✕</button>
 		</span>
 	</summary>
 
 	{#if open}
 	<div class="body" bind:this={bodyEl}>
 		<div class="grid2">
-			<label class="f">Time<input type="text" bind:value={block.time} placeholder="09:30 or ~14:00" /></label>
-			<label class="f">Dot color<input type="color" bind:value={block.dotColor} /></label>
+			<label class="f">{t('block.time')}<input type="text" bind:value={block.time} placeholder={t('block.timePlaceholder')} /></label>
+			<label class="f">{t('block.dotColor')}<input type="color" bind:value={block.dotColor} /></label>
 		</div>
-		<LocalizedInput bind:value={block.title} {langs} label="Title" />
+		<LocalizedInput bind:value={block.title} {langs} label={t('block.title')} />
 
 		{#if tagKeys.length}
 			<div class="tags">
-				<span class="lbl">Tags</span>
+				<span class="lbl">{t('block.tags')}</span>
 				<div class="chips">
 					{#each tagKeys as key (key)}
 						<label class="chip" class:on={block.tags?.includes(key)}>
@@ -127,58 +128,58 @@
 			</div>
 		{/if}
 
-		<LocalizedInput bind:value={block.description as never} {langs} label="Description" multiline />
+		<LocalizedInput bind:value={block.description as never} {langs} label={t('block.description')} multiline />
 
-		<PlaceSearch label="Find place" onPick={onPickPlace} />
+		<PlaceSearch label={t('block.findPlace')} onPick={onPickPlace} />
 
 		<div class="grid2">
-			<label class="f">Maps URL<input type="text" bind:value={block.mapsUrl} placeholder="https://maps.google.com/?q=..." /></label>
-			<label class="f">Walk (km)<input type="number" step="0.1" min="0" bind:value={block.km} /></label>
+			<label class="f">{t('block.mapsUrl')}<input type="text" bind:value={block.mapsUrl} placeholder="https://maps.google.com/?q=..." /></label>
+			<label class="f">{t('block.walkKm')}<input type="number" step="0.1" min="0" bind:value={block.km} /></label>
 		</div>
 
 		<div class="grid2">
-			<label class="f">Lat<input type="number" step="any" value={block.coords?.lat ?? ''} oninput={(e) => setCoord('lat', e.currentTarget.value)} /></label>
-			<label class="f">Lon<input type="number" step="any" value={block.coords?.lon ?? ''} oninput={(e) => setCoord('lon', e.currentTarget.value)} /></label>
+			<label class="f">{t('block.lat')}<input type="number" step="any" value={block.coords?.lat ?? ''} oninput={(e) => setCoord('lat', e.currentTarget.value)} /></label>
+			<label class="f">{t('block.lon')}<input type="number" step="any" value={block.coords?.lon ?? ''} oninput={(e) => setCoord('lon', e.currentTarget.value)} /></label>
 		</div>
 
-		<LocalizedInput bind:value={block.warning as never} {langs} label="Warning" multiline />
-		<LocalizedInput bind:value={block.note as never} {langs} label="Note" multiline />
+		<LocalizedInput bind:value={block.warning as never} {langs} label={t('block.warning')} multiline />
+		<LocalizedInput bind:value={block.note as never} {langs} label={t('block.note')} multiline />
 
 		<div class="sub">
-			<div class="sub-hd"><span class="lbl">Waypoints</span><button type="button" onclick={addWaypoint}>+ Add</button></div>
+			<div class="sub-hd"><span class="lbl">{t('block.waypoints')}</span><button type="button" onclick={addWaypoint}>+ {t('common.add')}</button></div>
 			{#each block.waypoints ?? [] as wp, i (i)}
 				<div class="rowline">
-					<input type="text" bind:value={wp.query} placeholder="Place+Query+For+Maps" aria-label="Waypoint maps query" />
-					<LocalizedInput bind:value={wp.name} {langs} label="Name" />
+					<input type="text" bind:value={wp.query} placeholder="Place+Query+For+Maps" aria-label={t('block.waypointQueryAria')} />
+					<LocalizedInput bind:value={wp.name} {langs} label={t('block.name')} />
 					<button type="button" class="del" onclick={() => removeAt(block.waypoints!, i)}>✕</button>
 				</div>
 			{/each}
 		</div>
 
 		<div class="sub">
-			<div class="sub-hd"><span class="lbl">Photo spots</span><button type="button" onclick={addPhoto}>+ Add</button></div>
+			<div class="sub-hd"><span class="lbl">{t('block.photoSpots')}</span><button type="button" onclick={addPhoto}>+ {t('common.add')}</button></div>
 			{#each block.photoSpots ?? [] as ps, i (i)}
 				<div class="photo">
-					<input type="text" bind:value={ps.name} placeholder="Caption" aria-label="Photo spot caption" />
-					<input type="text" bind:value={ps.mapsUrl} placeholder="Maps URL" aria-label="Photo spot maps URL" />
-					<input type="text" bind:value={ps.wiki} placeholder="Wikipedia page title (optional)" aria-label="Photo spot Wikipedia page title" />
-					<input type="text" bind:value={ps.fallbackImg} placeholder="Fallback image URL (optional)" aria-label="Photo spot fallback image URL" />
+					<input type="text" bind:value={ps.name} placeholder={t('block.captionPlaceholder')} aria-label={t('block.photoCaptionAria')} />
+					<input type="text" bind:value={ps.mapsUrl} placeholder={t('block.photoMapsPlaceholder')} aria-label={t('block.photoMapsAria')} />
+					<input type="text" bind:value={ps.wiki} placeholder={t('block.wikiPlaceholder')} aria-label={t('block.wikiAria')} />
+					<input type="text" bind:value={ps.fallbackImg} placeholder={t('block.fallbackImgPlaceholder')} aria-label={t('block.fallbackImgAria')} />
 					<button type="button" class="del" onclick={() => removeAt(block.photoSpots!, i)}>✕</button>
 				</div>
 			{/each}
 		</div>
 
 		<div class="sub">
-			<label class="f">Plan diff
+			<label class="f">{t('block.planDiff')}
 				<select value={diffKind} onchange={(e) => setDiffKind(e.currentTarget.value)}>
-					<option value="none">none</option>
-					<option value="added">added</option>
-					<option value="changed">changed</option>
-					<option value="kept">kept</option>
+					<option value="none">{t('block.diffNone')}</option>
+					<option value="added">{t('block.diffAdded')}</option>
+					<option value="changed">{t('block.diffChanged')}</option>
+					<option value="kept">{t('block.diffKept')}</option>
 				</select>
 			</label>
 			{#if block.diff}
-				<LocalizedInput bind:value={block.diff.reason} {langs} label="Diff reason" multiline />
+				<LocalizedInput bind:value={block.diff.reason} {langs} label={t('block.diffReason')} multiline />
 			{/if}
 		</div>
 	</div>

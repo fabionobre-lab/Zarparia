@@ -3,6 +3,7 @@
 	import TripView from '$lib/TripView.svelte';
 	import SharePanel from '$lib/SharePanel.svelte';
 	import { loc, type Trip } from '$lib/trip-engine';
+	import { t } from '$lib/i18n/store.svelte';
 	let { data } = $props();
 
 	let showShare = $state(false);
@@ -24,15 +25,15 @@
 
 <div class="page">
 	<div class="bar">
-		<a class="back" href="/">← All trips</a>
+		<a class="back" href="/">{t('tripbar.allTrips')}</a>
 		<div class="actions">
 			{#if data.role === 'owner'}
-				<button class="btn" onclick={() => (showShare = !showShare)}>{showShare ? 'Close' : 'Share'}</button>
+				<button class="btn" onclick={() => (showShare = !showShare)}>{showShare ? t('tripbar.close') : t('tripbar.share')}</button>
 			{:else}
-				<span class="role">Shared · {data.role === 'editor' ? 'can edit' : 'view only'}</span>
+				<span class="role">{t('tripbar.shared')} · {data.role === 'editor' ? t('role.canEdit') : t('role.viewOnly')}</span>
 			{/if}
 			{#if data.role === 'owner' || data.role === 'editor'}
-				<a class="btn" href="/trips/{data.trip.id}/edit">Edit</a>
+				<a class="btn" href="/trips/{data.trip.id}/edit">{t('tripbar.edit')}</a>
 			{/if}
 		</div>
 	</div>

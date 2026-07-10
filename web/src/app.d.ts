@@ -1,12 +1,14 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 /// <reference path="../worker-configuration.d.ts" />
 import type { SessionUser } from '$lib/types';
+import type { Locale } from '$lib/i18n';
 
 declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
 			user: SessionUser | null;
+			locale: Locale;
 		}
 		// interface PageData {}
 		// interface PageState {}
