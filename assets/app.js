@@ -17,6 +17,8 @@ const UI_STRINGS = {
     freeDay: 'Free day',
     days: 'Days',
     addToCalendar: 'Add to calendar',
+    dayMap: 'Day map',
+    dayMapAria: 'Day map, {n} stops',
   },
   pt: {
     maps: 'Abrir no Maps',
@@ -30,6 +32,8 @@ const UI_STRINGS = {
     freeDay: 'Dia livre',
     days: 'Dias',
     addToCalendar: 'Adicionar ao calendário',
+    dayMap: 'Mapa do dia',
+    dayMapAria: 'Mapa do dia, {n} paradas',
   },
 };
 
@@ -316,8 +320,57 @@ function routePlaces(blocks) {
   });
   return places;
 }
-function truncStop(name) {
-  return name.length > 20 ? name.substring(0, 18) + '…' : name;
+/* Schematic per-day map: equirectangular projection of the day's coord-bearing
+   blocks, letterboxed into a fixed viewBox. Zero dependencies, offline-safe. */
+function dayMapSVG(day) {
+  const stops = day.blocks.filter((b) => b.coords);
+  if (stops.length < 2) return '';
+  const VW = 320, VH = 180, padL = 44, padR = 44, padT = 18, padB = 30;
+  const plotW = VW - padL - padR;   // drawable width
+  const plotH = VH - padT - padB;   // drawable height
+  const meanLat = stops.reduce((s, b) => s + b.coords.lat, 0) / stops.length;
+  const cosLat = Math.cos(meanLat * Math.PI / 180) || 1; // shrink lon so shapes aren't stretched
+  const proj = stops.map((b) => ({ x: b.coords.lon * cosLat, y: b.coords.lat }));
+  let minX = Math.min.apply(null, proj.map((p) => p.x));
+  let maxX = Math.max.apply(null, proj.map((p) => p.x));
+  let minY = Math.min.apply(null, proj.map((p) => p.y));
+  let maxY = Math.max.apply(null, proj.map((p) => p.y));
+  let spanX = maxX - minX, spanY = maxY - minY;
+  // pad the bounding box ~12% (6% each side)
+  minX -= spanX * 0.06; maxX += spanX * 0.06;
+  minY -= spanY * 0.06; maxY += spanY * 0.06;
+  spanX = maxX - minX; spanY = maxY - minY;
+  const EPS = 1e-9;
+  // letterbox: one scale for both axes so nothing is distorted
+  let scale = Math.min(
+    spanX < EPS ? Infinity : plotW / spanX,
+    spanY < EPS ? Infinity : plotH / spanY
+  );
+  if (!isFinite(scale)) scale = 0; // all coords identical -> center the single point
+  const offX = padL + (plotW - spanX * scale) / 2;
+  const offY = padT + (plotH - spanY * scale) / 2;
+  const pts = proj.map((p) => ({
+    x: spanX < EPS ? padL + plotW / 2 : offX + (p.x - minX) * scale,
+    y: spanY < EPS ? padT + plotH / 2 : offY + (maxY - p.y) * scale, // invert: north is up
+  }));
+  const n = stops.length;
+  const aria = ui('dayMapAria').replace('{n}', n);
+  let svg = `<svg class="daymap-svg" viewBox="0 0 ${VW} ${VH}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="${esc(aria)}">`;
+  svg += `<polyline class="daymap-line" points="${pts.map((p) => p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ')}" />`;
+  pts.forEach((p, i) => {
+    const title = loc(stops[i].title) || '';
+    svg += `<circle class="daymap-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9"><title>${esc((i + 1) + '. ' + title + ' (' + stops[i].time + ')')}</title></circle>`;
+    svg += `<text class="daymap-num" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" dy=".32em" text-anchor="middle">${i + 1}</text>`;
+  });
+  [0, n - 1].forEach((idx) => {
+    const p = pts[idx];
+    let name = loc(stops[idx].title) || '';
+    if (name.length > 16) name = name.slice(0, 16) + '…';
+    const anchor = p.x < 40 ? 'start' : (p.x > VW - 40 ? 'end' : 'middle');
+    svg += `<text class="daymap-label" x="${p.x.toFixed(1)}" y="${(p.y + 17).toFixed(1)}" text-anchor="${anchor}">${esc(name)}</text>`;
+  });
+  svg += '</svg>';
+  return `<div class="daymap"><div class="daymap-eye">${ui('dayMap')}</div>${svg}</div>`;
 }
 
 /* ── Calendar export (.ics) ─────────────────────────────────────────── */
@@ -537,12 +590,14 @@ function renderDay() {
     h += '<div class="route-stops">';
     places.forEach((p, i) => {
       if (i > 0) h += '<div class="route-connector"></div>';
-      h += `<div class="route-stop"><div class="route-num">${i + 1}</div><div class="route-name">${truncStop(p.name)}</div></div>`;
+      h += `<div class="route-stop"><div class="route-num">${i + 1}</div><div class="route-name">${esc(p.name)}</div></div>`;
     });
     h += '</div>';
     h += `<div class="route-open">${PIN_SVG}${ui('openRoute')}</div>`;
     h += '</a>';
   }
+
+  h += dayMapSVG(day);
 
   h += '<div class="tl">';
   day.blocks.forEach((b, bi) => {
