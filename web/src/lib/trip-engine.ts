@@ -90,7 +90,10 @@ export function loc(trip: Trip, obj: Localized | undefined, lang: string): strin
 }
 
 export function localeFor(trip: Trip, lang: string): string {
-	return trip.locales?.[lang] ?? lang;
+	// Treat an empty-string locale value as absent (the editor's LocalizedInput
+	// seeds locales to {en:''}); an empty tag would make Intl throw "Invalid
+	// language tag". Fall back to the bare language code in that case.
+	return trip.locales?.[lang] || lang;
 }
 
 function dateUTC(iso: string): Date {

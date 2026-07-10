@@ -13,6 +13,10 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
   /* theme defaults (= tartan) */
   --hero-bg:#2b4a2b;--hero-eyebrow:#e8c84a;--accent:#2b4a2b}
 .shell.theme-navy{--hero-bg:#1e3054;--hero-eyebrow:#c17817;--accent:#1e3054}
+.shell.theme-terracotta{--hero-bg:#7c3a29;--hero-eyebrow:#e6b566;--accent:#7c3a29}
+.shell.theme-olive{--hero-bg:#4a5324;--hero-eyebrow:#d9c46a;--accent:#4a5324}
+.shell.theme-azure{--hero-bg:#17456b;--hero-eyebrow:#e0a24a;--accent:#17456b}
+.shell.theme-sand{--hero-bg:#5b4a30;--hero-eyebrow:#e8cf8a;--accent:#5b4a30}
 .hero{background:var(--hero-bg);padding:calc(12px + var(--safe-top)) 16px 0;flex-shrink:0;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;inset:0;pointer-events:none;
   background:repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.05) 18px,rgba(255,255,255,.05) 19.5px),

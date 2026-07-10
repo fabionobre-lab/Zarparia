@@ -1,13 +1,17 @@
 <script lang="ts">
+	import { onMount, untrack } from 'svelte';
 	import type { Segment, Trip } from '$lib/trip-engine';
-	import { move, removeAt, blankPlan, emptyLocalized, nextId } from './factories';
+	import { move, removeAt, blankPlan, nextId, slugifyId, THEME_NAMES } from './factories';
 	import PlanEditor from './PlanEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
+	import PlaceSearch from './PlaceSearch.svelte';
 
 	let {
 		segment = $bindable(),
 		langs,
 		tags,
+		defaultTimezone = 'Europe/London',
+		autoOpen = false,
 		onRemove,
 		onMove,
 		onGrab,
@@ -17,6 +21,8 @@
 		segment: Segment;
 		langs: string[];
 		tags: Trip['tags'];
+		defaultTimezone?: string;
+		autoOpen?: boolean;
 		onRemove: () => void;
 		onMove: (dir: -1 | 1) => void;
 		onGrab?: (e: Event) => void;
@@ -27,10 +33,27 @@
 	// Lazy body: segments are expanded by default (preserving prior behavior),
 	// but the body can be collapsed to drop its inputs from the DOM.
 	let open = $state(true);
+	let bodyEl = $state<HTMLElement>();
+	onMount(() => {
+		if (autoOpen) queueMicrotask(() => bodyEl?.querySelector<HTMLElement>('input,select,textarea')?.focus());
+	});
+
+	// ── Auto-slug the segment id from the title until the user edits the id ──
+	// A blank/placeholder id (new segment) tracks the title; a meaningful id
+	// (loaded trip, or once the user types) is left alone.
+	let idDirty = $state(!!segment.id && !/^segment(-\d+)?$/.test(segment.id));
+	$effect(() => {
+		const t = segment.title?.[langs[0]] ?? '';
+		if (idDirty) return;
+		const slug = slugifyId(t);
+		untrack(() => {
+			if (slug && segment.id !== slug) segment.id = slug;
+		});
+	});
 
 	const hasWeather = $derived(!!segment.weather);
 	function toggleWeather(on: boolean) {
-		segment.weather = on ? { lat: 0, lon: 0, granularity: 'daily', timezone: 'Europe/London' } : undefined;
+		segment.weather = on ? { lat: 0, lon: 0, granularity: 'daily', timezone: defaultTimezone } : undefined;
 	}
 
 	const hasColors = $derived(!!segment.themeColors);
@@ -39,6 +62,11 @@
 	}
 	function addPlan() {
 		segment.plans.push(blankPlan(langs, nextId('plan', segment.plans.map((p) => p.id))));
+	}
+	function onPickWeather(p: { name: string; lat: number; lon: number }) {
+		if (!segment.weather) return;
+		segment.weather.lat = p.lat;
+		segment.weather.lon = p.lon;
 	}
 </script>
 
@@ -60,13 +88,15 @@
 		</span>
 	</summary>
 	{#if open}
-	<div class="body">
+	<div class="body" bind:this={bodyEl}>
 		<div class="grid2">
-			<label class="f">Segment id<input type="text" bind:value={segment.id} /></label>
+			<label class="f">Segment id
+				<input type="text" bind:value={segment.id} oninput={() => (idDirty = true)} placeholder="auto" />
+				<span class="fhint">internal key, auto-generated</span>
+			</label>
 			<label class="f">Theme
 				<select bind:value={segment.theme}>
-					<option value="tartan">tartan (green)</option>
-					<option value="navy">navy (blue)</option>
+					{#each THEME_NAMES as t (t)}<option value={t}>{t}</option>{/each}
 				</select>
 			</label>
 		</div>
@@ -85,6 +115,7 @@
 
 		<label class="check"><input type="checkbox" checked={hasWeather} onchange={(e) => toggleWeather(e.currentTarget.checked)} /> Live weather</label>
 		{#if segment.weather}
+			<PlaceSearch label="Find place (sets lat/lon)" onPick={onPickWeather} />
 			<div class="grid4">
 				<label class="f">Lat<input type="number" step="0.0001" bind:value={segment.weather.lat} /></label>
 				<label class="f">Lon<input type="number" step="0.0001" bind:value={segment.weather.lon} /></label>
@@ -208,6 +239,13 @@
 		padding: 0.35rem 0.5rem;
 		border: 1px solid #d8ccb8;
 		border-radius: 6px;
+	}
+	.fhint {
+		font-size: 0.6rem;
+		text-transform: none;
+		letter-spacing: normal;
+		color: #a99f8d;
+		margin-top: 0.15rem;
 	}
 	.check {
 		display: flex;

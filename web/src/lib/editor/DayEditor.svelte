@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import type { Day, Block, Trip } from '$lib/trip-engine';
 	import { move, removeAt, blankBlock } from './factories';
 	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
@@ -12,7 +12,9 @@
 		day = $bindable(),
 		langs,
 		tags,
+		autoOpen = false,
 		onRemove,
+		onDuplicate,
 		onMove,
 		onGrab,
 		canUp,
@@ -21,7 +23,9 @@
 		day: Day;
 		langs: string[];
 		tags: Trip['tags'];
+		autoOpen?: boolean;
 		onRemove: () => void;
+		onDuplicate?: () => void;
 		onMove: (dir: -1 | 1) => void;
 		onGrab?: (e: Event) => void;
 		canUp: boolean;
@@ -29,14 +33,35 @@
 	} = $props();
 
 	// Lazy body: heavy block editors render only while the day is expanded.
-	let open = $state(false);
+	// autoOpen is a one-time seed (a newly added/duplicated day mounts expanded).
+	let open = $state(untrack(() => autoOpen));
+	let bodyEl = $state<HTMLElement>();
+	onMount(() => {
+		if (autoOpen) queueMicrotask(() => bodyEl?.querySelector<HTMLElement>('input,select,textarea')?.focus());
+	});
 
 	const hasStaticWx = $derived(!!day.staticWeather);
 	function toggleStaticWx(on: boolean) {
 		day.staticWeather = on ? { hi: 0, lo: 0, emoji: '☀️' } : undefined;
 	}
+
+	// Auto-expand + focus the most recently added/duplicated block.
+	let justAddedBlock = $state<Block | null>(null);
 	function addBlock() {
 		day.blocks.push(blankBlock(langs));
+		// Read the element back so the identity matches the reactive proxy the
+		// template sees (Svelte wraps inserted objects), so autoOpen resolves.
+		justAddedBlock = day.blocks[day.blocks.length - 1];
+		syncBlocks();
+	}
+	/** Deep-clone a block (from its snapshot) and insert it right after the source,
+	 *  expanded. */
+	function duplicateBlock(src: Block) {
+		const i = day.blocks.indexOf(src);
+		if (i === -1) return;
+		day.blocks.splice(i + 1, 0, structuredClone($state.snapshot(src)) as Block);
+		justAddedBlock = day.blocks[i + 1];
+		syncBlocks();
 	}
 
 	// ── Drag reorder for blocks within this day (handle-initiated) ──
@@ -47,6 +72,12 @@
 	let blockDragDisabled = $state(true);
 	const wrap = (b: Block): BlockItem => ({ id: dndId(b), item: b });
 	let blockItems = $state<BlockItem[]>(day.blocks.map(wrap));
+	// Rebuild the wrapped list from the model; called imperatively after add/
+	// remove/move/duplicate, since in-place array mutations don't reliably
+	// re-fire the sync effect below.
+	function syncBlocks() {
+		blockItems = day.blocks.map(wrap);
+	}
 	$effect(() => {
 		const modelIds = day.blocks.map(dndId).join('|');
 		untrack(() => {
@@ -84,11 +115,12 @@
 		<span class="controls">
 			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move day up">↑</button>
 			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move day down">↓</button>
+			{#if onDuplicate}<button type="button" onclick={(e) => (e.preventDefault(), onDuplicate())} aria-label="Duplicate day">Duplicate</button>{/if}
 			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label="Remove day">✕</button>
 		</span>
 	</summary>
 	{#if open}
-	<div class="body">
+	<div class="body" bind:this={bodyEl}>
 		<div class="grid2">
 			<label class="f">Date (ISO)<input type="date" bind:value={day.date} /></label>
 			<label class="f">Route mode
@@ -128,10 +160,12 @@
 						bind:block={w.item}
 						{langs}
 						{tags}
+						autoOpen={w.item === justAddedBlock}
 						canUp={blockIdx(w.item) > 0}
 						canDown={blockIdx(w.item) < day.blocks.length - 1}
-						onMove={(dir) => move(day.blocks, blockIdx(w.item), dir)}
-						onRemove={() => removeAt(day.blocks, blockIdx(w.item))}
+						onMove={(dir) => { move(day.blocks, blockIdx(w.item), dir); syncBlocks(); }}
+						onRemove={() => { removeAt(day.blocks, blockIdx(w.item)); syncBlocks(); }}
+						onDuplicate={() => duplicateBlock(w.item)}
 						onGrab={grabBlock}
 					/>
 				{/each}
