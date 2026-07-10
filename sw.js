@@ -9,7 +9,7 @@
    Bump CACHE_VERSION when engine files change to invalidate old caches. */
 'use strict';
 
-const CACHE_VERSION = 'trips-v4';
+const CACHE_VERSION = 'trips-v6';
 const SHELL = [
   './',
   'index.html',
