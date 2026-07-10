@@ -36,7 +36,10 @@
 	{#if data.user}
 		<div class="head">
 			<h1>Your trips</h1>
-			<a class="new" href="/trips/new">+ New trip</a>
+			<div class="actions">
+				<a class="import-btn" href="/trips/import">Import itinerary</a>
+				<a class="new" href="/trips/new">+ New trip</a>
+			</div>
 		</div>
 		{#if owned.length === 0}
 			<p class="empty">No trips yet. <a href="/trips/new">Create your first one.</a></p>
@@ -79,11 +82,24 @@
 		margin: 1.75rem 0 0.25rem;
 		color: #444;
 	}
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
 	.new {
 		font-size: 0.85rem;
 		text-decoration: none;
 		color: #2b4a2b;
 		border: 1px solid #cbb;
+		border-radius: 999px;
+		padding: 0.35rem 0.8rem;
+	}
+	.import-btn {
+		font-size: 0.85rem;
+		text-decoration: none;
+		color: #7a6e5f;
+		border: 1px solid #e2ddd2;
 		border-radius: 999px;
 		padding: 0.35rem 0.8rem;
 	}

@@ -1,0 +1,47 @@
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { getDb } from '$lib/server/db';
+import { requireUser } from '$lib/server/guards';
+import { createTrip } from '$lib/server/trips';
+import { getAnthropicKey, importItinerary, MAX_TEXT_CHARS } from '$lib/server/import';
+
+export const POST: RequestHandler = async ({ platform, locals, request }) => {
+	const user = requireUser(locals);
+	const db = getDb(platform);
+
+	const apiKey = getAnthropicKey(platform);
+	if (!apiKey) {
+		return json(
+			{ error: 'Import is not configured. Set the ANTHROPIC_API_KEY secret.' },
+			{ status: 501 }
+		);
+	}
+
+	const body = (await request.json().catch(() => null)) as { text?: unknown } | null;
+	const text = typeof body?.text === 'string' ? body.text.trim() : '';
+	if (!text) {
+		return json({ error: 'Paste an itinerary to import.' }, { status: 400 });
+	}
+	if (text.length > MAX_TEXT_CHARS) {
+		return json(
+			{ error: `That itinerary is too long (max ${MAX_TEXT_CHARS} characters).` },
+			{ status: 413 }
+		);
+	}
+
+	// today's date drives relative-date resolution ("next September"); server-side
+	// is fine here — it's just an anchor, not security-sensitive.
+	const today = new Date().toISOString().slice(0, 10);
+
+	const outcome = await importItinerary({ apiKey, text, today });
+	if (!outcome.ok) {
+		return json({ error: outcome.error }, { status: outcome.status });
+	}
+
+	const result = await createTrip(db, user.id, outcome.doc);
+	if (!result.ok) {
+		const first = result.reason === 'invalid' ? result.errors[0] : 'Could not save the imported trip.';
+		return json({ error: first }, { status: result.reason === 'invalid' ? 422 : 500 });
+	}
+	return json({ id: result.id }, { status: 201 });
+};

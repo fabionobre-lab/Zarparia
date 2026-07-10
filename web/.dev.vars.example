@@ -6,3 +6,9 @@ GOOGLE_CLIENT_SECRET=
 # Enables the dev-only /auth/dev-login route (session without Google).
 # NEVER set this in production.
 DEV_AUTH=1
+# Anthropic API key for the paste-your-itinerary import (/trips/import).
+# Local dev: paste it here in .dev.vars. Production: set it as a Worker secret
+# with `npx wrangler secret put ANTHROPIC_API_KEY` (do NOT commit the value).
+# When absent, the import endpoint returns 501 and the rest of the app is
+# unaffected.
+ANTHROPIC_API_KEY=
