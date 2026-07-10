@@ -33,8 +33,6 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:700;c
 .chip.active{background:#daf0e5;color:#1a5a34}
 .chip.upcoming{background:#dce8f5;color:#1e3a5f}
 .msg{color:rgba(255,255,255,.6);font-size:13px;margin-top:26px;text-align:center}
-.legacy{display:block;text-align:center;margin-top:26px;font-size:10.5px;color:rgba(255,255,255,.35);text-decoration:none;font-style:italic;font-family:'Playfair Display',serif}
-.legacy:hover{color:rgba(255,255,255,.6)}
 </style>
 </head>
 <body>
@@ -42,16 +40,15 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:700;c
   <div class="sub" id="sub"></div>
   <h1 id="h1"></h1>
   <div class="cards" id="cards"></div>
-  <a class="legacy" id="legacy" href="legacy.html"></a>
 </div>
 <script>
 'use strict';
 /* Trip picker: lists trips from trips/manifest.json. UI strings per language. */
 const STRINGS = {
   en: { sub: 'Fabio & Liana', title: 'Trips', past: 'Past', active: 'Now', upcoming: 'Upcoming',
-        error: 'Could not load the trip list.', legacy: 'Original UK Spring 2026 page' },
+        error: 'Could not load the trip list.' },
   pt: { sub: 'Fabio & Liana', title: 'Viagens', past: 'Passada', active: 'Agora', upcoming: 'Em breve',
-        error: 'Não foi possível carregar a lista de viagens.', legacy: 'Página original UK Spring 2026' },
+        error: 'Não foi possível carregar a lista de viagens.' },
 };
 const lang = (navigator.language || 'en').toLowerCase().startsWith('pt') ? 'pt' : 'en';
 const S = STRINGS[lang];
@@ -59,7 +56,6 @@ const locale = lang === 'pt' ? 'pt-BR' : 'en-GB';
 
 document.getElementById('sub').textContent = S.sub;
 document.getElementById('h1').textContent = S.title;
-document.getElementById('legacy').textContent = S.legacy;
 document.title = S.title + ' — Fabio & Liana';
 document.documentElement.lang = lang;
 

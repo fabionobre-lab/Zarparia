@@ -12,6 +12,10 @@ const UI_STRINGS = {
     loading: 'Loading trip…',
     loadError: 'Could not load trip data.',
     noTrip: 'No trip specified. Open as app.html?trip=&lt;id&gt;.',
+    backAria: 'All trips',
+    backToTrips: '← All trips',
+    freeDay: 'Free day',
+    days: 'Days',
   },
   pt: {
     maps: 'Abrir no Maps',
@@ -20,8 +24,21 @@ const UI_STRINGS = {
     loading: 'Carregando viagem…',
     loadError: 'Não foi possível carregar os dados da viagem.',
     noTrip: 'Nenhuma viagem especificada. Abra como app.html?trip=&lt;id&gt;.',
+    backAria: 'Todas as viagens',
+    backToTrips: '← Todas as viagens',
+    freeDay: 'Dia livre',
+    days: 'Dias',
   },
 };
+
+/* Text equivalents for weather emoji (accessibility only; visuals unchanged). */
+const WX_TEXT = {
+  en: { '☀️': 'clear sky', '🌤️': 'partly cloudy', '☁️': 'cloudy', '🌫️': 'fog', '🌦️': 'rain showers', '🌧️': 'rain', '❄️': 'snow', '⛈️': 'thunderstorm' },
+  pt: { '☀️': 'céu limpo', '🌤️': 'parcialmente nublado', '☁️': 'nublado', '🌫️': 'névoa', '🌦️': 'pancadas de chuva', '🌧️': 'chuva', '❄️': 'neve', '⛈️': 'tempestade' },
+};
+function wxText(emoji) {
+  return (WX_TEXT[lang] || WX_TEXT.en)[emoji] || '';
+}
 
 /* ── State ──────────────────────────────────────────────────────────── */
 let trip = null;
@@ -72,6 +89,20 @@ function dowShort(iso) {
 function dayNum(iso) {
   return String(Number(iso.slice(8, 10)));
 }
+/* "Friday 10 April" (no comma) — used for aria-label, not visible text. */
+function dayAriaLabel(iso) {
+  const s = new Intl.DateTimeFormat(locale(), { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(dateObj(iso));
+  return cap(s);
+}
+function addDaysIso(iso, n) {
+  const d = dateObj(iso);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+/* Escape for interpolation into HTML text/attribute contexts. */
+function esc(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
 
 /* ── Selection helpers ──────────────────────────────────────────────── */
 function planOf(seg) {
@@ -86,6 +117,65 @@ function rebuildFlatDays() {
 function current() {
   const f = flatDays[dayIdx];
   return { seg: f.seg, plan: planOf(f.seg), day: planOf(f.seg).days[f.dayInSeg] };
+}
+function dateOf(f) {
+  return planOf(f.seg).days[f.dayInSeg].date;
+}
+/* Trip status from the currently selected plans' actual date range. */
+function tripStatusFromRange() {
+  if (!flatDays.length) return 'upcoming';
+  const today = todayLocal();
+  const start = dateOf(flatDays[0]);
+  const end = dateOf(flatDays[flatDays.length - 1]);
+  if (end < today) return 'past';
+  if (start <= today && today <= end) return 'active';
+  return 'upcoming';
+}
+/* Index of today's day if planned, else the next planned day after today. */
+function todayFocusIndex() {
+  const today = todayLocal();
+  let idx = flatDays.findIndex((f) => dateOf(f) === today);
+  if (idx !== -1) return idx;
+  idx = flatDays.findIndex((f) => dateOf(f) > today);
+  if (idx !== -1) return idx;
+  return flatDays.length - 1;
+}
+/* Every calendar date from the trip's first to last day, planned or not.
+   Planned dates carry their flatDays index (gi); gaps carry null. */
+function calendarDays() {
+  if (!flatDays.length) return [];
+  const end = dateOf(flatDays[flatDays.length - 1]);
+  const out = [];
+  let iso = dateOf(flatDays[0]);
+  let gi = 0;
+  while (iso <= end) {
+    if (gi < flatDays.length && dateOf(flatDays[gi]) === iso) {
+      out.push({ iso, gi, segIdx: flatDays[gi].segIdx });
+      gi++;
+    } else {
+      out.push({ iso, gi: null, segIdx: null });
+    }
+    iso = addDaysIso(iso, 1);
+  }
+  return out;
+}
+
+/* ── Per-trip state persistence (localStorage; best-effort) ─────────── */
+function stateKey() {
+  return 'trip-state:' + trip.id;
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(stateKey());
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null; // private mode / storage disabled
+  }
+}
+function saveState() {
+  try {
+    localStorage.setItem(stateKey(), JSON.stringify({ lang, dayIndex: dayIdx, planBySeg }));
+  } catch (e) { /* private mode / storage full: ignore */ }
 }
 
 /* ── Weather ────────────────────────────────────────────────────────── */
@@ -139,7 +229,10 @@ function dailyWx(seg, day) {
   const live = wxBySeg[seg.id] && wxBySeg[seg.id].daily && wxBySeg[seg.id].daily[day.date];
   return live || day.staticWeather || null;
 }
-/* Per-block badge: hourly at the block's hour, else the day's daily/static value */
+/* Per-block badge: hourly at the block's hour, else the day's daily/static value.
+   Past trips never have live data (fetchWeather skips them), so the fallback
+   value below is always identical to the day-header summary — suppress it
+   there instead of showing the same reading on every block. */
 function wxBadge(seg, day, timeStr) {
   const w = wxBySeg[seg.id];
   if (w && w.hourly) {
@@ -150,10 +243,15 @@ function wxBadge(seg, day, timeStr) {
     const m = p[1] ? parseInt(p[1], 10) : 0;
     if (m >= 30) h = Math.min(h + 1, 23);
     const hw = w.hourly[day.date + '-' + String(h).padStart(2, '0')];
-    return hw ? `<div class="wx">${wxEmoji(hw.code)} ${Math.round(hw.temp)}°C</div>` : '';
+    if (!hw) return '';
+    const emoji = wxEmoji(hw.code), temp = Math.round(hw.temp);
+    return `<div class="wx" aria-label="${temp}°C, ${wxText(emoji)}"><span aria-hidden="true">${emoji}</span> ${temp}°C</div>`;
   }
+  if (isPast) return '';
   const dw = dailyWx(seg, day);
-  return dw ? `<div class="wx">${dw.emoji || ''} ${Math.round(dw.hi)}°C</div>` : '';
+  if (!dw) return '';
+  const temp = Math.round(dw.hi);
+  return `<div class="wx" aria-label="${temp}°C, ${wxText(dw.emoji)}"><span aria-hidden="true">${dw.emoji || ''}</span> ${temp}°C</div>`;
 }
 function wxDaySummary(seg, day, km) {
   const kmItem = km ? `<div class="wx-hdr-item wx-km">🦶 ~${km.toFixed(1)} km</div>` : '';
@@ -170,13 +268,14 @@ function wxDaySummary(seg, day, km) {
       const freq = {};
       codes.forEach((c) => { freq[c] = (freq[c] || 0) + 1; });
       const dom = Object.keys(freq).reduce((a, b) => (freq[a] > freq[b] ? a : b));
-      return wrap(`<div class="wx-hdr-item">${wxEmoji(parseInt(dom, 10))}</div><div class="wx-hdr-item">↑${hi}°C</div><div class="wx-hdr-item">↓${lo}°C</div>${kmItem}`);
+      const emoji = wxEmoji(parseInt(dom, 10));
+      return wrap(`<div class="wx-hdr-item" aria-label="${wxText(emoji)}"><span aria-hidden="true">${emoji}</span></div><div class="wx-hdr-item">↑${hi}°C</div><div class="wx-hdr-item">↓${lo}°C</div>${kmItem}`);
     }
     return kmItem ? wrap(kmItem) : '';
   }
   const dw = dailyWx(seg, day);
   if (dw) {
-    return wrap(`<div class="wx-hdr-item">${dw.emoji || ''}</div><div class="wx-hdr-item">↑${dw.hi}°C</div><div class="wx-hdr-item">↓${dw.lo}°C</div>${kmItem}`);
+    return wrap(`<div class="wx-hdr-item" aria-label="${wxText(dw.emoji)}"><span aria-hidden="true">${dw.emoji || ''}</span></div><div class="wx-hdr-item">↑${dw.hi}°C</div><div class="wx-hdr-item">↓${dw.lo}°C</div>${kmItem}`);
   }
   return kmItem ? wrap(kmItem) : '';
 }
@@ -220,8 +319,8 @@ function truncStop(name) {
 }
 
 /* ── Rendering ──────────────────────────────────────────────────────── */
-const PIN_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>';
-const TREND_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>';
+const PIN_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>';
+const TREND_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>';
 
 function renderHero() {
   const { seg } = current();
@@ -232,32 +331,45 @@ function renderHero() {
   $('ts').textContent = loc(seg.subtitle) || '';
   const shell = document.querySelector('.shell');
   shell.className = 'shell theme-' + (seg.theme || 'tartan');
+  // back link to the trip picker
+  const back = $('back-link');
+  if (back) {
+    back.textContent = '←';
+    back.setAttribute('aria-label', ui('backAria'));
+  }
   // language toggle
   const toggle = $('lang-toggle');
   toggle.classList.toggle('hidden', trip.languages.length < 2);
   toggle.innerHTML = trip.languages.map((l) =>
-    `<button class="lang-btn${l === lang ? ' on' : ''}" onclick="setL('${l}')">${l.toUpperCase()}</button>`).join('');
+    `<button class="lang-btn${l === lang ? ' on' : ''}" aria-pressed="${l === lang}" onclick="setL('${l}')">${l.toUpperCase()}</button>`).join('');
   // plan tabs
   const vtabs = $('vtabs');
   vtabs.classList.toggle('hidden', seg.plans.length < 2);
   vtabs.innerHTML = seg.plans.length < 2 ? '' : seg.plans.map((p) =>
-    `<button class="vtab${p.id === planOf(seg).id ? ' on' : ''}" onclick="setV('${p.id}')">${loc(p.label) || p.id}</button>`).join('');
+    `<button class="vtab${p.id === planOf(seg).id ? ' on' : ''}" aria-pressed="${p.id === planOf(seg).id}" onclick="setV('${p.id}')">${loc(p.label) || p.id}</button>`).join('');
 }
 
 function renderNav() {
   const nav = $('daynav');
+  nav.setAttribute('aria-label', ui('days'));
   let h = '';
-  let gi = 0;
-  trip.segments.forEach((seg, segIdx) => {
-    if (segIdx > 0) h += '<div class="daybtn-separator"></div>';
-    planOf(seg).days.forEach((day) => {
-      const on = gi === dayIdx ? ' on' : '';
-      const bday = day.banner ? ' has-bday' : '';
-      h += `<button class="daybtn${on}${bday}" onclick="sd(${gi})"><span class="dow">${dowShort(day.date)}</span><span class="dnum">${dayNum(day.date)}</span><span class="bday-pip"></span></button>`;
-      gi++;
-    });
+  let lastSegIdx = null;
+  calendarDays().forEach((c) => {
+    if (c.gi === null) {
+      h += `<span class="daybtn gap"><span aria-hidden="true"><span class="dow">${dowShort(c.iso)}</span><span class="dnum">${dayNum(c.iso)}</span></span><span class="sr-only">${ui('freeDay')}</span></span>`;
+      return;
+    }
+    if (lastSegIdx !== null && c.segIdx !== lastSegIdx) h += '<div class="daybtn-separator"></div>';
+    lastSegIdx = c.segIdx;
+    const f = flatDays[c.gi];
+    const day = planOf(f.seg).days[f.dayInSeg];
+    const on = c.gi === dayIdx;
+    const bday = day.banner ? ' has-bday' : '';
+    h += `<button class="daybtn${on ? ' on' : ''}${bday}" onclick="sd(${c.gi})"${on ? ' aria-current="date"' : ''} aria-label="${dayAriaLabel(day.date)}"><span class="dow">${dowShort(day.date)}</span><span class="dnum">${dayNum(day.date)}</span><span class="bday-pip"></span></button>`;
   });
   nav.innerHTML = h;
+  const activeBtn = nav.querySelector('.daybtn.on');
+  if (activeBtn) activeBtn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'auto' });
 }
 
 function renderDay() {
@@ -316,9 +428,9 @@ function renderDay() {
       h += b.photoSpots.map((p) => {
         const key = spotKey(p);
         const img = key && wikiImgs[key]
-          ? `<img src="${wikiImgs[key]}" class="ps-thumb" alt="">`
-          : '<div class="ps-thumb ps-placeholder"></div>';
-        return `<a href="${p.mapsUrl}" target="_blank" class="ps-card">${img}<span class="ps-label">${p.name}</span></a>`;
+          ? `<img src="${wikiImgs[key]}" class="ps-thumb" alt="${esc(p.name)}">`
+          : '<div class="ps-thumb ps-placeholder" aria-hidden="true"></div>';
+        return `<a href="${p.mapsUrl}" target="_blank" class="ps-card">${img}<span class="ps-label">${esc(p.name)}</span></a>`;
       }).join('');
       h += '</div>';
     }
@@ -343,6 +455,7 @@ function renderAll() {
 window.setL = function (l) {
   lang = l;
   renderAll();
+  saveState();
 };
 window.setV = function (planId) {
   trip.segments.forEach((seg) => {
@@ -351,18 +464,20 @@ window.setV = function (planId) {
   rebuildFlatDays();
   dayIdx = Math.max(0, Math.min(dayIdx, flatDays.length - 1)); // plan may have fewer days
   renderAll();
+  saveState();
 };
 window.sd = function (i) {
   dayIdx = Math.max(0, Math.min(i, flatDays.length - 1));
   $('content').scrollTop = 0;
   renderAll();
+  saveState();
 };
 
 /* ── Boot ───────────────────────────────────────────────────────────── */
 async function boot() {
   const id = new URLSearchParams(location.search).get('trip');
   if (!id || !/^[a-z0-9-]+$/.test(id)) {
-    $('content').innerHTML = `<div class="app-msg">${ui('noTrip')}</div>`;
+    $('content').innerHTML = `<div class="app-msg">${ui('noTrip')}</div><div class="app-msg"><a class="back-link-inline" href="./">${ui('backToTrips')}</a></div>`;
     return;
   }
   $('content').innerHTML = `<div class="app-msg">${ui('loading')}</div>`;
@@ -371,14 +486,42 @@ async function boot() {
     if (!r.ok) throw new Error(r.status);
     trip = await r.json();
   } catch (e) {
-    $('content').innerHTML = `<div class="app-msg">${ui('loadError')}</div>`;
+    $('content').innerHTML = `<div class="app-msg">${ui('loadError')}</div><div class="app-msg"><a class="back-link-inline" href="./">${ui('backToTrips')}</a></div>`;
     return;
   }
+
+  // defaults, then validated restore from localStorage
   lang = trip.defaultLanguage || trip.languages[0];
   trip.segments.forEach((seg) => { planBySeg[seg.id] = seg.defaultPlan || seg.plans[0].id; });
+
+  const saved = loadState();
+  let savedDayIndex = null;
+  if (saved) {
+    if (saved.lang && trip.languages.indexOf(saved.lang) !== -1) lang = saved.lang;
+    if (saved.planBySeg && typeof saved.planBySeg === 'object') {
+      trip.segments.forEach((seg) => {
+        const pid = saved.planBySeg[seg.id];
+        if (pid && seg.plans.some((p) => p.id === pid)) planBySeg[seg.id] = pid;
+      });
+    }
+    if (Number.isInteger(saved.dayIndex)) savedDayIndex = saved.dayIndex;
+  }
+
   rebuildFlatDays();
   isPast = tripIsPast();
+
+  // Active trips always open on today (or the next planned day past a gap);
+  // past/upcoming trips restore the saved day, clamped to the valid range.
+  if (tripStatusFromRange() === 'active') {
+    dayIdx = todayFocusIndex();
+  } else if (savedDayIndex !== null) {
+    dayIdx = Math.max(0, Math.min(savedDayIndex, flatDays.length - 1));
+  } else {
+    dayIdx = 0;
+  }
+
   renderAll();
+  saveState();
   fetchWeather();
 }
 boot();

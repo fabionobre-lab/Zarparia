@@ -1,5 +1,5 @@
 /* Service worker: offline caching for the trip engine.
-   - HTML pages (index/app/legacy + navigations) and trip JSON: network-first,
+   - HTML pages (index/app + navigations) and trip JSON: network-first,
      so deployed content changes and newly added trips reach installed users;
      the last successful response is cached and served when offline.
    - Other same-origin assets (assets/, icons, manifest.webmanifest): cache-first
@@ -9,7 +9,7 @@
    Bump CACHE_VERSION when engine files change to invalidate old caches. */
 'use strict';
 
-const CACHE_VERSION = 'trips-v2';
+const CACHE_VERSION = 'trips-v3';
 const SHELL = [
   './',
   'index.html',
