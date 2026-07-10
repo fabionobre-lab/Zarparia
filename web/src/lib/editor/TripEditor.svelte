@@ -87,6 +87,18 @@
 		return draft.segments.indexOf(s);
 	}
 
+	// The live preview renders TripView only once the draft has something to show:
+	// any day with a date, or any trip title text. A brand-new blank draft (one
+	// empty segment/day) otherwise renders as a broken empty hero, so we show a
+	// quiet placeholder card until real content exists.
+	const hasPreviewContent = $derived.by(() => {
+		const anyTitle = Object.values(draft.title ?? {}).some((v) => !!v && v.trim() !== '');
+		if (anyTitle) return true;
+		return draft.segments.some((s) =>
+			s.plans.some((p) => p.days.some((d) => !!d.date && d.date.trim() !== ''))
+		);
+	});
+
 	const hasHome = $derived(!!draft.home);
 	function toggleHome(on: boolean) {
 		draft.home = on ? { name: '', postcode: '', lat: 0, lon: 0 } : undefined;
@@ -231,25 +243,33 @@
 
 	<div class="preview">
 		<div class="preview-label">Live preview</div>
-		{#key draft.languages.length}
-			<TripView trip={draft} />
-		{/key}
+		{#if hasPreviewContent}
+			{#key draft.languages.length}
+				<TripView trip={draft} />
+			{/key}
+		{:else}
+			<div class="preview-empty">Preview appears as you add trip details</div>
+		{/if}
 	</div>
 </div>
 
 <style>
 	.editor {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 460px);
-		gap: 1.5rem;
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 1rem 1.25rem 3rem;
-		align-items: start;
+		padding: 1rem 1.5rem 3rem;
 		font-family: system-ui, sans-serif;
 	}
 	.form {
 		min-width: 0;
+	}
+	@media (min-width: 1024px) {
+		.editor {
+			display: grid;
+			grid-template-columns: minmax(560px, 1fr) 430px;
+			gap: 2rem;
+			align-items: start;
+		}
 	}
 	.bar {
 		display: flex;
@@ -360,6 +380,7 @@
 		text-transform: none;
 		letter-spacing: normal;
 		color: #1a1208;
+		min-width: 0;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid #d8ccb8;
 		border-radius: 6px;
@@ -379,7 +400,7 @@
 	}
 	.grid4 {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr 1fr;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 0.5rem;
 	}
 	select {
@@ -436,23 +457,35 @@
 		color: #a33;
 	}
 	.preview {
-		position: sticky;
-		top: 1rem;
+		margin-top: 1.5rem;
 	}
 	.preview-label {
 		font-size: 0.7rem;
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: #999;
-		margin-bottom: 0.4rem;
+		letter-spacing: 0.08em;
+		color: #a99f8d;
+		margin-bottom: 0.5rem;
 		text-align: center;
 	}
-	@media (max-width: 860px) {
-		.editor {
-			grid-template-columns: 1fr;
-		}
+	.preview-empty {
+		max-width: 430px;
+		margin: 0 auto;
+		border: 1px dashed #d8ccb8;
+		border-radius: 14px;
+		background: #fbf8f1;
+		color: #9b917f;
+		font-size: 0.85rem;
+		text-align: center;
+		padding: 3.5rem 1.5rem;
+	}
+	@media (min-width: 1024px) {
 		.preview {
-			position: static;
+			position: sticky;
+			top: 16px;
+			margin-top: 0;
+		}
+		.preview-empty {
+			padding: 5rem 1.5rem;
 		}
 	}
 </style>

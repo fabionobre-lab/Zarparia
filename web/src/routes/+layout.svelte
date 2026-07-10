@@ -31,29 +31,35 @@
 </svelte:head>
 
 <header>
-	<a class="brand" href="/">Trips</a>
-	<nav>
-		{#if data.user}
-			<span class="who">{data.user.name ?? data.user.email}</span>
-			<form method="POST" action="/auth/logout" onsubmit={onLogout}>
-				<button type="submit">Sign out</button>
-			</form>
-		{:else}
-			<a class="signin" href="/auth/login/google">Sign in with Google</a>
-		{/if}
-	</nav>
+	<div class="bar">
+		<a class="brand" href="/">Trips</a>
+		<nav>
+			{#if data.user}
+				<span class="who">{data.user.name ?? data.user.email}</span>
+				<form method="POST" action="/auth/logout" onsubmit={onLogout}>
+					<button type="submit">Sign out</button>
+				</form>
+			{:else}
+				<a class="signin" href="/auth/login/google">Sign in with Google</a>
+			{/if}
+		</nav>
+	</div>
 </header>
 
 {@render children()}
 
 <style>
 	header {
+		border-bottom: 1px solid #e2ddd2;
+		font-family: system-ui, sans-serif;
+	}
+	.bar {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		padding: 0.75rem 1.25rem;
-		border-bottom: 1px solid #e2ddd2;
-		font-family: system-ui, sans-serif;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 0.75rem 1.5rem;
 	}
 	.brand {
 		font-weight: 700;

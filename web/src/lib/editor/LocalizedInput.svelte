@@ -43,6 +43,7 @@
 <style>
 	.loc {
 		margin-bottom: 0.5rem;
+		min-width: 0;
 	}
 	.lbl {
 		display: block;
@@ -70,6 +71,7 @@
 	input,
 	textarea {
 		flex: 1;
+		min-width: 0;
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.35rem 0.5rem;

@@ -62,9 +62,9 @@
 <style>
 	main {
 		font-family: system-ui, sans-serif;
-		max-width: 40rem;
+		max-width: 1200px;
 		margin: 2rem auto;
-		padding: 0 1.25rem;
+		padding: 0 1.5rem;
 	}
 	.head {
 		display: flex;
@@ -93,9 +93,14 @@
 	}
 	.cards {
 		margin-top: 1.25rem;
-		display: flex;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: 1fr;
 		gap: 0.75rem;
+	}
+	@media (min-width: 1024px) {
+		.cards {
+			grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+		}
 	}
 	.card {
 		display: flex;
