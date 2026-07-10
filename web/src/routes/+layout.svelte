@@ -45,9 +45,11 @@
 
 <header>
 	<div class="bar">
-		<a class="brand" href="/">Trips</a>
-		<nav>
+		<div class="left">
+			<a class="brand" href="/">Trips</a>
 			<LocaleSwitcher />
+		</div>
+		<nav>
 			{#if data.user}
 				<button type="button" class="feedback" onclick={() => (feedbackOpen = true)}>{t('feedback.button')}</button>
 				<span class="who">{data.user.name ?? data.user.email}</span>
@@ -76,9 +78,16 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		gap: 0.75rem;
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 0.75rem 1.5rem;
+	}
+	.left {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		min-width: 0;
 	}
 	.brand {
 		font-weight: 700;
@@ -94,6 +103,34 @@
 	.who {
 		font-size: 0.85rem;
 		color: #555;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 12ch;
+	}
+	@media (max-width: 520px) {
+		.bar {
+			padding: 0.6rem 0.85rem;
+			gap: 0.5rem;
+		}
+		.left {
+			gap: 0.5rem;
+		}
+		nav {
+			gap: 0.5rem;
+		}
+		/* Below ~520px the name is the biggest offender: drop it, keep Sign out. */
+		.who {
+			display: none;
+		}
+		/* Keep every tappable control at a comfortable touch height. */
+		.signin,
+		.feedback,
+		nav button {
+			min-height: 40px;
+			display: inline-flex;
+			align-items: center;
+		}
 	}
 	.feedback {
 		border-color: #e2ddd2;

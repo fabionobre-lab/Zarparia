@@ -137,6 +137,7 @@
 
 <style>
 	.fb {
+		box-sizing: border-box;
 		width: min(440px, calc(100vw - 2rem));
 		border: 1px solid #d8ccb8;
 		border-radius: 14px;
