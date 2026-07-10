@@ -332,7 +332,7 @@
 	);
 </script>
 
-<div class="shell" class:theme-navy={current?.seg.theme === 'navy'} style={themeStyle}>
+<div class="shell theme-{current?.seg.theme || 'tartan'}" style={themeStyle}>
 	<div class="hero">
 		<div class="hero-inner">
 			<div class="hero-row1">
@@ -542,6 +542,26 @@
 		--hero-bg: #1e3054;
 		--hero-eyebrow: #c17817;
 		--accent: #1e3054;
+	}
+	.shell.theme-terracotta {
+		--hero-bg: #7c3a29;
+		--hero-eyebrow: #e6b566;
+		--accent: #7c3a29;
+	}
+	.shell.theme-olive {
+		--hero-bg: #4a5324;
+		--hero-eyebrow: #d9c46a;
+		--accent: #4a5324;
+	}
+	.shell.theme-azure {
+		--hero-bg: #17456b;
+		--hero-eyebrow: #e0a24a;
+		--accent: #17456b;
+	}
+	.shell.theme-sand {
+		--hero-bg: #5b4a30;
+		--hero-eyebrow: #e8cf8a;
+		--accent: #5b4a30;
 	}
 	.hero {
 		background: var(--hero-bg);

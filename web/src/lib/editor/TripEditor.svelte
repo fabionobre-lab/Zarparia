@@ -5,7 +5,8 @@
 	import TripView from '$lib/TripView.svelte';
 	import SegmentEditor from './SegmentEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
-	import { blankTrip, blankSegment, move, removeAt, pruneEmpty, nextId } from './factories';
+	import PlaceSearch from './PlaceSearch.svelte';
+	import { blankTrip, blankSegment, move, removeAt, pruneEmpty, nextId, slugifyId } from './factories';
 	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
 
@@ -47,17 +48,46 @@
 
 	const langs = $derived(draft.languages);
 
-	function addLanguage() {
-		const code = prompt('Language code (e.g. "es")')?.trim().toLowerCase();
-		if (code && !draft.languages.includes(code)) draft.languages.push(code);
+	// ── Inline "add language" form (replaces the native prompt ──
+	let langFormOpen = $state(false);
+	let langInput = $state('');
+	let langErr = $state('');
+	function submitLanguage() {
+		const code = langInput.trim().toLowerCase();
+		if (code.length < 2) return (langErr = 'Use a 2+ letter code, e.g. "es".');
+		if (draft.languages.includes(code)) return (langErr = `"${code}" is already added.`);
+		draft.languages.push(code);
+		langInput = '';
+		langErr = '';
+		langFormOpen = false;
 	}
 	function removeLanguage(code: string) {
 		if (draft.languages.length <= 1) return;
 		draft.languages = draft.languages.filter((l) => l !== code);
 		if (draft.defaultLanguage === code) draft.defaultLanguage = draft.languages[0];
 	}
+
+	// Auto-expand + focus the most recently added segment.
+	let justAddedSeg = $state<Segment | null>(null);
 	function addSegment() {
-		draft.segments.push(blankSegment(langs, nextId('segment', draft.segments.map((s) => s.id))));
+		const seg = blankSegment(langs, nextId('segment', draft.segments.map((s) => s.id)));
+		seg.id = ''; // let the auto-slug fill it from the title the user types
+		draft.segments.push(seg);
+		// Read the element back so the identity matches the reactive proxy the
+		// template sees (Svelte wraps inserted objects), so autoOpen resolves.
+		justAddedSeg = draft.segments[draft.segments.length - 1];
+		syncSegs();
+	}
+
+	// New segment's weather timezone defaults to the previous segment's (else the
+	// first segment's, else Europe/London), so a multi-city trip stays consistent.
+	function defaultTz(seg: Segment): string {
+		const i = draft.segments.indexOf(seg);
+		return (
+			draft.segments[i - 1]?.weather?.timezone ||
+			draft.segments[0]?.weather?.timezone ||
+			'Europe/London'
+		);
 	}
 
 	// ── Drag reorder for segments within the trip (handle-initiated) ──
@@ -66,6 +96,12 @@
 	let segDragDisabled = $state(true);
 	const wrapSeg = (s: Segment): SegItem => ({ id: dndId(s), item: s });
 	let segItems = $state<SegItem[]>(untrack(() => draft.segments.map(wrapSeg)));
+	// Rebuild the wrapped list from the model; called imperatively after add/
+	// remove/move, since in-place array mutations don't reliably re-fire the sync
+	// effect below.
+	function syncSegs() {
+		segItems = draft.segments.map(wrapSeg);
+	}
 	$effect(() => {
 		const modelIds = draft.segments.map(dndId).join('|');
 		untrack(() => {
@@ -103,13 +139,44 @@
 	function toggleHome(on: boolean) {
 		draft.home = on ? { name: '', postcode: '', lat: 0, lon: 0 } : undefined;
 	}
+	function onPickHome(p: { name: string; lat: number; lon: number }) {
+		if (!draft.home) return;
+		if (!draft.home.name) draft.home.name = p.name;
+		draft.home.lat = p.lat;
+		draft.home.lon = p.lon;
+	}
 
-	// Trip-level tags vocabulary
-	function addTag() {
-		const key = prompt('Tag key (short, e.g. "mu")')?.trim();
-		if (!key) return;
+	// ── Inline "add tag" form (replaces the native prompt ──
+	// The user edits the visible Label; the key is auto-slugged from it until they
+	// edit the key themselves. Validated inline (empty / duplicate).
+	let tagFormOpen = $state(false);
+	let tagLabel = $state('');
+	let tagKey = $state('');
+	let tagKeyDirty = $state(false);
+	let tagErr = $state('');
+	$effect(() => {
+		const label = tagLabel;
+		if (!tagKeyDirty) untrack(() => (tagKey = slugifyId(label)));
+	});
+	function openTagForm() {
+		tagFormOpen = true;
+		tagLabel = '';
+		tagKey = '';
+		tagKeyDirty = false;
+		tagErr = '';
+	}
+	function submitTag() {
+		const label = tagLabel.trim();
+		const key = tagKey.trim();
+		if (!label) return (tagErr = 'Give the tag a label.');
+		if (!key || !/^[a-z0-9][a-z0-9_-]*$/.test(key)) return (tagErr = 'Key must be lowercase letters/numbers.');
+		if (draft.tags?.[key]) return (tagErr = `Key "${key}" already exists.`);
 		draft.tags ??= {};
-		if (!draft.tags[key]) draft.tags[key] = { label: Object.fromEntries(langs.map((l) => [l, ''])), style: 'sight' };
+		draft.tags[key] = {
+			label: Object.fromEntries(langs.map((l) => [l, l === draft.defaultLanguage ? label : ''])),
+			style: 'sight'
+		};
+		tagFormOpen = false;
 	}
 	const tagKeys = $derived(draft.tags ? Object.keys(draft.tags) : []);
 
@@ -119,6 +186,18 @@
 		if (!clean) {
 			errors = ['Trip is empty.'];
 			return;
+		}
+		// On the create path the client must supply a schema-valid `id` or the
+		// validator rejects the doc before it ever reaches the server (which would
+		// otherwise slugify the title itself). Derive it here, mirroring the
+		// server's slugify; the server still dedupes across existing trips.
+		if (mode === 'new') {
+			const titleText = (clean.title?.[clean.defaultLanguage] ?? '').trim();
+			if (!titleText) {
+				errors = ['Give the trip a title'];
+				return;
+			}
+			clean.id = slugifyId(titleText) || 'trip';
 		}
 		const check = validateTripDoc(clean);
 		if (!check.valid) {
@@ -180,8 +259,24 @@
 						{#each draft.languages as l (l)}
 							<span class="chip">{l}{#if draft.languages.length > 1}<button type="button" onclick={() => removeLanguage(l)}>✕</button>{/if}</span>
 						{/each}
-						<button type="button" class="add" onclick={addLanguage}>+ Language</button>
+						{#if !langFormOpen}
+							<button type="button" class="add" onclick={() => { langFormOpen = true; langErr = ''; }}>+ Language</button>
+						{/if}
 					</div>
+					{#if langFormOpen}
+						<div class="miniform">
+							<input
+								type="text"
+								placeholder="Code, e.g. es"
+								bind:value={langInput}
+								onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), submitLanguage())}
+								aria-label="New language code"
+							/>
+							<button type="button" class="add" onclick={submitLanguage}>Add</button>
+							<button type="button" onclick={() => { langFormOpen = false; langInput = ''; langErr = ''; }}>Cancel</button>
+							{#if langErr}<span class="minierr">{langErr}</span>{/if}
+						</div>
+					{/if}
 					<label class="f inline">Default
 						<select bind:value={draft.defaultLanguage}>
 							{#each draft.languages as l (l)}<option value={l}>{l}</option>{/each}
@@ -194,6 +289,7 @@
 				<div class="homebase">
 					<label class="check"><input type="checkbox" checked={hasHome} onchange={(e) => toggleHome(e.currentTarget.checked)} /> Home base</label>
 					{#if draft.home}
+						<PlaceSearch label="Find place" onPick={onPickHome} />
 						<div class="grid4">
 							<label class="f">Name<input type="text" bind:value={draft.home.name} /></label>
 							<label class="f">Postcode<input type="text" bind:value={draft.home.postcode} /></label>
@@ -204,7 +300,20 @@
 				</div>
 
 				<div class="tagsvocab">
-					<div class="sub-hd"><span class="lbl">Tag vocabulary</span><button type="button" onclick={addTag}>+ Tag</button></div>
+					<div class="sub-hd"><span class="lbl">Tag vocabulary</span>
+						{#if !tagFormOpen}<button type="button" onclick={openTagForm}>+ Tag</button>{/if}
+					</div>
+					{#if tagFormOpen}
+						<div class="miniform tagform">
+							<label class="f">Label<input type="text" bind:value={tagLabel} placeholder="e.g. Museum" aria-label="New tag label" /></label>
+							<label class="f keyf">Key <span class="hint">auto</span>
+								<input type="text" bind:value={tagKey} oninput={() => (tagKeyDirty = true)} aria-label="New tag key" />
+							</label>
+							<button type="button" class="add" onclick={submitTag}>Add</button>
+							<button type="button" onclick={() => (tagFormOpen = false)}>Cancel</button>
+							{#if tagErr}<span class="minierr">{tagErr}</span>{/if}
+						</div>
+					{/if}
 					{#each tagKeys as key (key)}
 						<div class="tagrow">
 							<span class="tkey">{key}</span>
@@ -231,10 +340,12 @@
 					bind:segment={w.item}
 					{langs}
 					tags={draft.tags}
+					defaultTimezone={defaultTz(w.item)}
+					autoOpen={w.item === justAddedSeg}
 					canUp={segIdx(w.item) > 0}
 					canDown={segIdx(w.item) < draft.segments.length - 1}
-					onMove={(dir) => move(draft.segments, segIdx(w.item), dir)}
-					onRemove={() => removeAt(draft.segments, segIdx(w.item))}
+					onMove={(dir) => { move(draft.segments, segIdx(w.item), dir); syncSegs(); }}
+					onRemove={() => { removeAt(draft.segments, segIdx(w.item)); syncSegs(); }}
 					onGrab={grabSeg}
 				/>
 			{/each}
@@ -414,6 +525,31 @@
 		margin-top: 0.75rem;
 		padding-top: 0.5rem;
 		border-top: 1px dashed #eee5d6;
+	}
+	.miniform {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		gap: 0.4rem;
+		margin: 0.3rem 0 0.5rem;
+	}
+	.miniform input {
+		font: inherit;
+		font-size: 0.85rem;
+		padding: 0.35rem 0.5rem;
+		border: 1px solid #d8ccb8;
+		border-radius: 6px;
+	}
+	.miniform .keyf .hint {
+		font-size: 0.6rem;
+		color: #a99f8d;
+		text-transform: none;
+		letter-spacing: normal;
+	}
+	.minierr {
+		flex-basis: 100%;
+		font-size: 0.75rem;
+		color: #a33;
 	}
 	.sub-hd {
 		display: flex;

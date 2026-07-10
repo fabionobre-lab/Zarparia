@@ -1,13 +1,17 @@
 <script lang="ts">
+	import { onMount, untrack } from 'svelte';
 	import type { Block, Trip } from '$lib/trip-engine';
 	import { move, removeAt, emptyLocalized } from './factories';
 	import LocalizedInput from './LocalizedInput.svelte';
+	import PlaceSearch from './PlaceSearch.svelte';
 
 	let {
 		block = $bindable(),
 		langs,
 		tags,
+		autoOpen = false,
 		onRemove,
+		onDuplicate,
 		onMove,
 		onGrab,
 		canUp,
@@ -16,7 +20,9 @@
 		block: Block;
 		langs: string[];
 		tags: Trip['tags'];
+		autoOpen?: boolean;
 		onRemove: () => void;
+		onDuplicate?: () => void;
 		onMove: (dir: -1 | 1) => void;
 		onGrab?: (e: Event) => void;
 		canUp: boolean;
@@ -25,13 +31,21 @@
 
 	// Lazy body: only render the (heavy) editing fields while expanded. Model
 	// bindings live on `block`, so collapsing never loses unsaved edits.
-	let open = $state(false);
+	// autoOpen is a one-time seed (a newly added/duplicated block mounts expanded).
+	let open = $state(untrack(() => autoOpen));
+	let bodyEl = $state<HTMLElement>();
+	onMount(() => {
+		if (autoOpen) queueMicrotask(() => bodyEl?.querySelector<HTMLElement>('input,select,textarea')?.focus());
+	});
 
 	const tagKeys = $derived(tags ? Object.keys(tags) : []);
 	const summary = $derived(block.title?.[langs[0]] || '(untitled block)');
 
 	function toggleTag(key: string) {
-		const list = block.tags ?? (block.tags = []);
+		// Assign first, then read `block.tags` back as the reactive proxy — mutating
+		// the raw array returned by `?? (block.tags = [])` wouldn't notify.
+		if (!block.tags) block.tags = [];
+		const list = block.tags;
 		const i = list.indexOf(key);
 		if (i === -1) list.push(key);
 		else list.splice(i, 1);
@@ -49,6 +63,18 @@
 		const v = raw === '' ? undefined : Number(raw);
 		const next = { ...(block.coords ?? {}), [key]: v };
 		block.coords = next.lat === undefined && next.lon === undefined ? undefined : (next as never);
+	}
+
+	// Fill coords from a picked place. mapsUrl and the (default-language) title are
+	// only filled when empty — a pick never clobbers what the user already wrote.
+	function onPickPlace(p: { name: string; lat: number; lon: number }) {
+		block.coords = { lat: p.lat, lon: p.lon };
+		if (!block.mapsUrl) block.mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(p.name)}`;
+		const def = langs[0];
+		if (!block.title?.[def]) {
+			if (!block.title) block.title = {};
+			block.title[def] = p.name;
+		}
 	}
 
 	function addWaypoint() {
@@ -74,12 +100,13 @@
 		<span class="controls">
 			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move block up">↑</button>
 			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move block down">↓</button>
+			{#if onDuplicate}<button type="button" onclick={(e) => (e.preventDefault(), onDuplicate())} aria-label="Duplicate block">Duplicate</button>{/if}
 			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label="Remove block">✕</button>
 		</span>
 	</summary>
 
 	{#if open}
-	<div class="body">
+	<div class="body" bind:this={bodyEl}>
 		<div class="grid2">
 			<label class="f">Time<input type="text" bind:value={block.time} placeholder="09:30 or ~14:00" /></label>
 			<label class="f">Dot color<input type="color" bind:value={block.dotColor} /></label>
@@ -101,6 +128,8 @@
 		{/if}
 
 		<LocalizedInput bind:value={block.description as never} {langs} label="Description" multiline />
+
+		<PlaceSearch label="Find place" onPick={onPickPlace} />
 
 		<div class="grid2">
 			<label class="f">Maps URL<input type="text" bind:value={block.mapsUrl} placeholder="https://maps.google.com/?q=..." /></label>
