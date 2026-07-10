@@ -233,3 +233,135 @@ export async function fetchSegmentWeather(seg: Segment): Promise<SegWeather | nu
 		return null; // offline / out of range → staticWeather fallback applies
 	}
 }
+
+// ── Calendar export (.ics, RFC 5545) ───────────────────────────────────────
+
+function pad2(n: number): string {
+	return n < 10 ? '0' + n : String(n);
+}
+
+function isoParts(iso: string): { y: number; mo: number; d: number } {
+	const [y, mo, d] = iso.split('-').map(Number);
+	return { y, mo, d };
+}
+
+function isoToBasicDate(iso: string): string {
+	const { y, mo, d } = isoParts(iso);
+	return `${y}${pad2(mo)}${pad2(d)}`;
+}
+
+/** iso date + 1 calendar day (real date arithmetic; handles month/year rollover). */
+function isoPlusOneDay(iso: string): string {
+	const { y, mo, d } = isoParts(iso);
+	const dt = new Date(Date.UTC(y, mo - 1, d + 1));
+	return `${dt.getUTCFullYear()}${pad2(dt.getUTCMonth() + 1)}${pad2(dt.getUTCDate())}`;
+}
+
+/** Floating (no Z/TZID) local date-time = iso date @ h:m, plus optional minute offset
+ *  (real date arithmetic, so an offset that crosses midnight rolls the date forward). */
+function floatingDateTime(iso: string, h: number, m: number, addMin = 0): string {
+	const { y, mo, d } = isoParts(iso);
+	const dt = new Date(Date.UTC(y, mo - 1, d, h, m + addMin, 0));
+	return (
+		`${dt.getUTCFullYear()}${pad2(dt.getUTCMonth() + 1)}${pad2(dt.getUTCDate())}` +
+		`T${pad2(dt.getUTCHours())}${pad2(dt.getUTCMinutes())}00`
+	);
+}
+
+/** RFC 5545 §3.8.1 TEXT escaping (SUMMARY/DESCRIPTION/LOCATION values only). */
+function icsEscapeText(s: string): string {
+	return s
+		.replace(/\\/g, '\\\\')
+		.replace(/;/g, '\\;')
+		.replace(/,/g, '\\,')
+		.replace(/\r\n|\r|\n/g, '\\n');
+}
+
+/** RFC 5545 §3.1 line folding, byte-safe against multi-byte UTF-8 octets. */
+function foldLine(line: string): string {
+	const bytes = new TextEncoder().encode(line);
+	if (bytes.length <= 75) return line;
+	const dec = new TextDecoder();
+	const chunks: string[] = [];
+	let offset = 0;
+	let limit = 75;
+	while (offset < bytes.length) {
+		let end = Math.min(offset + limit, bytes.length);
+		// Never split a multi-byte UTF-8 sequence: back off while the next
+		// byte is a continuation byte (10xxxxxx).
+		while (end > offset && (bytes[end] & 0xc0) === 0x80) end--;
+		chunks.push(dec.decode(bytes.subarray(offset, end)));
+		offset = end;
+		limit = 74;
+	}
+	return chunks.join('\r\n ');
+}
+
+/** Selected plan for a segment: planBySeg override → segment default → first plan. */
+function selectedPlan(seg: Segment, planBySeg: Record<string, string>): Plan {
+	const id = planBySeg[seg.id] ?? seg.defaultPlan ?? seg.plans[0].id;
+	return seg.plans.find((p) => p.id === id) ?? seg.plans[0];
+}
+
+/** Pure .ics (RFC 5545) builder for the whole trip — no DOM access, so it's
+ *  directly importable/unit-testable from Node. */
+export function buildIcs(trip: Trip, lang: string, planBySeg: Record<string, string>): string {
+	const lines: string[] = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Trips//Trip Engine//EN', 'CALSCALE:GREGORIAN'];
+
+	// Fixed, deterministic DTSTAMP for the whole export — not wall-clock.
+	let dtstamp = '';
+	if (trip.segments.length > 0) {
+		const firstPlan = selectedPlan(trip.segments[0], planBySeg);
+		const firstDate = firstPlan.days[0]?.date;
+		if (firstDate) dtstamp = `${isoToBasicDate(firstDate)}T000000Z`;
+	}
+
+	for (const seg of trip.segments) {
+		const plan = selectedPlan(seg, planBySeg);
+		for (const day of plan.days) {
+			const parsed: { blockIndex: number; h: number; m: number }[] = [];
+			day.blocks.forEach((b, blockIndex) => {
+				const stripped = b.time.replace(/^~/, '');
+				const match = /^(\d{1,2}):(\d{2})$/.exec(stripped);
+				if (match) parsed.push({ blockIndex, h: Number(match[1]), m: Number(match[2]) });
+			});
+
+			if (parsed.length === 0) {
+				lines.push('BEGIN:VEVENT');
+				lines.push(foldLine(`UID:${trip.id}-${seg.id}-${day.date}-day@trips`));
+				lines.push(foldLine(`DTSTAMP:${dtstamp}`));
+				lines.push(foldLine(`DTSTART;VALUE=DATE:${isoToBasicDate(day.date)}`));
+				lines.push(foldLine(`DTEND;VALUE=DATE:${isoPlusOneDay(day.date)}`));
+				lines.push(foldLine(`SUMMARY:${icsEscapeText(loc(trip, day.title, lang))}`));
+				lines.push('END:VEVENT');
+				continue;
+			}
+
+			parsed.forEach((p, i) => {
+				const block = day.blocks[p.blockIndex];
+				const next = parsed[i + 1];
+				const dtstart = floatingDateTime(day.date, p.h, p.m);
+				const dtend = next
+					? floatingDateTime(day.date, next.h, next.m)
+					: floatingDateTime(day.date, p.h, p.m, 60);
+
+				lines.push('BEGIN:VEVENT');
+				lines.push(foldLine(`UID:${trip.id}-${seg.id}-${day.date}-${p.blockIndex}@trips`));
+				lines.push(foldLine(`DTSTAMP:${dtstamp}`));
+				lines.push(foldLine(`DTSTART:${dtstart}`));
+				lines.push(foldLine(`DTEND:${dtend}`));
+				lines.push(foldLine(`SUMMARY:${icsEscapeText(loc(trip, block.title, lang))}`));
+				if (block.description || block.mapsUrl) {
+					const desc = block.description ? loc(trip, block.description, lang) : '';
+					const descVal = block.description && block.mapsUrl ? desc + '\n' + block.mapsUrl : desc || block.mapsUrl || '';
+					lines.push(foldLine(`DESCRIPTION:${icsEscapeText(descVal)}`));
+				}
+				lines.push(foldLine(`LOCATION:${icsEscapeText(loc(trip, block.title, lang))}`));
+				lines.push('END:VEVENT');
+			});
+		}
+	}
+
+	lines.push('END:VCALENDAR');
+	return lines.join('\r\n') + '\r\n';
+}

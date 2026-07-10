@@ -16,6 +16,7 @@ const UI_STRINGS = {
     backToTrips: '← All trips',
     freeDay: 'Free day',
     days: 'Days',
+    addToCalendar: 'Add to calendar',
   },
   pt: {
     maps: 'Abrir no Maps',
@@ -28,6 +29,7 @@ const UI_STRINGS = {
     backToTrips: '← Todas as viagens',
     freeDay: 'Dia livre',
     days: 'Dias',
+    addToCalendar: 'Adicionar ao calendário',
   },
 };
 
@@ -318,9 +320,144 @@ function truncStop(name) {
   return name.length > 20 ? name.substring(0, 18) + '…' : name;
 }
 
+/* ── Calendar export (.ics) ─────────────────────────────────────────── */
+/* RFC 5545 TEXT escaping for SUMMARY/DESCRIPTION/LOCATION values only.
+   Order matters: backslash first, then ; and , then newlines, to avoid
+   double-escaping the backslashes introduced by earlier steps. */
+function icsEscapeText(s) {
+  return String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\r\n|\r|\n/g, '\\n');
+}
+/* Fold a content line at 75 UTF-8 octets (74 on continuation lines, since
+   the leading space occupies 1 octet), never splitting a multi-byte
+   UTF-8 sequence across a fold boundary. */
+function icsFoldLine(line) {
+  const enc = new TextEncoder();
+  const dec = new TextDecoder();
+  const bytes = enc.encode(line);
+  if (bytes.length <= 75) return line;
+  const chunks = [];
+  let start = 0;
+  let limit = 75;
+  while (start < bytes.length) {
+    let end = Math.min(start + limit, bytes.length);
+    while (end < bytes.length && (bytes[end] & 0xc0) === 0x80) end--; // don't split a UTF-8 sequence
+    chunks.push(dec.decode(bytes.slice(start, end)));
+    start = end;
+    limit = 74;
+  }
+  return chunks.join('\r\n ');
+}
+function icsDateStamp(iso) {
+  return iso.replace(/-/g, '') + 'T000000Z';
+}
+function icsDateOnly(iso) {
+  return iso.replace(/-/g, '');
+}
+function icsLocalDateTime(iso, h, m) {
+  return iso.replace(/-/g, '') + 'T' + String(h).padStart(2, '0') + String(m).padStart(2, '0') + '00';
+}
+/* DTSTART + addMin minutes, handling day/month/year rollover via Date math. */
+function icsAddMinutes(iso, h, m, addMin) {
+  const [y, mo, d] = iso.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, mo - 1, d, h, m + addMin, 0));
+  const yy = dt.getUTCFullYear();
+  const mm = String(dt.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(dt.getUTCDate()).padStart(2, '0');
+  const hh = String(dt.getUTCHours()).padStart(2, '0');
+  const mi = String(dt.getUTCMinutes()).padStart(2, '0');
+  return `${yy}${mm}${dd}T${hh}${mi}00`;
+}
+/* Strip a single leading '~' then require an exact H:MM/HH:MM match. */
+function icsParseBlockTime(block) {
+  const stripped = String((block && block.time) || '').replace(/^~/, '');
+  const m = stripped.match(/^(\d{1,2}):(\d{2})$/);
+  return m ? { h: parseInt(m[1], 10), m: parseInt(m[2], 10) } : null;
+}
+function icsBuildTimedEvent({ uid, dtstamp, dtstart, dtend, summary, description, location }) {
+  const lines = ['BEGIN:VEVENT', 'UID:' + uid, 'DTSTAMP:' + dtstamp, 'DTSTART:' + dtstart, 'DTEND:' + dtend,
+    'SUMMARY:' + icsEscapeText(summary)];
+  if (description) lines.push('DESCRIPTION:' + icsEscapeText(description));
+  lines.push('LOCATION:' + icsEscapeText(location), 'END:VEVENT');
+  return lines;
+}
+function icsBuildAllDayEvent({ uid, dtstamp, dtstartDate, dtendDate, summary }) {
+  return ['BEGIN:VEVENT', 'UID:' + uid, 'DTSTAMP:' + dtstamp,
+    'DTSTART;VALUE=DATE:' + dtstartDate, 'DTEND;VALUE=DATE:' + dtendDate,
+    'SUMMARY:' + icsEscapeText(summary), 'END:VEVENT'];
+}
+/* Selected plan for a segment: planBySegMap override, else segment default, else first plan. */
+function icsResolvePlan(seg, planBySegMap) {
+  const pid = (planBySegMap && planBySegMap[seg.id]) || seg.defaultPlan || seg.plans[0].id;
+  return seg.plans.find((p) => p.id === pid) || seg.plans[0];
+}
+/* Builds the whole-trip .ics text (all segments, each on its selected plan). */
+function buildTripIcs(tripObj, planBySegMap, currentLang) {
+  const locIn = (obj) => (obj ? (obj[currentLang] !== undefined ? obj[currentLang] : obj[tripObj.defaultLanguage]) : '');
+  const dtstamp = icsDateStamp(icsResolvePlan(tripObj.segments[0], planBySegMap).days[0].date);
+
+  const eventLines = [];
+  tripObj.segments.forEach((seg) => {
+    const plan = icsResolvePlan(seg, planBySegMap);
+    plan.days.forEach((day) => {
+      const parsedTimes = day.blocks.map(icsParseBlockTime);
+      const hasTimed = parsedTimes.some((t) => t !== null);
+      if (hasTimed) {
+        day.blocks.forEach((block, bi) => {
+          const t = parsedTimes[bi];
+          if (!t) return;
+          let found = false, endH = null, endM = null;
+          for (let j = bi + 1; j < day.blocks.length; j++) {
+            if (parsedTimes[j]) { endH = parsedTimes[j].h; endM = parsedTimes[j].m; found = true; break; }
+          }
+          const dtstart = icsLocalDateTime(day.date, t.h, t.m);
+          const dtend = found ? icsLocalDateTime(day.date, endH, endM) : icsAddMinutes(day.date, t.h, t.m, 60);
+          const summary = locIn(block.title);
+          let description = null;
+          if (block.description || block.mapsUrl) {
+            const descText = block.description ? locIn(block.description) : '';
+            description = block.mapsUrl ? (descText ? descText + '\n' + block.mapsUrl : block.mapsUrl) : descText;
+          }
+          eventLines.push(...icsBuildTimedEvent({
+            uid: `${tripObj.id}-${seg.id}-${day.date}-${bi}@trips`,
+            dtstamp, dtstart, dtend, summary, description, location: summary,
+          }));
+        });
+      } else {
+        eventLines.push(...icsBuildAllDayEvent({
+          uid: `${tripObj.id}-${seg.id}-${day.date}-day@trips`,
+          dtstamp,
+          dtstartDate: icsDateOnly(day.date),
+          dtendDate: icsDateOnly(addDaysIso(day.date, 1)),
+          summary: locIn(day.title),
+        }));
+      }
+    });
+  });
+
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Trips//Trip Engine//EN', 'CALSCALE:GREGORIAN',
+    ...eventLines, 'END:VCALENDAR'];
+  return lines.map(icsFoldLine).join('\r\n') + '\r\n';
+}
+function downloadIcsFile(filename, text) {
+  const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 /* ── Rendering ──────────────────────────────────────────────────────── */
 const PIN_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>';
 const TREND_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>';
+const CAL_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>';
 
 function renderHero() {
   const { seg } = current();
@@ -336,6 +473,12 @@ function renderHero() {
   if (back) {
     back.textContent = '←';
     back.setAttribute('aria-label', ui('backAria'));
+  }
+  // add-to-calendar button
+  const icsBtn = $('ics-btn');
+  if (icsBtn) {
+    icsBtn.innerHTML = CAL_SVG + '<span>' + esc(ui('addToCalendar')) + '</span>';
+    icsBtn.setAttribute('aria-label', ui('addToCalendar'));
   }
   // language toggle
   const toggle = $('lang-toggle');
@@ -471,6 +614,9 @@ window.sd = function (i) {
   $('content').scrollTop = 0;
   renderAll();
   saveState();
+};
+window.exportIcs = function () {
+  downloadIcsFile(trip.id + '.ics', buildTripIcs(trip, planBySeg, lang));
 };
 
 /* ── Boot ───────────────────────────────────────────────────────────── */

@@ -18,7 +18,8 @@
 		truncStop,
 		dayKmTotal,
 		fetchSegmentWeather,
-		safeUrl
+		safeUrl,
+		buildIcs
 	} from './trip-engine';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
@@ -154,8 +155,18 @@
 
 	const uiText = $derived(
 		lang === 'pt'
-			? { maps: 'Abrir no Maps', dayRoute: 'Rota do Dia', openRoute: 'Abrir rota no Google Maps →' }
-			: { maps: 'Open in Maps', dayRoute: 'Day Route', openRoute: 'Open route in Google Maps →' }
+			? {
+					maps: 'Abrir no Maps',
+					dayRoute: 'Rota do Dia',
+					openRoute: 'Abrir rota no Google Maps →',
+					addToCalendar: 'Adicionar ao calendário'
+				}
+			: {
+					maps: 'Open in Maps',
+					dayRoute: 'Day Route',
+					openRoute: 'Open route in Google Maps →',
+					addToCalendar: 'Add to calendar'
+				}
 	);
 
 	function setLang(l: string) {
@@ -163,6 +174,19 @@
 	}
 	function setPlan(seg: Segment, planId: string) {
 		planBySeg = { ...planBySeg, [seg.id]: planId };
+	}
+
+	function downloadIcs() {
+		const text = buildIcs(trip, lang, planBySeg);
+		const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${trip.id}.ics`;
+		document.body.appendChild(a);
+		a.click();
+		a.remove();
+		URL.revokeObjectURL(url);
 	}
 
 	// ── Weather (client-side, skipped for past trips) ──
@@ -291,15 +315,21 @@
 		<div class="hero-inner">
 			<div class="hero-row1">
 				<div class="trip-eyebrow">{L(trip.eyebrow)}</div>
-				{#if trip.languages.length > 1}
-					<div class="lang-toggle">
-						{#each trip.languages as l (l)}
-							<button class="lang-btn" class:on={l === lang} aria-pressed={l === lang} onclick={() => setLang(l)}>
-								{l.toUpperCase()}
-							</button>
-						{/each}
-					</div>
-				{/if}
+				<div class="hero-actions">
+					<button class="ics-btn" onclick={downloadIcs} aria-label={uiText.addToCalendar}>
+						<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
+						{uiText.addToCalendar}
+					</button>
+					{#if trip.languages.length > 1}
+						<div class="lang-toggle">
+							{#each trip.languages as l (l)}
+								<button class="lang-btn" class:on={l === lang} aria-pressed={l === lang} onclick={() => setLang(l)}>
+									{l.toUpperCase()}
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
 			</div>
 			<div class="trip-title">{L(current?.seg.title)}</div>
 			<div class="trip-sub">{L(current?.seg.subtitle)}</div>
@@ -509,6 +539,27 @@
 		text-transform: uppercase;
 		color: var(--hero-eyebrow);
 		opacity: 0.75;
+	}
+	.hero-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+	.ics-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 4px 12px;
+		min-height: 44px;
+		box-sizing: border-box;
+		border-radius: 20px;
+		border: 1px solid rgba(255, 255, 255, 0.18);
+		background: rgba(0, 0, 0, 0.2);
+		color: rgba(255, 255, 255, 0.75);
+		font-size: 11px;
+		font-family: inherit;
+		letter-spacing: 0.02em;
+		cursor: pointer;
 	}
 	.lang-toggle {
 		display: flex;
