@@ -305,6 +305,35 @@ export interface Messages {
 	'join.invalidHeading': string;
 	'join.invalidBody': string;
 	'join.goToTrips': string;
+
+	// ── Feedback (header button, FeedbackDialog, feedback/+page.svelte) ──
+	'feedback.button': string;
+	'feedback.title': string;
+	'feedback.typeLabel': string; // aria-label for the Bug/Idea/Other group
+	'feedback.typeBug': string;
+	'feedback.typeIdea': string;
+	'feedback.typeOther': string;
+	'feedback.messageLabel': string; // textarea aria-label
+	'feedback.messagePlaceholder': string;
+	'feedback.submit': string;
+	'feedback.sending': string;
+	'feedback.close': string; // aria-label for the dialog ✕
+	'feedback.successTitle': string;
+	'feedback.viewYours': string;
+	'feedback.errEmpty': string;
+	'feedback.errTooLong': string;
+	'feedback.errFailed': string;
+	'feedback.errNetwork': string;
+	'feedback.pageTitle': string;
+	'feedback.heading': string;
+	'feedback.adminHeading': string;
+	'feedback.back': string;
+	'feedback.empty': string;
+	'feedback.statusLabel': string; // aria-label for the admin status <select>
+	'feedback.statusNew': string;
+	'feedback.statusPlanned': string;
+	'feedback.statusDone': string;
+	'feedback.statusDismissed': string;
 }
 
 const enGB: Messages = {
@@ -578,7 +607,35 @@ const enGB: Messages = {
 	'join.signInDev': 'Sign in (dev)',
 	'join.invalidHeading': 'This invite link is no longer valid',
 	'join.invalidBody': 'The link may have been revoked or the trip removed.',
-	'join.goToTrips': 'Go to my trips'
+	'join.goToTrips': 'Go to my trips',
+
+	'feedback.button': 'Feedback',
+	'feedback.title': 'Send feedback',
+	'feedback.typeLabel': 'Type of feedback',
+	'feedback.typeBug': 'Bug',
+	'feedback.typeIdea': 'Idea',
+	'feedback.typeOther': 'Other',
+	'feedback.messageLabel': 'Your feedback',
+	'feedback.messagePlaceholder': "Tell us what's on your mind — a bug, an idea, anything.",
+	'feedback.submit': 'Send',
+	'feedback.sending': 'Sending…',
+	'feedback.close': 'Close',
+	'feedback.successTitle': 'Thanks — feedback sent',
+	'feedback.viewYours': 'View your feedback',
+	'feedback.errEmpty': 'Please enter a message.',
+	'feedback.errTooLong': 'Message is too long (max 2000 characters).',
+	'feedback.errFailed': 'Could not send feedback.',
+	'feedback.errNetwork': 'Network error. Please try again.',
+	'feedback.pageTitle': 'Feedback — Trips',
+	'feedback.heading': 'Your feedback',
+	'feedback.adminHeading': 'All feedback',
+	'feedback.back': '← Trips',
+	'feedback.empty': 'No feedback yet.',
+	'feedback.statusLabel': 'Status',
+	'feedback.statusNew': 'New',
+	'feedback.statusPlanned': 'Planned',
+	'feedback.statusDone': 'Done',
+	'feedback.statusDismissed': 'Dismissed'
 };
 
 const ptBR: Messages = {
@@ -853,7 +910,35 @@ const ptBR: Messages = {
 	'join.signInDev': 'Entrar (dev)',
 	'join.invalidHeading': 'Este link de convite não é mais válido',
 	'join.invalidBody': 'O link pode ter sido revogado ou a viagem removida.',
-	'join.goToTrips': 'Ir para as minhas viagens'
+	'join.goToTrips': 'Ir para as minhas viagens',
+
+	'feedback.button': 'Feedback',
+	'feedback.title': 'Enviar feedback',
+	'feedback.typeLabel': 'Tipo de feedback',
+	'feedback.typeBug': 'Erro',
+	'feedback.typeIdea': 'Ideia',
+	'feedback.typeOther': 'Outro',
+	'feedback.messageLabel': 'Seu feedback',
+	'feedback.messagePlaceholder': 'Conte o que você achou — um erro, uma ideia, o que quiser.',
+	'feedback.submit': 'Enviar',
+	'feedback.sending': 'Enviando…',
+	'feedback.close': 'Fechar',
+	'feedback.successTitle': 'Obrigado — feedback enviado',
+	'feedback.viewYours': 'Ver seu feedback',
+	'feedback.errEmpty': 'Digite uma mensagem.',
+	'feedback.errTooLong': 'Mensagem muito longa (máx. 2000 caracteres).',
+	'feedback.errFailed': 'Não foi possível enviar o feedback.',
+	'feedback.errNetwork': 'Erro de rede. Tente novamente.',
+	'feedback.pageTitle': 'Feedback — Trips',
+	'feedback.heading': 'Seu feedback',
+	'feedback.adminHeading': 'Todos os feedbacks',
+	'feedback.back': '← Viagens',
+	'feedback.empty': 'Nenhum feedback ainda.',
+	'feedback.statusLabel': 'Status',
+	'feedback.statusNew': 'Nova',
+	'feedback.statusPlanned': 'Planejada',
+	'feedback.statusDone': 'Concluída',
+	'feedback.statusDismissed': 'Descartada'
 };
 
 export const catalogs: Record<Locale, Messages> = {

@@ -6,6 +6,10 @@ GOOGLE_CLIENT_SECRET=
 # Enables the dev-only /auth/dev-login route (session without Google).
 # NEVER set this in production.
 DEV_AUTH=1
+# The user whose email matches this gets the feedback-admin view (see all
+# submissions, change status). Falls back to 'fabionobre.ai@gmail.com' when unset.
+# For local dev testing, dev-login with this email to exercise the admin flow.
+ADMIN_EMAIL=fabionobre.ai@gmail.com
 # Anthropic API key for the paste-your-itinerary import (/trips/import).
 # Local dev: paste it here in .dev.vars. Production: set it as a Worker secret
 # with `npx wrangler secret put ANTHROPIC_API_KEY` (do NOT commit the value).

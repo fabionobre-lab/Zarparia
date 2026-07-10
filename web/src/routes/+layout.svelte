@@ -3,9 +3,12 @@
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
+	import FeedbackDialog from '$lib/FeedbackDialog.svelte';
 	import { initLocale, t } from '$lib/i18n/store.svelte';
 
 	let { children, data } = $props();
+
+	let feedbackOpen = $state(false);
 
 	// Seed the UI locale synchronously (SSR + client) before children render, so
 	// the first paint is in the right language and there is no flash of English.
@@ -46,6 +49,7 @@
 		<nav>
 			<LocaleSwitcher />
 			{#if data.user}
+				<button type="button" class="feedback" onclick={() => (feedbackOpen = true)}>{t('feedback.button')}</button>
 				<span class="who">{data.user.name ?? data.user.email}</span>
 				<form method="POST" action="/auth/logout" onsubmit={onLogout}>
 					<button type="submit">{t('header.signOut')}</button>
@@ -58,6 +62,10 @@
 </header>
 
 {@render children()}
+
+{#if data.user}
+	<FeedbackDialog bind:open={feedbackOpen} />
+{/if}
 
 <style>
 	header {
@@ -86,6 +94,11 @@
 	.who {
 		font-size: 0.85rem;
 		color: #555;
+	}
+	.feedback {
+		border-color: #e2ddd2;
+		background: transparent;
+		color: #7a6e5f;
 	}
 	.signin,
 	button {
