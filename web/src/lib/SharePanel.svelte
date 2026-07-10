@@ -3,12 +3,22 @@
 
 	let { tripId }: { tripId: string } = $props();
 
+	type LinkInfo = { url: string; role: SharePermission } | null;
+
 	let shares = $state<ShareRow[]>([]);
 	let email = $state('');
 	let permission = $state<SharePermission>('viewer');
 	let loading = $state(true);
 	let busy = $state(false);
 	let error = $state('');
+
+	let link = $state<LinkInfo>(null);
+	// Select value mirrors the link state: 'off' when no link, else the role.
+	let linkMode = $state<'off' | SharePermission>('off');
+	let linkBusy = $state(false);
+	let linkError = $state('');
+	let copied = $state(false);
+	let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
 	async function load() {
 		loading = true;
@@ -23,9 +33,74 @@
 			loading = false;
 		}
 	}
+
+	async function loadLink() {
+		linkError = '';
+		try {
+			const res = await fetch(`/api/trips/${tripId}/share-link`);
+			if (res.ok) {
+				link = ((await res.json()) as { link: LinkInfo }).link;
+				linkMode = link ? link.role : 'off';
+			} else {
+				linkError = 'Could not load link info.';
+			}
+		} catch {
+			linkError = 'Could not load link info.';
+		}
+	}
+
 	$effect(() => {
 		load();
+		loadLink();
 	});
+
+	async function changeLink(e: Event) {
+		const next = (e.currentTarget as HTMLSelectElement).value as 'off' | SharePermission;
+		linkBusy = true;
+		linkError = '';
+		try {
+			if (next === 'off') {
+				const res = await fetch(`/api/trips/${tripId}/share-link`, { method: 'DELETE' });
+				if (res.ok) {
+					link = null;
+					linkMode = 'off';
+				} else {
+					linkError = 'Could not turn off the link.';
+					linkMode = link ? link.role : 'off';
+				}
+			} else {
+				const res = await fetch(`/api/trips/${tripId}/share-link`, {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ role: next })
+				});
+				if (res.ok) {
+					link = ((await res.json()) as { link: LinkInfo }).link;
+					linkMode = link ? link.role : 'off';
+				} else {
+					linkError = 'Could not update the link.';
+					linkMode = link ? link.role : 'off';
+				}
+			}
+		} catch {
+			linkError = 'Network error.';
+			linkMode = link ? link.role : 'off';
+		} finally {
+			linkBusy = false;
+		}
+	}
+
+	async function copyLink() {
+		if (!link) return;
+		try {
+			await navigator.clipboard.writeText(link.url);
+			copied = true;
+			clearTimeout(copyTimer);
+			copyTimer = setTimeout(() => (copied = false), 1500);
+		} catch {
+			linkError = 'Could not copy. Select the link and copy manually.';
+		}
+	}
 
 	async function add(e: Event) {
 		e.preventDefault();
@@ -68,6 +143,26 @@
 
 <div class="panel">
 	<h3>Share this trip</h3>
+
+	<section class="linkshare">
+		<label class="lbl" for="link-mode">Link sharing</label>
+		<select id="link-mode" value={linkMode} onchange={changeLink} disabled={linkBusy}>
+			<option value="off">Off</option>
+			<option value="viewer">Anyone with the link can view</option>
+			<option value="editor">Anyone with the link can edit</option>
+		</select>
+		{#if link}
+			<div class="linkrow">
+				<input class="linkurl" type="text" readonly value={link.url} aria-label="Shareable link" />
+				<button type="button" class="copy" onclick={copyLink} disabled={linkBusy}>
+					{copied ? 'Copied' : 'Copy'}
+				</button>
+			</div>
+			<p class="sr-only" aria-live="polite">{copied ? 'Link copied to clipboard' : ''}</p>
+		{/if}
+		{#if linkError}<p class="err">{linkError}</p>{/if}
+	</section>
+
 	<form onsubmit={add}>
 		<input type="email" bind:value={email} placeholder="person@email.com" required />
 		<select bind:value={permission}>
@@ -109,6 +204,55 @@
 	h3 {
 		font-size: 0.95rem;
 		margin-bottom: 0.6rem;
+	}
+	.linkshare {
+		margin-bottom: 0.9rem;
+		padding-bottom: 0.9rem;
+		border-bottom: 1px solid #eee5d6;
+	}
+	.lbl {
+		display: block;
+		font-size: 0.8rem;
+		color: #7a6e5f;
+		margin-bottom: 0.35rem;
+	}
+	.linkshare select {
+		width: 100%;
+		font: inherit;
+		font-size: 0.85rem;
+		padding: 0.4rem;
+		border: 1px solid #d8ccb8;
+		border-radius: 6px;
+	}
+	.linkrow {
+		display: flex;
+		gap: 0.4rem;
+		margin-top: 0.5rem;
+	}
+	.linkurl {
+		flex: 1;
+		min-width: 0;
+		font: inherit;
+		font-size: 0.8rem;
+		padding: 0.4rem 0.55rem;
+		border: 1px solid #d8ccb8;
+		border-radius: 6px;
+		background: #fff;
+		color: #333;
+	}
+	.copy {
+		flex: 0 0 auto;
+	}
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 	form {
 		display: flex;
