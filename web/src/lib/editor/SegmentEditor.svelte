@@ -174,17 +174,17 @@
 	}
 	.grid2 {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 0.5rem;
 	}
 	.grid3 {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 0.5rem;
 	}
 	.grid4 {
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr 1fr;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 0.5rem;
 	}
 	.f {
@@ -204,6 +204,7 @@
 		text-transform: none;
 		letter-spacing: normal;
 		color: #1a1208;
+		min-width: 0;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid #d8ccb8;
 		border-radius: 6px;

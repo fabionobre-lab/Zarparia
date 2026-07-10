@@ -49,6 +49,8 @@
 <style>
 	.page {
 		padding: 1rem 0.5rem 2rem;
+		min-height: calc(100vh - 60px);
+		background: #f4f1ea;
 	}
 	.bar {
 		max-width: 430px;

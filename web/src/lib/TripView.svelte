@@ -659,6 +659,13 @@
 		background: var(--cream);
 		border-bottom: 1px solid var(--border);
 		padding: 0 4px;
+		min-width: 0;
+		/* The day pills' total intrinsic width exceeds the shell on narrow
+		   viewports. `overflow-x: auto` scrolls them, but its scrollable overflow
+		   still propagates up and leaks a phantom horizontal page scroll (overflow
+		   clipping on ancestors does not stop it in this flex/scroll case).
+		   Paint containment keeps that scroll overflow inside the strip. */
+		contain: paint;
 	}
 	.daynav::-webkit-scrollbar {
 		display: none;
