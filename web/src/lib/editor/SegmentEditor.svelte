@@ -10,6 +10,7 @@
 		tags,
 		onRemove,
 		onMove,
+		onGrab,
 		canUp,
 		canDown
 	}: {
@@ -18,9 +19,14 @@
 		tags: Trip['tags'];
 		onRemove: () => void;
 		onMove: (dir: -1 | 1) => void;
+		onGrab?: (e: Event) => void;
 		canUp: boolean;
 		canDown: boolean;
 	} = $props();
+
+	// Lazy body: segments are expanded by default (preserving prior behavior),
+	// but the body can be collapsed to drop its inputs from the DOM.
+	let open = $state(true);
 
 	const hasWeather = $derived(!!segment.weather);
 	function toggleWeather(on: boolean) {
@@ -36,15 +42,24 @@
 	}
 </script>
 
-<details class="seg" open>
+<details class="seg" bind:open>
 	<summary>
+		<span
+			class="grip"
+			aria-hidden="true"
+			title="Drag to reorder segment"
+			onpointerdown={onGrab}
+			ontouchstart={onGrab}
+			onclick={(e) => e.preventDefault()}
+		>⠿</span>
 		<span class="title">{segment.title?.[langs[0]] || segment.id || '(segment)'}</span>
 		<span class="controls">
-			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))}>↑</button>
-			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))}>↓</button>
+			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move segment up">↑</button>
+			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move segment down">↓</button>
 			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())}>Remove segment</button>
 		</span>
 	</summary>
+	{#if open}
 	<div class="body">
 		<div class="grid2">
 			<label class="f">Segment id<input type="text" bind:value={segment.id} /></label>
@@ -109,6 +124,7 @@
 			{/each}
 		</div>
 	</div>
+	{/if}
 </details>
 
 <style>
@@ -132,7 +148,20 @@
 	summary::-webkit-details-marker {
 		display: none;
 	}
+	.grip {
+		cursor: grab;
+		color: #a89a7d;
+		font-size: 1rem;
+		line-height: 1;
+		flex-shrink: 0;
+		touch-action: none;
+		user-select: none;
+	}
+	.grip:active {
+		cursor: grabbing;
+	}
 	.title {
+		flex: 1;
 		font-weight: 700;
 		font-size: 0.95rem;
 	}

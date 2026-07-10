@@ -9,6 +9,7 @@
 		tags,
 		onRemove,
 		onMove,
+		onGrab,
 		canUp,
 		canDown
 	}: {
@@ -17,9 +18,14 @@
 		tags: Trip['tags'];
 		onRemove: () => void;
 		onMove: (dir: -1 | 1) => void;
+		onGrab?: (e: Event) => void;
 		canUp: boolean;
 		canDown: boolean;
 	} = $props();
+
+	// Lazy body: only render the (heavy) editing fields while expanded. Model
+	// bindings live on `block`, so collapsing never loses unsaved edits.
+	let open = $state(false);
 
 	const tagKeys = $derived(tags ? Object.keys(tags) : []);
 	const summary = $derived(block.title?.[langs[0]] || '(untitled block)');
@@ -45,17 +51,26 @@
 	}
 </script>
 
-<details class="block">
+<details class="block" bind:open>
 	<summary>
+		<span
+			class="grip"
+			aria-hidden="true"
+			title="Drag to reorder block"
+			onpointerdown={onGrab}
+			ontouchstart={onGrab}
+			onclick={(e) => e.preventDefault()}
+		>⠿</span>
 		<span class="time">{block.time || '—'}</span>
 		<span class="title">{summary}</span>
 		<span class="controls">
-			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move up">↑</button>
-			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move down">↓</button>
+			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move block up">↑</button>
+			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move block down">↓</button>
 			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label="Remove block">✕</button>
 		</span>
 	</summary>
 
+	{#if open}
 	<div class="body">
 		<div class="grid2">
 			<label class="f">Time<input type="text" bind:value={block.time} placeholder="09:30 or ~14:00" /></label>
@@ -91,7 +106,7 @@
 			<div class="sub-hd"><span class="lbl">Waypoints</span><button type="button" onclick={addWaypoint}>+ Add</button></div>
 			{#each block.waypoints ?? [] as wp, i (i)}
 				<div class="rowline">
-					<input type="text" bind:value={wp.query} placeholder="Place+Query+For+Maps" />
+					<input type="text" bind:value={wp.query} placeholder="Place+Query+For+Maps" aria-label="Waypoint maps query" />
 					<LocalizedInput bind:value={wp.name} {langs} label="Name" />
 					<button type="button" class="del" onclick={() => removeAt(block.waypoints!, i)}>✕</button>
 				</div>
@@ -102,10 +117,10 @@
 			<div class="sub-hd"><span class="lbl">Photo spots</span><button type="button" onclick={addPhoto}>+ Add</button></div>
 			{#each block.photoSpots ?? [] as ps, i (i)}
 				<div class="photo">
-					<input type="text" bind:value={ps.name} placeholder="Caption" />
-					<input type="text" bind:value={ps.mapsUrl} placeholder="Maps URL" />
-					<input type="text" bind:value={ps.wiki} placeholder="Wikipedia page title (optional)" />
-					<input type="text" bind:value={ps.fallbackImg} placeholder="Fallback image URL (optional)" />
+					<input type="text" bind:value={ps.name} placeholder="Caption" aria-label="Photo spot caption" />
+					<input type="text" bind:value={ps.mapsUrl} placeholder="Maps URL" aria-label="Photo spot maps URL" />
+					<input type="text" bind:value={ps.wiki} placeholder="Wikipedia page title (optional)" aria-label="Photo spot Wikipedia page title" />
+					<input type="text" bind:value={ps.fallbackImg} placeholder="Fallback image URL (optional)" aria-label="Photo spot fallback image URL" />
 					<button type="button" class="del" onclick={() => removeAt(block.photoSpots!, i)}>✕</button>
 				</div>
 			{/each}
@@ -125,6 +140,7 @@
 			{/if}
 		</div>
 	</div>
+	{/if}
 </details>
 
 <style>
@@ -144,6 +160,18 @@
 	}
 	summary::-webkit-details-marker {
 		display: none;
+	}
+	.grip {
+		cursor: grab;
+		color: #b3a892;
+		font-size: 0.9rem;
+		line-height: 1;
+		flex-shrink: 0;
+		touch-action: none;
+		user-select: none;
+	}
+	.grip:active {
+		cursor: grabbing;
 	}
 	.time {
 		font-size: 0.75rem;

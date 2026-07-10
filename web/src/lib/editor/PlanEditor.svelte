@@ -1,8 +1,12 @@
 <script lang="ts">
-	import type { Plan, Trip } from '$lib/trip-engine';
+	import { untrack } from 'svelte';
+	import type { Plan, Day, Trip } from '$lib/trip-engine';
 	import { move, removeAt, blankDay, emptyLocalized } from './factories';
+	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import DayEditor from './DayEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
+
+	type DayItem = { id: string; item: Day };
 
 	let {
 		plan = $bindable(),
@@ -33,15 +37,42 @@
 	function addDay() {
 		plan.days.push(blankDay(langs));
 	}
+
+	// ── Drag reorder for days within this plan (handle-initiated) ──
+	// See DayEditor for the state/effect rationale (dnd owns list identity during
+	// a drag; the model is mirrored on consider/finalize).
+	let dayDragDisabled = $state(true);
+	const wrap = (d: Day): DayItem => ({ id: dndId(d), item: d });
+	let dayItems = $state<DayItem[]>(plan.days.map(wrap));
+	$effect(() => {
+		const modelIds = plan.days.map(dndId).join('|');
+		untrack(() => {
+			if (dayItems.map((w) => w.id).join('|') !== modelIds) dayItems = plan.days.map(wrap);
+		});
+	});
+	function considerDays(e: CustomEvent<{ items: DayItem[] }>) {
+		dayItems = e.detail.items;
+	}
+	function finalizeDays(e: CustomEvent<{ items: DayItem[] }>) {
+		dayItems = e.detail.items;
+		plan.days = fromItems(e.detail.items);
+		dayDragDisabled = true;
+	}
+	function grabDay() {
+		grabHandle((v) => (dayDragDisabled = v));
+	}
+	function dayIdx(d: Day): number {
+		return plan.days.indexOf(d);
+	}
 </script>
 
 <div class="plan">
 	{#if multiPlan}
 		<div class="plan-hd">
-			<input class="pid" type="text" bind:value={plan.id} placeholder="plan-id" />
+			<input class="pid" type="text" bind:value={plan.id} placeholder="plan-id" aria-label="Plan id" />
 			<span class="controls">
-				<button type="button" disabled={!canUp} onclick={() => onMove(-1)}>↑</button>
-				<button type="button" disabled={!canDown} onclick={() => onMove(1)}>↓</button>
+				<button type="button" disabled={!canUp} onclick={() => onMove(-1)} aria-label="Move plan up">↑</button>
+				<button type="button" disabled={!canDown} onclick={() => onMove(1)} aria-label="Move plan down">↓</button>
 				<button type="button" class="del" onclick={onRemove}>Remove plan</button>
 			</span>
 		</div>
@@ -57,17 +88,25 @@
 	{/if}
 
 	<div class="days-hd"><span class="lbl">Days</span><button type="button" onclick={addDay}>+ Add day</button></div>
-	{#each plan.days as day, i (day)}
-		<DayEditor
-			bind:day={plan.days[i]}
-			{langs}
-			{tags}
-			canUp={i > 0}
-			canDown={i < plan.days.length - 1}
-			onMove={(dir) => move(plan.days, i, dir)}
-			onRemove={() => removeAt(plan.days, i)}
-		/>
-	{/each}
+	<div
+		class="dndlist"
+		use:dndzone={{ items: dayItems, flipDurationMs: FLIP_MS, dragDisabled: dayDragDisabled, dropTargetStyle: {} }}
+		onconsider={considerDays}
+		onfinalize={finalizeDays}
+	>
+		{#each dayItems as w (w.id)}
+			<DayEditor
+				bind:day={w.item}
+				{langs}
+				{tags}
+				canUp={dayIdx(w.item) > 0}
+				canDown={dayIdx(w.item) < plan.days.length - 1}
+				onMove={(dir) => move(plan.days, dayIdx(w.item), dir)}
+				onRemove={() => removeAt(plan.days, dayIdx(w.item))}
+				onGrab={grabDay}
+			/>
+		{/each}
+	</div>
 </div>
 
 <style>

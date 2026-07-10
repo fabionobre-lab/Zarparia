@@ -32,9 +32,9 @@
 		<div class="row">
 			{#if langs.length > 1}<span class="tag">{l}</span>{/if}
 			{#if multiline}
-				<textarea bind:value={value[l]} {placeholder} rows="2"></textarea>
+				<textarea bind:value={value[l]} {placeholder} rows="2" aria-label={`${label} (${l.toUpperCase()})`}></textarea>
 			{:else}
-				<input type="text" bind:value={value[l]} {placeholder} />
+				<input type="text" bind:value={value[l]} {placeholder} aria-label={`${label} (${l.toUpperCase()})`} />
 			{/if}
 		</div>
 	{/each}
