@@ -21,15 +21,15 @@
 		safeUrl
 	} from './trip-engine';
 
-	let { trip }: { trip: Trip } = $props();
-
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
 	// per trip id), so these initial reads are intentionally non-reactive.
-	let lang = $state(untrack(() => trip.defaultLanguage || trip.languages[0]));
+	let {
+		trip,
+		lang = $bindable(untrack(() => trip.defaultLanguage || trip.languages[0]))
+	}: { trip: Trip; lang?: string } = $props();
 	let planBySeg = $state<Record<string, string>>(
 		untrack(() => Object.fromEntries(trip.segments.map((s) => [s.id, s.defaultPlan ?? s.plans[0].id])))
 	);
-	let dayIdx = $state(0);
 	let wxBySeg = $state<Record<string, SegWeather | null>>({});
 	let wikiImgs = $state<Record<string, string | null>>({});
 
@@ -43,16 +43,114 @@
 		plan: Plan;
 		day: Day;
 	}
-	const flatDays = $derived.by<FlatDay[]>(() => {
+	function computeFlatDays(planSel: Record<string, string>): FlatDay[] {
 		const out: FlatDay[] = [];
 		for (const seg of trip.segments) {
-			const plan = planOf(seg);
+			const plan = seg.plans.find((p) => p.id === planSel[seg.id]) ?? seg.plans[0];
 			for (const day of plan.days) out.push({ seg, plan, day });
 		}
 		return out;
-	});
+	}
+
+	// ── Today auto-focus ──
+	// Local-date (YYYY-MM-DD from wall-clock getFullYear/Month/Date, NOT the
+	// UTC-based toISOString) so "today" matches the visitor's own calendar day.
+	function localISODate(d: Date): string {
+		const y = d.getFullYear();
+		const m = String(d.getMonth() + 1).padStart(2, '0');
+		const day = String(d.getDate()).padStart(2, '0');
+		return `${y}-${m}-${day}`;
+	}
+	/** Day index to open on: today's day if the trip is currently active
+	 *  (today between the first and last day, inclusive), landing on the next
+	 *  planned day when today itself is an unplanned gap date. Past/upcoming
+	 *  trips (today outside that range) keep the existing default of day 0. */
+	function initialDayIndex(days: FlatDay[]): number {
+		if (days.length === 0) return 0;
+		const first = days[0].day.date;
+		const last = days[days.length - 1].day.date;
+		const today = localISODate(new Date());
+		if (today < first || today > last) return 0;
+		const exact = days.findIndex((f) => f.day.date === today);
+		if (exact !== -1) return exact;
+		const next = days.findIndex((f) => f.day.date > today);
+		return next !== -1 ? next : days.length - 1;
+	}
+
+	let dayIdx = $state(untrack(() => initialDayIndex(computeFlatDays(planBySeg))));
+
+	const flatDays = $derived.by<FlatDay[]>(() => computeFlatDays(planBySeg));
 	const clampedIdx = $derived(Math.min(dayIdx, flatDays.length - 1));
 	const current = $derived(flatDays[clampedIdx]);
+
+	// ── Day nav: every calendar date from the trip's first to last day across
+	// ALL segments (mirrors calendarDays() in the static engine, assets/app.js),
+	// so free days between segments also render as muted, non-interactive pips. ──
+	function isValidISODate(iso: string): boolean {
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return false;
+		const [y, m, d] = iso.split('-').map(Number);
+		return !Number.isNaN(new Date(Date.UTC(y, m - 1, d)).getTime());
+	}
+	function addDaysISO(iso: string, n: number): string {
+		const [y, m, d] = iso.split('-').map(Number);
+		const dt = new Date(Date.UTC(y, m - 1, d));
+		dt.setUTCDate(dt.getUTCDate() + n);
+		return dt.toISOString().slice(0, 10);
+	}
+	interface NavDay {
+		kind: 'day';
+		day: Day;
+		gi: number;
+		/** True when this planned day starts a new segment (renders a separator before it). */
+		sep: boolean;
+	}
+	interface NavGap {
+		kind: 'gap';
+		date: string;
+	}
+	type NavEntry = NavDay | NavGap;
+	const navEntries = $derived.by<NavEntry[]>(() => {
+		const days = flatDays;
+		if (days.length === 0) return [];
+		// Draft data (e.g. a brand-new unsaved day in the editor's live preview)
+		// can have empty/invalid or out-of-order dates — skip gap synthesis and
+		// show the planned days as-is rather than doing date arithmetic on garbage.
+		const canFillGaps =
+			days.every((f) => isValidISODate(f.day.date)) &&
+			days.every((f, i) => i === 0 || days[i - 1].day.date <= f.day.date);
+		const entries: NavEntry[] = [];
+		let lastSeg: Segment | null = null;
+		const pushDay = (f: FlatDay, gi: number) => {
+			entries.push({ kind: 'day', day: f.day, gi, sep: lastSeg !== null && f.seg !== lastSeg });
+			lastSeg = f.seg;
+		};
+		if (canFillGaps) {
+			const end = days[days.length - 1].day.date;
+			let cursor = days[0].day.date;
+			let gi = 0;
+			while (cursor <= end) {
+				if (gi < days.length && days[gi].day.date === cursor) {
+					pushDay(days[gi], gi);
+					gi++;
+				} else {
+					entries.push({ kind: 'gap', date: cursor });
+				}
+				cursor = addDaysISO(cursor, 1);
+			}
+		} else {
+			days.forEach((f, gi) => pushDay(f, gi));
+		}
+		return entries;
+	});
+
+	// Keep the active day pip in view: on mount and whenever the selected day
+	// changes. behavior 'auto' matches the static engine — 'smooth' is silently
+	// dropped in some embedded/reduced-motion environments.
+	let dayBtnEls: (HTMLButtonElement | null)[] = [];
+	$effect(() => {
+		const el = dayBtnEls[clampedIdx];
+		el?.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+	});
 
 	const uiText = $derived(
 		lang === 'pt'
@@ -196,7 +294,7 @@
 				{#if trip.languages.length > 1}
 					<div class="lang-toggle">
 						{#each trip.languages as l (l)}
-							<button class="lang-btn" class:on={l === lang} onclick={() => setLang(l)}>
+							<button class="lang-btn" class:on={l === lang} aria-pressed={l === lang} onclick={() => setLang(l)}>
 								{l.toUpperCase()}
 							</button>
 						{/each}
@@ -208,7 +306,8 @@
 			{#if current && current.seg.plans.length > 1}
 				<div class="vtabs">
 					{#each current.seg.plans as p (p.id)}
-						<button class="vtab" class:on={p.id === planOf(current.seg).id} onclick={() => setPlan(current.seg, p.id)}>
+						{@const on = p.id === planOf(current.seg).id}
+						<button class="vtab" class:on aria-pressed={on} onclick={() => setPlan(current.seg, p.id)}>
 							{L(p.label) || p.id}
 						</button>
 					{/each}
@@ -217,17 +316,34 @@
 		</div>
 	</div>
 
-	<nav class="daynav">
-		{#each trip.segments as seg, si (seg.id)}
-			{#if si > 0}<div class="daybtn-separator"></div>{/if}
-			{#each planOf(seg).days as day (day)}
-				{@const gi = flatDays.findIndex((f) => f.seg === seg && f.day === day)}
-				<button class="daybtn" class:on={gi === clampedIdx} class:has-bday={!!L(day.banner)} onclick={() => (dayIdx = gi)}>
+	<nav class="daynav" aria-label="Days">
+		{#each navEntries as entry (entry.kind === 'day' ? entry.day : entry.date)}
+			{#if entry.kind === 'day'}
+				{@const day = entry.day}
+				{@const gi = entry.gi}
+				{@const on = gi === clampedIdx}
+				{@const label = dayLabel(day.date, localeFor(trip, lang))}
+				{#if entry.sep}<div class="daybtn-separator"></div>{/if}
+				<button
+					class="daybtn"
+					class:on
+					class:has-bday={!!L(day.banner)}
+					aria-current={on ? 'date' : undefined}
+					aria-label={label}
+					onclick={() => (dayIdx = gi)}
+					bind:this={dayBtnEls[gi]}
+				>
 					<span class="dow">{dowShort(day.date, localeFor(trip, lang))}</span>
 					<span class="dnum">{dayNum(day.date)}</span>
 					<span class="bday-pip"></span>
 				</button>
-			{/each}
+			{:else}
+				<div class="daybtn daybtn-gap">
+					<span class="dow" aria-hidden="true">{dowShort(entry.date, localeFor(trip, lang))}</span>
+					<span class="dnum" aria-hidden="true">{dayNum(entry.date)}</span>
+					<span class="sr-only">Free day</span>
+				</div>
+			{/if}
 		{/each}
 	</nav>
 
@@ -246,7 +362,7 @@
 					{#if wx || km}
 						<div class="wx-hdr">
 							{#if wx}
-								<div class="wx-hdr-item">{wx.emoji}</div>
+								<div class="wx-hdr-item" aria-hidden="true">{wx.emoji}</div>
 								<div class="wx-hdr-item">↑{wx.hi}°C</div>
 								<div class="wx-hdr-item">↓{wx.lo}°C</div>
 							{/if}
@@ -260,7 +376,7 @@
 			{#if routeForDay}
 				<a href={routeForDay.url} target="_blank" rel="noreferrer" class="route-card">
 					<div class="route-hdr">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
+						<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
 						{uiText.dayRoute}
 					</div>
 					<div class="route-stops">
@@ -273,7 +389,7 @@
 						{/each}
 					</div>
 					<div class="route-open">
-						<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+						<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
 						{uiText.openRoute}
 					</div>
 				</a>
@@ -286,7 +402,9 @@
 						<div class="tb-left">
 							<div class="tb-time">
 								{b.time}
-								{#if badge}<div class="wx">{badge.emoji} {badge.temp}°C</div>{/if}
+								{#if badge && !isPast}
+									<div class="wx"><span aria-hidden="true">{badge.emoji}</span> {badge.temp}°C</div>
+								{/if}
 							</div>
 							<div class="tb-dot-col">
 								<div class="tb-dot" style="background:{b.dotColor || 'var(--stone)'}"></div>
@@ -313,9 +431,9 @@
 										{@const key = spotKey(sp)}
 										<a href={safeUrl(sp.mapsUrl)} target="_blank" rel="noreferrer" class="ps-card">
 											{#if key && safeUrl(wikiImgs[key] ?? undefined)}
-												<img src={safeUrl(wikiImgs[key] ?? undefined)} class="ps-thumb" alt="" />
+												<img src={safeUrl(wikiImgs[key] ?? undefined)} class="ps-thumb" alt={sp.name} />
 											{:else}
-												<div class="ps-thumb ps-placeholder"></div>
+												<div class="ps-thumb ps-placeholder" aria-hidden="true"></div>
 											{/if}
 											<span class="ps-label">{sp.name}</span>
 										</a>
@@ -327,7 +445,7 @@
 							{/if}
 							{#if b.mapsUrl}
 								<a class="map-btn" href={safeUrl(b.mapsUrl)} target="_blank" rel="noreferrer">
-									<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+									<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
 									{uiText.maps}
 								</a>
 							{/if}
@@ -400,6 +518,11 @@
 	}
 	.lang-btn {
 		padding: 4px 12px;
+		min-height: 44px;
+		box-sizing: border-box;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		border: none;
 		background: rgba(0, 0, 0, 0.2);
 		cursor: pointer;
@@ -435,6 +558,11 @@
 	.vtab {
 		flex: 1;
 		padding: 8px 6px;
+		min-height: 44px;
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		border: none;
 		cursor: pointer;
 		background: rgba(255, 255, 255, 0.08);
@@ -459,8 +587,10 @@
 		display: none;
 	}
 	.daybtn {
-		flex: 1;
-		min-width: 0;
+		flex: 1 0 auto;
+		min-width: 44px;
+		min-height: 44px;
+		box-sizing: border-box;
 		padding: 7px 3px 5px;
 		border: none;
 		background: none;
@@ -468,11 +598,31 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		justify-content: center;
 		gap: 1px;
 		border-bottom: 2.5px solid transparent;
 	}
 	.daybtn.on {
 		border-bottom-color: var(--accent);
+	}
+	.daybtn-gap {
+		cursor: default;
+		opacity: 0.4;
+	}
+	.daybtn-gap .dow,
+	.daybtn-gap .dnum {
+		font-weight: 400;
+	}
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 	.daybtn .dow {
 		font-size: 9px;

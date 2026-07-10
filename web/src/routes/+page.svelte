@@ -16,8 +16,13 @@
 	const shared = $derived(data.trips.filter((t) => t.role !== 'owner'));
 </script>
 
+<svelte:head>
+	<title>Trips</title>
+</svelte:head>
+
 {#snippet card(t: (typeof data.trips)[number])}
 	<a class="card" href="/trips/{t.id}">
+		{#if t.cover}<div class="cover" aria-hidden="true">{t.cover}</div>{/if}
 		<div class="card-main">
 			<div class="card-title">{t.title ?? t.id}</div>
 			<div class="card-dates">{fmtRange(t.startDate, t.endDate)}</div>
@@ -102,6 +107,17 @@
 		padding: 0.9rem 1rem;
 		text-decoration: none;
 		color: #1a1208;
+	}
+	.cover {
+		font-size: 30px;
+		width: 52px;
+		height: 52px;
+		border-radius: 12px;
+		background: #efe9dc;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
 	}
 	.card-main {
 		flex: 1;
