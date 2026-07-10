@@ -5,6 +5,7 @@ import { getDb } from '$lib/server/db';
 import { getGoogle, fetchGoogleProfile } from '$lib/server/oauth';
 import { upsertGoogleUser } from '$lib/server/users';
 import { createSession, generateSessionToken, setSessionCookie } from '$lib/server/session';
+import { takeReturnTo } from '$lib/server/returnto';
 
 export const GET: RequestHandler = async ({ platform, url, cookies }) => {
 	const code = url.searchParams.get('code');
@@ -41,5 +42,7 @@ export const GET: RequestHandler = async ({ platform, url, cookies }) => {
 	cookies.delete('google_oauth_state', { path: '/' });
 	cookies.delete('google_code_verifier', { path: '/' });
 
-	redirect(303, '/');
+	// Return to where the visitor started (e.g. a /join/<token> invite), if a
+	// safe same-origin path was stashed before the OAuth round-trip.
+	redirect(303, takeReturnTo(cookies));
 };

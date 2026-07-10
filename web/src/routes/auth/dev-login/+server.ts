@@ -4,6 +4,7 @@ import { getDb } from '$lib/server/db';
 import { getAuthEnv } from '$lib/server/authenv';
 import { upsertGoogleUser } from '$lib/server/users';
 import { createSession, generateSessionToken, setSessionCookie } from '$lib/server/session';
+import { isSafeReturnTo } from '$lib/server/returnto';
 
 /**
  * DEV ONLY. Establishes a session without Google, so the app is usable locally
@@ -25,5 +26,7 @@ export const GET: RequestHandler = async ({ platform, cookies, url }) => {
 	await createSession(db, token, user.id);
 	setSessionCookie(cookies, token);
 
-	redirect(303, '/');
+	// Honour a safe same-origin return path (used by the /join invite flow).
+	const returnTo = url.searchParams.get('returnTo');
+	redirect(303, isSafeReturnTo(returnTo) ? returnTo : '/');
 };
