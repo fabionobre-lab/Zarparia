@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ShareRow, SharePermission } from '$lib/server/shares';
+	import { t } from '$lib/i18n/store.svelte';
 
 	let { tripId }: { tripId: string } = $props();
 
@@ -26,9 +27,9 @@
 		try {
 			const res = await fetch(`/api/trips/${tripId}/shares`);
 			if (res.ok) shares = ((await res.json()) as { shares: ShareRow[] }).shares;
-			else error = 'Could not load sharing info.';
+			else error = t('share.errLoad');
 		} catch {
-			error = 'Could not load sharing info.';
+			error = t('share.errLoad');
 		} finally {
 			loading = false;
 		}
@@ -42,10 +43,10 @@
 				link = ((await res.json()) as { link: LinkInfo }).link;
 				linkMode = link ? link.role : 'off';
 			} else {
-				linkError = 'Could not load link info.';
+				linkError = t('share.errLoadLink');
 			}
 		} catch {
-			linkError = 'Could not load link info.';
+			linkError = t('share.errLoadLink');
 		}
 	}
 
@@ -65,7 +66,7 @@
 					link = null;
 					linkMode = 'off';
 				} else {
-					linkError = 'Could not turn off the link.';
+					linkError = t('share.errTurnOff');
 					linkMode = link ? link.role : 'off';
 				}
 			} else {
@@ -78,12 +79,12 @@
 					link = ((await res.json()) as { link: LinkInfo }).link;
 					linkMode = link ? link.role : 'off';
 				} else {
-					linkError = 'Could not update the link.';
+					linkError = t('share.errUpdateLink');
 					linkMode = link ? link.role : 'off';
 				}
 			}
 		} catch {
-			linkError = 'Network error.';
+			linkError = t('share.errNetwork');
 			linkMode = link ? link.role : 'off';
 		} finally {
 			linkBusy = false;
@@ -98,7 +99,7 @@
 			clearTimeout(copyTimer);
 			copyTimer = setTimeout(() => (copied = false), 1500);
 		} catch {
-			linkError = 'Could not copy. Select the link and copy manually.';
+			linkError = t('share.errCopy');
 		}
 	}
 
@@ -117,10 +118,10 @@
 				email = '';
 				await load();
 			} else {
-				error = ((await res.json()) as { error?: string }).error ?? 'Could not share.';
+				error = ((await res.json()) as { error?: string }).error ?? t('share.errShare');
 			}
 		} catch {
-			error = 'Network error.';
+			error = t('share.errNetwork');
 		} finally {
 			busy = false;
 		}
@@ -132,9 +133,9 @@
 		try {
 			const res = await fetch(`/api/trips/${tripId}/shares/${userId}`, { method: 'DELETE' });
 			if (res.ok) await load();
-			else error = 'Could not remove this person.';
+			else error = t('share.errRemove');
 		} catch {
-			error = 'Could not remove this person.';
+			error = t('share.errRemove');
 		} finally {
 			busy = false;
 		}
@@ -142,53 +143,53 @@
 </script>
 
 <div class="panel">
-	<h3>Share this trip</h3>
+	<h3>{t('share.heading')}</h3>
 
 	<section class="linkshare">
-		<label class="lbl" for="link-mode">Link sharing</label>
+		<label class="lbl" for="link-mode">{t('share.linkSharing')}</label>
 		<select id="link-mode" value={linkMode} onchange={changeLink} disabled={linkBusy}>
-			<option value="off">Off</option>
-			<option value="viewer">Anyone with the link can view</option>
-			<option value="editor">Anyone with the link can edit</option>
+			<option value="off">{t('share.linkOff')}</option>
+			<option value="viewer">{t('share.linkCanView')}</option>
+			<option value="editor">{t('share.linkCanEdit')}</option>
 		</select>
 		{#if link}
 			<div class="linkrow">
-				<input class="linkurl" type="text" readonly value={link.url} aria-label="Shareable link" />
+				<input class="linkurl" type="text" readonly value={link.url} aria-label={t('share.shareableLink')} />
 				<button type="button" class="copy" onclick={copyLink} disabled={linkBusy}>
-					{copied ? 'Copied' : 'Copy'}
+					{copied ? t('share.copied') : t('share.copy')}
 				</button>
 			</div>
-			<p class="sr-only" aria-live="polite">{copied ? 'Link copied to clipboard' : ''}</p>
+			<p class="sr-only" aria-live="polite">{copied ? t('share.copiedAnnounce') : ''}</p>
 		{/if}
 		{#if linkError}<p class="err">{linkError}</p>{/if}
 	</section>
 
 	<form onsubmit={add}>
-		<input type="email" bind:value={email} placeholder="person@email.com" required />
+		<input type="email" bind:value={email} placeholder={t('share.emailPlaceholder')} required />
 		<select bind:value={permission}>
-			<option value="viewer">can view</option>
-			<option value="editor">can edit</option>
+			<option value="viewer">{t('share.optionCanView')}</option>
+			<option value="editor">{t('share.optionCanEdit')}</option>
 		</select>
-		<button type="submit" disabled={busy}>Share</button>
+		<button type="submit" disabled={busy}>{t('share.shareButton')}</button>
 	</form>
 	{#if error}<p class="err">{error}</p>{/if}
 
 	{#if loading}
-		<p class="muted">Loading…</p>
+		<p class="muted">{t('share.loading')}</p>
 	{:else if shares.length === 0}
-		<p class="muted">Not shared with anyone yet.</p>
+		<p class="muted">{t('share.notSharedYet')}</p>
 	{:else}
 		<ul>
 			{#each shares as s (s.userId)}
 				<li>
 					<span class="who">{s.name ?? s.email}</span>
-					<span class="perm">{s.permission === 'editor' ? 'can edit' : 'can view'}</span>
-					<button type="button" class="rm" onclick={() => remove(s.userId)} disabled={busy}>Remove</button>
+					<span class="perm">{s.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
+					<button type="button" class="rm" onclick={() => remove(s.userId)} disabled={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
 		</ul>
 	{/if}
-	<p class="hint">People must sign in once before you can share with them.</p>
+	<p class="hint">{t('share.hint')}</p>
 </div>
 
 <style>

@@ -2,6 +2,7 @@
 	import TripEditor from '$lib/editor/TripEditor.svelte';
 	import CreationWizard from '$lib/editor/CreationWizard.svelte';
 	import type { Trip } from '$lib/trip-engine';
+	import { t } from '$lib/i18n/store.svelte';
 
 	// The landing is a two-step creation wizard. "Start from a blank trip" drops
 	// straight into the old blank editor; "Create trip" scaffolds a draft and
@@ -16,7 +17,7 @@
 </script>
 
 <svelte:head>
-	<title>New trip — Trips</title>
+	<title>{t('wizard.pageTitle')}</title>
 </svelte:head>
 
 {#if stage === 'wizard'}

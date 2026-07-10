@@ -5,6 +5,7 @@
 	import PlanEditor from './PlanEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
 	import PlaceSearch from './PlaceSearch.svelte';
+	import { t } from '$lib/i18n/store.svelte';
 
 	let {
 		segment = $bindable(),
@@ -43,9 +44,9 @@
 	// (loaded trip, or once the user types) is left alone.
 	let idDirty = $state(!!segment.id && !/^segment(-\d+)?$/.test(segment.id));
 	$effect(() => {
-		const t = segment.title?.[langs[0]] ?? '';
+		const titleText = segment.title?.[langs[0]] ?? '';
 		if (idDirty) return;
-		const slug = slugifyId(t);
+		const slug = slugifyId(titleText);
 		untrack(() => {
 			if (slug && segment.id !== slug) segment.id = slug;
 		});
@@ -75,67 +76,67 @@
 		<span
 			class="grip"
 			aria-hidden="true"
-			title="Drag to reorder segment"
+			title={t('seg.dragReorder')}
 			onpointerdown={onGrab}
 			ontouchstart={onGrab}
 			onclick={(e) => e.preventDefault()}
 		>⠿</span>
-		<span class="title">{segment.title?.[langs[0]] || segment.id || '(segment)'}</span>
+		<span class="title">{segment.title?.[langs[0]] || segment.id || t('seg.placeholder')}</span>
 		<span class="controls">
-			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move segment up">↑</button>
-			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move segment down">↓</button>
-			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())}>Remove segment</button>
+			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label={t('seg.moveUp')}>↑</button>
+			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label={t('seg.moveDown')}>↓</button>
+			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())}>{t('seg.remove')}</button>
 		</span>
 	</summary>
 	{#if open}
 	<div class="body" bind:this={bodyEl}>
 		<div class="grid2">
-			<label class="f">Segment id
-				<input type="text" bind:value={segment.id} oninput={() => (idDirty = true)} placeholder="auto" />
-				<span class="fhint">internal key, auto-generated</span>
+			<label class="f">{t('seg.segmentId')}
+				<input type="text" bind:value={segment.id} oninput={() => (idDirty = true)} placeholder={t('seg.autoPlaceholder')} />
+				<span class="fhint">{t('seg.internalKey')}</span>
 			</label>
-			<label class="f">Theme
+			<label class="f">{t('seg.theme')}
 				<select bind:value={segment.theme}>
-					{#each THEME_NAMES as t (t)}<option value={t}>{t}</option>{/each}
+					{#each THEME_NAMES as themeName (themeName)}<option value={themeName}>{themeName}</option>{/each}
 				</select>
 			</label>
 		</div>
-		<LocalizedInput bind:value={segment.title} {langs} label="Segment title" />
-		<LocalizedInput bind:value={segment.subtitle as never} {langs} label="Subtitle" />
-		<LocalizedInput bind:value={segment.footer as never} {langs} label="Footer" />
+		<LocalizedInput bind:value={segment.title} {langs} label={t('seg.segmentTitle')} />
+		<LocalizedInput bind:value={segment.subtitle as never} {langs} label={t('seg.subtitle')} />
+		<LocalizedInput bind:value={segment.footer as never} {langs} label={t('seg.footer')} />
 
-		<label class="check"><input type="checkbox" checked={hasColors} onchange={(e) => toggleColors(e.currentTarget.checked)} /> Custom colors (override theme)</label>
+		<label class="check"><input type="checkbox" checked={hasColors} onchange={(e) => toggleColors(e.currentTarget.checked)} /> {t('seg.customColors')}</label>
 		{#if segment.themeColors}
 			<div class="grid3">
-				<label class="f">Header bg<input type="color" bind:value={segment.themeColors.heroBg} /></label>
-				<label class="f">Accent<input type="color" bind:value={segment.themeColors.accent} /></label>
-				<label class="f">Eyebrow<input type="color" bind:value={segment.themeColors.eyebrow} /></label>
+				<label class="f">{t('seg.headerBg')}<input type="color" bind:value={segment.themeColors.heroBg} /></label>
+				<label class="f">{t('seg.accent')}<input type="color" bind:value={segment.themeColors.accent} /></label>
+				<label class="f">{t('seg.eyebrow')}<input type="color" bind:value={segment.themeColors.eyebrow} /></label>
 			</div>
 		{/if}
 
-		<label class="check"><input type="checkbox" checked={hasWeather} onchange={(e) => toggleWeather(e.currentTarget.checked)} /> Live weather</label>
+		<label class="check"><input type="checkbox" checked={hasWeather} onchange={(e) => toggleWeather(e.currentTarget.checked)} /> {t('seg.liveWeather')}</label>
 		{#if segment.weather}
-			<PlaceSearch label="Find place (sets lat/lon)" onPick={onPickWeather} />
+			<PlaceSearch label={t('seg.findPlaceLatLon')} onPick={onPickWeather} />
 			<div class="grid4">
-				<label class="f">Lat<input type="number" step="0.0001" bind:value={segment.weather.lat} /></label>
-				<label class="f">Lon<input type="number" step="0.0001" bind:value={segment.weather.lon} /></label>
-				<label class="f">Granularity
+				<label class="f">{t('editor.lat')}<input type="number" step="0.0001" bind:value={segment.weather.lat} /></label>
+				<label class="f">{t('editor.lon')}<input type="number" step="0.0001" bind:value={segment.weather.lon} /></label>
+				<label class="f">{t('seg.granularity')}
 					<select bind:value={segment.weather.granularity}>
-						<option value="daily">daily</option>
-						<option value="hourly">hourly</option>
+						<option value="daily">{t('common.daily')}</option>
+						<option value="hourly">{t('common.hourly')}</option>
 					</select>
 				</label>
-				<label class="f">Timezone<input type="text" bind:value={segment.weather.timezone} /></label>
+				<label class="f">{t('seg.timezone')}<input type="text" bind:value={segment.weather.timezone} /></label>
 			</div>
 		{/if}
 
 		<div class="plans">
 			<div class="plans-hd">
-				<span class="lbl">Plans {segment.plans.length > 1 ? '(shown as tabs)' : ''}</span>
-				<button type="button" onclick={addPlan}>+ Add plan variant</button>
+				<span class="lbl">{t('seg.plans')} {segment.plans.length > 1 ? t('seg.plansAsTabs') : ''}</span>
+				<button type="button" onclick={addPlan}>{t('seg.addPlan')}</button>
 			</div>
 			{#if segment.plans.length > 1}
-				<label class="f">Default plan
+				<label class="f">{t('seg.defaultPlan')}
 					<select bind:value={segment.defaultPlan}>
 						{#each segment.plans as p (p.id)}<option value={p.id}>{p.id}</option>{/each}
 					</select>

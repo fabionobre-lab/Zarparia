@@ -2,6 +2,8 @@
 	// Compact search-as-you-type place finder backed by Nominatim (OpenStreetMap).
 	// Debounced (400ms), min 3 chars, at most one request/second (stale requests
 	// are dropped via a sequence guard). Emits the picked place to the parent.
+	import { t } from '$lib/i18n/store.svelte';
+
 	interface NominatimResult {
 		display_name: string;
 		lat: string;
@@ -10,8 +12,8 @@
 
 	let {
 		onPick,
-		label = 'Find place',
-		placeholder = 'Search for a place…'
+		label = t('place.findPlace'),
+		placeholder = t('place.searchPlaceholder')
 	}: {
 		onPick: (p: { name: string; lat: number; lon: number }) => void;
 		label?: string;
@@ -180,9 +182,9 @@
 						</li>
 					{/each}
 				{:else if searched}
-					<li class="opt empty">No results</li>
+					<li class="opt empty">{t('place.noResults')}</li>
 				{:else if loading}
-					<li class="opt empty">Searching…</li>
+					<li class="opt empty">{t('place.searching')}</li>
 				{/if}
 				<li class="attr" aria-hidden="true">© OpenStreetMap</li>
 			</ul>

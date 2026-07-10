@@ -9,6 +9,7 @@
 	import { blankTrip, blankSegment, move, removeAt, pruneEmpty, nextId, slugifyId } from './factories';
 	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
+	import { t } from '$lib/i18n/store.svelte';
 
 	let {
 		initial,
@@ -37,7 +38,7 @@
 	const dirty = $derived(!justSaved && serialize() !== savedSnapshot);
 
 	beforeNavigate((nav) => {
-		if (dirty && !confirm('Discard unsaved changes?')) nav.cancel();
+		if (dirty && !confirm(t('editor.discardConfirm'))) nav.cancel();
 	});
 	$effect(() => {
 		if (!dirty) return;
@@ -54,8 +55,8 @@
 	let langErr = $state('');
 	function submitLanguage() {
 		const code = langInput.trim().toLowerCase();
-		if (code.length < 2) return (langErr = 'Use a 2+ letter code, e.g. "es".');
-		if (draft.languages.includes(code)) return (langErr = `"${code}" is already added.`);
+		if (code.length < 2) return (langErr = t('editor.errLangCode'));
+		if (draft.languages.includes(code)) return (langErr = t('editor.errLangDup', { code }));
 		draft.languages.push(code);
 		langInput = '';
 		langErr = '';
@@ -168,9 +169,9 @@
 	function submitTag() {
 		const label = tagLabel.trim();
 		const key = tagKey.trim();
-		if (!label) return (tagErr = 'Give the tag a label.');
-		if (!key || !/^[a-z0-9][a-z0-9_-]*$/.test(key)) return (tagErr = 'Key must be lowercase letters/numbers.');
-		if (draft.tags?.[key]) return (tagErr = `Key "${key}" already exists.`);
+		if (!label) return (tagErr = t('editor.errTagLabel'));
+		if (!key || !/^[a-z0-9][a-z0-9_-]*$/.test(key)) return (tagErr = t('editor.errTagKey'));
+		if (draft.tags?.[key]) return (tagErr = t('editor.errTagKeyDup', { key }));
 		draft.tags ??= {};
 		draft.tags[key] = {
 			label: Object.fromEntries(langs.map((l) => [l, l === draft.defaultLanguage ? label : ''])),
@@ -184,7 +185,7 @@
 		errors = [];
 		const clean = pruneEmpty($state.snapshot(draft)) as TripDoc | undefined;
 		if (!clean) {
-			errors = ['Trip is empty.'];
+			errors = [t('editor.errTripEmpty')];
 			return;
 		}
 		// On the create path the client must supply a schema-valid `id` or the
@@ -194,7 +195,7 @@
 		if (mode === 'new') {
 			const titleText = (clean.title?.[clean.defaultLanguage] ?? '').trim();
 			if (!titleText) {
-				errors = ['Give the trip a title'];
+				errors = [t('editor.errGiveTitle')];
 				return;
 			}
 			clean.id = slugifyId(titleText) || 'trip';
@@ -223,10 +224,10 @@
 				await goto(`/trips/${data.id}`);
 			} else {
 				const e = (await res.json()) as { error?: string; details?: string[] };
-				errors = e.details ?? [e.error ?? `Save failed (${res.status})`];
+				errors = e.details ?? [e.error ?? t('editor.errSaveFailed', { status: res.status })];
 			}
 		} catch {
-			errors = ['Network error while saving.'];
+			errors = [t('editor.errNetworkSave')];
 		} finally {
 			saving = false;
 		}
@@ -236,89 +237,89 @@
 <div class="editor">
 	<div class="form">
 		<div class="bar">
-			<a class="back" href={mode === 'edit' ? `/trips/${tripId}` : '/'}>← Cancel</a>
-			<button class="save" onclick={save} disabled={saving}>{saving ? 'Saving…' : 'Save trip'}</button>
+			<a class="back" href={mode === 'edit' ? `/trips/${tripId}` : '/'}>{t('editor.cancel')}</a>
+			<button class="save" onclick={save} disabled={saving}>{saving ? t('editor.saving') : t('editor.saveTrip')}</button>
 		</div>
 
 		{#if errors.length}
 			<div class="errors">
-				<strong>Please fix:</strong>
+				<strong>{t('editor.pleaseFix')}</strong>
 				<ul>{#each errors as e (e)}<li>{e}</li>{/each}</ul>
 			</div>
 		{/if}
 
 		<details class="settings" open>
-			<summary>Trip settings</summary>
+			<summary>{t('editor.tripSettings')}</summary>
 			<div class="sbody">
-				<LocalizedInput bind:value={draft.title} {langs} label="Trip title" />
-				<LocalizedInput bind:value={draft.eyebrow as never} {langs} label="Eyebrow (e.g. April 2026)" />
+				<LocalizedInput bind:value={draft.title} {langs} label={t('editor.tripTitle')} />
+				<LocalizedInput bind:value={draft.eyebrow as never} {langs} label={t('editor.eyebrow')} />
 
 				<div class="langs">
-					<span class="lbl">Languages</span>
+					<span class="lbl">{t('editor.languages')}</span>
 					<div class="chips">
 						{#each draft.languages as l (l)}
 							<span class="chip">{l}{#if draft.languages.length > 1}<button type="button" onclick={() => removeLanguage(l)}>✕</button>{/if}</span>
 						{/each}
 						{#if !langFormOpen}
-							<button type="button" class="add" onclick={() => { langFormOpen = true; langErr = ''; }}>+ Language</button>
+							<button type="button" class="add" onclick={() => { langFormOpen = true; langErr = ''; }}>{t('editor.addLanguage')}</button>
 						{/if}
 					</div>
 					{#if langFormOpen}
 						<div class="miniform">
 							<input
 								type="text"
-								placeholder="Code, e.g. es"
+								placeholder={t('editor.langCodePlaceholder')}
 								bind:value={langInput}
 								onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), submitLanguage())}
-								aria-label="New language code"
+								aria-label={t('editor.newLangCodeAria')}
 							/>
-							<button type="button" class="add" onclick={submitLanguage}>Add</button>
-							<button type="button" onclick={() => { langFormOpen = false; langInput = ''; langErr = ''; }}>Cancel</button>
+							<button type="button" class="add" onclick={submitLanguage}>{t('common.add')}</button>
+							<button type="button" onclick={() => { langFormOpen = false; langInput = ''; langErr = ''; }}>{t('common.cancel')}</button>
 							{#if langErr}<span class="minierr">{langErr}</span>{/if}
 						</div>
 					{/if}
-					<label class="f inline">Default
+					<label class="f inline">{t('editor.default')}
 						<select bind:value={draft.defaultLanguage}>
 							{#each draft.languages as l (l)}<option value={l}>{l}</option>{/each}
 						</select>
 					</label>
 				</div>
 
-				<LocalizedInput bind:value={draft.locales as never} {langs} label="Locale (date format, e.g. en-GB)" placeholder="en-GB" />
+				<LocalizedInput bind:value={draft.locales as never} {langs} label={t('editor.locale')} placeholder="en-GB" />
 
 				<div class="homebase">
-					<label class="check"><input type="checkbox" checked={hasHome} onchange={(e) => toggleHome(e.currentTarget.checked)} /> Home base</label>
+					<label class="check"><input type="checkbox" checked={hasHome} onchange={(e) => toggleHome(e.currentTarget.checked)} /> {t('editor.homeBase')}</label>
 					{#if draft.home}
-						<PlaceSearch label="Find place" onPick={onPickHome} />
+						<PlaceSearch label={t('editor.findPlace')} onPick={onPickHome} />
 						<div class="grid4">
-							<label class="f">Name<input type="text" bind:value={draft.home.name} /></label>
-							<label class="f">Postcode<input type="text" bind:value={draft.home.postcode} /></label>
-							<label class="f">Lat<input type="number" step="0.0001" bind:value={draft.home.lat} /></label>
-							<label class="f">Lon<input type="number" step="0.0001" bind:value={draft.home.lon} /></label>
+							<label class="f">{t('editor.name')}<input type="text" bind:value={draft.home.name} /></label>
+							<label class="f">{t('editor.postcode')}<input type="text" bind:value={draft.home.postcode} /></label>
+							<label class="f">{t('editor.lat')}<input type="number" step="0.0001" bind:value={draft.home.lat} /></label>
+							<label class="f">{t('editor.lon')}<input type="number" step="0.0001" bind:value={draft.home.lon} /></label>
 						</div>
 					{/if}
 				</div>
 
 				<div class="tagsvocab">
-					<div class="sub-hd"><span class="lbl">Tag vocabulary</span>
-						{#if !tagFormOpen}<button type="button" onclick={openTagForm}>+ Tag</button>{/if}
+					<div class="sub-hd"><span class="lbl">{t('editor.tagVocabulary')}</span>
+						{#if !tagFormOpen}<button type="button" onclick={openTagForm}>{t('editor.addTag')}</button>{/if}
 					</div>
 					{#if tagFormOpen}
 						<div class="miniform tagform">
-							<label class="f">Label<input type="text" bind:value={tagLabel} placeholder="e.g. Museum" aria-label="New tag label" /></label>
-							<label class="f keyf">Key <span class="hint">auto</span>
-								<input type="text" bind:value={tagKey} oninput={() => (tagKeyDirty = true)} aria-label="New tag key" />
+							<label class="f">{t('editor.label')}<input type="text" bind:value={tagLabel} placeholder={t('editor.tagLabelPlaceholder')} aria-label={t('editor.newTagLabelAria')} /></label>
+							<label class="f keyf">{t('editor.key')} <span class="hint">{t('editor.auto')}</span>
+								<input type="text" bind:value={tagKey} oninput={() => (tagKeyDirty = true)} aria-label={t('editor.newTagKeyAria')} />
 							</label>
-							<button type="button" class="add" onclick={submitTag}>Add</button>
-							<button type="button" onclick={() => (tagFormOpen = false)}>Cancel</button>
+							<button type="button" class="add" onclick={submitTag}>{t('common.add')}</button>
+							<button type="button" onclick={() => (tagFormOpen = false)}>{t('common.cancel')}</button>
 							{#if tagErr}<span class="minierr">{tagErr}</span>{/if}
 						</div>
 					{/if}
 					{#each tagKeys as key (key)}
 						<div class="tagrow">
 							<span class="tkey">{key}</span>
-							<LocalizedInput bind:value={draft.tags![key].label} {langs} label="Label" />
-							<select bind:value={draft.tags![key].style} aria-label="Tag style">
+							<LocalizedInput bind:value={draft.tags![key].label} {langs} label={t('editor.label')} />
+							<select bind:value={draft.tags![key].style} aria-label={t('editor.tagStyleAria')}>
 								{#each ['sight', 'food', 'birthday', 'booking', 'logistics', 'fullday'] as s (s)}<option value={s}>{s}</option>{/each}
 							</select>
 							<button type="button" class="del" onclick={() => delete draft.tags![key]}>✕</button>
@@ -328,7 +329,7 @@
 			</div>
 		</details>
 
-		<div class="segs-hd"><h2>Segments</h2><button type="button" onclick={addSegment}>+ Add segment</button></div>
+		<div class="segs-hd"><h2>{t('editor.segments')}</h2><button type="button" onclick={addSegment}>{t('editor.addSegment')}</button></div>
 		<div
 			class="dndlist"
 			use:dndzone={{ items: segItems, flipDurationMs: FLIP_MS, dragDisabled: segDragDisabled, dropTargetStyle: {} }}
@@ -353,13 +354,13 @@
 	</div>
 
 	<div class="preview">
-		<div class="preview-label">Live preview</div>
+		<div class="preview-label">{t('editor.livePreview')}</div>
 		{#if hasPreviewContent}
 			{#key draft.languages.length}
 				<TripView trip={draft} />
 			{/key}
 		{:else}
-			<div class="preview-empty">Preview appears as you add trip details</div>
+			<div class="preview-empty">{t('editor.previewPlaceholder')}</div>
 		{/if}
 	</div>
 </div>

@@ -5,6 +5,7 @@
 	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import BlockEditor from './BlockEditor.svelte';
 	import LocalizedInput from './LocalizedInput.svelte';
+	import { t } from '$lib/i18n/store.svelte';
 
 	type BlockItem = { id: string; item: Block };
 
@@ -105,50 +106,50 @@
 		<span
 			class="grip"
 			aria-hidden="true"
-			title="Drag to reorder day"
+			title={t('day.dragReorder')}
 			onpointerdown={onGrab}
 			ontouchstart={onGrab}
 			onclick={(e) => e.preventDefault()}
 		>⠿</span>
-		<span class="date">{day.date || 'no date'}</span>
-		<span class="title">{day.title?.[langs[0]] || '(untitled day)'}</span>
+		<span class="date">{day.date || t('day.noDate')}</span>
+		<span class="title">{day.title?.[langs[0]] || t('day.untitled')}</span>
 		<span class="controls">
-			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label="Move day up">↑</button>
-			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label="Move day down">↓</button>
-			{#if onDuplicate}<button type="button" onclick={(e) => (e.preventDefault(), onDuplicate())} aria-label="Duplicate day">Duplicate</button>{/if}
-			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label="Remove day">✕</button>
+			<button type="button" disabled={!canUp} onclick={(e) => (e.preventDefault(), onMove(-1))} aria-label={t('day.moveUp')}>↑</button>
+			<button type="button" disabled={!canDown} onclick={(e) => (e.preventDefault(), onMove(1))} aria-label={t('day.moveDown')}>↓</button>
+			{#if onDuplicate}<button type="button" onclick={(e) => (e.preventDefault(), onDuplicate())} aria-label={t('day.duplicateAria')}>{t('day.duplicate')}</button>{/if}
+			<button type="button" class="del" onclick={(e) => (e.preventDefault(), onRemove())} aria-label={t('day.removeAria')}>✕</button>
 		</span>
 	</summary>
 	{#if open}
 	<div class="body" bind:this={bodyEl}>
 		<div class="grid2">
-			<label class="f">Date (ISO)<input type="date" bind:value={day.date} /></label>
-			<label class="f">Route mode
+			<label class="f">{t('day.dateIso')}<input type="date" bind:value={day.date} /></label>
+			<label class="f">{t('day.routeMode')}
 				<select bind:value={day.routeMode}>
-					<option value={undefined}>(none)</option>
-					<option value="walking">walking</option>
-					<option value="driving">driving</option>
-					<option value="transit">transit</option>
-					<option value="bicycling">bicycling</option>
+					<option value={undefined}>{t('day.routeNone')}</option>
+					<option value="walking">{t('day.walking')}</option>
+					<option value="driving">{t('day.driving')}</option>
+					<option value="transit">{t('day.transit')}</option>
+					<option value="bicycling">{t('day.bicycling')}</option>
 				</select>
 			</label>
 		</div>
-		<LocalizedInput bind:value={day.title} {langs} label="Day title" />
-		<LocalizedInput bind:value={day.note as never} {langs} label="Day note" multiline />
-		<LocalizedInput bind:value={day.banner as never} {langs} label="Banner (celebration strip)" />
-		<label class="f">Total km override (optional)<input type="number" step="0.1" min="0" bind:value={day.kmTotal} /></label>
+		<LocalizedInput bind:value={day.title} {langs} label={t('day.dayTitle')} />
+		<LocalizedInput bind:value={day.note as never} {langs} label={t('day.dayNote')} multiline />
+		<LocalizedInput bind:value={day.banner as never} {langs} label={t('day.banner')} />
+		<label class="f">{t('day.kmOverride')}<input type="number" step="0.1" min="0" bind:value={day.kmTotal} /></label>
 
-		<label class="check"><input type="checkbox" checked={hasStaticWx} onchange={(e) => toggleStaticWx(e.currentTarget.checked)} /> Stored weather (for past trips)</label>
+		<label class="check"><input type="checkbox" checked={hasStaticWx} onchange={(e) => toggleStaticWx(e.currentTarget.checked)} /> {t('day.storedWeather')}</label>
 		{#if day.staticWeather}
 			<div class="grid3">
-				<label class="f">High °C<input type="number" bind:value={day.staticWeather.hi} /></label>
-				<label class="f">Low °C<input type="number" bind:value={day.staticWeather.lo} /></label>
-				<label class="f">Emoji<input type="text" bind:value={day.staticWeather.emoji} /></label>
+				<label class="f">{t('day.highC')}<input type="number" bind:value={day.staticWeather.hi} /></label>
+				<label class="f">{t('day.lowC')}<input type="number" bind:value={day.staticWeather.lo} /></label>
+				<label class="f">{t('day.emoji')}<input type="text" bind:value={day.staticWeather.emoji} /></label>
 			</div>
 		{/if}
 
 		<div class="blocks">
-			<div class="blocks-hd"><span class="lbl">Blocks</span><button type="button" onclick={addBlock}>+ Add block</button></div>
+			<div class="blocks-hd"><span class="lbl">{t('day.blocks')}</span><button type="button" onclick={addBlock}>{t('day.addBlock')}</button></div>
 			<div
 				class="dndlist"
 				use:dndzone={{ items: blockItems, flipDurationMs: FLIP_MS, dragDisabled: blockDragDisabled, dropTargetStyle: {} }}
