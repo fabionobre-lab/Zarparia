@@ -1,11 +1,26 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import TripView from '$lib/TripView.svelte';
 	import SharePanel from '$lib/SharePanel.svelte';
-	import type { Trip } from '$lib/trip-engine';
+	import { loc, type Trip } from '$lib/trip-engine';
 	let { data } = $props();
 
 	let showShare = $state(false);
+
+	// Mirrors TripView's internal language selection so the document title
+	// tracks the language the visitor is currently viewing.
+	let lang = $state(untrack(() => (data.trip as unknown as Trip).defaultLanguage));
+	$effect(() => {
+		// Re-seed when navigating to a different trip (component below remounts via #key).
+		data.trip.id;
+		lang = (data.trip as unknown as Trip).defaultLanguage || (data.trip as unknown as Trip).languages[0];
+	});
+	const pageTitle = $derived(`${loc(data.trip as unknown as Trip, (data.trip as unknown as Trip).title, lang)} — Trips`);
 </script>
+
+<svelte:head>
+	<title>{pageTitle}</title>
+</svelte:head>
 
 <div class="page">
 	<div class="bar">
@@ -27,7 +42,7 @@
 	{/if}
 
 	{#key data.trip.id}
-		<TripView trip={data.trip as unknown as Trip} />
+		<TripView trip={data.trip as unknown as Trip} bind:lang />
 	{/key}
 </div>
 

@@ -71,6 +71,8 @@ export interface Trip {
 	locales?: Record<string, string>;
 	home?: { name: string; postcode?: string; lat?: number; lon?: number };
 	tags?: Record<string, { label: Localized; style?: string }>;
+	/** Optional emoji shown on the trip picker card (parity with the static app's manifest "cover"). */
+	cover?: string;
 	segments: Segment[];
 }
 

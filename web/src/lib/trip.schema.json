@@ -25,6 +25,10 @@
       "description": "UI hides the language toggle when only one language"
     },
     "defaultLanguage": { "type": "string" },
+    "cover": {
+      "type": "string",
+      "description": "Optional emoji shown on the trip picker card, e.g. \"🏛️\""
+    },
     "locales": {
       "type": "object",
       "additionalProperties": { "type": "string" },

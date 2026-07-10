@@ -10,6 +10,8 @@ export interface TripListItem {
 	endDate: string | null;
 	role: Role;
 	updatedAt: string;
+	/** Emoji cover, parsed from the stored doc (no denormalized column for it). */
+	cover?: string;
 }
 
 /** Result of a write: either the trip, or a typed failure. */
@@ -82,25 +84,36 @@ export async function roleFor(db: D1Database, userId: string, tripId: string): P
 }
 
 export async function listTripsForUser(db: D1Database, userId: string): Promise<TripListItem[]> {
+	// Pulls the full `doc` blob alongside the denormalized columns so the
+	// optional cover emoji (not worth its own column/migration) can be read
+	// off it directly — trips are stored as JSON, so no schema change needed.
 	const rows = await db
 		.prepare(
-			`SELECT id, title, status, startDate, endDate, role, updatedAt FROM (
+			`SELECT id, title, status, startDate, endDate, role, updatedAt, doc FROM (
 				SELECT t.id AS id, t.title AS title, t.status AS status,
 				       t.start_date AS startDate, t.end_date AS endDate,
-				       'owner' AS role, t.updated_at AS updatedAt
+				       'owner' AS role, t.updated_at AS updatedAt, t.doc AS doc
 				FROM trips t WHERE t.owner_id = ?1
 				UNION ALL
 				SELECT t.id, t.title, t.status, t.start_date, t.end_date,
-				       ts.permission, t.updated_at
+				       ts.permission, t.updated_at, t.doc
 				FROM trips t JOIN trip_shares ts ON ts.trip_id = t.id
 				WHERE ts.user_id = ?1
 			) ORDER BY (startDate IS NULL), startDate DESC`
 		)
 		.bind(userId)
-		.all<TripListItem>();
+		.all<TripListItem & { doc: string }>();
 	// status/start_date/end_date are denormalized at write time and never
 	// refreshed, so recompute status from the dates on read.
-	return rows.results.map((r) => ({ ...r, status: statusFor(r.startDate, r.endDate) }));
+	return rows.results.map(({ doc, ...r }) => {
+		let cover: string | undefined;
+		try {
+			cover = (JSON.parse(doc) as { cover?: string }).cover;
+		} catch {
+			cover = undefined;
+		}
+		return { ...r, status: statusFor(r.startDate, r.endDate), cover };
+	});
 }
 
 export async function getTripForUser(
