@@ -64,6 +64,13 @@ export function pruneEmpty(value: unknown): unknown {
 			const p = pruneEmpty(v);
 			if (p !== undefined) out[k] = p;
 		}
+		// Block coords is all-or-nothing (lat+lon both required by the schema);
+		// a partial coords object (only one field filled in) can't validate, so
+		// drop it entirely rather than surface a confusing schema error.
+		if (out.coords && typeof out.coords === 'object') {
+			const c = out.coords as Record<string, unknown>;
+			if (typeof c.lat !== 'number' || typeof c.lon !== 'number') delete out.coords;
+		}
 		return Object.keys(out).length ? out : undefined;
 	}
 	if (value === '' || value === null) return undefined;

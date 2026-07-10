@@ -197,6 +197,16 @@
         "km": { "type": "number", "exclusiveMinimum": 0 },
         "warning": { "$ref": "#/$defs/localized" },
         "note": { "$ref": "#/$defs/localized" },
+        "coords": {
+          "type": "object",
+          "description": "Geocoded lat/lon for the block's own destination (not route waypoints); used for map pins",
+          "required": ["lat", "lon"],
+          "additionalProperties": false,
+          "properties": {
+            "lat": { "type": "number" },
+            "lon": { "type": "number" }
+          }
+        },
         "waypoints": {
           "description": "Intermediate stops merged into the day-route URL and stop list",
           "type": "array",
