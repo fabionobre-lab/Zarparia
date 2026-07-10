@@ -15,12 +15,12 @@
 		tripIsPast,
 		routePlaces,
 		routeUrl,
-		truncStop,
 		dayKmTotal,
 		fetchSegmentWeather,
 		safeUrl,
 		buildIcs
 	} from './trip-engine';
+	import DayMap, { type MapStop } from './DayMap.svelte';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
 	// per trip id), so these initial reads are intentionally non-reactive.
@@ -308,6 +308,28 @@
 		if (places.length < 2) return null;
 		return { url: routeUrl(places, current.day.routeMode), places };
 	});
+
+	// ── Day map stops ──
+	// The current day's coord-bearing blocks, numbered in time order (blocks are
+	// stored in time order, so array order is time order). Popup title is
+	// localized for the active language, so switching languages re-renders them.
+	const dayMapStops = $derived.by<MapStop[]>(() => {
+		if (!current) return [];
+		const out: MapStop[] = [];
+		let n = 0;
+		for (const b of current.day.blocks) {
+			if (b.coords) {
+				n++;
+				out.push({ lat: b.coords.lat, lon: b.coords.lon, n, popup: `${b.time} — ${L(b.title)}` });
+			}
+		}
+		return out;
+	});
+	const mapAriaLabel = $derived(
+		lang === 'pt'
+			? `Mapa do dia, ${dayMapStops.length} paradas`
+			: `Day map, ${dayMapStops.length} stops`
+	);
 </script>
 
 <div class="shell" class:theme-navy={current?.seg.theme === 'navy'} style={themeStyle}>
@@ -414,7 +436,7 @@
 							{#if i > 0}<div class="route-connector"></div>{/if}
 							<div class="route-stop">
 								<div class="route-num">{i + 1}</div>
-								<div class="route-name">{truncStop(p.name)}</div>
+								<div class="route-name">{p.name}</div>
 							</div>
 						{/each}
 					</div>
@@ -423,6 +445,10 @@
 						{uiText.openRoute}
 					</div>
 				</a>
+			{/if}
+
+			{#if dayMapStops.length >= 2}
+				<DayMap stops={dayMapStops} ariaLabel={mapAriaLabel} />
 			{/if}
 
 			<div class="tl">
@@ -964,7 +990,7 @@
 	}
 	.route-stops {
 		display: flex;
-		align-items: center;
+		align-items: flex-start;
 		overflow-x: auto;
 		scrollbar-width: none;
 		padding: 2px 0 6px;
@@ -995,12 +1021,15 @@
 		font-size: 9px;
 		color: var(--stone);
 		text-align: center;
-		max-width: 58px;
-		line-height: 1.2;
+		width: 70px;
+		line-height: 1.25;
 		margin-top: 3px;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		white-space: nowrap;
 	}
 	.route-connector {
 		width: 20px;
