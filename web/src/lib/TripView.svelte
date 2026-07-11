@@ -18,9 +18,15 @@
 		dayKmTotal,
 		fetchSegmentWeather,
 		safeUrl,
-		buildIcs
+		buildIcs,
+		tripTimezone,
+		isoDateInTZ,
+		hhmmInTZ,
+		minutesSinceMidnightInTZ,
+		parseBlockTimeMinutes
 	} from './trip-engine';
 	import DayMap, { type MapStop } from './DayMap.svelte';
+	import { getNow } from './now';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
 	// per trip id), so these initial reads are intentionally non-reactive.
@@ -54,14 +60,11 @@
 	}
 
 	// ── Today auto-focus ──
-	// Local-date (YYYY-MM-DD from wall-clock getFullYear/Month/Date, NOT the
-	// UTC-based toISOString) so "today" matches the visitor's own calendar day.
-	function localISODate(d: Date): string {
-		const y = d.getFullYear();
-		const m = String(d.getMonth() + 1).padStart(2, '0');
-		const day = String(d.getDate()).padStart(2, '0');
-		return `${y}-${m}-${day}`;
-	}
+	// "Today" is resolved through the shared clock (`getNow()`, which honors
+	// `?now=<ISO datetime>` for testing) and the trip's own timezone (first
+	// segment carrying `weather.timezone` — the creation wizard applies one
+	// zone to every stop), not the browser's ambient locale/zone.
+	const tz = untrack(() => tripTimezone(trip));
 	/** Day index to open on: today's day if the trip is currently active
 	 *  (today between the first and last day, inclusive), landing on the next
 	 *  planned day when today itself is an unplanned gap date. Past/upcoming
@@ -70,7 +73,7 @@
 		if (days.length === 0) return 0;
 		const first = days[0].day.date;
 		const last = days[days.length - 1].day.date;
-		const today = localISODate(new Date());
+		const today = isoDateInTZ(getNow(), tz);
 		if (today < first || today > last) return 0;
 		const exact = days.findIndex((f) => f.day.date === today);
 		if (exact !== -1) return exact;
@@ -153,19 +156,71 @@
 		el?.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
 	});
 
+	// ── Sticky day nav: shadow only once it's actually pinned to the top ──
+	// A 1px sentinel sits just above the nav; once it scrolls out of view the
+	// nav has reached position:sticky's `top: 0` and is "stuck".
+	let sentinelEl: HTMLDivElement | null = null;
+	let daynavStuck = $state(false);
+	$effect(() => {
+		if (!sentinelEl || typeof IntersectionObserver === 'undefined') return;
+		const obs = new IntersectionObserver(([entry]) => (daynavStuck = !entry.isIntersecting), {
+			threshold: 0
+		});
+		obs.observe(sentinelEl);
+		return () => obs.disconnect();
+	});
+
+	// ── "Now" marker on the timeline ──
+	// Ticks once a minute; a frozen `?now=` (see ./now) simply repeats the same
+	// instant on every tick, which is fine — the marker just stays put.
+	let nowTick = $state(untrack(() => getNow()));
+	$effect(() => {
+		const id = setInterval(() => (nowTick = getNow()), 60_000);
+		return () => clearInterval(id);
+	});
+	const todayISO = $derived(isoDateInTZ(nowTick, tz));
+	const isToday = $derived(!!current && current.day.date === todayISO);
+	const nowMinutesToday = $derived(minutesSinceMidnightInTZ(nowTick, tz));
+	const nowLabel = $derived(hhmmInTZ(nowTick, tz));
+	/** Index of the next upcoming block for "today", or `blocks.length` when
+	 *  every timed block has already started (marker renders after the last
+	 *  one), or `null` when today isn't the selected day / has no blocks.
+	 *  Blocks with an unparseable time never count as "the next one" — the
+	 *  marker skips past them to the next block that does have a time. */
+	const nowMarkerIdx = $derived.by<number | null>(() => {
+		if (!isToday || !current || current.day.blocks.length === 0) return null;
+		const blocks = current.day.blocks;
+		for (let i = 0; i < blocks.length; i++) {
+			const mins = parseBlockTimeMinutes(blocks[i].time);
+			if (mins !== null && mins > nowMinutesToday) return i;
+		}
+		return blocks.length;
+	});
+	// Scroll the now-marker into view (centered) whenever the selected day
+	// becomes today's day, instead of leaving the visitor at the top.
+	let nowMarkerEl = $state<HTMLDivElement | null>(null);
+	$effect(() => {
+		clampedIdx;
+		if (isToday && nowMarkerEl) {
+			nowMarkerEl.scrollIntoView({ behavior: 'auto', block: 'center' });
+		}
+	});
+
 	const uiText = $derived(
 		lang === 'pt'
 			? {
 					maps: 'Abrir no Maps',
 					dayRoute: 'Rota do Dia',
 					openRoute: 'Abrir rota no Google Maps →',
-					addToCalendar: 'Adicionar ao calendário'
+					addToCalendar: 'Adicionar ao calendário',
+					now: 'Agora'
 				}
 			: {
 					maps: 'Open in Maps',
 					dayRoute: 'Day Route',
 					openRoute: 'Open route in Google Maps →',
-					addToCalendar: 'Add to calendar'
+					addToCalendar: 'Add to calendar',
+					now: 'Now'
 				}
 	);
 
@@ -368,7 +423,8 @@
 		</div>
 	</div>
 
-	<nav class="daynav" aria-label="Days">
+	<div class="daynav-sentinel" bind:this={sentinelEl} aria-hidden="true"></div>
+	<nav class="daynav" class:stuck={daynavStuck} aria-label="Days">
 		{#each navEntries as entry (entry.kind === 'day' ? entry.day : entry.date)}
 			{#if entry.kind === 'day'}
 				{@const day = entry.day}
@@ -454,6 +510,17 @@
 			<div class="tl">
 				{#each day.blocks as b, bi (bi)}
 					{@const badge = blockBadge(seg, day, b.time)}
+					{@const isNext = isToday && nowMarkerIdx === bi}
+					{#if isToday && nowMarkerIdx === bi}
+						<div class="tb tb-now" aria-hidden="true" bind:this={nowMarkerEl}>
+							<div class="tb-left"></div>
+							<div class="tb-body tb-now-body">
+								<div class="tb-now-dot"></div>
+								<div class="tb-now-line"></div>
+								<span class="tb-now-label">{uiText.now} · {nowLabel}</span>
+							</div>
+						</div>
+					{/if}
 					<div class="tb">
 						<div class="tb-left">
 							<div class="tb-time">
@@ -463,12 +530,12 @@
 								{/if}
 							</div>
 							<div class="tb-dot-col">
-								<div class="tb-dot" style="background:{b.dotColor || 'var(--stone)'}"></div>
+								<div class="tb-dot" class:tb-dot-next={isNext} style="background:{b.dotColor || 'var(--stone)'}"></div>
 								{#if bi < day.blocks.length - 1}<div class="tb-line"></div>{/if}
 							</div>
 						</div>
 						<div class="tb-body">
-							<div class="tb-title">{L(b.title)}</div>
+							<div class="tb-title" class:tb-title-next={isNext}>{L(b.title)}</div>
 							{#if b.tags?.length}
 								<div class="tb-tags">
 									{#each b.tags as key (key)}
@@ -508,6 +575,16 @@
 						</div>
 					</div>
 				{/each}
+				{#if isToday && day.blocks.length > 0 && nowMarkerIdx === day.blocks.length}
+					<div class="tb tb-now tb-now-end" aria-hidden="true" bind:this={nowMarkerEl}>
+						<div class="tb-left"></div>
+						<div class="tb-body tb-now-body">
+							<div class="tb-now-dot"></div>
+							<div class="tb-now-line"></div>
+							<span class="tb-now-label">{uiText.now} · {nowLabel}</span>
+						</div>
+					</div>
+				{/if}
 			</div>
 			{#if L(seg.footer)}<div class="footer">{L(seg.footer)}</div>{/if}
 		{/if}
@@ -535,7 +612,12 @@
 		font-family: 'Source Serif 4', Georgia, serif;
 		color: var(--ink);
 		border-radius: 14px;
-		overflow: hidden;
+		/* `clip`, not `hidden`: still clips content to the rounded corners, but
+		   (unlike `hidden`) doesn't turn .shell into a scroll container — which
+		   would otherwise become the sticky day nav's containing block and
+		   break position: sticky, since .shell itself never actually scrolls
+		   (the page does). */
+		overflow: clip;
 		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
 	}
 	.shell.theme-navy {
@@ -672,6 +754,13 @@
 		color: var(--ink);
 		font-weight: 500;
 	}
+	.daynav-sentinel {
+		/* Zero footprint (height cancelled by the negative margin) — exists only
+		   so an IntersectionObserver can detect the moment the day nav below it
+		   becomes pinned to the top of the viewport. */
+		height: 1px;
+		margin-bottom: -1px;
+	}
 	.daynav {
 		display: flex;
 		overflow-x: auto;
@@ -686,6 +775,17 @@
 		   clipping on ancestors does not stop it in this flex/scroll case).
 		   Paint containment keeps that scroll overflow inside the strip. */
 		contain: paint;
+		/* Sticks to the top of the trip shell as the page scrolls; the plan
+		   tabs and hero above it scroll away normally. z-index is set well
+		   above Leaflet's internal panes (tilePane 200 … popupPane 700) so the
+		   day-map never paints over it. */
+		position: sticky;
+		top: 0;
+		z-index: 1000;
+		transition: box-shadow 0.15s ease;
+	}
+	.daynav.stuck {
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 	}
 	.daynav::-webkit-scrollbar {
 		display: none;
@@ -866,6 +966,49 @@
 		background: var(--border);
 		margin-top: 2px;
 	}
+	.tb-dot-next {
+		box-shadow:
+			0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent),
+			0 0 0 1px var(--accent);
+	}
+	/* The "now" row: a quiet accent rule across the timeline with a small dot
+	   on the rail and a tiny HH:MM label, sitting between the last started
+	   block and the next upcoming one. */
+	.tb-now .tb-left {
+		width: 50px;
+		flex-shrink: 0;
+	}
+	.tb-now-body {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		padding: 0 0 0 5px;
+		min-height: 16px;
+		border-bottom: none;
+	}
+	.tb-now-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: var(--accent);
+		flex-shrink: 0;
+		box-shadow: 0 0 0 2px var(--cream);
+	}
+	.tb-now-line {
+		flex: 1;
+		height: 1.5px;
+		background: var(--accent);
+		opacity: 0.55;
+		margin: 0 6px;
+	}
+	.tb-now-label {
+		font-size: 9px;
+		letter-spacing: 0.03em;
+		color: var(--accent);
+		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
+		flex-shrink: 0;
+	}
 	.tb-body {
 		flex: 1;
 		padding: 11px 0 11px 9px;
@@ -880,6 +1023,10 @@
 		font-weight: 500;
 		color: var(--ink);
 		line-height: 1.3;
+	}
+	.tb-title-next {
+		color: var(--accent);
+		font-weight: 700;
 	}
 	.tb-tags {
 		display: flex;

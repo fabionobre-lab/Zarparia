@@ -39,6 +39,9 @@ export interface Messages {
 	'home.statusPast': string;
 	'home.statusNow': string;
 	'home.statusUpcoming': string;
+	'home.activeEyebrow': string;
+	'home.dayOfTotal': string; // "Day {day} of {total}"
+	'home.nextLabel': string; // "Next" (prefixes "Next: <title> · HH:MM")
 
 	// ── Role labels (home cards + trip bar) ──
 	'role.canEdit': string;
@@ -354,6 +357,9 @@ const enGB: Messages = {
 	'home.statusPast': 'Past',
 	'home.statusNow': 'Now',
 	'home.statusUpcoming': 'Upcoming',
+	'home.activeEyebrow': 'Happening now',
+	'home.dayOfTotal': 'Day {day} of {total}',
+	'home.nextLabel': 'Next',
 
 	'role.canEdit': 'can edit',
 	'role.viewOnly': 'view only',
@@ -656,6 +662,9 @@ const ptBR: Messages = {
 	'home.statusPast': 'Passada',
 	'home.statusNow': 'Agora',
 	'home.statusUpcoming': 'Futura',
+	'home.activeEyebrow': 'Acontecendo agora',
+	'home.dayOfTotal': 'Dia {day} de {total}',
+	'home.nextLabel': 'Próximo',
 
 	'role.canEdit': 'pode editar',
 	'role.viewOnly': 'somente leitura',
