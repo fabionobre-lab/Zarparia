@@ -21,8 +21,8 @@
 	.panel {
 		max-width: 430px;
 		margin: 3rem auto;
-		background: #fbf8f1;
-		border: 1px solid #d8ccb8;
+		background: var(--surface);
+		border: 1px solid var(--hairline-strong);
 		border-radius: 12px;
 		padding: 1.4rem 1.2rem;
 		font-family: system-ui, sans-serif;
@@ -31,19 +31,19 @@
 	h1 {
 		font-size: 1.1rem;
 		margin-bottom: 0.6rem;
-		color: #2b4a2b;
+		color: var(--accent-strong);
 	}
 	p {
 		font-size: 0.9rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		margin-bottom: 1rem;
 	}
 	.btn {
 		display: inline-block;
 		font-size: 0.85rem;
 		text-decoration: none;
-		border: 1px solid #d8ccb8;
-		background: #2b4a2b;
+		border: 1px solid var(--accent);
+		background: var(--accent);
 		color: #fff;
 		border-radius: 8px;
 		padding: 0.5rem 1rem;

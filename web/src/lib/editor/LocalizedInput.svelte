@@ -50,7 +50,7 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		margin-bottom: 0.2rem;
 	}
 	.row {
@@ -62,8 +62,8 @@
 	.tag {
 		font-size: 0.6rem;
 		text-transform: uppercase;
-		color: #999;
-		background: #f0ece4;
+		color: var(--text-muted);
+		background: var(--surface-sunken);
 		border-radius: 4px;
 		padding: 0.25rem 0.35rem;
 		margin-top: 0.35rem;
@@ -75,9 +75,10 @@
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
-		background: #fff;
+		background: var(--surface);
+		color: var(--text);
 		resize: vertical;
 	}
 </style>

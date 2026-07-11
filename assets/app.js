@@ -19,6 +19,9 @@ const UI_STRINGS = {
     addToCalendar: 'Add to calendar',
     dayMap: 'Day map',
     dayMapAria: 'Day map, {n} stops',
+    themeAuto: 'Theme: automatic (tap for dark)',
+    themeDark: 'Theme: dark (tap for light)',
+    themeLight: 'Theme: light (tap for automatic)',
   },
   pt: {
     maps: 'Abrir no Maps',
@@ -34,6 +37,9 @@ const UI_STRINGS = {
     addToCalendar: 'Adicionar ao calendário',
     dayMap: 'Mapa do dia',
     dayMapAria: 'Mapa do dia, {n} paradas',
+    themeAuto: 'Tema: automático (toque para escuro)',
+    themeDark: 'Tema: escuro (toque para claro)',
+    themeLight: 'Tema: claro (toque para automático)',
   },
 };
 
@@ -511,6 +517,46 @@ function downloadIcsFile(filename, text) {
 const PIN_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>';
 const TREND_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M17 7h4v4"/></svg>';
 const CAL_SVG = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>';
+const SUN_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+const MOON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 1 0 11 11z"/></svg>';
+const AUTO_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>';
+
+/* ── Theme (light/dark/auto) ───────────────────────────────────────────
+   Mirrors the "candlelit paper" dark palette in assets/app.css. Persisted
+   in localStorage so it applies across app.html and the index.html trip
+   picker; the inline <head> script in both applies it before first paint. */
+const THEME_KEY = 'theme-pref';
+function themePref() {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    return (v === 'dark' || v === 'light') ? v : 'auto';
+  } catch (e) { return 'auto'; }
+}
+function applyTheme(pref) {
+  const root = document.documentElement;
+  if (pref === 'dark' || pref === 'light') root.setAttribute('data-theme', pref);
+  else root.removeAttribute('data-theme');
+}
+function renderThemeBtn() {
+  const btn = $('theme-btn');
+  if (!btn) return;
+  const pref = themePref();
+  const icon = pref === 'dark' ? MOON_SVG : pref === 'light' ? SUN_SVG : AUTO_SVG;
+  const label = ui('theme' + cap(pref));
+  btn.innerHTML = icon;
+  btn.setAttribute('aria-label', label);
+}
+window.toggleTheme = function () {
+  const next = { auto: 'dark', dark: 'light', light: 'auto' }[themePref()];
+  try {
+    if (next === 'auto') localStorage.removeItem(THEME_KEY);
+    else localStorage.setItem(THEME_KEY, next);
+  } catch (e) { /* private mode / storage disabled */ }
+  applyTheme(next);
+  renderThemeBtn();
+};
+// Apply immediately (button exists in the static shell before the trip loads).
+renderThemeBtn();
 
 function renderHero() {
   const { seg } = current();
@@ -533,6 +579,8 @@ function renderHero() {
     icsBtn.innerHTML = CAL_SVG + '<span>' + esc(ui('addToCalendar')) + '</span>';
     icsBtn.setAttribute('aria-label', ui('addToCalendar'));
   }
+  // light/dark theme toggle (label text re-localized on language change)
+  renderThemeBtn();
   // language toggle
   const toggle = $('lang-toggle');
   toggle.classList.toggle('hidden', trip.languages.length < 2);

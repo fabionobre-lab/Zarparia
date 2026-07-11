@@ -390,18 +390,18 @@
 		margin-bottom: 0.75rem;
 		position: sticky;
 		top: 0;
-		background: #fff;
+		background: var(--bg);
 		padding: 0.5rem 0;
 		z-index: 2;
 	}
 	.back {
 		text-decoration: none;
-		color: #2b4a2b;
+		color: var(--accent-strong);
 		font-size: 0.9rem;
 	}
 	.save {
 		font: inherit;
-		background: #2b4a2b;
+		background: var(--accent);
 		color: #fff;
 		border: none;
 		border-radius: 999px;
@@ -412,22 +412,22 @@
 		opacity: 0.5;
 	}
 	.errors {
-		background: #fdf0ee;
-		border: 1px solid #e6b0aa;
+		background: var(--pill-bug-bg);
+		border: 1px solid var(--pill-bug-bg);
 		border-radius: 8px;
 		padding: 0.6rem 0.8rem;
 		margin-bottom: 0.75rem;
 		font-size: 0.85rem;
-		color: #7a2020;
+		color: var(--pill-bug-fg);
 	}
 	.errors ul {
 		margin: 0.3rem 0 0 1rem;
 	}
 	.settings {
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 10px;
 		margin-bottom: 1rem;
-		background: #fbf8f1;
+		background: var(--surface);
 	}
 	.settings > summary {
 		padding: 0.6rem 0.8rem;
@@ -436,7 +436,7 @@
 	}
 	.sbody {
 		padding: 0.7rem 0.8rem;
-		border-top: 1px solid #eee5d6;
+		border-top: 1px solid var(--hairline);
 	}
 	.langs {
 		margin: 0.5rem 0;
@@ -452,7 +452,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.25rem;
-		background: #f0ece4;
+		background: var(--surface-sunken);
 		border-radius: 999px;
 		padding: 0.2rem 0.6rem;
 		font-size: 0.8rem;
@@ -461,7 +461,7 @@
 		border: none;
 		background: none;
 		cursor: pointer;
-		color: #a33;
+		color: var(--pill-bug-fg);
 		padding: 0;
 		font-size: 0.75rem;
 	}
@@ -469,7 +469,7 @@
 		font-size: 0.72rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		font-weight: 600;
 	}
 	.f {
@@ -477,7 +477,7 @@
 		flex-direction: column;
 		gap: 0.2rem;
 		font-size: 0.72rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	.f.inline {
 		flex-direction: row;
@@ -491,23 +491,24 @@
 		font-size: 0.85rem;
 		text-transform: none;
 		letter-spacing: normal;
-		color: #1a1208;
+		background: var(--surface);
+		color: var(--text);
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.homebase {
 		margin-top: 0.75rem;
 		padding-top: 0.5rem;
-		border-top: 1px dashed #eee5d6;
+		border-top: 1px dashed var(--hairline);
 	}
 	.check {
 		display: flex;
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.8rem;
-		color: #555;
+		color: var(--text-muted);
 		margin: 0.3rem 0 0.5rem;
 	}
 	.grid4 {
@@ -518,14 +519,16 @@
 	select {
 		font: inherit;
 		font-size: 0.85rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.3rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.tagsvocab {
 		margin-top: 0.75rem;
 		padding-top: 0.5rem;
-		border-top: 1px dashed #eee5d6;
+		border-top: 1px dashed var(--hairline);
 	}
 	.miniform {
 		display: flex;
@@ -537,20 +540,22 @@
 	.miniform input {
 		font: inherit;
 		font-size: 0.85rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.miniform .keyf .hint {
 		font-size: 0.6rem;
-		color: #a99f8d;
+		color: var(--text-muted);
 		text-transform: none;
 		letter-spacing: normal;
 	}
 	.minierr {
 		flex-basis: 100%;
 		font-size: 0.75rem;
-		color: #a33;
+		color: var(--pill-bug-fg);
 	}
 	.sub-hd {
 		display: flex;
@@ -567,7 +572,7 @@
 	.tkey {
 		font-family: ui-monospace, monospace;
 		font-size: 0.8rem;
-		background: #f0ece4;
+		background: var(--surface-sunken);
 		border-radius: 4px;
 		padding: 0.3rem 0.4rem;
 		margin-top: 0.3rem;
@@ -584,14 +589,14 @@
 	button {
 		font: inherit;
 		font-size: 0.82rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 6px;
 		padding: 0.25rem 0.6rem;
 		cursor: pointer;
 	}
 	.del {
-		color: #a33;
+		color: var(--pill-bug-fg);
 	}
 	.preview {
 		margin-top: 1.5rem;
@@ -600,17 +605,17 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.08em;
-		color: #a99f8d;
+		color: var(--text-muted);
 		margin-bottom: 0.5rem;
 		text-align: center;
 	}
 	.preview-empty {
 		max-width: 430px;
 		margin: 0 auto;
-		border: 1px dashed #d8ccb8;
+		border: 1px dashed var(--hairline-strong);
 		border-radius: 14px;
-		background: #fbf8f1;
-		color: #9b917f;
+		background: var(--surface);
+		color: var(--text-muted);
 		font-size: 0.85rem;
 		text-align: center;
 		padding: 3.5rem 1.5rem;

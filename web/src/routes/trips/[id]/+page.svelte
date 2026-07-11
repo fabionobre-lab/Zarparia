@@ -51,7 +51,7 @@
 	.page {
 		padding: 1rem 0.5rem 2rem;
 		min-height: calc(100vh - 60px);
-		background: #f4f1ea;
+		background: var(--surface-sunken);
 	}
 	.bar {
 		max-width: 430px;
@@ -70,22 +70,22 @@
 	.btn {
 		font-size: 0.85rem;
 		text-decoration: none;
-		color: #2b4a2b;
+		color: var(--accent-strong);
 		font-family: system-ui, sans-serif;
 	}
 	.btn {
-		border: 1px solid #cbb;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;
 		padding: 0.3rem 0.8rem;
-		background: #faf6ee;
+		background: var(--surface);
 		cursor: pointer;
 	}
 	.role {
 		font-size: 0.72rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a5a10;
-		background: #f5edd5;
+		color: var(--pill-warn-fg);
+		background: var(--pill-warn-bg);
 		border-radius: 999px;
 		padding: 0.2rem 0.6rem;
 	}

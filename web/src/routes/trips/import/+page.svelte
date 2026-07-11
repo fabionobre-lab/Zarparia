@@ -95,19 +95,19 @@
 		max-width: 760px;
 		margin: 2rem auto;
 		padding: 0 1.5rem;
-		color: #1a1208;
+		color: var(--text);
 	}
 	.back {
 		font-size: 0.8rem;
 		text-decoration: none;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	h1 {
-		font-size: 1.5rem;
+		font-size: var(--type-h1);
 		margin: 0.5rem 0 0.25rem;
 	}
 	.lede {
-		color: #6b6153;
+		color: var(--text-muted);
 		margin: 0 0 1.25rem;
 	}
 	textarea {
@@ -117,14 +117,15 @@
 		font-size: 0.95rem;
 		line-height: 1.5;
 		padding: 0.9rem 1rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 12px;
-		background: #faf6ee;
+		background: var(--surface);
+		color: var(--text);
 		resize: vertical;
 		min-height: 240px;
 	}
 	textarea:focus {
-		outline: 2px solid #2b4a2b;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 1px;
 	}
 	.row {
@@ -136,16 +137,17 @@
 	}
 	.counter {
 		font-size: 0.8rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
+		font-variant-numeric: tabular-nums;
 	}
 	.counter.over {
-		color: #7a2020;
+		color: var(--pill-bug-fg);
 		font-weight: 700;
 	}
 	.import {
 		font: inherit;
 		font-size: 0.9rem;
-		background: #2b4a2b;
+		background: var(--accent);
 		color: #fff;
 		border: none;
 		border-radius: 999px;
@@ -158,14 +160,14 @@
 	}
 	.working {
 		font-size: 0.85rem;
-		color: #6b6153;
+		color: var(--text-muted);
 		margin-top: 0.75rem;
 	}
 	.error {
 		margin-top: 1rem;
-		background: #fdf0ee;
-		border: 1px solid #e6b0aa;
-		color: #7a2020;
+		background: var(--pill-bug-bg);
+		border: 1px solid var(--pill-bug-bg);
+		color: var(--pill-bug-fg);
 		border-radius: 12px;
 		padding: 0.75rem 1rem;
 	}
@@ -174,7 +176,7 @@
 	}
 	.error .hint {
 		margin-top: 0.4rem;
-		color: #8a4b2b;
+		color: var(--pill-bug-fg);
 		font-size: 0.9rem;
 	}
 </style>

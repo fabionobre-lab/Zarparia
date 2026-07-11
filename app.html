@@ -5,8 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#2b4a2b">
+<meta name="theme-color" content="#2b4a2b" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16120d" media="(prefers-color-scheme: dark)">
 <title>Trip</title>
+<script>
+/* Apply saved light/dark preference before first paint, to avoid a flash of
+   the wrong theme. 'auto' (no explicit choice) is left to the CSS media
+   query. Kept in sync with the toggle logic in assets/app.js. */
+(function () {
+  try {
+    var t = localStorage.getItem('theme-pref');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
@@ -25,6 +37,7 @@
         </div>
         <div class="hero-row1-right">
           <button class="ics-btn" id="ics-btn" onclick="exportIcs()"></button>
+          <button class="theme-btn" id="theme-btn" onclick="toggleTheme()"></button>
           <div class="lang-toggle hidden" id="lang-toggle"></div>
         </div>
       </div>

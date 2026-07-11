@@ -153,8 +153,10 @@
 	.pid {
 		font: inherit;
 		font-size: 0.85rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.3rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.controls {
@@ -172,7 +174,7 @@
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.8rem;
-		color: #555;
+		color: var(--text-muted);
 		margin: 0.3rem 0 0.5rem;
 	}
 	.days-hd {
@@ -185,14 +187,14 @@
 		font-size: 0.72rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		font-weight: 600;
 	}
 	button {
 		font: inherit;
 		font-size: 0.8rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 6px;
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
@@ -201,6 +203,6 @@
 		opacity: 0.35;
 	}
 	.del {
-		color: #a33;
+		color: var(--pill-bug-fg);
 	}
 </style>

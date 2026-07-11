@@ -128,7 +128,11 @@
 	.map-canvas {
 		width: 100%;
 		height: 100%;
-		background: #e8e4db;
+		background: var(--surface-sunken);
+		/* Keep the light OSM tiles (no inversion); in dark mode just knock the
+		   brightness back and lift contrast a touch so they don't glare. The
+		   --map-filter token is defined on .shell (this map is a descendant). */
+		filter: var(--map-filter, none);
 	}
 	/* Leaflet injects markers/popups into panes outside this component's scope,
 	   so these rules must be global. The elements are still DOM descendants of

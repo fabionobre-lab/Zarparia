@@ -1,10 +1,13 @@
 <script lang="ts">
+	import '../styles/tokens.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
+	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
 	import FeedbackDialog from '$lib/FeedbackDialog.svelte';
 	import { initLocale, t } from '$lib/i18n/store.svelte';
+	import { initTheme } from '$lib/theme/store.svelte';
 
 	let { children, data } = $props();
 
@@ -17,6 +20,10 @@
 	// sync on the next request).
 	// svelte-ignore state_referenced_locally
 	initLocale(data.locale);
+	// Seed the theme mode the same way (SSR stamped <html data-theme> already;
+	// this keeps the store's reactive icon in sync from the first render).
+	// svelte-ignore state_referenced_locally
+	initTheme(data.theme);
 
 	onMount(() => {
 		if (!('serviceWorker' in navigator)) return;
@@ -48,6 +55,7 @@
 		<div class="left">
 			<a class="brand" href="/">Trips</a>
 			<LocaleSwitcher />
+			<ThemeToggle />
 		</div>
 		<nav>
 			{#if data.user}
@@ -71,8 +79,9 @@
 
 <style>
 	header {
-		border-bottom: 1px solid #e2ddd2;
+		border-bottom: 1px solid var(--hairline);
 		font-family: system-ui, sans-serif;
+		background: var(--surface);
 	}
 	.bar {
 		display: flex;
@@ -93,7 +102,7 @@
 		font-weight: 700;
 		font-size: 1.1rem;
 		text-decoration: none;
-		color: #2b4a2b;
+		color: var(--accent-strong);
 	}
 	nav {
 		display: flex;
@@ -102,7 +111,7 @@
 	}
 	.who {
 		font-size: 0.85rem;
-		color: #555;
+		color: var(--text-muted);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -133,19 +142,19 @@
 		}
 	}
 	.feedback {
-		border-color: #e2ddd2;
+		border-color: var(--hairline);
 		background: transparent;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	.signin,
 	button {
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.35rem 0.8rem;
-		border: 1px solid #cbb;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;
-		background: #faf6ee;
-		color: #1a1208;
+		background: var(--bg);
+		color: var(--text);
 		text-decoration: none;
 		cursor: pointer;
 	}

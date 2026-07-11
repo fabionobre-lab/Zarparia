@@ -161,10 +161,10 @@
 
 <style>
 	.seg {
-		border: 1px solid #cbbfa6;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 10px;
 		margin-bottom: 0.75rem;
-		background: #fff;
+		background: var(--surface);
 	}
 	summary {
 		display: flex;
@@ -174,7 +174,7 @@
 		padding: 0.6rem 0.8rem;
 		cursor: pointer;
 		list-style: none;
-		background: #f3eee2;
+		background: var(--surface-sunken);
 		border-radius: 10px 10px 0 0;
 	}
 	summary::-webkit-details-marker {
@@ -182,7 +182,7 @@
 	}
 	.grip {
 		cursor: grab;
-		color: #a89a7d;
+		color: var(--text-muted);
 		font-size: 1rem;
 		line-height: 1;
 		flex-shrink: 0;
@@ -225,7 +225,7 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		gap: 0.2rem;
 		margin-bottom: 0.5rem;
 	}
@@ -235,17 +235,18 @@
 		font-size: 0.85rem;
 		text-transform: none;
 		letter-spacing: normal;
-		color: #1a1208;
+		background: var(--surface);
+		color: var(--text);
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.fhint {
 		font-size: 0.6rem;
 		text-transform: none;
 		letter-spacing: normal;
-		color: #a99f8d;
+		color: var(--text-muted);
 		margin-top: 0.15rem;
 	}
 	.check {
@@ -253,13 +254,13 @@
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.8rem;
-		color: #555;
+		color: var(--text-muted);
 		margin: 0.3rem 0 0.5rem;
 	}
 	.plans {
 		margin-top: 0.5rem;
 		padding-top: 0.5rem;
-		border-top: 1px solid #eee5d6;
+		border-top: 1px solid var(--hairline);
 	}
 	.plans-hd {
 		display: flex;
@@ -271,14 +272,14 @@
 		font-size: 0.72rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		font-weight: 600;
 	}
 	button {
 		font: inherit;
 		font-size: 0.8rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 6px;
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
@@ -287,6 +288,6 @@
 		opacity: 0.35;
 	}
 	.del {
-		color: #a33;
+		color: var(--pill-bug-fg);
 	}
 </style>

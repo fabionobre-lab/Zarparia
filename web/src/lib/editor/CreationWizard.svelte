@@ -247,7 +247,7 @@
 		margin: 0 auto;
 		padding: 1.5rem 1.5rem 3rem;
 		font-family: system-ui, sans-serif;
-		color: #1a1208;
+		color: var(--text);
 	}
 	.head {
 		display: flex;
@@ -257,11 +257,11 @@
 		gap: 0.5rem;
 	}
 	h1 {
-		font-size: 1.4rem;
+		font-size: var(--type-h1);
 	}
 	.blanklink {
 		font-size: 0.85rem;
-		color: #2b4a2b;
+		color: var(--accent-strong);
 		text-decoration: none;
 	}
 	.blanklink:hover {
@@ -276,17 +276,17 @@
 		font-size: 0.78rem;
 		padding: 0.25rem 0.7rem;
 		border-radius: 999px;
-		background: #f0ece4;
-		color: #7a6e5f;
+		background: var(--surface-sunken);
+		color: var(--text-muted);
 	}
 	.stepdot.on {
-		background: #2b4a2b;
+		background: var(--accent);
 		color: #fff;
 	}
 	.card {
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 12px;
-		background: #fbf8f1;
+		background: var(--surface);
 		padding: 1.1rem 1.1rem 1rem;
 	}
 	.f {
@@ -296,19 +296,19 @@
 		font-size: 0.72rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		margin-bottom: 0.9rem;
 	}
 	.lbl {
 		font-size: 0.72rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		font-weight: 600;
 	}
 	.lblhint {
 		font-size: 0.62rem;
-		color: #a99f8d;
+		color: var(--text-muted);
 		text-transform: none;
 		letter-spacing: normal;
 	}
@@ -319,18 +319,18 @@
 		font-size: 0.9rem;
 		text-transform: none;
 		letter-spacing: normal;
-		color: #1a1208;
+		color: var(--text);
 		padding: 0.45rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 7px;
-		background: #fff;
+		background: var(--surface);
 	}
 	.inline {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.4rem;
 		font-size: 0.72rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		margin-top: 0.4rem;
 	}
 	.chips {
@@ -344,7 +344,7 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.25rem;
-		background: #f0ece4;
+		background: var(--surface-sunken);
 		border-radius: 999px;
 		padding: 0.2rem 0.6rem;
 		font-size: 0.8rem;
@@ -355,7 +355,7 @@
 		border: none;
 		background: none;
 		cursor: pointer;
-		color: #a33;
+		color: var(--pill-bug-fg);
 		padding: 0;
 	}
 	.miniform {
@@ -368,8 +368,10 @@
 	.miniform input {
 		font: inherit;
 		font-size: 0.85rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.stops-hd {
@@ -388,8 +390,10 @@
 		flex: 1;
 		font: inherit;
 		font-size: 0.9rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.45rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 7px;
 		min-width: 0;
 	}
@@ -400,14 +404,16 @@
 		font-size: 0.62rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		width: 4.5rem;
 	}
 	.nights input {
 		font: inherit;
 		font-size: 0.9rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.45rem 0.4rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 7px;
 	}
 	.rowctl {
@@ -420,10 +426,10 @@
 		flex-wrap: wrap;
 		gap: 0.4rem;
 		font-size: 0.85rem;
-		border-top: 1px dashed #d8ccb8;
+		border-top: 1px dashed var(--hairline-strong);
 		margin-top: 0.5rem;
 		padding-top: 0.7rem;
-		color: #4a4033;
+		color: var(--text-muted);
 	}
 	.actions {
 		display: flex;
@@ -434,16 +440,16 @@
 	.actions button {
 		font: inherit;
 		font-size: 0.9rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 999px;
 		padding: 0.5rem 1.1rem;
 		cursor: pointer;
 	}
 	.primary {
-		background: #2b4a2b !important;
+		background: var(--accent) !important;
 		color: #fff;
-		border-color: #2b4a2b !important;
+		border-color: var(--accent) !important;
 		margin-left: auto;
 	}
 	.primary:disabled {
@@ -453,8 +459,8 @@
 	button.add {
 		font: inherit;
 		font-size: 0.8rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 6px;
 		padding: 0.25rem 0.6rem;
 		cursor: pointer;
@@ -462,8 +468,8 @@
 	.rowctl button {
 		font: inherit;
 		font-size: 0.8rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 6px;
 		padding: 0.3rem 0.5rem;
 		cursor: pointer;
@@ -473,16 +479,16 @@
 		cursor: default;
 	}
 	.del {
-		color: #a33;
+		color: var(--pill-bug-fg);
 	}
 	.err {
 		flex-basis: 100%;
 		font-size: 0.8rem;
-		color: #a33;
+		color: var(--pill-bug-fg);
 		margin-top: 0.3rem;
 	}
 	.muted {
-		color: #9b917f;
+		color: var(--text-muted);
 		font-size: 0.82rem;
 	}
 	.geo {

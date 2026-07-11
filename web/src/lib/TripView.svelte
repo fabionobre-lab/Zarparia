@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { fly } from 'svelte/transition';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import {
 		type Trip,
 		type Segment,
@@ -148,12 +150,17 @@
 	});
 
 	// Keep the active day pip in view: on mount and whenever the selected day
-	// changes. behavior 'auto' matches the static engine — 'smooth' is silently
-	// dropped in some embedded/reduced-motion environments.
+	// changes. The initial mount scroll always uses 'auto' (no animation, so
+	// page load doesn't visibly scroll); subsequent day switches scroll
+	// 'smooth' — but only when the visitor hasn't asked for reduced motion.
 	let dayBtnEls: (HTMLButtonElement | null)[] = [];
+	let daynavMounted = false;
 	$effect(() => {
 		const el = dayBtnEls[clampedIdx];
-		el?.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+		if (!el) return;
+		const behavior = daynavMounted && !prefersReducedMotion.current ? 'smooth' : 'auto';
+		el.scrollIntoView({ behavior, inline: 'center', block: 'nearest' });
+		daynavMounted = true;
 	});
 
 	// ── Sticky day nav: shadow only once it's actually pinned to the top ──
@@ -462,131 +469,151 @@
 			{@const day = current.day}
 			{@const wx = daySummary(seg, day)}
 			{@const km = dayKmTotal(day)}
-			<div class="day-hdr">
-				<div class="dh-in">
-					<div class="dh-eye">{dayLabel(day.date, localeFor(trip, lang))}</div>
-					<div class="dh-title">{L(day.title)}</div>
-					{#if L(day.note)}<div class="dh-note">{L(day.note)}</div>{/if}
-					{#if wx || km}
-						<div class="wx-hdr">
-							{#if wx}
-								<div class="wx-hdr-item" aria-hidden="true">{wx.emoji}</div>
-								<div class="wx-hdr-item">↑{wx.hi}°C</div>
-								<div class="wx-hdr-item">↓{wx.lo}°C</div>
+			{#key clampedIdx}
+				<div
+					class="day-content"
+					in:fly={{
+						y: prefersReducedMotion.current ? 0 : 8,
+						duration: prefersReducedMotion.current ? 0 : 180
+					}}
+				>
+					<div class="day-hdr">
+						<div class="dh-in">
+							<div class="dh-eye">{dayLabel(day.date, localeFor(trip, lang))}</div>
+							<div class="dh-title">{L(day.title)}</div>
+							{#if L(day.note)}<div class="dh-note">{L(day.note)}</div>{/if}
+							{#if wx || km}
+								<div class="wx-hdr">
+									{#if wx}
+										<div class="wx-hdr-item" aria-hidden="true">{wx.emoji}</div>
+										<div class="wx-hdr-item">↑{wx.hi}°C</div>
+										<div class="wx-hdr-item">↓{wx.lo}°C</div>
+									{/if}
+									{#if km}<div class="wx-hdr-item wx-km">🦶 ~{km.toFixed(1)} km</div>{/if}
+								</div>
 							{/if}
-							{#if km}<div class="wx-hdr-item wx-km">🦶 ~{km.toFixed(1)} km</div>{/if}
+							{#if L(day.banner)}<div class="bday-strip">{L(day.banner)}</div>{/if}
 						</div>
-					{/if}
-					{#if L(day.banner)}<div class="bday-strip">{L(day.banner)}</div>{/if}
-				</div>
-			</div>
-
-			{#if routeForDay}
-				<a href={routeForDay.url} target="_blank" rel="noreferrer" class="route-card">
-					<div class="route-hdr">
-						<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
-						{uiText.dayRoute}
 					</div>
-					<div class="route-stops">
-						{#each routeForDay.places as p, i (i)}
-							{#if i > 0}<div class="route-connector"></div>{/if}
-							<div class="route-stop">
-								<div class="route-num">{i + 1}</div>
-								<div class="route-name">{p.name}</div>
+
+					{#if routeForDay}
+						<a href={routeForDay.url} target="_blank" rel="noreferrer" class="route-card">
+							<div class="route-hdr">
+								<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
+								{uiText.dayRoute}
+							</div>
+							<div class="route-stops">
+								{#each routeForDay.places as p, i (i)}
+									{#if i > 0}<div class="route-connector"></div>{/if}
+									<div class="route-stop">
+										<div class="route-num">{i + 1}</div>
+										<div class="route-name">{p.name}</div>
+									</div>
+								{/each}
+							</div>
+							<div class="route-open">
+								<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+								{uiText.openRoute}
+							</div>
+						</a>
+					{/if}
+
+					{#if dayMapStops.length >= 2}
+						<DayMap stops={dayMapStops} ariaLabel={mapAriaLabel} />
+					{/if}
+
+					<div class="tl">
+						{#each day.blocks as b, bi (bi)}
+							{@const badge = blockBadge(seg, day, b.time)}
+							{@const isNext = isToday && nowMarkerIdx === bi}
+							{#if isToday && nowMarkerIdx === bi}
+								<div class="tb tb-now" aria-hidden="true" bind:this={nowMarkerEl}>
+									<div class="tb-left"></div>
+									<div class="tb-body tb-now-body">
+										<div class="tb-now-dot"></div>
+										<div class="tb-now-line"></div>
+										<span class="tb-now-label">{uiText.now} · {nowLabel}</span>
+									</div>
+								</div>
+							{/if}
+							<div class="tb">
+								<div class="tb-left">
+									<div class="tb-time">
+										{b.time}
+										{#if badge && !isPast}
+											<div class="wx"><span aria-hidden="true">{badge.emoji}</span> {badge.temp}°C</div>
+										{/if}
+									</div>
+									<div class="tb-dot-col">
+										<div class="tb-dot" class:tb-dot-next={isNext} style="background:{b.dotColor || 'var(--stone)'}"></div>
+										{#if bi < day.blocks.length - 1}<div class="tb-line"></div>{/if}
+									</div>
+								</div>
+								<div class="tb-body">
+									<div class="tb-title-row">
+										<div class="tb-title" class:tb-title-next={isNext}>{L(b.title)}</div>
+										{#if b.mapsUrl}
+											<a
+												class="map-icon-btn"
+												href={safeUrl(b.mapsUrl)}
+												target="_blank"
+												rel="noreferrer"
+												aria-label={uiText.maps}
+												title={uiText.maps}
+											>
+												<span class="map-icon-circle">
+													<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+												</span>
+											</a>
+										{/if}
+									</div>
+									{#if b.tags?.length}
+										<div class="tb-tags">
+											{#each b.tags as key (key)}
+												{@const tag = trip.tags?.[key]}
+												{#if tag}<span class="tb-tag {tag.style ?? 'logistics'}">{L(tag.label)}</span>{/if}
+											{/each}
+										</div>
+									{/if}
+									{#if L(b.description)}<div class="tb-meta">{L(b.description)}</div>{/if}
+									{#if b.km}<div class="km-tag">🚶 ~{b.km} km</div>{/if}
+									{#if L(b.warning)}<div class="tb-warn">{L(b.warning)}</div>{/if}
+									{#if L(b.note)}<div class="tb-note">{L(b.note)}</div>{/if}
+									{#if b.photoSpots?.length}
+										<div class="tb-photos">
+											{#each b.photoSpots as sp (sp)}
+												{@const key = spotKey(sp)}
+												<a href={safeUrl(sp.mapsUrl)} target="_blank" rel="noreferrer" class="ps-card">
+													{#if key && safeUrl(wikiImgs[key] ?? undefined)}
+														<img src={safeUrl(wikiImgs[key] ?? undefined)} class="ps-thumb" alt={sp.name} />
+													{:else}
+														<div class="ps-thumb ps-placeholder" aria-hidden="true"></div>
+													{/if}
+													<span class="ps-label">{sp.name}</span>
+												</a>
+											{/each}
+										</div>
+									{/if}
+									{#if b.diff && plan.diffLabels?.[b.diff.kind]}
+										<div class="diff-{b.diff.kind}">{L(plan.diffLabels[b.diff.kind])}{L(b.diff.reason)}</div>
+									{/if}
+								</div>
 							</div>
 						{/each}
-					</div>
-					<div class="route-open">
-						<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
-						{uiText.openRoute}
-					</div>
-				</a>
-			{/if}
-
-			{#if dayMapStops.length >= 2}
-				<DayMap stops={dayMapStops} ariaLabel={mapAriaLabel} />
-			{/if}
-
-			<div class="tl">
-				{#each day.blocks as b, bi (bi)}
-					{@const badge = blockBadge(seg, day, b.time)}
-					{@const isNext = isToday && nowMarkerIdx === bi}
-					{#if isToday && nowMarkerIdx === bi}
-						<div class="tb tb-now" aria-hidden="true" bind:this={nowMarkerEl}>
-							<div class="tb-left"></div>
-							<div class="tb-body tb-now-body">
-								<div class="tb-now-dot"></div>
-								<div class="tb-now-line"></div>
-								<span class="tb-now-label">{uiText.now} · {nowLabel}</span>
-							</div>
-						</div>
-					{/if}
-					<div class="tb">
-						<div class="tb-left">
-							<div class="tb-time">
-								{b.time}
-								{#if badge && !isPast}
-									<div class="wx"><span aria-hidden="true">{badge.emoji}</span> {badge.temp}°C</div>
-								{/if}
-							</div>
-							<div class="tb-dot-col">
-								<div class="tb-dot" class:tb-dot-next={isNext} style="background:{b.dotColor || 'var(--stone)'}"></div>
-								{#if bi < day.blocks.length - 1}<div class="tb-line"></div>{/if}
-							</div>
-						</div>
-						<div class="tb-body">
-							<div class="tb-title" class:tb-title-next={isNext}>{L(b.title)}</div>
-							{#if b.tags?.length}
-								<div class="tb-tags">
-									{#each b.tags as key (key)}
-										{@const tag = trip.tags?.[key]}
-										{#if tag}<span class="tb-tag {tag.style ?? 'logistics'}">{L(tag.label)}</span>{/if}
-									{/each}
+						{#if isToday && day.blocks.length > 0 && nowMarkerIdx === day.blocks.length}
+							<div class="tb tb-now tb-now-end" aria-hidden="true" bind:this={nowMarkerEl}>
+								<div class="tb-left"></div>
+								<div class="tb-body tb-now-body">
+									<div class="tb-now-dot"></div>
+									<div class="tb-now-line"></div>
+									<span class="tb-now-label">{uiText.now} · {nowLabel}</span>
 								</div>
-							{/if}
-							{#if L(b.description)}<div class="tb-meta">{L(b.description)}</div>{/if}
-							{#if b.km}<div class="km-tag">🚶 ~{b.km} km</div>{/if}
-							{#if L(b.warning)}<div class="tb-warn">{L(b.warning)}</div>{/if}
-							{#if L(b.note)}<div class="tb-note">{L(b.note)}</div>{/if}
-							{#if b.photoSpots?.length}
-								<div class="tb-photos">
-									{#each b.photoSpots as sp (sp)}
-										{@const key = spotKey(sp)}
-										<a href={safeUrl(sp.mapsUrl)} target="_blank" rel="noreferrer" class="ps-card">
-											{#if key && safeUrl(wikiImgs[key] ?? undefined)}
-												<img src={safeUrl(wikiImgs[key] ?? undefined)} class="ps-thumb" alt={sp.name} />
-											{:else}
-												<div class="ps-thumb ps-placeholder" aria-hidden="true"></div>
-											{/if}
-											<span class="ps-label">{sp.name}</span>
-										</a>
-									{/each}
-								</div>
-							{/if}
-							{#if b.diff && plan.diffLabels?.[b.diff.kind]}
-								<div class="diff-{b.diff.kind}">{L(plan.diffLabels[b.diff.kind])}{L(b.diff.reason)}</div>
-							{/if}
-							{#if b.mapsUrl}
-								<a class="map-btn" href={safeUrl(b.mapsUrl)} target="_blank" rel="noreferrer">
-									<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
-									{uiText.maps}
-								</a>
-							{/if}
-						</div>
+							</div>
+						{/if}
 					</div>
-				{/each}
-				{#if isToday && day.blocks.length > 0 && nowMarkerIdx === day.blocks.length}
-					<div class="tb tb-now tb-now-end" aria-hidden="true" bind:this={nowMarkerEl}>
-						<div class="tb-left"></div>
-						<div class="tb-body tb-now-body">
-							<div class="tb-now-dot"></div>
-							<div class="tb-now-line"></div>
-							<span class="tb-now-label">{uiText.now} · {nowLabel}</span>
-						</div>
-					</div>
-				{/if}
-			</div>
-			{#if L(seg.footer)}<div class="footer">{L(seg.footer)}</div>{/if}
+					{#if L(seg.footer)}<div class="footer">{L(seg.footer)}</div>{/if}
+				</div>
+			{/key}
 		{/if}
 	</div>
 </div>
@@ -597,20 +624,51 @@
 		margin: 0 auto;
 		display: flex;
 		flex-direction: column;
-		background: var(--cream);
-		--ink: #1a1208;
-		--stone: #7a6e5f;
+		background: var(--surface);
+		/* Trip theme = ONE base colour + its gold eyebrow. Light values ARE the
+		   current identity. hero-bg/accent derive from the base; --accent-text is
+		   the text-level accent (equals the base in light; lightened via OKLCH in
+		   the dark block below so it reads on dark surfaces). Neutrals (--cream/
+		   --ink/--stone/--border) are intentionally NOT redefined here — they
+		   inherit the global tokens.css aliases so they flip light↔dark. */
+		--theme-base: #2b4a2b;
+		--theme-eyebrow: #e8c84a;
+		--hero-bg: var(--theme-base);
+		--hero-eyebrow: var(--theme-eyebrow);
+		--accent: var(--theme-base);
+		--accent-text: var(--theme-base);
+		/* Trip-specific accent hues (outside the global system) */
 		--heather: #7b4f7a;
 		--gold: #b8860b;
-		--cream: #faf6ee;
 		--moss: #3d5a3d;
-		--border: #d8ccb8;
 		--loch: #1e3a5f;
-		--hero-bg: #2b4a2b;
-		--hero-eyebrow: #e8c84a;
-		--accent: #2b4a2b;
+		/* Category chips + note strips — light values keep the current identity;
+		   the dark block flips them to translucent fills with lighter text. */
+		--chip-sight-bg: #dce8f5;
+		--chip-sight-fg: var(--loch);
+		--chip-food-bg: #daf0e5;
+		--chip-food-fg: var(--moss);
+		--chip-logistics-bg: #ede8e0;
+		--chip-logistics-fg: var(--stone);
+		--chip-booking-bg: #f5edd5;
+		--chip-booking-fg: #7a5a10;
+		--chip-fullday-bg: #ede0f0;
+		--chip-fullday-fg: var(--heather);
+		--chip-bday-grad: linear-gradient(120deg, #f2d2f0, #dfd0f2);
+		--chip-bday-fg: #5a2a78;
+		--note-bg: #f0ece4;
+		--note-fg: var(--stone);
+		--warn-bg: #fdf0ee;
+		--warn-fg: #7a2020;
+		--warn-bar: #c84040;
+		--add-bg: #e5f5e8;
+		--add-fg: #1a3a1a;
+		--chg-bg: #fef6de;
+		--chg-fg: #5a3a00;
+		--photo-filter: none;
+		--map-filter: none;
 		font-family: 'Source Serif 4', Georgia, serif;
-		color: var(--ink);
+		color: var(--text);
 		border-radius: 14px;
 		/* `clip`, not `hidden`: still clips content to the rounded corners, but
 		   (unlike `hidden`) doesn't turn .shell into a scroll container — which
@@ -621,29 +679,83 @@
 		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
 	}
 	.shell.theme-navy {
-		--hero-bg: #1e3054;
-		--hero-eyebrow: #c17817;
-		--accent: #1e3054;
+		--theme-base: #1e3054;
+		--theme-eyebrow: #c17817;
 	}
 	.shell.theme-terracotta {
-		--hero-bg: #7c3a29;
-		--hero-eyebrow: #e6b566;
-		--accent: #7c3a29;
+		--theme-base: #7c3a29;
+		--theme-eyebrow: #e6b566;
 	}
 	.shell.theme-olive {
-		--hero-bg: #4a5324;
-		--hero-eyebrow: #d9c46a;
-		--accent: #4a5324;
+		--theme-base: #4a5324;
+		--theme-eyebrow: #d9c46a;
 	}
 	.shell.theme-azure {
-		--hero-bg: #17456b;
-		--hero-eyebrow: #e0a24a;
-		--accent: #17456b;
+		--theme-base: #17456b;
+		--theme-eyebrow: #e0a24a;
 	}
 	.shell.theme-sand {
-		--hero-bg: #5b4a30;
-		--hero-eyebrow: #e8cf8a;
-		--accent: #5b4a30;
+		--theme-base: #5b4a30;
+		--theme-eyebrow: #e8cf8a;
+	}
+	/* ── Dark mode: lift the text-level accent off the (dark) theme base via
+	   OKLCH relative-colour syntax — same hue/chroma, forced light so it reads on
+	   dark surfaces. Applies for explicit dark AND system-dark (no attribute).
+	   The saturated --accent (fills with white text) and --hero-bg stay put:
+	   the hero colours are already dark enough to keep in both modes. ── */
+	:global(html[data-theme='dark']) .shell {
+		--accent-text: oklch(from var(--theme-base) 0.82 calc(c * 0.9) h);
+		--chip-sight-bg: rgba(120, 160, 210, 0.2);
+		--chip-sight-fg: #bcd4f0;
+		--chip-food-bg: rgba(90, 170, 120, 0.2);
+		--chip-food-fg: #a9d9bf;
+		--chip-logistics-bg: rgba(180, 168, 148, 0.16);
+		--chip-logistics-fg: var(--text-muted);
+		--chip-booking-bg: rgba(200, 170, 90, 0.18);
+		--chip-booking-fg: #e0c987;
+		--chip-fullday-bg: rgba(160, 120, 170, 0.22);
+		--chip-fullday-fg: #d3b0dd;
+		--chip-bday-grad: linear-gradient(120deg, rgba(200, 130, 190, 0.22), rgba(170, 140, 210, 0.22));
+		--chip-bday-fg: #e6c8f0;
+		--note-bg: rgba(236, 228, 212, 0.06);
+		--note-fg: var(--text-muted);
+		--warn-bg: rgba(200, 64, 64, 0.14);
+		--warn-fg: #e8a99f;
+		--warn-bar: #c85a4a;
+		--add-bg: rgba(90, 170, 110, 0.14);
+		--add-fg: #a9d9b5;
+		--chg-bg: rgba(200, 170, 80, 0.14);
+		--chg-fg: #e0c987;
+		--photo-filter: brightness(0.9);
+		--map-filter: brightness(0.85) contrast(1.05);
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(html:not([data-theme])) .shell {
+			--accent-text: oklch(from var(--theme-base) 0.82 calc(c * 0.9) h);
+			--chip-sight-bg: rgba(120, 160, 210, 0.2);
+			--chip-sight-fg: #bcd4f0;
+			--chip-food-bg: rgba(90, 170, 120, 0.2);
+			--chip-food-fg: #a9d9bf;
+			--chip-logistics-bg: rgba(180, 168, 148, 0.16);
+			--chip-logistics-fg: var(--text-muted);
+			--chip-booking-bg: rgba(200, 170, 90, 0.18);
+			--chip-booking-fg: #e0c987;
+			--chip-fullday-bg: rgba(160, 120, 170, 0.22);
+			--chip-fullday-fg: #d3b0dd;
+			--chip-bday-grad: linear-gradient(120deg, rgba(200, 130, 190, 0.22), rgba(170, 140, 210, 0.22));
+			--chip-bday-fg: #e6c8f0;
+			--note-bg: rgba(236, 228, 212, 0.06);
+			--note-fg: var(--text-muted);
+			--warn-bg: rgba(200, 64, 64, 0.14);
+			--warn-fg: #e8a99f;
+			--warn-bar: #c85a4a;
+			--add-bg: rgba(90, 170, 110, 0.14);
+			--add-fg: #a9d9b5;
+			--chg-bg: rgba(200, 170, 80, 0.14);
+			--chg-fg: #e0c987;
+			--photo-filter: brightness(0.9);
+			--map-filter: brightness(0.85) contrast(1.05);
+		}
 	}
 	.hero {
 		background: var(--hero-bg);
@@ -689,6 +801,12 @@
 		letter-spacing: 0.02em;
 		cursor: pointer;
 	}
+	@media (hover: hover) {
+		.ics-btn:hover {
+			background: rgba(0, 0, 0, 0.3);
+			color: #fff;
+		}
+	}
 	.lang-toggle {
 		display: flex;
 		border-radius: 20px;
@@ -714,6 +832,25 @@
 		background: rgba(255, 255, 255, 0.18);
 		color: #fff;
 		font-weight: 500;
+	}
+	@media (hover: hover) {
+		.lang-btn:not(.on):hover {
+			background: rgba(0, 0, 0, 0.28);
+			color: rgba(255, 255, 255, 0.75);
+		}
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.ics-btn,
+		.lang-btn {
+			transition:
+				background 0.15s ease,
+				color 0.15s ease,
+				transform 0.1s ease;
+		}
+		.ics-btn:active,
+		.lang-btn:active {
+			transform: scale(0.96);
+		}
 	}
 	.trip-title {
 		font-family: 'Playfair Display', Georgia, serif;
@@ -750,9 +887,26 @@
 		font-size: 11.5px;
 	}
 	.vtab.on {
-		background: var(--cream);
-		color: var(--ink);
+		background: var(--surface);
+		color: var(--text);
 		font-weight: 500;
+	}
+	@media (hover: hover) {
+		.vtab:not(.on):hover {
+			background: rgba(255, 255, 255, 0.16);
+			color: rgba(255, 255, 255, 0.8);
+		}
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.vtab {
+			transition:
+				background 0.15s ease,
+				color 0.15s ease,
+				transform 0.1s ease;
+		}
+		.vtab:active {
+			transform: scale(0.97);
+		}
 	}
 	.daynav-sentinel {
 		/* Zero footprint (height cancelled by the negative margin) — exists only
@@ -765,7 +919,7 @@
 		display: flex;
 		overflow-x: auto;
 		scrollbar-width: none;
-		background: var(--cream);
+		background: var(--surface);
 		border-bottom: 1px solid var(--border);
 		padding: 0 4px;
 		min-width: 0;
@@ -807,7 +961,22 @@
 		border-bottom: 2.5px solid transparent;
 	}
 	.daybtn.on {
-		border-bottom-color: var(--accent);
+		border-bottom-color: var(--accent-text);
+	}
+	@media (hover: hover) {
+		.daybtn:not(.on):not(.daybtn-gap):hover {
+			background: rgba(0, 0, 0, 0.03);
+		}
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.daybtn {
+			transition:
+				background 0.15s ease,
+				transform 0.1s ease;
+		}
+		.daybtn:not(.daybtn-gap):active {
+			transform: scale(0.96);
+		}
 	}
 	.daybtn-gap {
 		cursor: default;
@@ -840,10 +1009,11 @@
 		color: var(--stone);
 		font-family: 'Playfair Display', serif;
 		line-height: 1;
+		font-variant-numeric: tabular-nums;
 	}
 	.daybtn.on .dow,
 	.daybtn.on .dnum {
-		color: var(--accent);
+		color: var(--accent-text);
 	}
 	.bday-pip {
 		width: 5px;
@@ -943,6 +1113,7 @@
 		color: var(--stone);
 		text-align: center;
 		line-height: 1.2;
+		font-variant-numeric: tabular-nums;
 	}
 	.tb-dot-col {
 		display: flex;
@@ -956,8 +1127,8 @@
 		height: 10px;
 		border-radius: 50%;
 		flex-shrink: 0;
-		border: 2px solid var(--cream);
-		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.07);
+		border: 2px solid var(--surface);
+		box-shadow: 0 0 0 1px var(--hairline);
 	}
 	.tb-line {
 		width: 1.5px;
@@ -968,8 +1139,8 @@
 	}
 	.tb-dot-next {
 		box-shadow:
-			0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent),
-			0 0 0 1px var(--accent);
+			0 0 0 3px color-mix(in srgb, var(--accent-text) 25%, transparent),
+			0 0 0 1px var(--accent-text);
 	}
 	/* The "now" row: a quiet accent rule across the timeline with a small dot
 	   on the rail and a tiny HH:MM label, sitting between the last started
@@ -990,21 +1161,21 @@
 		width: 7px;
 		height: 7px;
 		border-radius: 50%;
-		background: var(--accent);
+		background: var(--accent-text);
 		flex-shrink: 0;
-		box-shadow: 0 0 0 2px var(--cream);
+		box-shadow: 0 0 0 2px var(--surface);
 	}
 	.tb-now-line {
 		flex: 1;
 		height: 1.5px;
-		background: var(--accent);
+		background: var(--accent-text);
 		opacity: 0.55;
 		margin: 0 6px;
 	}
 	.tb-now-label {
 		font-size: 9px;
 		letter-spacing: 0.03em;
-		color: var(--accent);
+		color: var(--accent-text);
 		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
 		flex-shrink: 0;
@@ -1017,6 +1188,12 @@
 	.tb:last-child .tb-body {
 		border-bottom: none;
 	}
+	.tb-title-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 6px;
+	}
 	.tb-title {
 		font-family: 'Playfair Display', serif;
 		font-size: 14px;
@@ -1025,8 +1202,49 @@
 		line-height: 1.3;
 	}
 	.tb-title-next {
-		color: var(--accent);
+		color: var(--accent-text);
 		font-weight: 700;
+	}
+	/* Quiet "open in maps" affordance: a small stone-colored ghost circle on
+	   the block's title row. The anchor itself is the full 44px touch target
+	   (padding, not visual size) — the visible circle inside it is smaller. */
+	.map-icon-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		flex-shrink: 0;
+		color: var(--stone);
+		text-decoration: none;
+	}
+	.map-icon-circle {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		border: 1px solid var(--border);
+		background: transparent;
+	}
+	.map-icon-btn:hover .map-icon-circle,
+	.map-icon-btn:focus-visible .map-icon-circle {
+		border-color: var(--accent-text);
+		color: var(--accent-text);
+		background: color-mix(in srgb, var(--accent-text) 8%, transparent);
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.map-icon-circle {
+			transition:
+				border-color 0.15s ease,
+				background 0.15s ease,
+				color 0.15s ease,
+				transform 0.1s ease;
+		}
+		.map-icon-btn:active .map-icon-circle {
+			transform: scale(0.9);
+		}
 	}
 	.tb-tags {
 		display: flex;
@@ -1041,28 +1259,28 @@
 		white-space: nowrap;
 	}
 	.tb-tag.sight {
-		background: #dce8f5;
-		color: var(--loch);
+		background: var(--chip-sight-bg);
+		color: var(--chip-sight-fg);
 	}
 	.tb-tag.food {
-		background: #daf0e5;
-		color: var(--moss);
+		background: var(--chip-food-bg);
+		color: var(--chip-food-fg);
 	}
 	.tb-tag.logistics {
-		background: #ede8e0;
-		color: var(--stone);
+		background: var(--chip-logistics-bg);
+		color: var(--chip-logistics-fg);
 	}
 	.tb-tag.booking {
-		background: #f5edd5;
-		color: #7a5a10;
+		background: var(--chip-booking-bg);
+		color: var(--chip-booking-fg);
 	}
 	.tb-tag.fullday {
-		background: #ede0f0;
-		color: var(--heather);
+		background: var(--chip-fullday-bg);
+		color: var(--chip-fullday-fg);
 	}
 	.tb-tag.birthday {
-		background: linear-gradient(120deg, #f2d2f0, #dfd0f2);
-		color: #5a2a78;
+		background: var(--chip-bday-grad);
+		color: var(--chip-bday-fg);
 		font-weight: 500;
 	}
 	.tb-meta {
@@ -1072,72 +1290,60 @@
 		margin-top: 2px;
 	}
 	.tb-warn {
-		background: #fdf0ee;
-		border-left: 2.5px solid #c84040;
+		background: var(--warn-bg);
+		border-left: 2.5px solid var(--warn-bar);
 		border-radius: 0 7px 7px 0;
 		padding: 5px 9px;
 		margin-top: 5px;
 		font-size: 11px;
-		color: #7a2020;
+		color: var(--warn-fg);
 		line-height: 1.45;
 	}
 	.tb-note {
-		background: #f0ece4;
+		background: var(--note-bg);
 		border-radius: 7px;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
-		color: var(--stone);
+		color: var(--note-fg);
 		line-height: 1.45;
 	}
 	.diff-added {
-		background: #e5f5e8;
+		background: var(--add-bg);
 		border-left: 2.5px solid var(--moss);
 		border-radius: 0 7px 7px 0;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
-		color: #1a3a1a;
+		color: var(--add-fg);
 		line-height: 1.45;
 	}
 	.diff-changed {
-		background: #fef6de;
+		background: var(--chg-bg);
 		border-left: 2.5px solid var(--gold);
 		border-radius: 0 7px 7px 0;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
-		color: #5a3a00;
+		color: var(--chg-fg);
 		line-height: 1.45;
 	}
 	.diff-kept {
-		background: #f0ece4;
-		border-left: 2.5px solid var(--accent);
+		background: var(--note-bg);
+		border-left: 2.5px solid var(--accent-text);
 		border-radius: 0 7px 7px 0;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
-		color: var(--stone);
+		color: var(--note-fg);
 		line-height: 1.45;
-	}
-	.map-btn {
-		display: inline-flex;
-		align-items: center;
-		gap: 5px;
-		margin-top: 6px;
-		padding: 5px 11px;
-		border: 1px solid var(--border);
-		border-radius: 20px;
-		font-size: 11px;
-		color: var(--loch);
-		text-decoration: none;
-		background: rgba(30, 58, 95, 0.04);
 	}
 	.footer {
 		text-align: center;
 		padding: 10px 0 3px;
 		font-size: 10px;
-		color: var(--border);
+		color: var(--text-muted);
+		opacity: 0.7;
 		font-family: 'Playfair Display', serif;
 		font-style: italic;
 		letter-spacing: 0.05em;
@@ -1145,12 +1351,29 @@
 	.route-card {
 		display: block;
 		margin: 10px 13px 4px;
-		background: linear-gradient(135deg, #f7f4ee 0%, #eee9df 100%);
+		background: var(--surface-sunken);
 		border: 1px solid var(--border);
 		border-radius: 12px;
 		padding: 12px 14px 10px;
 		text-decoration: none;
-		color: var(--ink);
+		color: var(--text);
+	}
+	@media (hover: hover) {
+		.route-card:hover {
+			border-color: var(--accent-text);
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+		}
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.route-card {
+			transition:
+				border-color 0.15s ease,
+				box-shadow 0.15s ease,
+				transform 0.1s ease;
+		}
+		.route-card:active {
+			transform: scale(0.98);
+		}
 	}
 	.route-hdr {
 		display: flex;
@@ -1159,7 +1382,7 @@
 		font-family: 'Playfair Display', serif;
 		font-size: 13px;
 		font-weight: 600;
-		color: var(--accent);
+		color: var(--accent-text);
 		margin-bottom: 8px;
 	}
 	.route-stops {
@@ -1220,17 +1443,17 @@
 		justify-content: center;
 		gap: 5px;
 		font-size: 11px;
-		color: var(--loch);
+		color: var(--accent-text);
 		padding-top: 4px;
-		border-top: 1px solid rgba(0, 0, 0, 0.06);
+		border-top: 1px solid var(--hairline);
 		margin-top: 2px;
 	}
 	.km-tag {
 		display: inline-block;
 		margin-top: 5px;
 		font-size: 10px;
-		color: #888;
-		background: #f4f1ec;
+		color: var(--text-muted);
+		background: var(--surface-sunken);
 		border-radius: 10px;
 		padding: 1px 7px;
 	}
@@ -1254,9 +1477,10 @@
 		object-fit: cover;
 		border-radius: 5px;
 		display: block;
+		filter: var(--photo-filter);
 	}
 	.ps-placeholder {
-		background: #e8e4db;
+		background: var(--surface-sunken);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -1268,7 +1492,7 @@
 	}
 	.ps-label {
 		font-size: 10px;
-		color: #1e3a5f;
+		color: var(--text-muted);
 		text-align: center;
 		line-height: 1.3;
 		margin-top: 3px;
@@ -1276,7 +1500,7 @@
 	}
 	.wx {
 		font-size: 9px;
-		color: #888;
+		color: var(--text-muted);
 		margin-top: 3px;
 		line-height: 1.2;
 		text-align: center;

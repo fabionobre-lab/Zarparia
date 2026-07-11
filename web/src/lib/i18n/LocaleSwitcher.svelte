@@ -23,10 +23,10 @@
 <style>
 	.locale-switch {
 		display: inline-flex;
-		border: 1px solid #cbb;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;
 		overflow: hidden;
-		background: #faf6ee;
+		background: var(--bg);
 	}
 	.ls-btn {
 		font: inherit;
@@ -36,11 +36,11 @@
 		padding: 0.2rem 0.7rem;
 		border: none;
 		background: transparent;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		cursor: pointer;
 	}
 	.ls-btn.on {
-		background: #2b4a2b;
+		background: var(--accent);
 		color: #fff;
 		font-weight: 600;
 	}
@@ -51,6 +51,6 @@
 		}
 	}
 	.ls-btn:not(.on):hover {
-		color: #2b4a2b;
+		color: var(--accent-strong);
 	}
 </style>

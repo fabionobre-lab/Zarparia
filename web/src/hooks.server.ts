@@ -11,6 +11,7 @@ import {
 	isLocale,
 	resolveLocale
 } from '$lib/i18n';
+import { THEME_COOKIE, resolveTheme, themeAttr } from '$lib/theme';
 
 /** Resolve the session cookie to a user on every request. */
 export const handle: Handle = async ({ event, resolve }) => {
@@ -48,9 +49,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 		});
 	}
 
-	// Stamp <html lang="%lang%"> so the very first server-rendered byte carries
-	// the right language (no post-hydration correction).
+	// ── Theme ──
+	// Cookie holds light|dark|system (default system). For an explicit mode we
+	// stamp data-theme on <html> so the first server-rendered byte carries the
+	// right palette (no flash); `system` stamps nothing and lets the @media
+	// (prefers-color-scheme) rules in tokens.css decide.
+	const theme = resolveTheme(event.cookies.get(THEME_COOKIE));
+	event.locals.theme = theme;
+
+	// Stamp <html lang="%lang%"%theme-attr%> so the very first server-rendered
+	// byte carries the right language + palette (no post-hydration correction).
 	return resolve(event, {
-		transformPageChunk: ({ html }) => html.replace('%lang%', locale)
+		transformPageChunk: ({ html }) =>
+			html.replace('%lang%', locale).replace('%theme-attr%', themeAttr(theme))
 	});
 };

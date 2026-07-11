@@ -1,10 +1,25 @@
 <!doctype html>
-<html lang="%lang%">
+<html lang="%lang%"%theme-attr%>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
-		<meta name="theme-color" content="#2b4a2b" />
+		<meta name="theme-color" content="#faf6ee" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#16120d" media="(prefers-color-scheme: dark)" />
+		<script>
+			// Belt-and-braces: reconcile <html data-theme> from localStorage before
+			// first paint, so a cached/prerendered page whose SSR cookie is stale
+			// still renders in the user's chosen theme (no flash). SSR already
+			// stamped the attribute from the cookie; this only corrects divergence.
+			(function () {
+				try {
+					var m = localStorage.getItem('trips.theme');
+					var el = document.documentElement;
+					if (m === 'dark' || m === 'light') el.setAttribute('data-theme', m);
+					else if (m === 'system') el.removeAttribute('data-theme');
+				} catch (e) {}
+			})();
+		</script>
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<link rel="icon" href="/icon-192.png" />
 		<link rel="apple-touch-icon" href="/icon-192.png" />

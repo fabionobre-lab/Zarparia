@@ -188,10 +188,10 @@
 
 <style>
 	.block {
-		border: 1px solid #e2ddd2;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 8px;
 		margin-bottom: 0.4rem;
-		background: #fff;
+		background: var(--surface);
 	}
 	summary {
 		display: flex;
@@ -206,7 +206,7 @@
 	}
 	.grip {
 		cursor: grab;
-		color: #b3a892;
+		color: var(--text-muted);
 		font-size: 0.9rem;
 		line-height: 1;
 		flex-shrink: 0;
@@ -218,7 +218,7 @@
 	}
 	.time {
 		font-size: 0.75rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		width: 3.5rem;
 		flex-shrink: 0;
 	}
@@ -236,7 +236,7 @@
 	}
 	.body {
 		padding: 0.6rem;
-		border-top: 1px solid #f0ece4;
+		border-top: 1px solid var(--hairline);
 	}
 	.grid2 {
 		display: grid;
@@ -249,7 +249,7 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		gap: 0.2rem;
 		margin-bottom: 0.5rem;
 	}
@@ -259,17 +259,18 @@
 		font-size: 0.85rem;
 		text-transform: none;
 		letter-spacing: normal;
-		color: #1a1208;
+		background: var(--surface);
+		color: var(--text);
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 	}
 	.lbl {
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	.chips {
 		display: flex;
@@ -279,7 +280,7 @@
 	}
 	.chip {
 		font-size: 0.72rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;
 		padding: 0.2rem 0.55rem;
 		cursor: pointer;
@@ -288,8 +289,8 @@
 		gap: 0.3rem;
 	}
 	.chip.on {
-		background: #dce8f5;
-		border-color: #b6cbe4;
+		background: var(--pill-info-bg);
+		border-color: var(--pill-info-bg);
 	}
 	.chip input {
 		display: none;
@@ -297,7 +298,7 @@
 	.sub {
 		margin-top: 0.5rem;
 		padding-top: 0.5rem;
-		border-top: 1px dashed #eee5d6;
+		border-top: 1px dashed var(--hairline);
 	}
 	.sub-hd {
 		display: flex;
@@ -317,8 +318,10 @@
 	.photo input {
 		font: inherit;
 		font-size: 0.8rem;
+		background: var(--surface);
+		color: var(--text);
 		padding: 0.3rem 0.45rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 		flex: 1;
 		min-width: 8rem;
@@ -326,8 +329,8 @@
 	button {
 		font: inherit;
 		font-size: 0.8rem;
-		border: 1px solid #d8ccb8;
-		background: #faf6ee;
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
 		border-radius: 6px;
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
@@ -337,6 +340,6 @@
 		cursor: default;
 	}
 	.del {
-		color: #a33;
+		color: var(--pill-bug-fg);
 	}
 </style>
