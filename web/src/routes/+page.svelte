@@ -2,6 +2,18 @@
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
 	import { t, formatDateRange } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
+	import { getNow } from '$lib/now';
+	import {
+		type Trip,
+		type Segment,
+		tripTimezone,
+		isoDateInTZ,
+		minutesSinceMidnightInTZ,
+		parseBlockTimeMinutes,
+		flattenTripDays,
+		daysBetweenISO,
+		loc
+	} from '$lib/trip-engine';
 
 	let { data } = $props();
 
@@ -11,8 +23,100 @@
 		upcoming: 'home.statusUpcoming'
 	};
 
-	const owned = $derived(data.trips.filter((tr) => tr.role === 'owner'));
-	const shared = $derived(data.trips.filter((tr) => tr.role !== 'owner'));
+	// The active trip (today within start–end) is pulled out into its own hero
+	// card above the grid, so it's excluded from the owned/shared lists
+	// rendered as regular cards below. Activeness is judged against the shared
+	// clock (not the server-computed `status`) so the hero honours the `?now=`
+	// test override; without the override the two always agree.
+	// "empty trips" is judged from the *unfiltered* owned list, so a user
+	// whose only trip is the active one doesn't see "No trips yet.".
+	const activeTrip = $derived.by(() => {
+		const today = isoDateInTZ(getNow());
+		return data.trips.find(
+			(tr) => tr.startDate && tr.endDate && tr.startDate <= today && today <= tr.endDate
+		);
+	});
+	const ownedAll = $derived(data.trips.filter((tr) => tr.role === 'owner'));
+	const owned = $derived(ownedAll.filter((tr) => tr.id !== activeTrip?.id));
+	const shared = $derived(
+		data.trips.filter((tr) => tr.role !== 'owner' && tr.id !== activeTrip?.id)
+	);
+
+	// "Day N of M" from the list payload's date range alone (no trip timezone
+	// available there) — refined below once the full doc is fetched.
+	const dayCount = $derived.by(() => {
+		if (!activeTrip?.startDate || !activeTrip?.endDate) return null;
+		const today = isoDateInTZ(getNow());
+		const day = daysBetweenISO(activeTrip.startDate, today) + 1;
+		const total = daysBetweenISO(activeTrip.startDate, activeTrip.endDate) + 1;
+		return { day: Math.min(Math.max(day, 1), total), total };
+	});
+
+	// Segment/city + "next block" info isn't in the list payload — fetched
+	// client-side after mount from the trip's full doc. Best-effort: any
+	// failure just means the hero shows less detail, never breaks the page.
+	const THEME_COLORS: Record<string, { bg: string; eyebrow: string; accent: string }> = {
+		tartan: { bg: '#2b4a2b', eyebrow: '#e8c84a', accent: '#2b4a2b' },
+		navy: { bg: '#1e3054', eyebrow: '#c17817', accent: '#1e3054' },
+		terracotta: { bg: '#7c3a29', eyebrow: '#e6b566', accent: '#7c3a29' },
+		olive: { bg: '#4a5324', eyebrow: '#d9c46a', accent: '#4a5324' },
+		azure: { bg: '#17456b', eyebrow: '#e0a24a', accent: '#17456b' },
+		sand: { bg: '#5b4a30', eyebrow: '#e8cf8a', accent: '#5b4a30' }
+	};
+	function heroStyleFor(seg: Segment): string {
+		const base = THEME_COLORS[seg.theme || 'tartan'] ?? THEME_COLORS.tartan;
+		const bg = seg.themeColors?.heroBg || base.bg;
+		const eyebrow = seg.themeColors?.eyebrow || base.eyebrow;
+		const accent = seg.themeColors?.accent || base.accent;
+		return `--ha-bg:${bg};--ha-eyebrow:${eyebrow};--ha-accent:${accent}`;
+	}
+
+	let activeDetail = $state<{ city?: string; next?: { title: string; time: string } } | null>(
+		null
+	);
+	let heroThemeStyle = $state('');
+
+	$effect(() => {
+		const id = activeTrip?.id;
+		activeDetail = null;
+		heroThemeStyle = '';
+		if (!id) return;
+		let cancelled = false;
+		(async () => {
+			try {
+				const res = await fetch(`/api/trips/${id}`);
+				if (!res.ok || cancelled) return;
+				const body = (await res.json()) as { doc: Trip };
+				const trip = body.doc;
+				const tz = tripTimezone(trip);
+				const now = getNow();
+				const todayISO = isoDateInTZ(now, tz);
+				const flat = flattenTripDays(trip);
+				const todays = flat.find((f) => f.day.date === todayISO);
+				const lang = trip.defaultLanguage;
+				let next: { title: string; time: string } | undefined;
+				if (todays) {
+					const mins = minutesSinceMidnightInTZ(now, tz);
+					for (const b of todays.day.blocks) {
+						const bt = parseBlockTimeMinutes(b.time);
+						if (bt !== null && bt > mins) {
+							next = { title: loc(trip, b.title, lang), time: b.time };
+							break;
+						}
+					}
+				}
+				if (cancelled) return;
+				activeDetail = { city: todays ? loc(trip, todays.seg.title, lang) : undefined, next };
+				const themeSeg = todays?.seg ?? trip.segments[0];
+				if (themeSeg) heroThemeStyle = heroStyleFor(themeSeg);
+			} catch {
+				// Network/parse error — the hero already renders fine without this detail.
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	});
 </script>
 
 {#snippet card(trip: (typeof data.trips)[number])}
@@ -40,9 +144,32 @@
 				<a class="new" href="/trips/new">{t('home.newTrip')}</a>
 			</div>
 		</div>
-		{#if owned.length === 0}
+
+		{#if activeTrip}
+			<a class="hero-active" style={heroThemeStyle} href="/trips/{activeTrip.id}">
+				<div class="hero-active-eyebrow">{t('home.activeEyebrow')}</div>
+				<div class="hero-active-title">{activeTrip.title ?? activeTrip.id}</div>
+				<div class="hero-active-meta">
+					{#if dayCount}
+						<span
+							>{t('home.dayOfTotal', { day: dayCount.day, total: dayCount.total })}{activeDetail?.city
+								? ` · ${activeDetail.city}`
+								: ''}</span
+						>
+					{/if}
+					<span class="hero-active-dates">{formatDateRange(activeTrip.startDate, activeTrip.endDate)}</span>
+				</div>
+				{#if activeDetail?.next}
+					<div class="hero-active-next">
+						{t('home.nextLabel')}: {activeDetail.next.title} · {activeDetail.next.time}
+					</div>
+				{/if}
+			</a>
+		{/if}
+
+		{#if ownedAll.length === 0}
 			<p class="empty">{t('home.noTrips')} <a href="/trips/new">{t('home.createFirst')}</a></p>
-		{:else}
+		{:else if owned.length > 0}
 			<div class="cards">
 				{#each owned as trip (trip.id)}{@render card(trip)}{/each}
 			</div>
@@ -129,6 +256,54 @@
 	.empty {
 		color: #666;
 		margin-top: 1.5rem;
+	}
+	/* Active-trip hero: a single prominent card above the regular grid.
+	   --ha-* custom properties default to the app's "active" green (matching
+	   .chip.active below) and are overridden inline once the trip's own
+	   segment theme colors are fetched client-side. */
+	.hero-active {
+		display: block;
+		margin-top: 1.25rem;
+		padding: 1.1rem 1.3rem 1.25rem;
+		border-radius: 16px;
+		background: var(--ha-bg, #1a5a34);
+		color: #fff;
+		text-decoration: none;
+		box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+	}
+	.hero-active-eyebrow {
+		font-size: 0.68rem;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--ha-eyebrow, #bfe7cf);
+		opacity: 0.85;
+		margin-bottom: 0.3rem;
+	}
+	.hero-active-title {
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: 1.6rem;
+		font-weight: 700;
+		line-height: 1.12;
+		margin-bottom: 0.45rem;
+	}
+	.hero-active-meta {
+		font-size: 0.85rem;
+		color: rgba(255, 255, 255, 0.82);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0 0.6rem;
+	}
+	.hero-active-dates::before {
+		content: '·';
+		margin-right: 0.6rem;
+		opacity: 0.6;
+	}
+	.hero-active-next {
+		margin-top: 0.65rem;
+		padding-top: 0.55rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.18);
+		font-size: 0.8rem;
+		color: rgba(255, 255, 255, 0.78);
 	}
 	.landing-lang {
 		margin-top: 1.5rem;

@@ -154,6 +154,105 @@ export function tripIsPast(trip: Trip): boolean {
 	return last !== '' && last < new Date().toISOString().slice(0, 10);
 }
 
+// ── Shared "today"/"now" helpers (trip-timezone aware) ──
+// A trip has no single top-level timezone field; the creation wizard applies
+// one IANA zone to every stop's `segment.weather.timezone` at once, so the
+// first segment that has one is a reliable stand-in for "the trip's
+// timezone". Falls back to the browser's local time when no segment carries
+// one (older/manually-built trips, or weather never enabled).
+export function tripTimezone(trip: Trip): string | undefined {
+	for (const seg of trip.segments) {
+		if (seg.weather?.timezone) return seg.weather.timezone;
+	}
+	return undefined;
+}
+
+/** `date` as a YYYY-MM-DD wall-clock day in `tz` (or local time if `tz` is
+ *  absent/invalid). Use with `getNow()` from `./now` for testability. */
+export function isoDateInTZ(date: Date, tz?: string): string {
+	try {
+		const parts = new Intl.DateTimeFormat('en-CA', {
+			timeZone: tz || undefined,
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit'
+		}).formatToParts(date);
+		const y = parts.find((p) => p.type === 'year')?.value;
+		const m = parts.find((p) => p.type === 'month')?.value;
+		const d = parts.find((p) => p.type === 'day')?.value;
+		if (y && m && d) return `${y}-${m}-${d}`;
+	} catch {
+		// Invalid IANA zone string — fall through to local wall-clock below.
+	}
+	const y = date.getFullYear();
+	const m = String(date.getMonth() + 1).padStart(2, '0');
+	const d = String(date.getDate()).padStart(2, '0');
+	return `${y}-${m}-${d}`;
+}
+
+/** `date`'s wall-clock time in `tz` as "HH:MM" (24h), or local time if `tz`
+ *  is absent/invalid. */
+export function hhmmInTZ(date: Date, tz?: string): string {
+	try {
+		return new Intl.DateTimeFormat('en-GB', {
+			timeZone: tz || undefined,
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false
+		}).format(date);
+	} catch {
+		return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+	}
+}
+
+/** Minutes since midnight (wall-clock) in `tz`, for comparing against
+ *  `parseBlockTimeMinutes()`. */
+export function minutesSinceMidnightInTZ(date: Date, tz?: string): number {
+	const [h, m] = hhmmInTZ(date, tz).split(':').map(Number);
+	return h * 60 + m;
+}
+
+/** Parse a block time like "11:45" or "~12:30" into minutes since midnight.
+ *  Any non-digit/colon prefix (e.g. "~") is stripped leniently. Returns
+ *  `null` when the time can't be parsed — such blocks are treated as
+ *  "before" the next timed block by callers, never as the upcoming one. */
+export function parseBlockTimeMinutes(time: string): number | null {
+	const clean = (time || '').replace(/[^0-9:]/g, '');
+	const m = /^(\d{1,2}):(\d{2})/.exec(clean);
+	if (!m) return null;
+	const h = Number(m[1]);
+	const min = Number(m[2]);
+	if (Number.isNaN(h) || Number.isNaN(min) || h > 23 || min > 59) return null;
+	return h * 60 + min;
+}
+
+/** Whole calendar days between two YYYY-MM-DD dates (`b - a`), UTC-based so
+ *  DST transitions never skew the count. */
+export function daysBetweenISO(aISO: string, bISO: string): number {
+	const a = dateUTC(aISO).getTime();
+	const b = dateUTC(bISO).getTime();
+	return Math.round((b - a) / 86_400_000);
+}
+
+export interface FlatTripDay {
+	seg: Segment;
+	plan: Plan;
+	day: Day;
+}
+/** Flatten a trip's segments (using each segment's default plan) into a
+ *  single ordered list of {seg, plan, day}. A lighter-weight, read-only
+ *  cousin of TripView's own plan-aware flattening — used where only the
+ *  default itinerary is needed (e.g. the home page's active-trip hero). */
+export function flattenTripDays(trip: Trip): FlatTripDay[] {
+	const out: FlatTripDay[] = [];
+	for (const seg of trip.segments) {
+		const plan = seg.plans.find((p) => p.id === seg.defaultPlan) ?? seg.plans[0];
+		if (!plan) continue;
+		for (const day of plan.days) out.push({ seg, plan, day });
+	}
+	return out;
+}
+
 export interface RoutePlace {
 	q: string;
 	name: string;
