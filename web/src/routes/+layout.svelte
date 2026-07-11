@@ -59,10 +59,21 @@
 		</div>
 		<nav>
 			{#if data.user}
-				<button type="button" class="feedback" onclick={() => (feedbackOpen = true)}>{t('feedback.button')}</button>
+				<button
+					type="button"
+					class="feedback"
+					onclick={() => (feedbackOpen = true)}
+					aria-label={t('feedback.button')}
+					title={t('feedback.button')}
+				>
+					<svg class="feedback-icon" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M4 5.5h16a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9.5L5 19.5V16H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
+					</svg>
+					<span class="feedback-label">{t('feedback.button')}</span>
+				</button>
 				<span class="who">{data.user.name ?? data.user.email}</span>
 				<form method="POST" action="/auth/logout" onsubmit={onLogout}>
-					<button type="submit">{t('header.signOut')}</button>
+					<button type="submit" class="signout">{t('header.signOut')}</button>
 				</form>
 			{:else}
 				<a class="signin" href="/auth/login/google">{t('header.signInGoogle')}</a>
@@ -85,6 +96,7 @@
 	}
 	.bar {
 		display: flex;
+		flex-wrap: nowrap;
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.75rem;
@@ -94,11 +106,13 @@
 	}
 	.left {
 		display: flex;
+		flex-wrap: nowrap;
 		align-items: center;
 		gap: 0.75rem;
 		min-width: 0;
 	}
 	.brand {
+		flex-shrink: 0;
 		font-weight: 700;
 		font-size: 1.1rem;
 		text-decoration: none;
@@ -106,8 +120,19 @@
 	}
 	nav {
 		display: flex;
+		flex-wrap: nowrap;
 		align-items: center;
 		gap: 0.75rem;
+	}
+	.feedback {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		flex-shrink: 0;
+	}
+	.feedback-icon {
+		display: none;
+		flex-shrink: 0;
 	}
 	.who {
 		font-size: 0.85rem;
@@ -139,6 +164,30 @@
 			min-height: 40px;
 			display: inline-flex;
 			align-items: center;
+		}
+		/* Feedback collapses to an icon-only ghost circle; the text label
+		   (still present for screen readers via aria-label) is visually hidden. */
+		.feedback {
+			width: 40px;
+			padding: 0;
+			justify-content: center;
+			border-radius: 999px;
+		}
+		.feedback-icon {
+			display: inline-flex;
+		}
+		.feedback-label {
+			display: none;
+		}
+		/* Sign out drops its pill chrome for a quiet text link — one fewer
+		   bordered control competing for the row's limited width. */
+		.signout {
+			border: none;
+			background: transparent;
+			padding: 0 0.15rem;
+			color: var(--text-muted);
+			text-decoration: underline;
+			text-underline-offset: 0.15em;
 		}
 	}
 	.feedback {

@@ -125,11 +125,13 @@
 	<a class="card" style={cardBandStyle(trip)} href="/trips/{trip.id}">
 		{#if trip.cover}<div class="cover" aria-hidden="true">{trip.cover}</div>{/if}
 		<div class="card-main">
-			<div class="card-title">{trip.title ?? trip.id}</div>
+			<div class="card-top">
+				<div class="card-title">{trip.title ?? trip.id}</div>
+				<span class="chip {trip.status}">{t(statusKey[trip.status] ?? 'home.statusUpcoming')}</span>
+			</div>
 			<div class="card-dates">{formatDateRange(trip.startDate, trip.endDate)}</div>
+			{#if trip.role !== 'owner'}<span class="role">{trip.role === 'editor' ? t('role.canEdit') : t('role.viewOnly')}</span>{/if}
 		</div>
-		{#if trip.role !== 'owner'}<span class="role">{trip.role === 'editor' ? t('role.canEdit') : t('role.viewOnly')}</span>{/if}
-		<span class="chip {trip.status}">{t(statusKey[trip.status] ?? 'home.statusUpcoming')}</span>
 	</a>
 {/snippet}
 
@@ -212,10 +214,16 @@
 	/* Below ~520px stack: heading on its own row, actions side by side below it,
 	   so the buttons never squeeze the heading into a mid-word wrap. */
 	@media (max-width: 520px) {
+		main {
+			margin-top: 1rem;
+		}
+		h1 {
+			font-size: clamp(21px, 1.15rem + 0.9vw, 25px);
+		}
 		.head {
 			flex-direction: column;
 			align-items: stretch;
-			gap: 0.75rem;
+			gap: 0.5rem;
 		}
 		.actions {
 			width: 100%;
@@ -223,10 +231,16 @@
 		.import-btn,
 		.new {
 			flex: 1;
-			min-height: 40px;
+			min-height: 44px;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
+		}
+		.hero-active {
+			margin-top: 0.9rem;
+		}
+		.cards {
+			margin-top: 0.9rem;
 		}
 	}
 	.shared-hd {
@@ -355,8 +369,11 @@
 	}
 	.card {
 		/* Band tint derived from the inline --card-base: the base itself in light
-		   (identity unchanged), an OKLCH-lightened tint in dark. Falls back to the
-		   hairline when a trip has no theme. The derived colour is applied to
+		   (identity unchanged); in dark, re-lightened to L 0.58 with chroma
+		   preserved so the band still reads as the theme's hue (e.g. navy stays
+		   blue) instead of washing out to a near-white pastel at high lightness.
+		   Falls back to the hairline when a trip has no theme. The derived colour
+		   is applied to
 		   border-left-color DIRECTLY in the theme-conditional rules (not routed
 		   through a custom property): Chromium keeps the pending-substitution
 		   value of the `border-left` shorthand stale across live data-theme
@@ -373,11 +390,11 @@
 		color: var(--text);
 	}
 	:root[data-theme='dark'] .card {
-		border-left-color: oklch(from var(--card-base, #7a6e5f) 0.72 calc(c * 0.9) h);
+		border-left-color: oklch(from var(--card-base, #7a6e5f) 0.58 c h);
 	}
 	@media (prefers-color-scheme: dark) {
 		:root:not([data-theme]) .card {
-			border-left-color: oklch(from var(--card-base, #7a6e5f) 0.72 calc(c * 0.9) h);
+			border-left-color: oklch(from var(--card-base, #7a6e5f) 0.58 c h);
 		}
 	}
 	.card:hover {
@@ -414,7 +431,18 @@
 		flex: 1;
 		min-width: 0;
 	}
+	/* Title + status chip share a row so the chip sits top-right, vertically
+	   aligned with the title's own line — not floating centered against the
+	   whole card's height (which grows/shrinks with the optional cover/role). */
+	.card-top {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
 	.card-title {
+		flex: 1;
+		min-width: 0;
 		font-weight: 700;
 	}
 	.card-dates {
@@ -424,6 +452,8 @@
 		font-variant-numeric: tabular-nums;
 	}
 	.role {
+		display: inline-block;
+		margin-top: 0.35rem;
 		font-size: 0.65rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
@@ -433,6 +463,7 @@
 		padding: 0.15rem 0.5rem;
 	}
 	.chip {
+		flex-shrink: 0;
 		font-size: 0.62rem;
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
