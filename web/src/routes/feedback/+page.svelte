@@ -99,19 +99,19 @@
 		max-width: 760px;
 		margin: 2rem auto;
 		padding: 0 1.5rem;
-		color: #1a1208;
+		color: var(--text);
 	}
 	.back {
 		font-size: 0.8rem;
 		text-decoration: none;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	h1 {
-		font-size: 1.5rem;
+		font-size: var(--type-h1);
 		margin: 0.5rem 0 1.25rem;
 	}
 	.empty {
-		color: #666;
+		color: var(--text-muted);
 	}
 	.list {
 		list-style: none;
@@ -122,8 +122,8 @@
 		gap: 0.75rem;
 	}
 	.item {
-		background: #faf6ee;
-		border: 1px solid #e2ddd2;
+		background: var(--surface);
+		border: 1px solid var(--hairline);
 		border-radius: 12px;
 		padding: 0.8rem 1rem;
 	}
@@ -139,30 +139,31 @@
 		letter-spacing: 0.05em;
 		padding: 0.15rem 0.5rem;
 		border-radius: 999px;
-		background: #efe9dc;
-		color: #6b6153;
+		background: var(--pill-neutral-bg);
+		color: var(--pill-neutral-fg);
 	}
 	.badge.bug {
-		background: #fbe3df;
-		color: #8a2b20;
+		background: var(--pill-bug-bg);
+		color: var(--pill-bug-fg);
 	}
 	.badge.idea {
-		background: #e3eefb;
-		color: #1e3a5f;
+		background: var(--pill-info-bg);
+		color: var(--pill-info-fg);
 	}
 	.badge.other {
-		background: #ece8e0;
-		color: #6b6153;
+		background: var(--pill-neutral-bg);
+		color: var(--pill-neutral-fg);
 	}
 	.who {
 		font-size: 0.82rem;
 		font-weight: 600;
-		color: #4a4030;
+		color: var(--text);
 	}
 	.date {
 		font-size: 0.78rem;
-		color: #9a8f7f;
+		color: var(--text-muted);
 		margin-left: auto;
+		font-variant-numeric: tabular-nums;
 	}
 	.chip {
 		font-size: 0.68rem;
@@ -170,32 +171,33 @@
 		letter-spacing: 0.05em;
 		padding: 0.15rem 0.55rem;
 		border-radius: 999px;
-		background: #ede8e0;
-		color: #7a6e5f;
+		background: var(--pill-neutral-bg);
+		color: var(--pill-neutral-fg);
 	}
 	.chip.new {
-		background: #dce8f5;
-		color: #1e3a5f;
+		background: var(--pill-info-bg);
+		color: var(--pill-info-fg);
 	}
 	.chip.planned {
-		background: #f5edd5;
-		color: #7a5a10;
+		background: var(--pill-warn-bg);
+		color: var(--pill-warn-fg);
 	}
 	.chip.done {
-		background: #daf0e5;
-		color: #1a5a34;
+		background: var(--pill-go-bg);
+		color: var(--pill-go-fg);
 	}
 	.chip.dismissed {
-		background: #ede8e0;
-		color: #7a6e5f;
+		background: var(--pill-neutral-bg);
+		color: var(--pill-neutral-fg);
 	}
 	.status-sel {
 		font: inherit;
 		font-size: 0.8rem;
 		padding: 0.25rem 0.4rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
-		background: #fff;
+		background: var(--surface);
+		color: var(--text);
 	}
 	.msg {
 		margin: 0.6rem 0 0;
@@ -207,7 +209,7 @@
 		display: inline-block;
 		margin-top: 0.5rem;
 		font-size: 0.72rem;
-		color: #9a8f7f;
+		color: var(--text-muted);
 		font-family: ui-monospace, monospace;
 	}
 </style>

@@ -4,14 +4,70 @@
 :root{
   --ink:#1a1208;--stone:#7a6e5f;--heather:#7b4f7a;
   --gold:#b8860b;--cream:#faf6ee;--moss:#3d5a3d;--border:#d8ccb8;--loch:#1e3a5f;
+  --surface:#f7f4ee;--surface-2:#eee9df;
+  --chip-sight-bg:#dce8f5;--chip-food-bg:#daf0e5;--chip-logistics-bg:#ede8e0;
+  --chip-booking-bg:#f5edd5;--chip-fullday-bg:#ede0f0;
+  --chip-bday-bg1:#f2d2f0;--chip-bday-bg2:#dfd0f2;--chip-bday-text:#5a2a78;
+  --warn-bg:#fdf0ee;--warn-border:#c84040;--warn-text:#7a2020;
+  --diff-added-bg:#e5f5e8;--diff-added-text:#1a3a1a;
+  --diff-changed-bg:#fef6de;--diff-changed-text:#5a3a00;
+  --tb-dot-filter:none;--photo-filter:none;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
+}
+/* Dark mode: "candlelit paper" palette. `html[data-theme]` explicit overrides
+   win over the `prefers-color-scheme` media query in both directions: the
+   guard below skips the media query entirely when the user explicitly chose
+   light, and the explicit dark block below applies regardless of OS setting. */
+@media (prefers-color-scheme: dark){
+  html:not([data-theme="light"]){
+    --ink:#ece4d4;--stone:#a3957f;--heather:#c79bc6;--gold:#e0b84a;
+    --cream:#16120d;--moss:#8fbf8f;--border:#3a3226;--loch:#8ec0e8;
+    --surface:#1f1913;--surface-2:#241d15;
+    --chip-sight-bg:rgba(142,192,232,.16);--chip-food-bg:rgba(143,191,143,.16);
+    --chip-logistics-bg:rgba(163,149,127,.18);--chip-booking-bg:rgba(224,184,74,.16);
+    --chip-fullday-bg:rgba(199,155,198,.16);
+    --chip-bday-bg1:rgba(199,155,198,.22);--chip-bday-bg2:rgba(150,140,199,.22);--chip-bday-text:#e3b8e8;
+    --warn-bg:rgba(200,64,64,.16);--warn-border:#c9695a;--warn-text:#f2a99b;
+    --diff-added-bg:rgba(143,191,143,.16);--diff-added-text:#bfe0bf;
+    --diff-changed-bg:rgba(224,184,74,.16);--diff-changed-text:#f0dba0;
+    --tb-dot-filter:brightness(1.55) saturate(.85);--photo-filter:brightness(.9);
+  }
+}
+html[data-theme="dark"]{
+  --ink:#ece4d4;--stone:#a3957f;--heather:#c79bc6;--gold:#e0b84a;
+  --cream:#16120d;--moss:#8fbf8f;--border:#3a3226;--loch:#8ec0e8;
+  --surface:#1f1913;--surface-2:#241d15;
+  --chip-sight-bg:rgba(142,192,232,.16);--chip-food-bg:rgba(143,191,143,.16);
+  --chip-logistics-bg:rgba(163,149,127,.18);--chip-booking-bg:rgba(224,184,74,.16);
+  --chip-fullday-bg:rgba(199,155,198,.16);
+  --chip-bday-bg1:rgba(199,155,198,.22);--chip-bday-bg2:rgba(150,140,199,.22);--chip-bday-text:#e3b8e8;
+  --warn-bg:rgba(200,64,64,.16);--warn-border:#c9695a;--warn-text:#f2a99b;
+  --diff-added-bg:rgba(143,191,143,.16);--diff-added-text:#bfe0bf;
+  --diff-changed-bg:rgba(224,184,74,.16);--diff-changed-text:#f0dba0;
+  --tb-dot-filter:brightness(1.55) saturate(.85);--photo-filter:brightness(.9);
+}
+/* Per-theme "ink" accent: text/border usages of the segment accent color need
+   to lighten a lot in dark mode to stay readable on the near-black surface.
+   Filled marks that carry white text on top (route-num badge, daymap-dot)
+   only need a moderate lift so the white numeral inside stays legible while
+   the mark itself is still visibly lighter than the card behind it. Both
+   default to --accent (no-op) in light mode. */
+@media (prefers-color-scheme: dark){
+  html:not([data-theme="light"]) .shell{
+    --accent-ink:color-mix(in srgb, var(--accent) 50%, white 50%);
+    --accent-fill:color-mix(in srgb, var(--accent) 75%, white 25%);
+  }
+}
+html[data-theme="dark"] .shell{
+  --accent-ink:color-mix(in srgb, var(--accent) 50%, white 50%);
+  --accent-fill:color-mix(in srgb, var(--accent) 75%, white 25%);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;overflow:hidden;background:#1e3520}
 body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-smoothing:antialiased}
 .shell{max-width:430px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--cream);overflow:hidden;
   /* theme defaults (= tartan) */
-  --hero-bg:#2b4a2b;--hero-eyebrow:#e8c84a;--accent:#2b4a2b}
+  --hero-bg:#2b4a2b;--hero-eyebrow:#e8c84a;--accent:#2b4a2b;--accent-ink:var(--accent);--accent-fill:var(--accent)}
 .shell.theme-navy{--hero-bg:#1e3054;--hero-eyebrow:#c17817;--accent:#1e3054}
 .shell.theme-terracotta{--hero-bg:#7c3a29;--hero-eyebrow:#e6b566;--accent:#7c3a29}
 .shell.theme-olive{--hero-bg:#4a5324;--hero-eyebrow:#d9c46a;--accent:#4a5324}
@@ -33,6 +89,8 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .ics-btn{min-height:44px;display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border:1px solid rgba(255,255,255,.18);border-radius:20px;background:rgba(0,0,0,.2);cursor:pointer;font-size:11px;color:rgba(255,255,255,.85);font-family:'Source Serif 4',serif;letter-spacing:.03em;transition:all .2s}
 .ics-btn:hover{background:rgba(255,255,255,.32)}
 .ics-btn span{white-space:nowrap}
+.theme-btn{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18);border-radius:20px;background:rgba(0,0,0,.2);cursor:pointer;color:rgba(255,255,255,.85);transition:all .2s;flex-shrink:0}
+.theme-btn:hover{background:rgba(255,255,255,.32)}
 .back-link{display:flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;color:var(--hero-eyebrow);opacity:.75;text-decoration:none;font-size:15px;line-height:1}
 .back-link:hover{opacity:1}
 .trip-eyebrow{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--hero-eyebrow);opacity:.75;font-weight:300}
@@ -49,10 +107,10 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .daynav{display:flex;overflow-x:auto;scrollbar-width:none;background:var(--cream);border-bottom:1px solid var(--border);padding:0 4px;flex-shrink:0}
 .daynav::-webkit-scrollbar{display:none}
 .daybtn{flex:1 0 auto;min-width:44px;min-height:44px;padding:7px 3px 5px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border-bottom:2.5px solid transparent;transition:all .15s;position:relative}
-.daybtn.on{border-bottom-color:var(--accent)}
+.daybtn.on{border-bottom-color:var(--accent-ink)}
 .daybtn .dow{font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--stone);font-family:'Source Serif 4',serif;transition:color .15s}
 .daybtn .dnum{font-size:15px;font-weight:500;color:var(--stone);font-family:'Playfair Display',serif;line-height:1;transition:color .15s}
-.daybtn.on .dow,.daybtn.on .dnum{color:var(--accent)}
+.daybtn.on .dow,.daybtn.on .dnum{color:var(--accent-ink)}
 .daybtn.gap{opacity:.4;cursor:default}
 .daybtn.gap .dnum{font-weight:400}
 .bday-pip{width:5px;height:5px;border-radius:50%;background:var(--heather);margin-top:1px;opacity:0}
@@ -73,7 +131,7 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .tb-left{display:flex;flex-direction:column;align-items:center;width:50px;flex-shrink:0;padding-top:12px}
 .tb-time{font-size:10px;font-weight:500;color:var(--stone);text-align:center;line-height:1.2;font-family:'Source Serif 4',serif}
 .tb-dot-col{display:flex;flex-direction:column;align-items:center;margin-top:4px}
-.tb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--cream);box-shadow:0 0 0 1px rgba(0,0,0,.07)}
+.tb-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--cream);box-shadow:0 0 0 1px rgba(0,0,0,.07);filter:var(--tb-dot-filter,none)}
 .tb-line{width:1.5px;flex:1;min-height:14px;background:var(--border);margin-top:2px}
 .tb-body{flex:1;padding:11px 0 11px 9px;border-bottom:1px solid var(--border)}
 .tb:last-child .tb-body{border-bottom:none}
@@ -81,48 +139,48 @@ body{font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-
 .tb-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:500;color:var(--ink);line-height:1.3}
 .tb-tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 3px}
 .tb-tag{font-size:10px;padding:2px 7px;border-radius:20px;font-family:'Source Serif 4',serif;white-space:nowrap}
-.tb-tag.sight{background:#dce8f5;color:var(--loch)}
-.tb-tag.food{background:#daf0e5;color:var(--moss)}
-.tb-tag.logistics{background:#ede8e0;color:var(--stone)}
-.tb-tag.booking{background:#f5edd5;color:#7a5a10}
-.tb-tag.fullday{background:#ede0f0;color:var(--heather)}
-.tb-tag.birthday{background:linear-gradient(120deg,#f2d2f0,#dfd0f2);color:#5a2a78;font-weight:500}
+.tb-tag.sight{background:var(--chip-sight-bg);color:var(--loch)}
+.tb-tag.food{background:var(--chip-food-bg);color:var(--moss)}
+.tb-tag.logistics{background:var(--chip-logistics-bg);color:var(--stone)}
+.tb-tag.booking{background:var(--chip-booking-bg);color:var(--gold)}
+.tb-tag.fullday{background:var(--chip-fullday-bg);color:var(--heather)}
+.tb-tag.birthday{background:linear-gradient(120deg,var(--chip-bday-bg1),var(--chip-bday-bg2));color:var(--chip-bday-text);font-weight:500}
 .tb-meta{font-size:12px;color:var(--stone);line-height:1.55;margin-top:2px;font-weight:300}
-.tb-warn{background:#fdf0ee;border-left:2.5px solid #c84040;border-radius:0 7px 7px 0;padding:5px 9px;margin-top:5px;font-size:11px;color:#7a2020;line-height:1.45}
-.tb-note{background:#f0ece4;border-radius:7px;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
-.diff-added{background:#e5f5e8;border-left:2.5px solid var(--moss);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:#1a3a1a;line-height:1.45}
-.diff-changed{background:#fef6de;border-left:2.5px solid var(--gold);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:#5a3a00;line-height:1.45}
-.diff-kept{background:#f0ece4;border-left:2.5px solid var(--accent);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
+.tb-warn{background:var(--warn-bg);border-left:2.5px solid var(--warn-border);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:5px;font-size:11px;color:var(--warn-text);line-height:1.45}
+.tb-note{background:var(--surface);border-radius:7px;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
+.diff-added{background:var(--diff-added-bg);border-left:2.5px solid var(--moss);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--diff-added-text);line-height:1.45}
+.diff-changed{background:var(--diff-changed-bg);border-left:2.5px solid var(--gold);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--diff-changed-text);line-height:1.45}
+.diff-kept{background:var(--surface);border-left:2.5px solid var(--accent-ink);border-radius:0 7px 7px 0;padding:5px 9px;margin-top:4px;font-size:11px;color:var(--stone);line-height:1.45}
 .map-btn{display:inline-flex;align-items:center;gap:5px;margin-top:6px;padding:5px 11px;border:1px solid var(--border);border-radius:20px;font-size:11px;color:var(--loch);text-decoration:none;font-family:'Source Serif 4',serif;background:rgba(30,58,95,.04)}
 .footer{text-align:center;padding:10px 0 3px;font-size:10px;color:var(--border);font-family:'Playfair Display',serif;font-style:italic;letter-spacing:.05em}
-.route-card{display:block;margin:10px 13px 4px;background:linear-gradient(135deg,#f7f4ee 0%,#eee9df 100%);border:1px solid var(--border);border-radius:12px;padding:12px 14px 10px;text-decoration:none;color:var(--ink);transition:all .2s}
-.route-card:active{transform:scale(.98);background:#eee9df}
-.route-hdr{display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--accent);margin-bottom:8px}
+.route-card{display:block;margin:10px 13px 4px;background:linear-gradient(135deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid var(--border);border-radius:12px;padding:12px 14px 10px;text-decoration:none;color:var(--ink);transition:all .2s}
+.route-card:active{transform:scale(.98);background:var(--surface-2)}
+.route-hdr{display:flex;align-items:center;gap:6px;font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--accent-ink);margin-bottom:8px}
 .route-stops{display:flex;align-items:flex-start;gap:0;overflow-x:auto;scrollbar-width:none;padding:2px 0 6px}
 .route-stops::-webkit-scrollbar{display:none}
 .route-stop{display:flex;flex-direction:column;align-items:center;min-width:0;flex-shrink:0;position:relative}
-.route-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;flex-shrink:0}
+.route-num{width:22px;height:22px;border-radius:50%;background:var(--accent-fill);color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;flex-shrink:0}
 .route-name{font-size:9px;color:var(--stone);text-align:center;width:70px;line-height:1.25;margin-top:3px;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis}
 .route-connector{width:20px;height:2px;background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 4px,transparent 4px,transparent 7px);margin:0 1px;flex-shrink:0;align-self:flex-start;margin-top:10px}
 .route-open{display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;color:var(--loch);font-family:'Source Serif 4',serif;padding-top:4px;border-top:1px solid rgba(0,0,0,.06);margin-top:2px}
 .route-open svg{flex-shrink:0}
-.daymap{margin:8px 13px 4px;background:linear-gradient(135deg,#f7f4ee 0%,#eee9df 100%);border:1px solid var(--border);border-radius:12px;padding:10px 14px 8px}
-.daymap-eye{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--accent);margin-bottom:6px}
+.daymap{margin:8px 13px 4px;background:linear-gradient(135deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid var(--border);border-radius:12px;padding:10px 14px 8px}
+.daymap-eye{font-family:'Playfair Display',serif;font-size:13px;font-weight:600;color:var(--accent-ink);margin-bottom:6px}
 .daymap-svg{display:block;width:100%;height:auto}
 .daymap-line{fill:none;stroke:var(--stone);stroke-width:1.5;stroke-dasharray:3 3;opacity:.5}
-.daymap-dot{fill:var(--accent)}
+.daymap-dot{fill:var(--accent-fill)}
 .daymap-num{fill:#fff;font-size:10px;font-weight:600;font-family:'Source Serif 4',serif}
 .daymap-label{fill:var(--stone);font-size:8px;font-family:'Source Serif 4',serif}
-.km-tag{display:inline-block;margin-top:5px;font-size:10px;color:#888;background:#f4f1ec;border-radius:10px;padding:1px 7px}
+.km-tag{display:inline-block;margin-top:5px;font-size:10px;color:var(--stone);background:var(--surface);border-radius:10px;padding:1px 7px}
 .wx-km{color:#9caf88;font-weight:600;padding-left:8px;border-left:1px solid rgba(255,255,255,.25);margin-left:4px}
 .tb-photos{margin-top:8px;display:flex;flex-wrap:wrap;gap:7px}
 .ps-card{display:flex;flex-direction:column;align-items:center;text-decoration:none;width:80px;flex-shrink:0}
-.ps-thumb{width:80px;height:55px;object-fit:cover;border-radius:5px;display:block}
-.ps-placeholder{background:#e8e4db;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.ps-thumb{width:80px;height:55px;object-fit:cover;border-radius:5px;display:block;filter:var(--photo-filter,none)}
+.ps-placeholder{background:var(--surface);border-radius:5px;display:flex;align-items:center;justify-content:center}
 .ps-placeholder::after{content:'📷';font-size:18px;opacity:.35}
-.ps-label{font-size:10px;color:#1e3a5f;text-align:center;line-height:1.3;margin-top:3px;padding:0 2px}
-.ps-card:hover .ps-label{color:#3d5a3d;text-decoration:underline}
-.wx{font-size:9px;color:#888;margin-top:3px;line-height:1.2;text-align:center;letter-spacing:0}
+.ps-label{font-size:10px;color:var(--loch);text-align:center;line-height:1.3;margin-top:3px;padding:0 2px}
+.ps-card:hover .ps-label{color:var(--moss);text-decoration:underline}
+.wx{font-size:9px;color:var(--stone);margin-top:3px;line-height:1.2;text-align:center;letter-spacing:0}
 .wx-hdr{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:6px 12px 2px;font-size:11px;color:var(--stone)}
 .wx-hdr-item{display:flex;align-items:center;gap:3px}
 .app-msg{padding:40px 20px;text-align:center;color:var(--stone);font-size:13px}

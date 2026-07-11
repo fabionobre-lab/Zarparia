@@ -1,0 +1,130 @@
+/* ============================================================================
+   Trips house design system — global tokens
+   Shared architecture with Nobria (same mechanism + token names; skins differ).
+   Imported once, globally, from the root +layout.svelte.
+
+   Mechanism: mode = light | dark | system.
+     - Explicit mode  → <html data-theme="light|dark"> (set by SSR + the store)
+     - system         → no attribute; @media (prefers-color-scheme) supplies dark
+   See docs/DESIGN_SYSTEM.md for the full spec.
+   ========================================================================== */
+
+/* Register the OKLCH-derived theme property as a real <color>. Without this,
+   Chromium caches the relative-colour resolution (`oklch(from var(--…))`) held
+   in an unregistered custom property and fails to re-resolve it when
+   `data-theme` flips at runtime — fresh loads are fine, live toggles stale.
+   Registration makes it compute eagerly, so invalidation works. */
+@property --accent-text {
+	syntax: '<color>';
+	inherits: true;
+	initial-value: #2b4a2b;
+}
+
+:root {
+	/* ── Semantic surface + text (LIGHT) ── */
+	--bg: #faf6ee;
+	--surface: #fffdf7;
+	--surface-sunken: #f3eee2;
+	--text: #1a1208;
+	--text-muted: #7a6e5f;
+	--hairline: rgba(122, 110, 95, 0.28);
+	--hairline-strong: rgba(122, 110, 95, 0.5);
+	--accent: #2b4a2b; /* saturated brand green — fills with light text */
+	--accent-strong: #2b4a2b; /* text-level accent (dark-legible in light mode) */
+
+	/* ── Status pills (home cards + feedback list; outside the trip shell) ── */
+	--pill-neutral-bg: #ede8e0;
+	--pill-neutral-fg: #7a6e5f;
+	--pill-info-bg: #dce8f5;
+	--pill-info-fg: #1e3a5f;
+	--pill-go-bg: #daf0e5;
+	--pill-go-fg: #1a5a34;
+	--pill-warn-bg: #f5edd5;
+	--pill-warn-fg: #7a5a10;
+	--pill-bug-bg: #fbe3df;
+	--pill-bug-fg: #8a2b20;
+
+	/* ── Motion ── */
+	--dur-fast: 120ms;
+	--dur-base: 180ms;
+	--dur-slow: 240ms;
+	--ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
+
+	/* ── Fluid type (clamp: min at ~430px, grows on wider chrome) ── */
+	--type-display: clamp(30px, 2.2rem + 1.5vw, 42px);
+	--type-h1: clamp(24px, 1.35rem + 1vw, 30px);
+	--type-body: clamp(16px, 0.95rem + 0.3vw, 18px);
+	--type-small: clamp(13px, 0.8rem + 0.15vw, 14px);
+
+	/* ── Legacy aliases (kept working during migration; resolve to the tokens
+	   above at use-time, so they flip with the theme automatically) ── */
+	--cream: var(--bg);
+	--ink: var(--text);
+	--stone: var(--text-muted);
+	--border: var(--hairline-strong);
+
+	color-scheme: light;
+}
+
+/* ── Dark palette: "candlelit paper" — warm, never gray ── */
+:root[data-theme='dark'] {
+	--bg: #16120d;
+	--surface: #1f1913;
+	--surface-sunken: #120f0b;
+	--text: #ece4d4;
+	--text-muted: #a3957f;
+	--hairline: rgba(236, 228, 212, 0.12);
+	--hairline-strong: rgba(236, 228, 212, 0.28);
+	--accent: #2b4a2b; /* fills only */
+	--accent-strong: #9fbf9f; /* text-level; 9.3:1 on --bg (verified) */
+
+	--pill-neutral-bg: rgba(236, 228, 212, 0.08);
+	--pill-neutral-fg: #a3957f;
+	--pill-info-bg: rgba(120, 160, 210, 0.2);
+	--pill-info-fg: #bcd4f0;
+	--pill-go-bg: rgba(90, 170, 120, 0.2);
+	--pill-go-fg: #a9d9bf;
+	--pill-warn-bg: rgba(200, 170, 90, 0.18);
+	--pill-warn-fg: #e0c987;
+	--pill-bug-bg: rgba(200, 90, 80, 0.18);
+	--pill-bug-fg: #eaa89f;
+
+	color-scheme: dark;
+}
+
+/* system mode (no explicit attribute) follows the OS preference */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme]) {
+		--bg: #16120d;
+		--surface: #1f1913;
+		--surface-sunken: #120f0b;
+		--text: #ece4d4;
+		--text-muted: #a3957f;
+		--hairline: rgba(236, 228, 212, 0.12);
+		--hairline-strong: rgba(236, 228, 212, 0.28);
+		--accent: #2b4a2b;
+		--accent-strong: #9fbf9f;
+
+		--pill-neutral-bg: rgba(236, 228, 212, 0.08);
+		--pill-neutral-fg: #a3957f;
+		--pill-info-bg: rgba(120, 160, 210, 0.2);
+		--pill-info-fg: #bcd4f0;
+		--pill-go-bg: rgba(90, 170, 120, 0.2);
+		--pill-go-fg: #a9d9bf;
+		--pill-warn-bg: rgba(200, 170, 90, 0.18);
+		--pill-warn-fg: #e0c987;
+		--pill-bug-bg: rgba(200, 90, 80, 0.18);
+		--pill-bug-fg: #eaa89f;
+
+		color-scheme: dark;
+	}
+}
+
+/* ── Global baseline ── */
+html {
+	background: var(--bg);
+}
+body {
+	background: var(--bg);
+	color: var(--text);
+}

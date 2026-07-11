@@ -139,15 +139,15 @@
 	.fb {
 		box-sizing: border-box;
 		width: min(440px, calc(100vw - 2rem));
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 14px;
 		padding: 1.1rem 1.2rem;
-		background: #fbf8f1;
-		color: #1a1208;
+		background: var(--surface);
+		color: var(--text);
 		font-family: system-ui, sans-serif;
 	}
 	.fb::backdrop {
-		background: rgba(26, 18, 8, 0.4);
+		background: rgba(10, 7, 3, 0.55);
 	}
 	.hd {
 		display: flex;
@@ -165,7 +165,7 @@
 		line-height: 1;
 		background: none;
 		border: none;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		cursor: pointer;
 		padding: 0.25rem;
 	}
@@ -179,15 +179,15 @@
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.45rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 8px;
-		background: #fff;
-		color: #4a4030;
+		background: var(--bg);
+		color: var(--text);
 		cursor: pointer;
 	}
 	.seg.active {
-		background: #2b4a2b;
-		border-color: #2b4a2b;
+		background: var(--accent);
+		border-color: var(--accent);
 		color: #fff;
 	}
 	textarea {
@@ -197,14 +197,15 @@
 		font-size: 0.9rem;
 		line-height: 1.45;
 		padding: 0.6rem 0.7rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 8px;
-		background: #fff;
+		background: var(--bg);
+		color: var(--text);
 		resize: vertical;
 		min-height: 110px;
 	}
 	textarea:focus {
-		outline: 2px solid #2b4a2b;
+		outline: 2px solid var(--accent-strong);
 		outline-offset: 1px;
 	}
 	.row {
@@ -216,16 +217,17 @@
 	}
 	.counter {
 		font-size: 0.78rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
+		font-variant-numeric: tabular-nums;
 	}
 	.counter.over {
-		color: #7a2020;
+		color: var(--pill-bug-fg);
 		font-weight: 700;
 	}
 	.send {
 		font: inherit;
 		font-size: 0.88rem;
-		background: #2b4a2b;
+		background: var(--accent);
 		color: #fff;
 		border: none;
 		border-radius: 999px;
@@ -237,7 +239,7 @@
 		cursor: not-allowed;
 	}
 	.err {
-		color: #a33;
+		color: var(--pill-bug-fg);
 		font-size: 0.82rem;
 		margin: 0.6rem 0 0;
 	}
@@ -245,7 +247,7 @@
 		display: inline-block;
 		margin-top: 0.9rem;
 		font-size: 0.8rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	.done {
 		text-align: center;
@@ -256,8 +258,8 @@
 		height: 44px;
 		margin: 0 auto 0.6rem;
 		border-radius: 999px;
-		background: #daf0e5;
-		color: #1a5a34;
+		background: var(--pill-go-bg);
+		color: var(--pill-go-fg);
 		font-size: 1.4rem;
 		display: flex;
 		align-items: center;
@@ -268,7 +270,7 @@
 	}
 	.viewlink {
 		font-size: 0.88rem;
-		color: #2b4a2b;
+		color: var(--accent-strong);
 		font-weight: 600;
 	}
 </style>

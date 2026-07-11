@@ -14,6 +14,7 @@
 		daysBetweenISO,
 		loc
 	} from '$lib/trip-engine';
+	import { paletteFor } from '$lib/theme-colors';
 
 	let { data } = $props();
 
@@ -55,20 +56,21 @@
 	// Segment/city + "next block" info isn't in the list payload — fetched
 	// client-side after mount from the trip's full doc. Best-effort: any
 	// failure just means the hero shows less detail, never breaks the page.
-	const THEME_COLORS: Record<string, { bg: string; eyebrow: string; accent: string }> = {
-		tartan: { bg: '#2b4a2b', eyebrow: '#e8c84a', accent: '#2b4a2b' },
-		navy: { bg: '#1e3054', eyebrow: '#c17817', accent: '#1e3054' },
-		terracotta: { bg: '#7c3a29', eyebrow: '#e6b566', accent: '#7c3a29' },
-		olive: { bg: '#4a5324', eyebrow: '#d9c46a', accent: '#4a5324' },
-		azure: { bg: '#17456b', eyebrow: '#e0a24a', accent: '#17456b' },
-		sand: { bg: '#5b4a30', eyebrow: '#e8cf8a', accent: '#5b4a30' }
-	};
 	function heroStyleFor(seg: Segment): string {
-		const base = THEME_COLORS[seg.theme || 'tartan'] ?? THEME_COLORS.tartan;
-		const bg = seg.themeColors?.heroBg || base.bg;
-		const eyebrow = seg.themeColors?.eyebrow || base.eyebrow;
-		const accent = seg.themeColors?.accent || base.accent;
-		return `--ha-bg:${bg};--ha-eyebrow:${eyebrow};--ha-accent:${accent}`;
+		const p = paletteFor(seg.theme, seg.themeColors);
+		return `--ha-bg:${p.bg};--ha-eyebrow:${p.eyebrow};--ha-accent:${p.accent}`;
+	}
+
+	// Non-active cards get a thin theme-colored left band using the trip's
+	// first-segment theme (carried on the list payload — see listTripsForUser),
+	// reusing the same palette as the active-trip hero above instead of
+	// rendering flat.
+	function cardBandStyle(trip: (typeof data.trips)[number]): string {
+		// Emit only the theme BASE colour; the card CSS derives a mode-appropriate
+		// band tint from it (the base itself in light — unchanged identity — and an
+		// OKLCH-lightened tint in dark so the band reads on a dark surface).
+		const p = paletteFor(trip.theme, trip.themeColors);
+		return `--card-base:${p.accent}`;
 	}
 
 	let activeDetail = $state<{ city?: string; next?: { title: string; time: string } } | null>(
@@ -120,7 +122,7 @@
 </script>
 
 {#snippet card(trip: (typeof data.trips)[number])}
-	<a class="card" href="/trips/{trip.id}">
+	<a class="card" style={cardBandStyle(trip)} href="/trips/{trip.id}">
 		{#if trip.cover}<div class="cover" aria-hidden="true">{trip.cover}</div>{/if}
 		<div class="card-main">
 			<div class="card-title">{trip.title ?? trip.id}</div>
@@ -205,7 +207,7 @@
 		gap: 0.75rem;
 	}
 	h1 {
-		font-size: 1.5rem;
+		font-size: var(--type-h1);
 	}
 	/* Below ~520px stack: heading on its own row, actions side by side below it,
 	   so the buttons never squeeze the heading into a mid-word wrap. */
@@ -230,7 +232,7 @@
 	.shared-hd {
 		font-size: 1.1rem;
 		margin: 1.75rem 0 0.25rem;
-		color: #444;
+		color: var(--text);
 	}
 	.actions {
 		display: flex;
@@ -240,21 +242,39 @@
 	.new {
 		font-size: 0.85rem;
 		text-decoration: none;
-		color: #2b4a2b;
-		border: 1px solid #cbb;
+		color: var(--accent-strong);
+		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;
 		padding: 0.35rem 0.8rem;
+	}
+	.new:hover {
+		background: color-mix(in srgb, var(--accent) 10%, transparent);
 	}
 	.import-btn {
 		font-size: 0.85rem;
 		text-decoration: none;
-		color: #7a6e5f;
-		border: 1px solid #e2ddd2;
+		color: var(--text-muted);
+		border: 1px solid var(--hairline);
 		border-radius: 999px;
 		padding: 0.35rem 0.8rem;
 	}
+	.import-btn:hover {
+		background: var(--surface-sunken);
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.new,
+		.import-btn {
+			transition:
+				transform 0.1s ease,
+				background 0.15s ease;
+		}
+		.new:active,
+		.import-btn:active {
+			transform: scale(0.97);
+		}
+	}
 	.empty {
-		color: #666;
+		color: var(--text-muted);
 		margin-top: 1.5rem;
 	}
 	/* Active-trip hero: a single prominent card above the regular grid.
@@ -270,6 +290,19 @@
 		color: #fff;
 		text-decoration: none;
 		box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+	}
+	.hero-active:hover {
+		box-shadow: 0 6px 22px rgba(0, 0, 0, 0.2);
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.hero-active {
+			transition:
+				transform 0.1s ease,
+				box-shadow 0.15s ease;
+		}
+		.hero-active:active {
+			transform: scale(0.98);
+		}
 	}
 	.hero-active-eyebrow {
 		font-size: 0.68rem;
@@ -292,6 +325,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0 0.6rem;
+		font-variant-numeric: tabular-nums;
 	}
 	.hero-active-dates::before {
 		content: '·';
@@ -320,22 +354,57 @@
 		}
 	}
 	.card {
+		/* Band tint derived from the inline --card-base: the base itself in light
+		   (identity unchanged), an OKLCH-lightened tint in dark. Falls back to the
+		   hairline when a trip has no theme. The derived colour is applied to
+		   border-left-color DIRECTLY in the theme-conditional rules (not routed
+		   through a custom property): Chromium keeps the pending-substitution
+		   value of the `border-left` shorthand stale across live data-theme
+		   flips when the derivation lives in an intermediate variable. */
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		background: #faf6ee;
-		border: 1px solid #e2ddd2;
+		background: var(--surface);
+		border: 1px solid var(--hairline);
+		border-left: 4px solid var(--card-base, var(--hairline-strong));
 		border-radius: 12px;
 		padding: 0.9rem 1rem;
 		text-decoration: none;
-		color: #1a1208;
+		color: var(--text);
+	}
+	:root[data-theme='dark'] .card {
+		border-left-color: oklch(from var(--card-base, #7a6e5f) 0.72 calc(c * 0.9) h);
+	}
+	@media (prefers-color-scheme: dark) {
+		:root:not([data-theme]) .card {
+			border-left-color: oklch(from var(--card-base, #7a6e5f) 0.72 calc(c * 0.9) h);
+		}
+	}
+	.card:hover {
+		/* Only the three non-band sides — the band (left) colour is theme-managed
+		   above and must not be clobbered by a hover border-color shorthand. */
+		border-top-color: var(--hairline-strong);
+		border-right-color: var(--hairline-strong);
+		border-bottom-color: var(--hairline-strong);
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.card {
+			transition:
+				transform 0.1s ease,
+				box-shadow 0.15s ease,
+				border-color 0.15s ease;
+		}
+		.card:active {
+			transform: scale(0.98);
+		}
 	}
 	.cover {
 		font-size: 30px;
 		width: 52px;
 		height: 52px;
 		border-radius: 12px;
-		background: #efe9dc;
+		background: var(--surface-sunken);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -350,15 +419,16 @@
 	}
 	.card-dates {
 		font-size: 0.8rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		margin-top: 0.15rem;
+		font-variant-numeric: tabular-nums;
 	}
 	.role {
 		font-size: 0.65rem;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		color: #7a5a10;
-		background: #f5edd5;
+		color: var(--pill-warn-fg);
+		background: var(--pill-warn-bg);
 		border-radius: 999px;
 		padding: 0.15rem 0.5rem;
 	}
@@ -370,15 +440,15 @@
 		border-radius: 999px;
 	}
 	.chip.past {
-		background: #ede8e0;
-		color: #7a6e5f;
+		background: var(--pill-neutral-bg);
+		color: var(--pill-neutral-fg);
 	}
 	.chip.active {
-		background: #daf0e5;
-		color: #1a5a34;
+		background: var(--pill-go-bg);
+		color: var(--pill-go-fg);
 	}
 	.chip.upcoming {
-		background: #dce8f5;
-		color: #1e3a5f;
+		background: var(--pill-info-bg);
+		color: var(--pill-info-fg);
 	}
 </style>

@@ -3,16 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2b4a2b">
+<meta name="theme-color" content="#2b4a2b" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16120d" media="(prefers-color-scheme: dark)">
 <title>Trips — Fabio &amp; Liana</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="assets/icon-192.png">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500&display=swap" rel="stylesheet">
+<script>
+/* Apply saved light/dark preference before first paint (see assets/app.js
+   for the toggle this mirrors; kept in sync manually since this page has
+   no shared script). 'auto' (no explicit choice) is left to the CSS media
+   query below. */
+(function () {
+  try {
+    var t = localStorage.getItem('theme-pref');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {}
+})();
+</script>
 <style>
-:root{--ink:#1a1208;--stone:#7a6e5f;--gold-lt:#e8c84a;--cream:#faf6ee;--border:#d8ccb8;
+:root{--ink:#1a1208;--stone:#7a6e5f;--gold-lt:#e8c84a;--cream:#faf6ee;--border:#d8ccb8;--surface:#efe9dc;
+  --chip-past-bg:#ede8e0;--chip-active-bg:#daf0e5;--chip-active-text:#1a5a34;
+  --chip-upcoming-bg:#dce8f5;--chip-upcoming-text:#1e3a5f;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme: dark){
+  html:not([data-theme="light"]){
+    --ink:#ece4d4;--stone:#a3957f;--cream:#16120d;--border:#3a3226;--surface:#1f1913;
+    --chip-past-bg:rgba(163,149,127,.18);
+    --chip-active-bg:rgba(143,191,143,.16);--chip-active-text:#9ed9ae;
+    --chip-upcoming-bg:rgba(142,192,232,.16);--chip-upcoming-text:#8ec0e8;
+  }
+}
+html[data-theme="dark"]{
+  --ink:#ece4d4;--stone:#a3957f;--cream:#16120d;--border:#3a3226;--surface:#1f1913;
+  --chip-past-bg:rgba(163,149,127,.18);
+  --chip-active-bg:rgba(143,191,143,.16);--chip-active-text:#9ed9ae;
+  --chip-upcoming-bg:rgba(142,192,232,.16);--chip-upcoming-text:#8ec0e8;
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{min-height:100dvh;background:#1e3520;font-family:'Source Serif 4','Georgia',serif;color:var(--ink);-webkit-font-smoothing:antialiased;
   background-image:repeating-linear-gradient(0deg,transparent,transparent 18px,rgba(255,255,255,.04) 18px,rgba(255,255,255,.04) 19.5px),
@@ -20,25 +49,33 @@ body{min-height:100dvh;background:#1e3520;font-family:'Source Serif 4','Georgia'
   repeating-linear-gradient(0deg,transparent,transparent 54px,rgba(184,134,11,.12) 54px,rgba(184,134,11,.12) 57px),
   repeating-linear-gradient(90deg,transparent,transparent 54px,rgba(184,134,11,.12) 54px,rgba(184,134,11,.12) 57px)}
 .wrap{max-width:430px;margin:0 auto;padding:calc(28px + var(--safe-top)) 18px calc(28px + var(--safe-bottom))}
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 h1{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:700;color:#fff;line-height:1.1}
 .sub{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-lt);opacity:.75;font-weight:300;margin-bottom:6px}
+.theme-btn{flex-shrink:0;min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.18);border-radius:20px;background:rgba(0,0,0,.2);cursor:pointer;color:rgba(255,255,255,.85);transition:all .2s}
+.theme-btn:hover{background:rgba(255,255,255,.32)}
 .cards{margin-top:22px;display:flex;flex-direction:column;gap:14px}
 .card{display:flex;align-items:center;gap:14px;background:var(--cream);border-radius:14px;padding:16px 16px;text-decoration:none;color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.25);transition:transform .15s}
 .card:active{transform:scale(.98)}
-.cover{font-size:30px;width:52px;height:52px;border-radius:12px;background:#efe9dc;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cover{font-size:30px;width:52px;height:52px;border-radius:12px;background:var(--surface);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .card-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;line-height:1.2}
 .card-dates{font-size:11.5px;color:var(--stone);margin-top:3px;font-weight:300}
 .chip{margin-left:auto;flex-shrink:0;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
-.chip.past{background:#ede8e0;color:var(--stone)}
-.chip.active{background:#daf0e5;color:#1a5a34}
-.chip.upcoming{background:#dce8f5;color:#1e3a5f}
+.chip.past{background:var(--chip-past-bg);color:var(--stone)}
+.chip.active{background:var(--chip-active-bg);color:var(--chip-active-text)}
+.chip.upcoming{background:var(--chip-upcoming-bg);color:var(--chip-upcoming-text)}
 .msg{color:rgba(255,255,255,.6);font-size:13px;margin-top:26px;text-align:center}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="sub" id="sub"></div>
-  <h1 id="h1"></h1>
+  <div class="hdr-row">
+    <div>
+      <div class="sub" id="sub"></div>
+      <h1 id="h1"></h1>
+    </div>
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()"></button>
+  </div>
   <div class="cards" id="cards"></div>
 </div>
 <script>
@@ -46,9 +83,13 @@ h1{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:700;c
 /* Trip picker: lists trips from trips/manifest.json. UI strings per language. */
 const STRINGS = {
   en: { sub: 'Fabio & Liana', title: 'Trips', past: 'Past', active: 'Now', upcoming: 'Upcoming',
-        error: 'Could not load the trip list.' },
+        error: 'Could not load the trip list.',
+        themeAuto: 'Theme: automatic (tap for dark)', themeDark: 'Theme: dark (tap for light)',
+        themeLight: 'Theme: light (tap for automatic)' },
   pt: { sub: 'Fabio & Liana', title: 'Viagens', past: 'Passada', active: 'Agora', upcoming: 'Em breve',
-        error: 'Não foi possível carregar a lista de viagens.' },
+        error: 'Não foi possível carregar a lista de viagens.',
+        themeAuto: 'Tema: automático (toque para escuro)', themeDark: 'Tema: escuro (toque para claro)',
+        themeLight: 'Tema: claro (toque para automático)' },
 };
 const lang = (navigator.language || 'en').toLowerCase().startsWith('pt') ? 'pt' : 'en';
 const S = STRINGS[lang];
@@ -58,6 +99,41 @@ document.getElementById('sub').textContent = S.sub;
 document.getElementById('h1').textContent = S.title;
 document.title = S.title + ' — Fabio & Liana';
 document.documentElement.lang = lang;
+
+/* ── Theme (light/dark/auto) toggle — mirrors assets/app.js's version so the
+   preference is shared (localStorage) across this page and app.html. ── */
+const SUN_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+const MOON_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 1 0 11 11z"/></svg>';
+const AUTO_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>';
+const THEME_KEY = 'theme-pref';
+function themePref() {
+  try {
+    const v = localStorage.getItem(THEME_KEY);
+    return (v === 'dark' || v === 'light') ? v : 'auto';
+  } catch (e) { return 'auto'; }
+}
+function applyTheme(pref) {
+  if (pref === 'dark' || pref === 'light') document.documentElement.setAttribute('data-theme', pref);
+  else document.documentElement.removeAttribute('data-theme');
+}
+function renderThemeBtn() {
+  const btn = document.getElementById('theme-btn');
+  const pref = themePref();
+  const icon = pref === 'dark' ? MOON_SVG : pref === 'light' ? SUN_SVG : AUTO_SVG;
+  const key = 'theme' + pref.charAt(0).toUpperCase() + pref.slice(1);
+  btn.innerHTML = icon;
+  btn.setAttribute('aria-label', S[key]);
+}
+window.toggleTheme = function () {
+  const next = { auto: 'dark', dark: 'light', light: 'auto' }[themePref()];
+  try {
+    if (next === 'auto') localStorage.removeItem(THEME_KEY);
+    else localStorage.setItem(THEME_KEY, next);
+  } catch (e) {}
+  applyTheme(next);
+  renderThemeBtn();
+};
+renderThemeBtn();
 
 /* Local (not UTC) YYYY-MM-DD, so status chips flip at local midnight (e.g. BST). */
 function todayLocal() {

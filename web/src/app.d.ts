@@ -2,6 +2,7 @@
 /// <reference path="../worker-configuration.d.ts" />
 import type { SessionUser } from '$lib/types';
 import type { Locale } from '$lib/i18n';
+import type { ThemeMode } from '$lib/theme';
 
 declare global {
 	namespace App {
@@ -9,6 +10,7 @@ declare global {
 		interface Locals {
 			user: SessionUser | null;
 			locale: Locale;
+			theme: ThemeMode;
 		}
 		// interface PageData {}
 		// interface PageState {}

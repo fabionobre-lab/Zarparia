@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	return { user: locals.user, locale: locals.locale };
+	return { user: locals.user, locale: locals.locale, theme: locals.theme };
 };

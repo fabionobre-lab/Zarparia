@@ -1,4 +1,5 @@
 import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
+import type { ThemeColors } from '$lib/trip-engine';
 
 export type Role = 'owner' | 'editor' | 'viewer';
 
@@ -12,6 +13,11 @@ export interface TripListItem {
 	updatedAt: string;
 	/** Emoji cover, parsed from the stored doc (no denormalized column for it). */
 	cover?: string;
+	/** First segment's theme, parsed from the stored doc (no denormalized column
+	 *  for it), so the home list can render a themed card without fetching the
+	 *  full trip doc for every card. */
+	theme?: string;
+	themeColors?: ThemeColors;
 }
 
 /** Result of a write: either the trip, or a typed failure. */
@@ -107,12 +113,20 @@ export async function listTripsForUser(db: D1Database, userId: string): Promise<
 	// refreshed, so recompute status from the dates on read.
 	return rows.results.map(({ doc, ...r }) => {
 		let cover: string | undefined;
+		let theme: string | undefined;
+		let themeColors: ThemeColors | undefined;
 		try {
-			cover = (JSON.parse(doc) as { cover?: string }).cover;
+			const parsed = JSON.parse(doc) as {
+				cover?: string;
+				segments?: Array<{ theme?: string; themeColors?: ThemeColors }>;
+			};
+			cover = parsed.cover;
+			theme = parsed.segments?.[0]?.theme;
+			themeColors = parsed.segments?.[0]?.themeColors;
 		} catch {
 			cover = undefined;
 		}
-		return { ...r, status: statusFor(r.startDate, r.endDate), cover };
+		return { ...r, status: statusFor(r.startDate, r.endDate), cover, theme, themeColors };
 	});
 }
 

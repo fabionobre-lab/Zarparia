@@ -204,7 +204,7 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
-		color: #7a6e5f;
+		color: var(--text-muted);
 	}
 	.control {
 		position: relative;
@@ -214,11 +214,11 @@
 		box-sizing: border-box;
 		font: inherit;
 		font-size: 0.85rem;
-		color: #1a1208;
+		color: var(--text);
 		padding: 0.35rem 0.5rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
-		background: #fff;
+		background: var(--surface);
 	}
 	.menu {
 		position: absolute;
@@ -229,8 +229,8 @@
 		margin: 0;
 		padding: 0.2rem;
 		list-style: none;
-		background: #fff;
-		border: 1px solid #d8ccb8;
+		background: var(--surface);
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
 		box-shadow: 0 6px 18px rgba(30, 22, 8, 0.12);
 		max-height: 15rem;
@@ -240,25 +240,25 @@
 		padding: 0.35rem 0.45rem;
 		border-radius: 4px;
 		font-size: 0.8rem;
-		color: #1a1208;
+		color: var(--text);
 		cursor: pointer;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 	.opt.active {
-		background: #dce8f5;
+		background: var(--pill-info-bg);
 	}
 	.opt.empty {
-		color: #9b917f;
+		color: var(--text-muted);
 		cursor: default;
 	}
 	.attr {
 		padding: 0.25rem 0.45rem 0.1rem;
 		font-size: 0.62rem;
-		color: #a99f8d;
+		color: var(--text-muted);
 		text-align: right;
-		border-top: 1px solid #f0ece4;
+		border-top: 1px solid var(--hairline);
 		margin-top: 0.15rem;
 	}
 </style>

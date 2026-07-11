@@ -23,6 +23,10 @@ export interface Messages {
 	'header.signOut': string;
 	'header.signInGoogle': string;
 	'header.language': string; // aria-label for the switcher group
+	// ── Theme toggle (aria-label/title reflect the CURRENT mode) ──
+	'theme.system': string;
+	'theme.dark': string;
+	'theme.light': string;
 
 	// ── Signed-out landing (+page.svelte) ──
 	'landing.tagline': string;
@@ -343,6 +347,9 @@ const enGB: Messages = {
 	'header.signOut': 'Sign out',
 	'header.signInGoogle': 'Sign in with Google',
 	'header.language': 'Language',
+	'theme.system': 'Theme: system',
+	'theme.dark': 'Theme: dark',
+	'theme.light': 'Theme: light',
 
 	'landing.tagline': 'A place for your travel itineraries.',
 	'landing.toGetStarted': 'to get started.',
@@ -648,6 +655,9 @@ const ptBR: Messages = {
 	'header.signOut': 'Sair',
 	'header.signInGoogle': 'Entrar com Google',
 	'header.language': 'Idioma',
+	'theme.system': 'Tema: sistema',
+	'theme.dark': 'Tema: escuro',
+	'theme.light': 'Tema: claro',
 
 	'landing.tagline': 'Um lugar para os seus roteiros de viagem.',
 	'landing.toGetStarted': 'para começar.',

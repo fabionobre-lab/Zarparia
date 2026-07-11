@@ -196,8 +196,8 @@
 	.panel {
 		max-width: 430px;
 		margin: 0 auto 1rem;
-		background: #fbf8f1;
-		border: 1px solid #d8ccb8;
+		background: var(--surface);
+		border: 1px solid var(--hairline-strong);
 		border-radius: 12px;
 		padding: 0.9rem 1rem;
 		font-family: system-ui, sans-serif;
@@ -209,12 +209,12 @@
 	.linkshare {
 		margin-bottom: 0.9rem;
 		padding-bottom: 0.9rem;
-		border-bottom: 1px solid #eee5d6;
+		border-bottom: 1px solid var(--hairline);
 	}
 	.lbl {
 		display: block;
 		font-size: 0.8rem;
-		color: #7a6e5f;
+		color: var(--text-muted);
 		margin-bottom: 0.35rem;
 	}
 	.linkshare select {
@@ -222,8 +222,10 @@
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.4rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
+		background: var(--surface);
+		color: var(--text);
 	}
 	.linkrow {
 		display: flex;
@@ -236,10 +238,10 @@
 		font: inherit;
 		font-size: 0.8rem;
 		padding: 0.4rem 0.55rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
-		background: #fff;
-		color: #333;
+		background: var(--surface);
+		color: var(--text);
 	}
 	.copy {
 		flex: 0 0 auto;
@@ -266,21 +268,25 @@
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.4rem 0.55rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
+		background: var(--surface);
+		color: var(--text);
 	}
 	select {
 		font: inherit;
 		font-size: 0.85rem;
 		padding: 0.4rem;
-		border: 1px solid #d8ccb8;
+		border: 1px solid var(--hairline-strong);
 		border-radius: 6px;
+		background: var(--surface);
+		color: var(--text);
 	}
 	button {
 		font: inherit;
 		font-size: 0.82rem;
-		border: 1px solid #d8ccb8;
-		background: #2b4a2b;
+		border: 1px solid var(--accent);
+		background: var(--accent);
 		color: #fff;
 		border-radius: 6px;
 		padding: 0.4rem 0.8rem;
@@ -290,12 +296,12 @@
 		opacity: 0.5;
 	}
 	.err {
-		color: #a33;
+		color: var(--pill-bug-fg);
 		font-size: 0.8rem;
 		margin-top: 0.4rem;
 	}
 	.muted {
-		color: #999;
+		color: var(--text-muted);
 		font-size: 0.85rem;
 		margin-top: 0.6rem;
 	}
@@ -309,7 +315,7 @@
 		align-items: center;
 		gap: 0.5rem;
 		padding: 0.35rem 0;
-		border-top: 1px solid #eee5d6;
+		border-top: 1px solid var(--hairline);
 		font-size: 0.85rem;
 	}
 	.who {
@@ -320,20 +326,20 @@
 	}
 	.perm {
 		font-size: 0.72rem;
-		color: #7a6e5f;
-		background: #f0ece4;
+		color: var(--text-muted);
+		background: var(--surface-sunken);
 		border-radius: 999px;
 		padding: 0.15rem 0.5rem;
 	}
 	.rm {
 		background: none;
-		color: #a33;
-		border-color: #e6cccc;
+		color: var(--pill-bug-fg);
+		border-color: var(--hairline-strong);
 		padding: 0.25rem 0.5rem;
 	}
 	.hint {
 		font-size: 0.72rem;
-		color: #aaa;
+		color: var(--text-muted);
 		margin-top: 0.6rem;
 	}
 </style>
