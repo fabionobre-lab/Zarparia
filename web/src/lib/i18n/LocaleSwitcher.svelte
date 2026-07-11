@@ -23,6 +23,7 @@
 <style>
 	.locale-switch {
 		display: inline-flex;
+		flex-shrink: 0;
 		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;
 		overflow: hidden;
@@ -38,6 +39,16 @@
 		background: transparent;
 		color: var(--text-muted);
 		cursor: pointer;
+		/* Root cause of the PT-label clipping: this button previously had no
+		   flex-shrink guard, so when the header row ran out of space the flex
+		   algorithm shrank it below its own text's min-content width — and
+		   because the parent .locale-switch has overflow:hidden (for the pill's
+		   rounded corners), the shrunk text was silently cut off mid-letter
+		   instead of wrapping or reflowing. Buttons must never shrink smaller
+		   than their label; the header now keeps this row from overflowing in
+		   the first place, but this guard holds at any width. */
+		flex-shrink: 0;
+		white-space: nowrap;
 	}
 	.ls-btn.on {
 		background: var(--accent);
