@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>{t('editor.editLabel')}: {tripTitle} — Trips</title>
+	<title>{t('editor.editLabel')}: {tripTitle} — geornada</title>
 </svelte:head>
 
 <TripEditor initial={data.trip as unknown as Trip} mode="edit" tripId={data.tripId} baseUpdatedAt={data.updatedAt} />

@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../styles/tokens.css';
 	import favicon from '$lib/assets/favicon.svg';
+	import markSvg from '$lib/assets/geornada-mark-cc.svg?raw';
+	import wordSvg from '$lib/assets/geornada-wordmark-cc.svg?raw';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
@@ -53,7 +55,10 @@
 <header>
 	<div class="bar">
 		<div class="left">
-			<a class="brand" href="/">Trips</a>
+			<a class="brand" href="/" aria-label="geornada — home">
+				{@html markSvg}
+				<span class="wordmark">{@html wordSvg}</span>
+			</a>
 			<LocaleSwitcher />
 			<ThemeToggle />
 		</div>
@@ -113,10 +118,21 @@
 	}
 	.brand {
 		flex-shrink: 0;
-		font-weight: 700;
-		font-size: 1.1rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
 		text-decoration: none;
 		color: var(--accent-strong);
+	}
+	.brand :global(svg) {
+		display: block;
+		width: auto;
+	}
+	.brand > :global(svg) {
+		height: 26px;
+	}
+	.wordmark :global(svg) {
+		height: 17px;
 	}
 	nav {
 		display: flex;

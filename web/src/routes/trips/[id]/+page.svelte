@@ -16,7 +16,7 @@
 		data.trip.id;
 		lang = (data.trip as unknown as Trip).defaultLanguage || (data.trip as unknown as Trip).languages[0];
 	});
-	const pageTitle = $derived(`${loc(data.trip as unknown as Trip, (data.trip as unknown as Trip).title, lang)} — Trips`);
+	const pageTitle = $derived(`${loc(data.trip as unknown as Trip, (data.trip as unknown as Trip).title, lang)} — geornada`);
 </script>
 
 <svelte:head>

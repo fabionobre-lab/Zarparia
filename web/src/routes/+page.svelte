@@ -186,7 +186,7 @@
 			</div>
 		{/if}
 	{:else}
-		<h1>Trips</h1>
+		<h1>geornada</h1>
 		<p>{t('landing.tagline')}</p>
 		<p><a href="/auth/login/google">{t('header.signInGoogle')}</a> {t('landing.toGetStarted')}</p>
 		<div class="landing-lang">
