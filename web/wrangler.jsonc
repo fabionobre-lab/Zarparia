@@ -17,5 +17,13 @@
 			"database_id": "92ea4a9d-25c9-4039-912b-b711af1da8a6",
 			"migrations_dir": "./migrations"
 		}
+	],
+	// Cached copies (thumb + display size) of Google Photos linked to trips.
+	// Provision once: `npx wrangler r2 bucket create trips-photos`.
+	"r2_buckets": [
+		{
+			"binding": "PHOTOS",
+			"bucket_name": "trips-photos"
+		}
 	]
 }

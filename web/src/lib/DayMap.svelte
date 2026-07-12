@@ -16,7 +16,28 @@
 		popup: string;
 	}
 
-	let { stops, ariaLabel }: { stops: MapStop[]; ariaLabel: string } = $props();
+	/** A cluster of linked photos anchored at a block's coordinates. */
+	export interface PhotoStop {
+		lat: number;
+		lon: number;
+		/** App-served thumbnail URL (same-origin /api/... path). */
+		thumbUrl: string;
+		count: number;
+		/** Index of the block the photos belong to, passed to the click handler. */
+		blockIndex: number;
+	}
+
+	let {
+		stops,
+		ariaLabel,
+		photoStops = [],
+		onphotostopclick
+	}: {
+		stops: MapStop[];
+		ariaLabel: string;
+		photoStops?: PhotoStop[];
+		onphotostopclick?: (blockIndex: number) => void;
+	} = $props();
 
 	let container: HTMLDivElement | null = null;
 	let map: LMap | null = null;
@@ -50,6 +71,33 @@
 			el.className = 'daymap-popup';
 			el.textContent = s.popup;
 			marker.bindPopup(el);
+			marker.addTo(layer);
+		}
+		// Photo clusters render beside their block's numbered pin, as a round
+		// thumbnail with a count badge. Built as DOM nodes (never an HTML
+		// string) so no stored value can inject markup into the map layer.
+		for (const ps of photoStops) {
+			const el = document.createElement('span');
+			el.className = 'daymap-photo';
+			const img = document.createElement('img');
+			img.src = ps.thumbUrl;
+			img.alt = '';
+			el.appendChild(img);
+			if (ps.count > 1) {
+				const badge = document.createElement('span');
+				badge.className = 'daymap-photo-count';
+				badge.textContent = String(ps.count);
+				el.appendChild(badge);
+			}
+			const icon = L.divIcon({
+				className: 'daymap-photo-marker',
+				html: el,
+				iconSize: [30, 30],
+				// Anchored up-right of the block pin so both stay visible.
+				iconAnchor: [-2, 32]
+			});
+			const marker = L.marker([ps.lat, ps.lon], { icon });
+			if (onphotostopclick) marker.on('click', () => onphotostopclick(ps.blockIndex));
 			marker.addTo(layer);
 		}
 		if (latlngs.length >= 2) {
@@ -105,10 +153,12 @@
 		L = null;
 	});
 
-	// Rebuild markers/polyline reactively on every day / plan / language change.
-	// render() reads current `stops`; no reactive state is written, so no loop.
+	// Rebuild markers/polyline reactively on every day / plan / language /
+	// photo change. render() reads current props; no reactive state is
+	// written, so no loop.
 	$effect(() => {
 		stops;
+		photoStops;
 		if (map && L && layer) render();
 	});
 </script>
@@ -158,5 +208,41 @@
 		font-family: 'Source Serif 4', Georgia, serif;
 		font-size: 12px;
 		color: #1a1208;
+	}
+	:global(.daymap-photo-marker) {
+		cursor: pointer;
+	}
+	:global(.daymap-photo) {
+		position: relative;
+		display: block;
+		width: 30px;
+		height: 30px;
+	}
+	:global(.daymap-photo img) {
+		width: 30px;
+		height: 30px;
+		border-radius: 8px;
+		object-fit: cover;
+		border: 2px solid #fff;
+		box-sizing: border-box;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+	}
+	:global(.daymap-photo-count) {
+		position: absolute;
+		top: -6px;
+		right: -6px;
+		min-width: 15px;
+		height: 15px;
+		padding: 0 3px;
+		border-radius: 999px;
+		background: var(--accent);
+		color: #fff;
+		font-family: system-ui, sans-serif;
+		font-size: 9px;
+		font-weight: 700;
+		line-height: 15px;
+		text-align: center;
+		border: 1px solid #fff;
+		box-sizing: content-box;
 	}
 </style>

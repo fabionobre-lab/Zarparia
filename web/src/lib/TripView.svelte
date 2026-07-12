@@ -27,15 +27,29 @@
 		minutesSinceMidnightInTZ,
 		parseBlockTimeMinutes
 	} from './trip-engine';
-	import DayMap, { type MapStop } from './DayMap.svelte';
+	import DayMap, { type MapStop, type PhotoStop } from './DayMap.svelte';
+	import PhotoLightbox from './PhotoLightbox.svelte';
+	import { photoUrl, type TripPhoto } from './photos';
 	import { getNow } from './now';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
 	// per trip id), so these initial reads are intentionally non-reactive.
 	let {
 		trip,
-		lang = $bindable(untrack(() => trip.defaultLanguage || trip.languages[0]))
-	}: { trip: Trip; lang?: string } = $props();
+		lang = $bindable(untrack(() => trip.defaultLanguage || trip.languages[0])),
+		photos = [],
+		photosEditable = false,
+		onphotoschanged
+	}: {
+		trip: Trip;
+		lang?: string;
+		/** Google Photos linked to this trip (omitted in editor previews). */
+		photos?: TripPhoto[];
+		photosEditable?: boolean;
+		/** Called after a photo was moved/deleted from the lightbox, so the
+		 *  owner of `photos` can refetch. */
+		onphotoschanged?: () => void;
+	} = $props();
 	let planBySeg = $state<Record<string, string>>(
 		untrack(() => Object.fromEntries(trip.segments.map((s) => [s.id, s.defaultPlan ?? s.plans[0].id])))
 	);
@@ -220,14 +234,20 @@
 					dayRoute: 'Rota do Dia',
 					openRoute: 'Abrir rota no Google Maps →',
 					addToCalendar: 'Adicionar ao calendário',
-					now: 'Agora'
+					now: 'Agora',
+					photos: 'Fotos',
+					unmatchedPhotos: 'Fotos fora do roteiro',
+					openPhoto: 'Abrir foto'
 				}
 			: {
 					maps: 'Open in Maps',
 					dayRoute: 'Day Route',
 					openRoute: 'Open route in Google Maps →',
 					addToCalendar: 'Add to calendar',
-					now: 'Now'
+					now: 'Now',
+					photos: 'Photos',
+					unmatchedPhotos: 'Photos not on the itinerary',
+					openPhoto: 'Open photo'
 				}
 	);
 
@@ -392,6 +412,85 @@
 			? `Mapa do dia, ${dayMapStops.length} paradas`
 			: `Day map, ${dayMapStops.length} stops`
 	);
+
+	// ── Linked Google Photos ──
+	// Photos come pre-placed (segment/plan/day/block) by capture time; this
+	// component only groups them onto the selected day. The segment guard
+	// covers the rare case of two segments containing the same calendar date.
+	const dayPhotos = $derived.by<TripPhoto[]>(() => {
+		if (!current) return [];
+		return photos.filter(
+			(p) => p.dayDate === current.day.date && (!p.segmentId || p.segmentId === current.seg.id)
+		);
+	});
+	/** blockIndex → photos, counting only indexes that are valid for the plan
+	 *  being viewed (a stale index after an itinerary edit, or a placement
+	 *  computed against another plan, degrades to the day-level strip). */
+	const photosByBlock = $derived.by<Map<number, TripPhoto[]>>(() => {
+		const m = new Map<number, TripPhoto[]>();
+		if (!current) return m;
+		for (const p of dayPhotos) {
+			if (p.blockIndex == null) continue;
+			if (p.planId && p.planId !== current.plan.id) continue;
+			if (p.blockIndex < 0 || p.blockIndex >= current.day.blocks.length) continue;
+			const arr = m.get(p.blockIndex);
+			if (arr) arr.push(p);
+			else m.set(p.blockIndex, [p]);
+		}
+		return m;
+	});
+	const dayLevelPhotos = $derived(
+		dayPhotos.filter((p) => {
+			if (p.blockIndex == null || !current) return true;
+			if (p.planId && p.planId !== current.plan.id) return true;
+			return p.blockIndex < 0 || p.blockIndex >= current.day.blocks.length;
+		})
+	);
+	/** Photos whose capture date matched no itinerary day (or were unassigned
+	 *  by hand) — surfaced at the end of the trip so they can be placed. */
+	const unmatchedPhotos = $derived(photos.filter((p) => p.dayDate == null));
+
+	// Photo clusters on the day map, anchored at their block's coordinates.
+	const photoMapStops = $derived.by<PhotoStop[]>(() => {
+		if (!current) return [];
+		const out: PhotoStop[] = [];
+		for (const [bi, list] of photosByBlock) {
+			const b = current.day.blocks[bi];
+			if (!b?.coords) continue;
+			out.push({
+				lat: b.coords.lat,
+				lon: b.coords.lon,
+				thumbUrl: photoUrl(trip.id, list[0].id, 'thumb'),
+				count: list.length,
+				blockIndex: bi
+			});
+		}
+		return out.sort((a, b) => a.blockIndex - b.blockIndex);
+	});
+
+	// Lightbox: a snapshot list + cursor. Closed (and re-seeded from fresh
+	// props) after any mutation, so it never renders stale placements.
+	let lbList = $state<TripPhoto[] | null>(null);
+	let lbIdx = $state(0);
+	function openLightbox(list: TripPhoto[], idx: number) {
+		lbList = list;
+		lbIdx = idx;
+	}
+	function openBlockPhotos(blockIndex: number) {
+		const list = photosByBlock.get(blockIndex);
+		if (list?.length) openLightbox(list, 0);
+	}
+	const lightboxDayOptions = $derived(
+		flatDays.map((f) => ({
+			date: f.day.date,
+			label: `${dayLabel(f.day.date, localeFor(trip, lang))} — ${L(f.day.title)}`
+		}))
+	);
+	function photoCaption(p: TripPhoto): string {
+		const instant = new Date(p.creationTime);
+		if (Number.isNaN(instant.getTime())) return '';
+		return `${dayLabel(isoDateInTZ(instant, tz), localeFor(trip, lang))} · ${hhmmInTZ(instant, tz)}`;
+	}
 </script>
 
 <div class="shell theme-{current?.seg.theme || 'tartan'}" style={themeStyle}>
@@ -519,7 +618,12 @@
 					{/if}
 
 					{#if dayMapStops.length >= 2}
-						<DayMap stops={dayMapStops} ariaLabel={mapAriaLabel} />
+						<DayMap
+							stops={dayMapStops}
+							ariaLabel={mapAriaLabel}
+							photoStops={photoMapStops}
+							onphotostopclick={openBlockPhotos}
+						/>
 					{/if}
 
 					<div class="tl">
@@ -597,6 +701,16 @@
 									{#if b.diff && plan.diffLabels?.[b.diff.kind]}
 										<div class="diff-{b.diff.kind}">{L(plan.diffLabels[b.diff.kind])}{L(b.diff.reason)}</div>
 									{/if}
+									{#if photosByBlock.get(bi)?.length}
+										{@const bp = photosByBlock.get(bi) ?? []}
+										<div class="ph-strip">
+											{#each bp as p, pi (p.id)}
+												<button class="ph-thumb" onclick={() => openLightbox(bp, pi)} aria-label={uiText.openPhoto}>
+													<img src={photoUrl(trip.id, p.id, 'thumb')} alt="" loading="lazy" />
+												</button>
+											{/each}
+										</div>
+									{/if}
 								</div>
 							</div>
 						{/each}
@@ -611,12 +725,52 @@
 							</div>
 						{/if}
 					</div>
+					{#if dayLevelPhotos.length}
+						<div class="day-photos">
+							<div class="dp-title">{uiText.photos}</div>
+							<div class="ph-strip">
+								{#each dayLevelPhotos as p, pi (p.id)}
+									<button class="ph-thumb" onclick={() => openLightbox(dayLevelPhotos, pi)} aria-label={uiText.openPhoto}>
+										<img src={photoUrl(trip.id, p.id, 'thumb')} alt="" loading="lazy" />
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
 					{#if L(seg.footer)}<div class="footer">{L(seg.footer)}</div>{/if}
 				</div>
 			{/key}
 		{/if}
+		{#if unmatchedPhotos.length && photosEditable}
+			<div class="day-photos day-photos-unmatched">
+				<div class="dp-title">{uiText.unmatchedPhotos}</div>
+				<div class="ph-strip">
+					{#each unmatchedPhotos as p, pi (p.id)}
+						<button class="ph-thumb" onclick={() => openLightbox(unmatchedPhotos, pi)} aria-label={uiText.openPhoto}>
+							<img src={photoUrl(trip.id, p.id, 'thumb')} alt="" loading="lazy" />
+						</button>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>
+
+{#if lbList}
+	<PhotoLightbox
+		tripId={trip.id}
+		photos={lbList}
+		bind:index={lbIdx}
+		canEdit={photosEditable}
+		dayOptions={lightboxDayOptions}
+		captionFor={photoCaption}
+		onclose={() => (lbList = null)}
+		onchanged={() => {
+			lbList = null;
+			onphotoschanged?.();
+		}}
+	/>
+{/if}
 
 <style>
 	.shell {
@@ -1462,6 +1616,46 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 7px;
+	}
+	/* Linked Google Photos: thumbnail strips (inside a block, or day-level). */
+	.ph-strip {
+		margin-top: 8px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+	.ph-thumb {
+		width: 56px;
+		height: 56px;
+		padding: 0;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--surface-sunken);
+		overflow: hidden;
+		cursor: pointer;
+	}
+	.ph-thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		filter: var(--photo-filter);
+	}
+	.day-photos {
+		margin: 10px 13px 4px;
+		padding: 10px 12px;
+		border: 1px solid var(--border);
+		border-radius: 12px;
+	}
+	.day-photos-unmatched {
+		margin: 14px 13px;
+		border-style: dashed;
+	}
+	.dp-title {
+		font-size: 11px;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		color: var(--text-muted);
 	}
 	.ps-card {
 		display: flex;
