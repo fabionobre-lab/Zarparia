@@ -42,6 +42,19 @@ npx wrangler secret put GOOGLE_CLIENT_SECRET
 
 Never set `DEV_AUTH` in production (it would let anyone forge a session).
 
+### Google Photos linking
+
+Linking photos to trips additionally needs, one time:
+
+```bash
+npx wrangler r2 bucket create trips-photos   # cached photo renditions
+```
+
+and, in the Google Cloud project that owns the OAuth client, enable the
+**Google Photos Picker API** (APIs & Services → Library). No new OAuth client
+or redirect URI is needed — the photos consent flow reuses
+`/auth/callback/google`.
+
 ## Editing trips
 
 Trips are stored per-user in D1 and edited in-app (`/trips/new`,

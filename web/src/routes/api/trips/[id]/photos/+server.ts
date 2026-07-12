@@ -1,0 +1,144 @@
+import { json } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { requireUser } from '$lib/server/guards';
+import { getDb } from '$lib/server/db';
+import { getTripForUser, roleFor } from '$lib/server/trips';
+import {
+	getPhotosToken,
+	clearPhotosTokenCookie,
+	listPickedMediaItems,
+	deletePickerSession,
+	fetchPhotoBytes,
+	type PickedMediaItem
+} from '$lib/server/googlephotos';
+import {
+	getPhotosBucket,
+	listTripPhotos,
+	photoExists,
+	insertTripPhoto,
+	photoR2Key,
+	PHOTO_SIZES
+} from '$lib/server/photos';
+import { mapPhotoToTrip } from '$lib/photo-mapping';
+import type { Trip } from '$lib/trip-engine';
+
+/** All photos linked to the trip (any role that can see the trip). */
+export const GET: RequestHandler = async ({ locals, platform, params }) => {
+	const user = requireUser(locals);
+	const db = getDb(platform);
+	const role = await roleFor(db, user.id, params.id);
+	if (!role) return json({ error: 'not_found' }, { status: 404 });
+	return json({ photos: await listTripPhotos(db, params.id) });
+};
+
+// Photos ingested per request. Each costs up to 4 subrequests (2 downloads +
+// 2 R2 puts) beyond the page list and D1 writes, and the whole batch must fit
+// the Workers subrequest budget — the client loops with `nextPageToken` until
+// `done`, so small pages just mean a few more round-trips.
+const PAGE_SIZE = 5;
+
+interface ImportBody {
+	sessionId?: string;
+	pageToken?: string;
+}
+
+/** Ingest one page of a completed picking session into this trip:
+ *  map by capture time, cache thumb+display bytes in R2, insert rows. */
+export const POST: RequestHandler = async ({ locals, platform, params, cookies, request }) => {
+	const user = requireUser(locals);
+	const db = getDb(platform);
+	const bucket = getPhotosBucket(platform);
+
+	const trip = await getTripForUser(db, user.id, params.id);
+	if (!trip) return json({ error: 'not_found' }, { status: 404 });
+	if (trip.role === 'viewer') return json({ error: 'forbidden' }, { status: 403 });
+
+	const token = getPhotosToken(cookies);
+	if (!token) return json({ reason: 'reconnect' }, { status: 401 });
+
+	let body: ImportBody;
+	try {
+		body = (await request.json()) as ImportBody;
+	} catch {
+		return json({ error: 'bad_request' }, { status: 400 });
+	}
+	if (!body.sessionId || typeof body.sessionId !== 'string') {
+		return json({ error: 'bad_request' }, { status: 400 });
+	}
+
+	const page = await listPickedMediaItems(token, body.sessionId, PAGE_SIZE, body.pageToken);
+	if (!page.ok) {
+		if (page.reason === 'unauthorized') {
+			clearPhotosTokenCookie(cookies);
+			return json({ reason: 'reconnect' }, { status: 401 });
+		}
+		return json({ reason: 'session_gone' }, { status: 410 });
+	}
+
+	const tripDoc = trip.doc as unknown as Trip;
+	let imported = 0;
+	let unmatched = 0;
+	let skippedExisting = 0;
+	let skippedOther = 0; // videos, and items whose bytes couldn't be fetched
+
+	for (const item of page.value.mediaItems ?? []) {
+		const outcome = await importOne(db, bucket, token, params.id, user.id, tripDoc, item);
+		if (outcome === 'imported') imported++;
+		else if (outcome === 'unmatched') unmatched++;
+		else if (outcome === 'existing') skippedExisting++;
+		else skippedOther++;
+	}
+
+	const nextPageToken = page.value.nextPageToken ?? null;
+	if (!nextPageToken) {
+		// Best-effort cleanup; sessions expire on their own if this fails.
+		await deletePickerSession(token, body.sessionId).catch(() => {});
+	}
+	return json({ imported, unmatched, skippedExisting, skippedOther, nextPageToken, done: !nextPageToken });
+};
+
+async function importOne(
+	db: D1Database,
+	bucket: R2Bucket,
+	token: string,
+	tripId: string,
+	userId: string,
+	tripDoc: Trip,
+	item: PickedMediaItem
+): Promise<'imported' | 'unmatched' | 'existing' | 'skipped'> {
+	// v1 is photos-only: a video's poster frame in a strip reads as a broken
+	// photo, and its bytes need a different (much larger) download path.
+	if (item.type !== 'PHOTO' || !item.mediaFile?.baseUrl || !item.createTime) return 'skipped';
+	if (await photoExists(db, tripId, item.id)) return 'existing';
+
+	const [thumb, disp] = await Promise.all([
+		fetchPhotoBytes(token, item.mediaFile.baseUrl, PHOTO_SIZES.thumb),
+		fetchPhotoBytes(token, item.mediaFile.baseUrl, PHOTO_SIZES.disp)
+	]);
+	if (!thumb || !disp) return 'skipped';
+
+	const id = crypto.randomUUID();
+	await Promise.all([
+		bucket.put(photoR2Key(tripId, id, 'thumb'), thumb.bytes, {
+			httpMetadata: { contentType: thumb.contentType }
+		}),
+		bucket.put(photoR2Key(tripId, id, 'disp'), disp.bytes, {
+			httpMetadata: { contentType: disp.contentType }
+		})
+	]);
+
+	const placement = mapPhotoToTrip(tripDoc, item.createTime);
+	const meta = item.mediaFile.mediaFileMetadata;
+	await insertTripPhoto(db, {
+		id,
+		tripId,
+		mediaItemId: item.id,
+		creationTime: item.createTime,
+		width: meta?.width ?? null,
+		height: meta?.height ?? null,
+		contentType: disp.contentType,
+		placement,
+		addedBy: userId
+	});
+	return placement ? 'imported' : 'unmatched';
+}

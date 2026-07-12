@@ -55,6 +55,28 @@ Every trip query is scoped to owner or an accepted share.
   network-first-with-cache-fallback for pages/API). Verified: colors live-update
   the preview; offline reload serves both the logged-out shell and a
   previously-viewed trip. Cutover: platform branch merged to `main`.
+- **G — Google Photos** ✅ Link photos from the user's Google Photos library
+  onto the itinerary. Google's Photos APIs deliberately never expose GPS, so
+  placement is **by capture time**: photo `createTime` → wall-clock date/time
+  in the trip's timezone → itinerary day → block whose time window contains it
+  (`src/lib/photo-mapping.ts`, pure + tested against the UK trip incl. the BST
+  midnight rollover). Selection uses the **Picker API** (the only sanctioned
+  path since the 2025 Library API restrictions): incremental OAuth consent
+  reusing the login client/redirect (`/auth/photos/connect`, short-lived token
+  in an httpOnly cookie — nothing at rest), picker session opened in Google's
+  UI, then a client-driven batched import (5/page, sized to the Workers
+  subrequest budget) that caches two renditions per photo in **R2**
+  (`trips-photos`: ≤360px strip/marker thumb + ≤1600px lightbox) because
+  picker baseUrls die within the hour, and indexes rows in `trip_photos`
+  (migration 0005; placement columns + `manual_override`). UI: a Photos panel
+  on the trip page (connect → pick → live import progress), thumbnail strips
+  per block and per day in TripView, photo markers with count badges at block
+  coordinates on the day map, a lightbox with prev/next, move-to-day
+  correction (recorded as manual override) and remove, and an editor-only
+  "Photos not on the itinerary" strip for unmatched dates. Photos-only for
+  now (videos are skipped and reported). Verified locally end-to-end minus
+  the Google round-trip itself (needs real OAuth creds): auth-gated serving
+  with ETag/304, reassign validation, delete incl. R2 cleanup, SSR strips.
 
 ## Deployment status
 
@@ -76,6 +98,12 @@ yet functional** — it needs the OAuth client + secrets below.
    - Give me the **Client ID** (safe to share); put the **Client secret** into
      Worker secrets via `npx wrangler secret put GOOGLE_CLIENT_SECRET` (never in
      the repo). For local dev it goes in `web/.dev.vars` (gitignored).
+
+4. **Google Photos linking** (Phase G) additionally needs, once:
+   `npx wrangler r2 bucket create trips-photos`, and enabling the
+   **Google Photos Picker API** on the same Google Cloud project (APIs &
+   Services → Library). No new OAuth client or redirect URI — the photos
+   consent flow reuses `/auth/callback/google`.
 
 Local development needs none of this except a Google OAuth client for testing
 the login flow; everything else runs against local D1.

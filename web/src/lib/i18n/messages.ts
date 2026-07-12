@@ -341,6 +341,35 @@ export interface Messages {
 	'feedback.statusPlanned': string;
 	'feedback.statusDone': string;
 	'feedback.statusDismissed': string;
+
+	'tripbar.photos': string;
+	'photos.heading': string;
+	'photos.loading': string;
+	'photos.intro': string;
+	'photos.connect': string;
+	'photos.choose': string;
+	'photos.chooseMore': string;
+	'photos.waiting': string;
+	'photos.openGoogle': string;
+	'photos.importing': string; // {n} = photos imported so far
+	'photos.importedDone': string; // {n}
+	'photos.unmatchedNote': string; // {n}
+	'photos.skippedNote': string; // {n}
+	'photos.retry': string;
+	'photos.hint': string;
+	'photos.errPicker': string;
+	'photos.errImport': string;
+	'photos.errSessionGone': string;
+	'photos.errGeneric': string;
+	'photos.lightboxLabel': string;
+	'photos.close': string;
+	'photos.prev': string;
+	'photos.next': string;
+	'photos.moveTo': string;
+	'photos.unassigned': string;
+	'photos.delete': string;
+	'photos.confirmDelete': string;
+	'photos.errSave': string;
 }
 
 const enGB: Messages = {
@@ -648,7 +677,39 @@ const enGB: Messages = {
 	'feedback.statusNew': 'New',
 	'feedback.statusPlanned': 'Planned',
 	'feedback.statusDone': 'Done',
-	'feedback.statusDismissed': 'Dismissed'
+	'feedback.statusDismissed': 'Dismissed',
+
+	'tripbar.photos': 'Photos',
+	'photos.heading': 'Google Photos',
+	'photos.loading': 'Checking your Google Photos connection…',
+	'photos.intro':
+		'Pick photos from your Google Photos library and they are placed on the itinerary automatically, matched to each day and stop by when they were taken.',
+	'photos.connect': 'Connect Google Photos',
+	'photos.choose': 'Choose photos',
+	'photos.chooseMore': 'Choose more photos',
+	'photos.waiting': 'Waiting for your selection in Google Photos… finish there and this page picks it up.',
+	'photos.openGoogle': 'Open Google Photos',
+	'photos.importing': 'Importing… {n} photos added so far.',
+	'photos.importedDone': '{n} photos added to the trip.',
+	'photos.unmatchedNote':
+		'{n} of them were taken outside the trip dates — find them under “Photos not on the itinerary” at the bottom of the trip.',
+	'photos.skippedNote': '{n} items were skipped (already linked, or videos — not supported yet).',
+	'photos.retry': 'Try again',
+	'photos.hint':
+		'Photos are matched by capture time (Google does not share photo locations). You can move any photo to another day from its preview.',
+	'photos.errPicker': 'Could not start Google Photos. Please try again.',
+	'photos.errImport': 'Importing failed part-way. Choose the photos again to finish — already-imported ones are kept.',
+	'photos.errSessionGone': 'The Google Photos session expired. Please choose the photos again.',
+	'photos.errGeneric': 'Something went wrong. Please try again.',
+	'photos.lightboxLabel': 'Photo viewer',
+	'photos.close': 'Close',
+	'photos.prev': 'Previous photo',
+	'photos.next': 'Next photo',
+	'photos.moveTo': 'Day',
+	'photos.unassigned': 'Not on the itinerary',
+	'photos.delete': 'Remove',
+	'photos.confirmDelete': 'Remove this photo from the trip? (It stays in your Google Photos.)',
+	'photos.errSave': 'Could not save. Please try again.'
 };
 
 const ptBR: Messages = {
@@ -957,7 +1018,39 @@ const ptBR: Messages = {
 	'feedback.statusNew': 'Nova',
 	'feedback.statusPlanned': 'Planejada',
 	'feedback.statusDone': 'Concluída',
-	'feedback.statusDismissed': 'Descartada'
+	'feedback.statusDismissed': 'Descartada',
+
+	'tripbar.photos': 'Fotos',
+	'photos.heading': 'Google Fotos',
+	'photos.loading': 'Verificando sua conexão com o Google Fotos…',
+	'photos.intro':
+		'Escolha fotos da sua biblioteca do Google Fotos e elas entram no roteiro automaticamente, associadas a cada dia e parada pelo horário em que foram tiradas.',
+	'photos.connect': 'Conectar Google Fotos',
+	'photos.choose': 'Escolher fotos',
+	'photos.chooseMore': 'Escolher mais fotos',
+	'photos.waiting': 'Aguardando sua seleção no Google Fotos… conclua lá e esta página continua sozinha.',
+	'photos.openGoogle': 'Abrir Google Fotos',
+	'photos.importing': 'Importando… {n} fotos adicionadas até agora.',
+	'photos.importedDone': '{n} fotos adicionadas à viagem.',
+	'photos.unmatchedNote':
+		'{n} delas foram tiradas fora das datas da viagem — veja em “Fotos fora do roteiro”, no fim da página da viagem.',
+	'photos.skippedNote': '{n} itens foram ignorados (já vinculados, ou vídeos — ainda não suportados).',
+	'photos.retry': 'Tentar novamente',
+	'photos.hint':
+		'As fotos são associadas pelo horário da captura (o Google não compartilha a localização das fotos). Você pode mover qualquer foto para outro dia pela pré-visualização.',
+	'photos.errPicker': 'Não foi possível abrir o Google Fotos. Tente novamente.',
+	'photos.errImport': 'A importação falhou no meio. Escolha as fotos de novo para concluir — as já importadas são mantidas.',
+	'photos.errSessionGone': 'A sessão do Google Fotos expirou. Escolha as fotos novamente.',
+	'photos.errGeneric': 'Algo deu errado. Tente novamente.',
+	'photos.lightboxLabel': 'Visualizador de fotos',
+	'photos.close': 'Fechar',
+	'photos.prev': 'Foto anterior',
+	'photos.next': 'Próxima foto',
+	'photos.moveTo': 'Dia',
+	'photos.unassigned': 'Fora do roteiro',
+	'photos.delete': 'Remover',
+	'photos.confirmDelete': 'Remover esta foto da viagem? (Ela continua no seu Google Fotos.)',
+	'photos.errSave': 'Não foi possível salvar. Tente novamente.'
 };
 
 export const catalogs: Record<Locale, Messages> = {

@@ -2,11 +2,31 @@
 	import { untrack } from 'svelte';
 	import TripView from '$lib/TripView.svelte';
 	import SharePanel from '$lib/SharePanel.svelte';
+	import TripPhotosPanel from '$lib/TripPhotosPanel.svelte';
 	import { loc, type Trip } from '$lib/trip-engine';
+	import type { TripPhoto } from '$lib/photos';
 	import { t } from '$lib/i18n/store.svelte';
 	let { data } = $props();
 
 	let showShare = $state(false);
+	let showPhotos = $state(false);
+	const canEdit = $derived(data.role === 'owner' || data.role === 'editor');
+
+	// Photos are server-loaded with the page, then refetched after any
+	// mutation (import, move, delete) — the API is the source of truth.
+	let photos = $state<TripPhoto[]>(untrack(() => data.photos ?? []));
+	$effect(() => {
+		data.trip.id;
+		photos = data.photos ?? [];
+	});
+	async function refreshPhotos() {
+		try {
+			const res = await fetch(`/api/trips/${data.trip.id}/photos`);
+			if (res.ok) photos = ((await res.json()) as { photos: TripPhoto[] }).photos;
+		} catch {
+			// keep the current list; next navigation reloads it anyway
+		}
+	}
 
 	// Mirrors TripView's internal language selection so the document title
 	// tracks the language the visitor is currently viewing.
@@ -32,7 +52,8 @@
 			{:else}
 				<span class="role">{t('tripbar.shared')} · {data.role === 'editor' ? t('role.canEdit') : t('role.viewOnly')}</span>
 			{/if}
-			{#if data.role === 'owner' || data.role === 'editor'}
+			{#if canEdit}
+				<button class="btn" onclick={() => (showPhotos = !showPhotos)}>{showPhotos ? t('tripbar.close') : t('tripbar.photos')}</button>
 				<a class="btn" href="/trips/{data.trip.id}/edit">{t('tripbar.edit')}</a>
 			{/if}
 		</div>
@@ -42,8 +63,18 @@
 		<SharePanel tripId={data.trip.id} />
 	{/if}
 
+	{#if showPhotos && canEdit}
+		<TripPhotosPanel tripId={data.trip.id} onImported={refreshPhotos} />
+	{/if}
+
 	{#key data.trip.id}
-		<TripView trip={data.trip as unknown as Trip} bind:lang />
+		<TripView
+			trip={data.trip as unknown as Trip}
+			bind:lang
+			{photos}
+			photosEditable={canEdit}
+			onphotoschanged={refreshPhotos}
+		/>
 	{/key}
 </div>
 
