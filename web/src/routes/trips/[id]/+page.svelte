@@ -12,12 +12,14 @@
 	let showPhotos = $state(false);
 	const canEdit = $derived(data.role === 'owner' || data.role === 'editor');
 
-	// Photos are server-loaded with the page, then refetched after any
-	// mutation (import, move, delete) — the API is the source of truth.
-	let photos = $state<TripPhoto[]>(untrack(() => data.photos ?? []));
+	// Photos load client-side only (SSR of a big trip's strips exceeds the
+	// Workers CPU limit) and are refetched after any mutation (import, move,
+	// delete) — the API is the source of truth.
+	let photos = $state<TripPhoto[]>([]);
 	$effect(() => {
 		data.trip.id;
-		photos = data.photos ?? [];
+		photos = [];
+		refreshPhotos();
 	});
 	async function refreshPhotos() {
 		try {
