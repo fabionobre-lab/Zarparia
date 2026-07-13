@@ -76,6 +76,11 @@ async function pickerFetch<T>(token: string, path: string, init?: RequestInit): 
 		...init,
 		headers: { Authorization: `Bearer ${token}`, ...(init?.headers ?? {}) }
 	});
+	if (!res.ok) {
+		// Surface Google's actual complaint in `wrangler tail` — the UI only
+		// ever sees a generic reconnect/picker_error.
+		console.error(`picker ${init?.method ?? 'GET'} ${path} -> ${res.status}: ${(await res.text()).slice(0, 600)}`);
+	}
 	if (res.status === 401 || res.status === 403) {
 		return { ok: false, status: res.status, reason: 'unauthorized' };
 	}
