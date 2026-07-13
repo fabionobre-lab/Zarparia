@@ -1,3 +1,6 @@
 baseline*/
 node_modules/
 __pycache__/
+.o9-edits.log
+.claude/settings.local.json
+CLAUDE_CODE_HANDOVER.md
