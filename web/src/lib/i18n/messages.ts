@@ -29,7 +29,7 @@ export interface Messages {
 	'theme.light': string;
 
 	// ── OAuth consent page (oauth/authorize) — MCP connector authorization ──
-	'consent.heading': string; // "{client} wants access to your geornada trips"
+	'consent.heading': string; // "{client} wants access to your Zarparia trips"
 	'consent.account': string; // "Signed in as {account}"
 	'consent.scope': string;
 	'consent.approve': string;
@@ -388,7 +388,7 @@ const enGB: Messages = {
 	'theme.dark': 'Theme: dark',
 	'theme.light': 'Theme: light',
 
-	'consent.heading': '{client} wants access to your geornada trips',
+	'consent.heading': '{client} wants access to your Zarparia trips',
 	'consent.account': 'Signed in as {account}',
 	'consent.scope': 'This lets it create, read, update and delete your trips on your behalf.',
 	'consent.approve': 'Approve',
@@ -398,7 +398,7 @@ const enGB: Messages = {
 	'landing.tagline': 'A place for your travel itineraries.',
 	'landing.toGetStarted': 'to get started.',
 
-	'home.pageTitle': 'geornada',
+	'home.pageTitle': 'Zarparia',
 	'home.yourTrips': 'Your trips',
 	'home.importItinerary': 'Import itinerary',
 	'home.newTrip': '+ New trip',
@@ -447,7 +447,7 @@ const enGB: Messages = {
 	'share.errShare': 'Could not share.',
 	'share.errRemove': 'Could not remove this person.',
 
-	'wizard.pageTitle': 'New trip — geornada',
+	'wizard.pageTitle': 'New trip — Zarparia',
 	'wizard.newTrip': 'New trip',
 	'wizard.startBlank': 'Start from a blank trip →',
 	'wizard.step1': '1 · Trip',
@@ -683,7 +683,7 @@ const enGB: Messages = {
 	'feedback.errTooLong': 'Message is too long (max 2000 characters).',
 	'feedback.errFailed': 'Could not send feedback.',
 	'feedback.errNetwork': 'Network error. Please try again.',
-	'feedback.pageTitle': 'Feedback — geornada',
+	'feedback.pageTitle': 'Feedback — Zarparia',
 	'feedback.heading': 'Your feedback',
 	'feedback.adminHeading': 'All feedback',
 	'feedback.back': '← Trips',
@@ -735,7 +735,7 @@ const ptBR: Messages = {
 	'theme.dark': 'Tema: escuro',
 	'theme.light': 'Tema: claro',
 
-	'consent.heading': '{client} quer acesso às suas viagens no geornada',
+	'consent.heading': '{client} quer acesso às suas viagens no Zarparia',
 	'consent.account': 'Conectado como {account}',
 	'consent.scope': 'Isso permite criar, ler, atualizar e excluir as suas viagens em seu nome.',
 	'consent.approve': 'Aprovar',
@@ -794,7 +794,7 @@ const ptBR: Messages = {
 	'share.errShare': 'Não foi possível compartilhar.',
 	'share.errRemove': 'Não foi possível remover esta pessoa.',
 
-	'wizard.pageTitle': 'Nova viagem — geornada',
+	'wizard.pageTitle': 'Nova viagem — Zarparia',
 	'wizard.newTrip': 'Nova viagem',
 	'wizard.startBlank': 'Começar com uma viagem em branco →',
 	'wizard.step1': '1 · Viagem',
@@ -1031,7 +1031,7 @@ const ptBR: Messages = {
 	'feedback.errTooLong': 'Mensagem muito longa (máx. 2000 caracteres).',
 	'feedback.errFailed': 'Não foi possível enviar o feedback.',
 	'feedback.errNetwork': 'Erro de rede. Tente novamente.',
-	'feedback.pageTitle': 'Feedback — geornada',
+	'feedback.pageTitle': 'Feedback — Zarparia',
 	'feedback.heading': 'Seu feedback',
 	'feedback.adminHeading': 'Todos os feedbacks',
 	'feedback.back': '← Viagens',

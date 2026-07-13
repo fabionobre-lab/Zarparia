@@ -1,6 +1,6 @@
-# geornada MCP connector
+# Zarparia MCP connector
 
-geornada exposes a remote [Model Context Protocol](https://modelcontextprotocol.io)
+Zarparia exposes a remote [Model Context Protocol](https://modelcontextprotocol.io)
 server so you can create, read, and update your trips from Claude (claude.ai and
 the Claude desktop/mobile apps). You sign in with the same Google account you use
 on the web app; Claude only ever acts as you, on your own trips.
@@ -15,11 +15,11 @@ on the web app; Claude only ever acts as you, on your own trips.
    ```
 
 3. Claude discovers the authorization server, registers itself automatically
-   (no client secret — it is a public OAuth client), and opens a geornada
+   (no client secret — it is a public OAuth client), and opens a Zarparia
    sign-in page.
 4. Sign in with Google if you aren't already, then **Approve** on the consent
-   screen ("… wants access to your geornada trips").
-5. The connector is now live. Ask Claude things like *"list my geornada trips"*
+   screen ("… wants access to your Zarparia trips").
+5. The connector is now live. Ask Claude things like *"list my Zarparia trips"*
    or *"add a museum stop to day 2 of my Rome trip"*.
 
 ## Tools
@@ -79,7 +79,7 @@ JSON-RPC endpoint, all inside the SvelteKit app:
   registration. Public clients only (`token_endpoint_auth_method: none`).
 - **Authorization**: `GET /oauth/authorize` — a SvelteKit page that validates the
   request (exact `redirect_uri` match, mandatory PKCE `S256`), requires a signed-in
-  geornada session (reusing the existing Google login + `returnTo` flow), and
+  Zarparia session (reusing the existing Google login + `returnTo` flow), and
   renders the consent screen. Approve is a form action that mints a single-use
   code.
 - **Token**: `POST /oauth/token` — `authorization_code` (PKCE-verified) and

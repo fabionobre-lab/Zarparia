@@ -1,8 +1,8 @@
 <script lang="ts">
 	import '../styles/tokens.css';
 	import favicon from '$lib/assets/favicon.svg';
-	import markSvg from '$lib/assets/geornada-mark-cc.svg?raw';
-	import wordSvg from '$lib/assets/geornada-wordmark-cc.svg?raw';
+	import markSvg from '$lib/assets/zarparia-mark-cc.svg?raw';
+	import wordSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
 	import { browser } from '$app/environment';
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
@@ -55,7 +55,7 @@
 <header>
 	<div class="bar">
 		<div class="left">
-			<a class="brand" href="/" aria-label="geornada — home">
+			<a class="brand" href="/" aria-label="Zarparia — home">
 				{@html markSvg}
 				<span class="wordmark">{@html wordSvg}</span>
 			</a>

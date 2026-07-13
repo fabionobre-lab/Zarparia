@@ -1,7 +1,7 @@
 // Remote MCP server — stateless Streamable HTTP, hand-rolled JSON-RPC 2.0.
 // One POST = one JSON response (no SSE needed for stateless request/response).
 // Every request must carry a Bearer access token (gna_…) minted by the OAuth
-// flow; the token resolves to a geornada user and all tools operate as them via
+// flow; the token resolves to a Zarparia user and all tools operate as them via
 // the existing trips.ts data layer (no new trip SQL).
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
@@ -16,12 +16,12 @@ import {
 import type { TripDoc } from '$lib/validateTrip';
 import tripSchema from '$lib/trip.schema.json';
 
-const SERVER_INFO = { name: 'geornada-trips', version: '1.0.0' };
+const SERVER_INFO = { name: 'zarparia-trips', version: '1.0.0' };
 const SUPPORTED_PROTOCOLS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 const DEFAULT_PROTOCOL = '2025-06-18';
 
 const INSTRUCTIONS =
-	'Manage the user\'s geornada travel itineraries. A trip is a single JSON document. ' +
+	'Manage the user\'s Zarparia travel itineraries. A trip is a single JSON document. ' +
 	'Before writing, call get_trip_schema to learn the document shape and see a minimal example. ' +
 	'To edit an existing trip, call get_trip first, modify the returned doc, then call update_trip ' +
 	'passing the same updatedAt back as base_updated_at so concurrent edits are detected. ' +
