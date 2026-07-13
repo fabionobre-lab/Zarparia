@@ -13,8 +13,30 @@ import {
 } from '$lib/i18n';
 import { THEME_COOKIE, resolveTheme, themeAttr } from '$lib/theme';
 
+// Cross-origin form-POST guard, re-implemented here because SvelteKit's built-in
+// check (csrf.checkOrigin) is disabled in vite.config so the OAuth token/register
+// endpoints and /mcp can be called cross-origin by MCP clients. These exact paths
+// are the only exemptions; every other state-changing form POST from a foreign
+// origin is still rejected (the consent action at /oauth/authorize included).
+const CSRF_EXEMPT_PATHS = new Set(['/oauth/token', '/oauth/register', '/mcp']);
+const FORM_CONTENT_TYPES = ['application/x-www-form-urlencoded', 'multipart/form-data', 'text/plain'];
+const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+function isCrossOriginFormForbidden(event: Parameters<Handle>[0]['event']): boolean {
+	if (!UNSAFE_METHODS.has(event.request.method)) return false;
+	if (CSRF_EXEMPT_PATHS.has(event.url.pathname)) return false;
+	const contentType = (event.request.headers.get('content-type') ?? '').split(';')[0].trim().toLowerCase();
+	if (!FORM_CONTENT_TYPES.includes(contentType)) return false;
+	const origin = event.request.headers.get('origin');
+	return origin !== event.url.origin;
+}
+
 /** Resolve the session cookie to a user on every request. */
 export const handle: Handle = async ({ event, resolve }) => {
+	if (isCrossOriginFormForbidden(event)) {
+		return new Response('Cross-site form submissions are forbidden', { status: 403 });
+	}
+
 	const token = event.cookies.get(SESSION_COOKIE);
 	const db = event.platform?.env?.DB;
 

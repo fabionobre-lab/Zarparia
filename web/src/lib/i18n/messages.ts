@@ -28,6 +28,14 @@ export interface Messages {
 	'theme.dark': string;
 	'theme.light': string;
 
+	// ── OAuth consent page (oauth/authorize) — MCP connector authorization ──
+	'consent.heading': string; // "{client} wants access to your geornada trips"
+	'consent.account': string; // "Signed in as {account}"
+	'consent.scope': string;
+	'consent.approve': string;
+	'consent.deny': string;
+	'consent.genericClient': string; // fallback when a client sends no name
+
 	// ── Signed-out landing (+page.svelte) ──
 	'landing.tagline': string;
 	'landing.toGetStarted': string;
@@ -380,6 +388,13 @@ const enGB: Messages = {
 	'theme.dark': 'Theme: dark',
 	'theme.light': 'Theme: light',
 
+	'consent.heading': '{client} wants access to your geornada trips',
+	'consent.account': 'Signed in as {account}',
+	'consent.scope': 'This lets it create, read, update and delete your trips on your behalf.',
+	'consent.approve': 'Approve',
+	'consent.deny': 'Deny',
+	'consent.genericClient': 'An application',
+
 	'landing.tagline': 'A place for your travel itineraries.',
 	'landing.toGetStarted': 'to get started.',
 
@@ -719,6 +734,13 @@ const ptBR: Messages = {
 	'theme.system': 'Tema: sistema',
 	'theme.dark': 'Tema: escuro',
 	'theme.light': 'Tema: claro',
+
+	'consent.heading': '{client} quer acesso às suas viagens no geornada',
+	'consent.account': 'Conectado como {account}',
+	'consent.scope': 'Isso permite criar, ler, atualizar e excluir as suas viagens em seu nome.',
+	'consent.approve': 'Aprovar',
+	'consent.deny': 'Recusar',
+	'consent.genericClient': 'Um aplicativo',
 
 	'landing.tagline': 'Um lugar para os seus roteiros de viagem.',
 	'landing.toGetStarted': 'para começar.',
