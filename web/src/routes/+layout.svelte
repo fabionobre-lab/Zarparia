@@ -142,7 +142,7 @@
 		align-items: center;
 		gap: 0.55rem;
 		text-decoration: none;
-		color: var(--brand-ink);
+		color: var(--text);
 	}
 	.brand :global(svg) {
 		display: block;
