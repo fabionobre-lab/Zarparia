@@ -38,12 +38,32 @@
 			if (hadController) location.reload();
 		};
 		navigator.serviceWorker.addEventListener('controllerchange', onChange);
-		return () => navigator.serviceWorker.removeEventListener('controllerchange', onChange);
+
+		// Ask the worker to pull this user's trips into the cache, so an installed
+		// app opens a trip you never visited on this device. Only worth doing while
+		// signed in and online; the worker itself is best-effort and won't throw.
+		const warm = () => {
+			if (!data.user || !navigator.onLine) return;
+			navigator.serviceWorker.ready.then((reg) => reg.active?.postMessage({ type: 'warm-offline' }));
+		};
+		warm();
+		// Coming back online is the other moment worth warming: it's the likely
+		// last chance before signal goes away again.
+		addEventListener('online', warm);
+
+		return () => {
+			navigator.serviceWorker.removeEventListener('controllerchange', onChange);
+			removeEventListener('online', warm);
+		};
 	});
 
-	// Cached pages hold the previous user's data; drop the runtime cache on logout.
+	// Cached pages and photos hold the previous user's data; drop both on logout.
+	// The external cache (map tiles, weather, Wikipedia) isn't per-user, so it stays.
 	function onLogout() {
-		if (browser && 'caches' in window) caches.delete('runtime');
+		if (browser && 'caches' in window) {
+			caches.delete('runtime');
+			caches.delete('photos');
+		}
 		// no preventDefault: the normal POST to /auth/logout still proceeds.
 	}
 </script>
