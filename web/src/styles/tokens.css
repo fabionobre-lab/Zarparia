@@ -31,6 +31,8 @@
 	--hairline-strong: rgba(122, 110, 95, 0.5);
 	--accent: #2b4a2b; /* saturated brand green — fills with light text */
 	--accent-strong: #2b4a2b; /* text-level accent (dark-legible in light mode) */
+	--brand-ink: #1a2332; /* Zarparia crest shield + wordmark (navy) */
+	--brand-gold: #c1a374; /* Zarparia crest Z — constant across themes */
 
 	/* ── Status pills (home cards + feedback list; outside the trip shell) ── */
 	--pill-neutral-bg: #ede8e0;
@@ -77,6 +79,8 @@
 	--hairline-strong: rgba(236, 228, 212, 0.28);
 	--accent: #2b4a2b; /* fills only */
 	--accent-strong: #9fbf9f; /* text-level; 9.3:1 on --bg (verified) */
+	--brand-ink: #eae4d6; /* crest shield flips to cream on dark */
+	--brand-gold: #c1a374;
 
 	--pill-neutral-bg: rgba(236, 228, 212, 0.08);
 	--pill-neutral-fg: #a3957f;
@@ -104,6 +108,8 @@
 		--hairline-strong: rgba(236, 228, 212, 0.28);
 		--accent: #2b4a2b;
 		--accent-strong: #9fbf9f;
+		--brand-ink: #eae4d6;
+		--brand-gold: #c1a374;
 
 		--pill-neutral-bg: rgba(236, 228, 212, 0.08);
 		--pill-neutral-fg: #a3957f;

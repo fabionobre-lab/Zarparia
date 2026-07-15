@@ -140,16 +140,16 @@
 		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0.55rem;
 		text-decoration: none;
-		color: var(--accent-strong);
+		color: var(--brand-ink);
 	}
 	.brand :global(svg) {
 		display: block;
 		width: auto;
 	}
 	.brand > :global(svg) {
-		height: 26px;
+		height: 30px;
 	}
 	.wordmark :global(svg) {
 		height: 17px;
