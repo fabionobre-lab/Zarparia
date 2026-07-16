@@ -31,11 +31,13 @@
 
 <div class="page">
 	<div class="demo-banner">
-		<span class="demo-banner-text">{t('demo.banner')}</span>
-		<div class="demo-banner-actions">
-			<button type="button" class="ghost" onclick={() => (aboutOpen = true)}>{t('demo.about')}</button>
-			<a class="ghost" href="/">{t('demo.back')}</a>
-			<a class="primary" href="/auth/login/google">{t('demo.signInCta')}</a>
+		<div class="demo-banner-inner">
+			<span class="demo-banner-text">{t('demo.banner')}</span>
+			<div class="demo-banner-actions">
+				<button type="button" class="ghost" onclick={() => (aboutOpen = true)}>{t('demo.about')}</button>
+				<a class="ghost" href="/">{t('demo.back')}</a>
+				<a class="primary" href="/auth/login/google">{t('demo.signInCta')}</a>
+			</div>
 		</div>
 	</div>
 
@@ -53,14 +55,21 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
+		background: var(--surface);
+		border-bottom: 1px solid var(--hairline-strong);
+	}
+	/* Background stays full-bleed; the content is centered and capped to the trip
+	   shell width so the actions line up with the (up to 1060px) shell instead of
+	   spilling to the far edges on wide screens. */
+	.demo-banner-inner {
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem 0.75rem;
 		font-family: system-ui, sans-serif;
-		background: var(--surface);
-		border-bottom: 1px solid var(--hairline-strong);
+		max-width: 1060px;
+		margin: 0 auto;
 		padding: 0.6rem 1rem;
 	}
 	.demo-banner-text {
@@ -96,7 +105,7 @@
 		font-weight: 600;
 	}
 	@media (max-width: 520px) {
-		.demo-banner {
+		.demo-banner-inner {
 			padding: 0.55rem 0.75rem;
 		}
 		.demo-banner-text {

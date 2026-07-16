@@ -94,6 +94,13 @@
 		align-items: center;
 		font-family: system-ui, sans-serif;
 	}
+	/* Match the widened trip shell so the control bar doesn't sit 430px-wide
+	   above a 1060px shell. */
+	@media (min-width: 960px) {
+		.bar {
+			max-width: 1060px;
+		}
+	}
 	.actions {
 		display: flex;
 		align-items: center;

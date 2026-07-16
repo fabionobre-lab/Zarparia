@@ -44,6 +44,8 @@
 	let layer: LayerGroup | null = null;
 	let L: typeof import('leaflet') | null = null;
 	let destroyed = false;
+	let resizeObs: ResizeObserver | null = null;
+	let refitTimer: ReturnType<typeof setTimeout> | null = null;
 
 	/** Rebuild every marker + the connecting polyline from `stops`, then refit. */
 	function render() {
@@ -115,12 +117,33 @@
 		map.invalidateSize();
 	}
 
+	/** Re-measure the container and re-fit the current stops without rebuilding
+	 *  markers — used by the ResizeObserver when the panel changes size (e.g. the
+	 *  mobile↔desktop breakpoint changes the map height). */
+	function refit() {
+		if (!map || !L) return;
+		map.invalidateSize();
+		const latlngs: [number, number][] = stops.map((s) => [s.lat, s.lon]);
+		if (latlngs.length) {
+			map.fitBounds(L.latLngBounds(latlngs), { padding: [28, 28], maxZoom: 15, animate: false });
+		}
+	}
+
 	onMount(async () => {
 		const mod = await import('leaflet');
 		// Component may have been torn down while the async import was in flight
 		// (rapid day switching) — bail rather than binding to a detached node.
 		if (destroyed || !container || map) return;
 		L = mod.default ?? mod;
+		// On coarse pointers (touch), disable one-finger drag so a thumb-swipe over
+		// the map scrolls the page instead of being trapped panning the map.
+		// Combined with `touch-action: pan-y` on the container (see CSS below), the
+		// map never steals vertical scroll. The +/− zoom buttons stay (zoomControl)
+		// and pinch/touch-zoom stays enabled. Marker taps still fire as native
+		// clicks. (Leaflet 1.9 removed the `tap` handler entirely, so there's no
+		// tap option to turn off here — dragging + touch-action cover it.)
+		const coarse =
+			typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
 		// Zoom/fade animations are disabled: the map is driven programmatically by
 		// frequent fitBounds across day switches and is torn down on unmount, so an
 		// in-flight zoom-animation frame could dereference a cleared marker
@@ -131,7 +154,11 @@
 			zoomControl: true,
 			zoomAnimation: false,
 			fadeAnimation: false,
-			markerZoomAnimation: false
+			markerZoomAnimation: false,
+			// Wheel over the map scrolls the page (never zooms) on every device.
+			scrollWheelZoom: false,
+			dragging: !coarse,
+			touchZoom: true
 		});
 		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -140,10 +167,28 @@
 		layer = L.layerGroup().addTo(map);
 		render();
 		map.invalidateSize();
+
+		// Re-measure + re-fit when the panel's box changes size — most importantly
+		// when crossing the 960px breakpoint flips the map between 200px (mobile)
+		// and the taller desktop height, which otherwise leaves Leaflet rendering
+		// against a stale size (gray half-tiles / wrong fit). Debounced lightly so
+		// a drag-resize doesn't thrash fitBounds.
+		if (typeof ResizeObserver !== 'undefined') {
+			resizeObs = new ResizeObserver(() => {
+				if (refitTimer) clearTimeout(refitTimer);
+				refitTimer = setTimeout(refit, 100);
+			});
+			resizeObs.observe(container);
+		}
 	});
 
 	onDestroy(() => {
 		destroyed = true;
+		if (refitTimer) clearTimeout(refitTimer);
+		if (resizeObs) {
+			resizeObs.disconnect();
+			resizeObs = null;
+		}
 		if (map) {
 			map.stop();
 			map.remove();
@@ -169,7 +214,7 @@
 
 <style>
 	.map-panel {
-		margin: 10px 13px 4px;
+		margin: 8px 13px 2px;
 		height: 200px;
 		border: 1px solid var(--border);
 		border-radius: 12px;
@@ -183,6 +228,18 @@
 		   brightness back and lift contrast a touch so they don't glare. The
 		   --map-filter token is defined on .shell (this map is a descendant). */
 		filter: var(--map-filter, none);
+		/* Let a vertical thumb-swipe over the map scroll the PAGE instead of being
+		   trapped by Leaflet. This scoped rule (plus dragging/tap off on coarse
+		   pointers in JS) beats Leaflet's own `.leaflet-touch-*` touch-action
+		   rules, which otherwise reserve the gesture and block page scroll. */
+		touch-action: pan-y !important;
+	}
+	/* Desktop: the map lives in the sticky right column and can be much taller. */
+	@media (min-width: 960px) {
+		.map-panel {
+			margin: 0;
+			height: clamp(360px, 55vh, 520px);
+		}
 	}
 	/* Leaflet injects markers/popups into panes outside this component's scope,
 	   so these rules must be global. The elements are still DOM descendants of

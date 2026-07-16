@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { fly } from 'svelte/transition';
+	import { fly, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import {
 		type Trip,
@@ -190,6 +190,13 @@
 		obs.observe(sentinelEl);
 		return () => obs.disconnect();
 	});
+	// Short label for the second line shown inside the day nav once it's stuck:
+	// "Mon 20 · Arrival & the Old Town" (weekday + day number · day title).
+	const stuckDayLabel = $derived(
+		current
+			? `${dowShort(current.day.date, localeFor(trip, lang))} ${dayNum(current.day.date)} · ${L(current.day.title)}`
+			: ''
+	);
 
 	// ── "Now" marker on the timeline ──
 	// Ticks once a minute; a frozen `?now=` (see ./now) simply repeats the same
@@ -531,34 +538,44 @@
 
 	<div class="daynav-sentinel" bind:this={sentinelEl} aria-hidden="true"></div>
 	<nav class="daynav" class:stuck={daynavStuck} aria-label="Days">
-		{#each navEntries as entry (entry.kind === 'day' ? entry.day : entry.date)}
-			{#if entry.kind === 'day'}
-				{@const day = entry.day}
-				{@const gi = entry.gi}
-				{@const on = gi === clampedIdx}
-				{@const label = dayLabel(day.date, localeFor(trip, lang))}
-				{#if entry.sep}<div class="daybtn-separator"></div>{/if}
-				<button
-					class="daybtn"
-					class:on
-					class:has-bday={!!L(day.banner)}
-					aria-current={on ? 'date' : undefined}
-					aria-label={label}
-					onclick={() => (dayIdx = gi)}
-					bind:this={dayBtnEls[gi]}
-				>
-					<span class="dow">{dowShort(day.date, localeFor(trip, lang))}</span>
-					<span class="dnum">{dayNum(day.date)}</span>
-					<span class="bday-pip"></span>
-				</button>
-			{:else}
-				<div class="daybtn daybtn-gap">
-					<span class="dow" aria-hidden="true">{dowShort(entry.date, localeFor(trip, lang))}</span>
-					<span class="dnum" aria-hidden="true">{dayNum(entry.date)}</span>
-					<span class="sr-only">Free day</span>
-				</div>
-			{/if}
-		{/each}
+		<div class="daynav-scroll">
+			{#each navEntries as entry (entry.kind === 'day' ? entry.day : entry.date)}
+				{#if entry.kind === 'day'}
+					{@const day = entry.day}
+					{@const gi = entry.gi}
+					{@const on = gi === clampedIdx}
+					{@const label = dayLabel(day.date, localeFor(trip, lang))}
+					{#if entry.sep}<div class="daybtn-separator"></div>{/if}
+					<button
+						class="daybtn"
+						class:on
+						class:has-bday={!!L(day.banner)}
+						aria-current={on ? 'date' : undefined}
+						aria-label={label}
+						onclick={() => (dayIdx = gi)}
+						bind:this={dayBtnEls[gi]}
+					>
+						<span class="dow">{dowShort(day.date, localeFor(trip, lang))}</span>
+						<span class="dnum">{dayNum(day.date)}</span>
+						<span class="bday-pip"></span>
+					</button>
+				{:else}
+					<div class="daybtn daybtn-gap">
+						<span class="dow" aria-hidden="true">{dowShort(entry.date, localeFor(trip, lang))}</span>
+						<span class="dnum" aria-hidden="true">{dayNum(entry.date)}</span>
+						<span class="sr-only">Free day</span>
+					</div>
+				{/if}
+			{/each}
+		</div>
+		{#if daynavStuck && current}
+			<div
+				class="daynav-context"
+				transition:slide={{ duration: prefersReducedMotion.current ? 0 : 180 }}
+			>
+				{stuckDayLabel}
+			</div>
+		{/if}
 	</nav>
 
 	<div class="scroll-area">
@@ -595,36 +612,46 @@
 						</div>
 					</div>
 
-					{#if routeForDay}
-						<a href={routeForDay.url} target="_blank" rel="noreferrer" class="route-card">
-							<div class="route-hdr">
-								<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
-								{uiText.dayRoute}
-							</div>
-							<div class="route-stops">
-								{#each routeForDay.places as p, i (i)}
-									{#if i > 0}<div class="route-connector"></div>{/if}
-									<div class="route-stop">
-										<div class="route-num">{i + 1}</div>
-										<div class="route-name">{p.name}</div>
-									</div>
-								{/each}
-							</div>
-							<div class="route-open">
-								<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
-								{uiText.openRoute}
-							</div>
-						</a>
-					{/if}
+					<aside class="day-aside">
+						{#if dayMapStops.length >= 2}
+							<DayMap
+								stops={dayMapStops}
+								ariaLabel={mapAriaLabel}
+								photoStops={photoMapStops}
+								onphotostopclick={openBlockPhotos}
+							/>
+						{/if}
 
-					{#if dayMapStops.length >= 2}
-						<DayMap
-							stops={dayMapStops}
-							ariaLabel={mapAriaLabel}
-							photoStops={photoMapStops}
-							onphotostopclick={openBlockPhotos}
-						/>
-					{/if}
+						{#if routeForDay}
+							<!-- Mobile-only compact stand-in for the (hidden) route stepper:
+							     preserves the one thing the card uniquely offers, the Maps link. -->
+							<a href={routeForDay.url} target="_blank" rel="noreferrer" class="maps-link-btn">
+								<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+								{uiText.openRoute}
+							</a>
+
+							<!-- Full Day-Route stepper: desktop only (hidden on mobile). -->
+							<a href={routeForDay.url} target="_blank" rel="noreferrer" class="route-card">
+								<div class="route-hdr">
+									<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
+									{uiText.dayRoute}
+								</div>
+								<div class="route-stops">
+									{#each routeForDay.places as p, i (i)}
+										{#if i > 0}<div class="route-connector"></div>{/if}
+										<div class="route-stop">
+											<div class="route-num">{i + 1}</div>
+											<div class="route-name">{p.name}</div>
+										</div>
+									{/each}
+								</div>
+								<div class="route-open">
+									<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
+									{uiText.openRoute}
+								</div>
+							</a>
+						{/if}
+					</aside>
 
 					<div class="tl">
 						{#each day.blocks as b, bi (bi)}
@@ -881,7 +908,7 @@
 		--chg-bg: rgba(200, 170, 80, 0.14);
 		--chg-fg: #e0c987;
 		--photo-filter: brightness(0.9);
-		--map-filter: brightness(0.85) contrast(1.05);
+		--map-filter: brightness(0.72) contrast(1.05) saturate(0.85);
 	}
 	@media (prefers-color-scheme: dark) {
 		:global(html:not([data-theme])) .shell {
@@ -908,7 +935,7 @@
 			--chg-bg: rgba(200, 170, 80, 0.14);
 			--chg-fg: #e0c987;
 			--photo-filter: brightness(0.9);
-			--map-filter: brightness(0.85) contrast(1.05);
+			--map-filter: brightness(0.72) contrast(1.05) saturate(0.85);
 		}
 	}
 	.hero {
@@ -1070,19 +1097,8 @@
 		margin-bottom: -1px;
 	}
 	.daynav {
-		display: flex;
-		overflow-x: auto;
-		scrollbar-width: none;
 		background: var(--surface);
 		border-bottom: 1px solid var(--border);
-		padding: 0 4px;
-		min-width: 0;
-		/* The day pills' total intrinsic width exceeds the shell on narrow
-		   viewports. `overflow-x: auto` scrolls them, but its scrollable overflow
-		   still propagates up and leaks a phantom horizontal page scroll (overflow
-		   clipping on ancestors does not stop it in this flex/scroll case).
-		   Paint containment keeps that scroll overflow inside the strip. */
-		contain: paint;
 		/* Sticks to the top of the trip shell as the page scrolls; the plan
 		   tabs and hero above it scroll away normally. z-index is set well
 		   above Leaflet's internal panes (tilePane 200 … popupPane 700) so the
@@ -1095,8 +1111,37 @@
 	.daynav.stuck {
 		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 	}
-	.daynav::-webkit-scrollbar {
+	.daynav-scroll {
+		display: flex;
+		overflow-x: auto;
+		scrollbar-width: none;
+		padding: 0 4px;
+		min-width: 0;
+		/* The day pills' total intrinsic width exceeds the shell on narrow
+		   viewports. `overflow-x: auto` scrolls them, but its scrollable overflow
+		   still propagates up and leaks a phantom horizontal page scroll (overflow
+		   clipping on ancestors does not stop it in this flex/scroll case).
+		   Paint containment keeps that scroll overflow inside the strip. */
+		contain: paint;
+	}
+	.daynav-scroll::-webkit-scrollbar {
 		display: none;
+	}
+	/* Second line inside the day nav, revealed only once the nav is stuck to the
+	   top: the active day's weekday + title, ellipsized to a single line. Eyebrow
+	   styling, theme-tinted via --accent-text. Its slide/fade is reduced-motion
+	   gated in the markup (transition duration → 0). */
+	.daynav-context {
+		padding: 3px 12px 4px;
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--accent-text);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		line-height: 1.3;
+		border-top: 1px solid var(--hairline);
 	}
 	.daybtn {
 		flex: 1 0 auto;
@@ -1190,10 +1235,13 @@
 		padding-bottom: 20px;
 	}
 	.day-hdr {
-		margin: 12px 13px 0;
+		margin: 10px 13px 0;
 		background: var(--hero-bg);
 		border-radius: 13px;
-		padding: 13px 15px 12px;
+		/* Slimmed: tighter padding + smaller title + a single compact weather row
+		   trims the header from ~107px toward ~80px, so more of the timeline is
+		   visible on first paint. Keeps the theme colour band identity. */
+		padding: 8px 14px 8px;
 	}
 	.dh-eye {
 		font-size: 9px;
@@ -1201,14 +1249,14 @@
 		text-transform: uppercase;
 		color: var(--hero-eyebrow);
 		opacity: 0.7;
-		margin-bottom: 2px;
+		margin-bottom: 1px;
 	}
 	.dh-title {
 		font-family: 'Playfair Display', serif;
-		font-size: 18px;
+		font-size: 16px;
 		color: #fff;
 		font-weight: 700;
-		line-height: 1.2;
+		line-height: 1.15;
 	}
 	.dh-note {
 		font-size: 11px;
@@ -1230,9 +1278,9 @@
 	.wx-hdr {
 		display: flex;
 		gap: 8px;
-		flex-wrap: wrap;
-		padding: 6px 0 2px;
-		font-size: 11px;
+		flex-wrap: nowrap;
+		padding: 0;
+		font-size: 10.5px;
 		color: rgba(255, 255, 255, 0.85);
 		margin-top: 4px;
 	}
@@ -1248,7 +1296,7 @@
 		border-left: 1px solid rgba(255, 255, 255, 0.25);
 	}
 	.tl {
-		padding: 5px 13px 0;
+		padding: 2px 13px 0;
 	}
 	.tb {
 		display: flex;
@@ -1502,8 +1550,11 @@
 		font-style: italic;
 		letter-spacing: 0.05em;
 	}
+	/* Mobile: the Day-Route stepper is hidden (its Maps link survives as the
+	   compact .maps-link-btn under the map). It returns on desktop (see the
+	   ≥960px block), where it sits in the sticky right column beneath the map. */
 	.route-card {
-		display: block;
+		display: none;
 		margin: 10px 13px 4px;
 		background: var(--surface-sunken);
 		border: 1px solid var(--border);
@@ -1511,6 +1562,43 @@
 		padding: 12px 14px 10px;
 		text-decoration: none;
 		color: var(--text);
+	}
+	/* Compact full-width quiet button that replaces the stepper on mobile — the
+	   route card's one unique affordance (open the whole day's route in Maps),
+	   kept at ≥44px tall. Hidden on desktop where the full card is back. */
+	.maps-link-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		margin: 4px 13px 2px;
+		min-height: 44px;
+		box-sizing: border-box;
+		padding: 6px 12px;
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		background: var(--surface-sunken);
+		color: var(--accent-text);
+		font-family: 'Playfair Display', serif;
+		font-size: 12px;
+		text-decoration: none;
+	}
+	@media (hover: hover) {
+		.maps-link-btn:hover {
+			border-color: var(--accent-text);
+			background: color-mix(in srgb, var(--accent-text) 6%, transparent);
+		}
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.maps-link-btn {
+			transition:
+				border-color 0.15s ease,
+				background 0.15s ease,
+				transform 0.1s ease;
+		}
+		.maps-link-btn:active {
+			transform: scale(0.98);
+		}
 	}
 	@media (hover: hover) {
 		.route-card:hover {
@@ -1698,5 +1786,66 @@
 		margin-top: 3px;
 		line-height: 1.2;
 		text-align: center;
+	}
+
+	/* ── Desktop: two-pane layout ──
+	   The shell widens; hero + sticky daynav still span its full width (they live
+	   outside .day-content). The day body becomes a two-column grid: a scrolling
+	   left column (header, timeline, photos) and a sticky right column holding the
+	   map then the Day-Route card. The keyed day-switch fly transition still
+	   applies to the whole .day-content grid. */
+	@media (min-width: 960px) {
+		.shell {
+			max-width: 1060px;
+		}
+		.day-content {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 420px;
+			gap: 0 24px;
+			padding: 0 24px 8px;
+			align-items: start;
+		}
+		/* Left-column items are pinned to explicit rows 1-4 and the aside spans
+		   those same rows (grid-row: 1 / 5). Spanning explicit row lines — rather
+		   than `1 / -1`, which collapses to a single row when no rows are declared
+		   and would force row 1 to the map's full height — lets the tall map/route
+		   column sit beside the naturally-flowing left column. */
+		.day-hdr,
+		.tl,
+		.day-photos,
+		.footer {
+			grid-column: 1;
+			min-width: 0;
+		}
+		.day-hdr {
+			grid-row: 1;
+			margin: 16px 0 0;
+		}
+		.tl {
+			grid-row: 2;
+			padding: 12px 0 0;
+		}
+		.day-photos {
+			grid-row: 3;
+			margin: 12px 0 0;
+		}
+		.footer {
+			grid-row: 4;
+		}
+		.day-aside {
+			grid-column: 2;
+			grid-row: 1 / 5;
+			align-self: start;
+			position: sticky;
+			/* Clear the stuck day nav: pills row (~48px) + context line (~22px). */
+			top: 74px;
+		}
+		.route-card {
+			display: block;
+			margin: 16px 0 0;
+		}
+		.maps-link-btn {
+			display: none;
+		}
 	}
 </style>
