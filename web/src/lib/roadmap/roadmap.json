@@ -1,5 +1,5 @@
 {
-	"updated": "2026-07-16",
+	"updated": "2026-07-17",
 	"items": [
 		{
 			"id": "trips-editor",
@@ -63,7 +63,11 @@
 		{
 			"id": "backups-ops",
 			"title": { "en": "Backups & reliability hardening", "pt": "Backups e reforço de confiabilidade" },
-			"status": "building"
+			"status": "shipped",
+			"note": {
+				"en": "Nightly automatic backups are live; general reliability hardening continues.",
+				"pt": "Backups automáticos noturnos já estão no ar; o reforço geral de confiabilidade continua."
+			}
 		},
 		{
 			"id": "approval-emails",

@@ -270,7 +270,8 @@ async function purgeTrip(db: D1Database, bucket: R2Bucket, tripId: string): Prom
  * matters: auth material first (a half-deleted account must never still
  * authenticate), then every owned trip (R2 + its D1 rows — owned trips are
  * deleted WITH the account, including for people they're shared with), then
- * shares this user received elsewhere, then feedback, then the user row last.
+ * shares this user received elsewhere, then photo/rate-limit residue this
+ * user left on data they don't own, then feedback, then the user row last.
  *
  * Feedback rows are DELETED rather than anonymized: `feedback.user_id` is a
  * NOT NULL FK with no ON DELETE SET NULL, and the admin triage view
@@ -297,9 +298,22 @@ export async function deleteAccount(db: D1Database, bucket: R2Bucket, userId: st
 	//    owned trips were already purged as part of step 2).
 	await db.prepare('DELETE FROM trip_shares WHERE user_id = ?').bind(userId).run();
 
-	// 4. Feedback (see doc comment above for the delete-vs-anonymize call).
+	// 4. Photos this user added as an editor on someone else's trip — the trip
+	//    (and its own photo rows) survives, only the attribution is erased.
+	//    added_by is declared ON DELETE SET NULL in migrations/0005, but the
+	//    hand-driven cascade must not silently depend on D1's FK enforcement
+	//    being on, so it's set explicitly here too.
+	await db.prepare('UPDATE trip_photos SET added_by = NULL WHERE added_by = ?').bind(userId).run();
+
+	// 5. Rate-limit counters keyed to this user (userKey in ratelimit.ts —
+	//    'user:<id>:<surface>', no FK by design). The opportunistic sweep in
+	//    ratelimit.ts only clears rows once they're ~2 days stale; deletion
+	//    can't wait on that, so no identifier is left outliving the account.
+	await db.prepare('DELETE FROM rate_limits WHERE key LIKE ?').bind(`user:${userId}:%`).run();
+
+	// 6. Feedback (see doc comment above for the delete-vs-anonymize call).
 	await db.prepare('DELETE FROM feedback WHERE user_id = ?').bind(userId).run();
 
-	// 5. The user row, last.
+	// 7. The user row, last.
 	await db.prepare('DELETE FROM users WHERE id = ?').bind(userId).run();
 }

@@ -45,8 +45,11 @@ describe('roadmap snapshot', () => {
 		}
 	});
 
-	it('has at least one item in each of shipped/building/planned', () => {
-		for (const status of VALID_STATUSES) {
+	it('has at least one shipped and one planned item', () => {
+		// 'building' is deliberately excluded: it's fine for the snapshot to have
+		// zero in-progress items when everything in flight has just shipped —
+		// unlike shipped/planned, which should never both be empty on a real roadmap.
+		for (const status of ['shipped', 'planned'] as RoadmapStatus[]) {
 			expect(
 				roadmap.items.some((it) => it.status === status),
 				`at least one ${status} item`

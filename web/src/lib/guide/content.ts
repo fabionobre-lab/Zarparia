@@ -65,14 +65,16 @@ export const guide: GuideCatalog = {
 						id: 'trip-view',
 						title: 'Trip view',
 						body: [
-							'The read-through view of a trip: a day-by-day itinerary with times, places, notes and a map, organised into stops. This is what you see when you open a trip, and what anyone you share it with sees too.'
+							'The read-through view of a trip: a day-by-day itinerary with times, places, notes and a map, organised into stops. This is what you see when you open a trip, and what anyone you share it with sees too.',
+							"Each day also shows a weather forecast, when the trip is close enough in time for one to be available. For trips that have already happened, the editor can instead record the weather that actually happened, so the day still shows something useful."
 						]
 					},
 					{
 						id: 'editor',
 						title: 'Trip editor',
 						body: [
-							"Where you build and change a trip: settings (title, languages, home base), stops, days and the individual blocks of a day's schedule, each with a live preview alongside. Reached from a trip's Edit button — only people with edit access (owners and editors) can get to it."
+							"Where you build and change a trip: settings (title, languages, home base), stops (\"segments\" in the editor's own labels), days and the individual blocks of a day's schedule, each with a live preview alongside. Reached from a trip's Edit button — only people with edit access (owners and editors) can get to it.",
+							"A stop can hold more than one plan — alternate versions of the same days, for example a rainy-day option alongside the usual one. Anyone viewing the trip can switch between a stop's plans using the plan tabs in the trip view."
 						]
 					},
 					{
@@ -128,6 +130,13 @@ export const guide: GuideCatalog = {
 						title: 'Export my data',
 						body: [
 							'From the Account page, "Export my data" downloads a single JSON file with everything Zarparia holds about you: your profile, your trips, sharing records, feedback you\'ve sent, and your photo records.'
+						]
+					},
+					{
+						id: 'add-to-calendar',
+						title: 'Add a trip to your calendar',
+						body: [
+							'Open a trip and use the "Add to calendar" button, always visible near the top — it downloads a single .ics file for the whole trip. Import that file into Google Calendar, Apple Calendar, Outlook or any other calendar app that accepts .ics files, and each event carries the trip\'s local times.'
 						]
 					},
 					{
@@ -261,14 +270,16 @@ export const guide: GuideCatalog = {
 						id: 'trip-view',
 						title: 'Visualização da viagem',
 						body: [
-							'A visão de leitura de uma viagem: um roteiro dia a dia com horários, lugares, notas e um mapa, organizado em paradas. É o que você vê ao abrir uma viagem, e o que qualquer pessoa com quem você a compartilha também vê.'
+							'A visão de leitura de uma viagem: um roteiro dia a dia com horários, lugares, notas e um mapa, organizado em paradas. É o que você vê ao abrir uma viagem, e o que qualquer pessoa com quem você a compartilha também vê.',
+							'Cada dia também mostra uma previsão do tempo, quando a viagem está próxima o suficiente para haver uma previsão disponível. Para viagens que já aconteceram, o editor pode registrar o tempo que realmente fez, para que o dia continue mostrando algo útil.'
 						]
 					},
 					{
 						id: 'editor',
 						title: 'Editor de viagem',
 						body: [
-							'Onde você monta e altera uma viagem: configurações (título, idiomas, base de origem), paradas, dias e os blocos individuais da programação de um dia, cada um com uma pré-visualização ao vivo ao lado. Acessado pelo botão Editar de uma viagem — só quem tem acesso de edição (donos e editores) consegue chegar até lá.'
+							'Onde você monta e altera uma viagem: configurações (título, idiomas, base de origem), paradas ("trechos" nos próprios rótulos do editor), dias e os blocos individuais da programação de um dia, cada um com uma pré-visualização ao vivo ao lado. Acessado pelo botão Editar de uma viagem — só quem tem acesso de edição (donos e editores) consegue chegar até lá.',
+							'Uma parada pode ter mais de um plano — versões alternativas dos mesmos dias, por exemplo uma opção para dia de chuva ao lado da opção normal. Quem visualiza a viagem pode alternar entre os planos de uma parada usando as abas de plano na visualização da viagem.'
 						]
 					},
 					{
@@ -324,6 +335,13 @@ export const guide: GuideCatalog = {
 						title: 'Exportar meus dados',
 						body: [
 							'Na página de Conta, "Exportar meus dados" baixa um único arquivo JSON com tudo o que o Zarparia guarda sobre você: seu perfil, suas viagens, registros de compartilhamento, feedback enviado e seus registros de fotos.'
+						]
+					},
+					{
+						id: 'add-to-calendar',
+						title: 'Adicionar uma viagem ao seu calendário',
+						body: [
+							'Abra a viagem e use o botão "Adicionar ao calendário", sempre visível perto do topo — ele baixa um único arquivo .ics com a viagem inteira. Importe esse arquivo no Google Agenda, no Calendário da Apple, no Outlook ou em qualquer outro aplicativo de calendário que aceite arquivos .ics, e cada evento leva os horários locais da viagem.'
 						]
 					},
 					{

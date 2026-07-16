@@ -5,7 +5,7 @@ import { env } from 'cloudflare:workers';
 import { isHttpError } from '@sveltejs/kit';
 import { describe, expect, it } from 'vitest';
 import { buildAccountExport, deleteAccount } from '../src/lib/server/account';
-import { registerClient } from '../src/lib/server/mcp/oauth';
+import { registerClient, createAuthCode } from '../src/lib/server/mcp/oauth';
 import { issueTokenPair } from '../src/lib/server/mcp/tokens';
 import { requireUser } from '../src/lib/server/guards';
 import { createSession, generateSessionToken, validateSessionToken } from '../src/lib/server/session';
@@ -240,6 +240,114 @@ describe('deleteAccount', () => {
 		expect(await env.DB.prepare('SELECT 1 FROM users WHERE id = ?').bind(user.id).first()).toBeNull();
 		expect(await env.DB.prepare('SELECT 1 FROM trips WHERE id = ?').bind('half-trip').first()).toBeNull();
 		expect(await env.DB.prepare('SELECT 1 FROM feedback WHERE user_id = ?').bind(user.id).first()).toBeNull();
+	});
+
+	it('removes oauth_codes rows for the deleted user', async () => {
+		const user = await approvedUser('del-oauth-code@example.com', 'Code Holder');
+		const client = await registerClient(env.DB, {
+			client_name: 'Delete Code Test Client',
+			redirect_uris: ['http://localhost/callback']
+		});
+		if (!client.ok || !client.client) throw new Error('client registration failed');
+		await createAuthCode(env.DB, {
+			clientId: client.client.client_id,
+			userId: user.id,
+			redirectUri: 'http://localhost/callback',
+			codeChallenge: 'challenge',
+			codeChallengeMethod: 'S256',
+			scope: 'trips',
+			resource: null
+		});
+		expect(await env.DB.prepare('SELECT 1 FROM oauth_codes WHERE user_id = ?').bind(user.id).first()).not.toBeNull();
+
+		const bucket = getPhotosBucket(platformWith(env.DB));
+		await deleteAccount(env.DB, bucket, user.id);
+
+		expect(await env.DB.prepare('SELECT 1 FROM oauth_codes WHERE user_id = ?').bind(user.id).first()).toBeNull();
+	});
+
+	it('deleting a share RECIPIENT removes only their received-share row, leaving the sharing friend and their trip untouched', async () => {
+		const friend = await approvedUser('del-share-owner@example.com', 'Share Owner Friend');
+		const target = await approvedUser('del-share-recipient@example.com', 'Share Recipient');
+
+		const friendTrip = await createTrip(env.DB, friend.id, minimalTripDoc('Friend Owned Trip'), 'friend-owned-trip');
+		if (!friendTrip.ok) throw new Error('setup failed');
+		await shareWithEmail(env.DB, friend.id, friendTrip.id, target.email, 'viewer');
+		expect(
+			await env.DB
+				.prepare('SELECT 1 FROM trip_shares WHERE trip_id = ? AND user_id = ?')
+				.bind(friendTrip.id, target.id)
+				.first()
+		).not.toBeNull();
+
+		const bucket = getPhotosBucket(platformWith(env.DB));
+		await deleteAccount(env.DB, bucket, target.id);
+
+		// The received-share row is gone...
+		expect(
+			await env.DB
+				.prepare('SELECT 1 FROM trip_shares WHERE trip_id = ? AND user_id = ?')
+				.bind(friendTrip.id, target.id)
+				.first()
+		).toBeNull();
+		// ...but the friend's trip and their own account are entirely untouched.
+		expect(await env.DB.prepare('SELECT 1 FROM trips WHERE id = ?').bind(friendTrip.id).first()).not.toBeNull();
+		expect(await env.DB.prepare('SELECT 1 FROM users WHERE id = ?').bind(friend.id).first()).not.toBeNull();
+	});
+
+	it('deleting an editor who added a photo to someone else\'s trip keeps the photo row but clears added_by', async () => {
+		const friend = await approvedUser('del-photo-owner@example.com', 'Photo Trip Owner');
+		const target = await approvedUser('del-photo-editor@example.com', 'Photo Editor');
+
+		const friendTrip = await createTrip(env.DB, friend.id, minimalTripDoc('Friend Photo Trip'), 'friend-photo-trip');
+		if (!friendTrip.ok) throw new Error('setup failed');
+		await shareWithEmail(env.DB, friend.id, friendTrip.id, target.email, 'editor');
+
+		await insertTripPhoto(env.DB, {
+			id: 'photo-editor-1',
+			tripId: friendTrip.id,
+			mediaItemId: 'media-editor-1',
+			creationTime: '2026-01-01T00:00:00Z',
+			width: 80,
+			height: 80,
+			contentType: 'image/jpeg',
+			placement: null,
+			addedBy: target.id
+		});
+
+		const bucket = getPhotosBucket(platformWith(env.DB));
+		await deleteAccount(env.DB, bucket, target.id);
+
+		// The photo row survives — it belongs to the friend's trip, not the
+		// deleted editor — but the attribution is cleared.
+		const photoRow = await env.DB
+			.prepare('SELECT added_by AS addedBy FROM trip_photos WHERE id = ?')
+			.bind('photo-editor-1')
+			.first<{ addedBy: string | null }>();
+		expect(photoRow).not.toBeNull();
+		expect(photoRow?.addedBy).toBeNull();
+	});
+
+	it('removes only the deleted user\'s rate_limits rows, leaving ip-keyed rows for the same surface untouched', async () => {
+		const target = await approvedUser('del-ratelimit@example.com', 'Rate Limited');
+		await env.DB
+			.prepare('INSERT INTO rate_limits (key, window_start, count) VALUES (?, ?, ?)')
+			.bind(`user:${target.id}:feedback`, 0, 1)
+			.run();
+		await env.DB
+			.prepare('INSERT INTO rate_limits (key, window_start, count) VALUES (?, ?, ?)')
+			.bind('ip:1.2.3.4:feedback', 0, 1)
+			.run();
+
+		const bucket = getPhotosBucket(platformWith(env.DB));
+		await deleteAccount(env.DB, bucket, target.id);
+
+		expect(
+			await env.DB.prepare('SELECT 1 FROM rate_limits WHERE key = ?').bind(`user:${target.id}:feedback`).first()
+		).toBeNull();
+		expect(
+			await env.DB.prepare('SELECT 1 FROM rate_limits WHERE key = ?').bind('ip:1.2.3.4:feedback').first()
+		).not.toBeNull();
 	});
 });
 

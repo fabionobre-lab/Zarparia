@@ -132,8 +132,8 @@ Currently any verified Google account gets an account instantly (`web/src/routes
 
 Everything needed to onboard a **small, gated beta cohort** exists at this point, at zero recurring cost.
 
-- [ ] **6.1 Pre-beta review** — legal docs owner-approved, deletion cascade re-tested against the final schema, backups restoring, pending-user gate verified live.
-- [ ] **6.2 Roadmap & guide freshness** — regenerate the roadmap snapshot; confirm the guide covers Phases 1–5 (house rule 4.1 should make this a no-op).
+- [~] **6.1 Pre-beta review** — deletion cascade AUDITED + HARDENED 2026-07-17: full table-by-table audit against the final schema (through 0009); two gaps closed in `deleteAccount` (explicit `trip_photos.added_by` clearing instead of silent reliance on D1 FK enforcement; immediate `rate_limits` cleanup for `user:<id>:*` keys) + 4 new regression tests (oauth_codes, share-recipient direction, editor-added photos, rate-limit keys) — 105 tests total. Backups verified 2026-07-16 (manual prod backup content-checked); first scheduled cron fire is the night of 2026-07-17 — confirm one object per day accrues. Still open (Fabio): legal docs owner sign-off; pending-user gate live check happens naturally with the first real sign-up (prod state 2026-07-17: 2 approved, 0 pending).
+- [x] **6.2 Roadmap & guide freshness** — DONE 2026-07-17: production feedback queue is empty (nothing to triage), `backups-ops` roadmap item corrected to shipped with a user-facing note, snapshot date bumped. Guide audited against the full feature surface: sidebar/bottom-bar wording verified current; 3 missing entries added (add-to-calendar/.ics, per-day weather + stored weather, multi-plan segments) and the guide now uses the editor's on-screen "segments" terminology. EN/PT lockstep enforced by tests.
 - [ ] **6.3 Invite the first cohort** — approve in small batches (friends/family + trusted testers, within the ≤100-user OAuth testing cap if 0.2 found the consent screen unpublished); notify manually. Watch Sentry/uptime/feedback for a couple of weeks.
 
 **Exit criteria:** real third-party users using the app safely, before any money is spent.
