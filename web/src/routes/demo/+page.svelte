@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import TripView from '$lib/TripView.svelte';
+	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { loc, type Trip } from '$lib/trip-engine';
 	import { t } from '$lib/i18n/store.svelte';
 	import DemoAboutDialog from './DemoAboutDialog.svelte';
@@ -44,6 +45,13 @@
 	<DemoAboutDialog bind:open={aboutOpen} />
 
 	<TripView {trip} bind:lang photos={data.photos} photosEditable={false} />
+
+	<BottomBar
+		user={data.user}
+		items={[{ id: 'back', label: t('nav.back'), icon: 'back', href: '/' }]}
+		onAbout={() => (aboutOpen = true)}
+		aboutLabel={t('demo.about')}
+	/>
 </div>
 
 <style>
@@ -104,21 +112,22 @@
 		border: 1px solid var(--accent);
 		font-weight: 600;
 	}
+	/* On mobile the bottom app bar carries Back / About / Sign in, so the banner
+	   sheds its action buttons and keeps just the "nothing is saved" notice. */
+	@media (max-width: 959.98px) {
+		.demo-banner-actions {
+			display: none;
+		}
+		.demo-banner-text {
+			flex-basis: 100%;
+		}
+	}
 	@media (max-width: 520px) {
 		.demo-banner-inner {
 			padding: 0.55rem 0.75rem;
 		}
 		.demo-banner-text {
-			flex-basis: 100%;
 			order: -1;
-		}
-		.demo-banner-actions {
-			flex: 1;
-		}
-		.ghost,
-		.primary {
-			flex: 1;
-			text-align: center;
 		}
 	}
 </style>

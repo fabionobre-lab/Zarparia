@@ -1,5 +1,6 @@
 <script lang="ts">
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
+	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { t, formatDateRange } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import { getNow } from '$lib/now';
@@ -187,6 +188,15 @@
 				{#each shared as trip (trip.id)}{@render card(trip)}{/each}
 			</div>
 		{/if}
+
+		<BottomBar
+			user={data.user}
+			items={[
+				{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/', current: true },
+				{ id: 'new', label: t('nav.newTrip'), icon: 'newTrip', href: '/trips/new' },
+				{ id: 'import', label: t('nav.import'), icon: 'import', href: '/trips/import' }
+			]}
+		/>
 	{:else}
 		<div class="auth-shell">
 			<div class="auth-card">

@@ -4,6 +4,7 @@
 	import markSvg from '$lib/assets/zarparia-mark-cc.svg?raw';
 	import wordSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
 	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
@@ -14,6 +15,20 @@
 	let { children, data } = $props();
 
 	let feedbackOpen = $state(false);
+
+	// Routes that render the mobile BottomBar (signed-in home, trip view, demo).
+	// Only there does the mobile header slim to crest + wordmark — the bar's More
+	// sheet carries locale/theme/feedback/sign-out instead. Every other route
+	// (signed-out landing, editor, import, new trip, feedback, join…) keeps the
+	// full header at all widths, since it is the only chrome those screens have.
+	// Derived from route id here (not signalled up from children) because the
+	// header renders before children during SSR — a child-set flag would arrive
+	// too late for the first paint.
+	const hasBottomBar = $derived(
+		page.route.id === '/trips/[id]' ||
+			page.route.id === '/demo' ||
+			(page.route.id === '/' && !!data.user)
+	);
 
 	// Seed the UI locale synchronously (SSR + client) before children render, so
 	// the first paint is in the right language and there is no flash of English.
@@ -72,7 +87,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<header>
+<header class:slim={hasBottomBar}>
 	<div class="bar" class:signed-in={!!data.user}>
 		<div class="left">
 			<a class="brand" href="/" aria-label="Zarparia — home">
@@ -181,6 +196,21 @@
 		text-overflow: ellipsis;
 		max-width: 12ch;
 	}
+	/* Mobile (< desktop breakpoint) on BottomBar routes only (header.slim — set
+	   for signed-in home, trip view and demo): the bar's More sheet carries
+	   locale, theme, feedback and sign in/out, so the top header slims to just
+	   the crest + wordmark (still a link home). Routes without the bar (signed-out
+	   landing, editor, import, new trip…) keep the full header at every width —
+	   it is the only chrome they have. Desktop (>=960px) is unchanged everywhere. */
+	@media (max-width: 959.98px) {
+		header.slim nav {
+			display: none;
+		}
+		header.slim .left :global(.locale-switch),
+		header.slim .left :global(.theme-toggle) {
+			display: none;
+		}
+	}
 	@media (max-width: 520px) {
 		.bar {
 			padding: 0.6rem 0.85rem;
@@ -239,23 +269,27 @@
 			text-underline-offset: 0.15em;
 		}
 	}
-	/* Signed-in rows carry two 40px circles (theme + feedback) plus "Sign out",
-	   which measures ~368px of minimum content — it genuinely cannot fit at 360.
-	   When the row can't fit, flexbox shrinks the .left CONTAINER below its
-	   (un-shrinkable) children's width and they visually overflow it, painting
-	   the theme toggle under the feedback circle. Hide the wordmark (crest-only
-	   brand) below 380px: measured stop-fitting point 368px + headroom for
-	   Android font metrics. Signed-out fits at 360 and keeps its wordmark. */
+	/* Full-header (non-slim) narrow-phone fallbacks — these only matter where the
+	   complete control row still renders (routes without the BottomBar). Signed-in
+	   rows carry two 40px circles (theme + feedback) plus "Sign out", measuring
+	   ~368px of minimum content — they genuinely cannot fit at 360. When the row
+	   can't fit, flexbox shrinks the .left CONTAINER below its (un-shrinkable)
+	   children's width and they visually overflow it, painting the theme toggle
+	   under the feedback circle. Hide the wordmark (crest-only brand) below 380px:
+	   measured stop-fitting point 368px + headroom for Android font metrics.
+	   Signed-out fits at 360 and keeps its wordmark. Slim headers (BottomBar
+	   routes) always keep the wordmark — crest + wordmark alone always fit. */
 	@media (max-width: 379px) {
-		.bar.signed-in .wordmark {
+		header:not(.slim) .bar.signed-in .wordmark {
 			display: none;
 		}
 	}
 	/* Safety valve for very narrow phones (below the 360px baseline): drop the
-	   wordmark so the crest stands alone, guaranteeing the row can't overflow even
-	   on the smallest devices. At >=360px the (signed-out) wordmark stays. */
+	   wordmark so the crest stands alone, guaranteeing the full-header row can't
+	   overflow even on the smallest devices. At >=360px the (signed-out) wordmark
+	   stays. */
 	@media (max-width: 359px) {
-		.wordmark {
+		header:not(.slim) .wordmark {
 			display: none;
 		}
 	}

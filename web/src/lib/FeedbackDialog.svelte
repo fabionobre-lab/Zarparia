@@ -6,7 +6,10 @@
 	// `open` is bindable so the header button can toggle it. A native <dialog>
 	// gives us the modal focus trap, Escape-to-close, and focus-return-to-trigger
 	// for free (showModal() is called while the trigger still holds focus).
-	let { open = $bindable(false) }: { open?: boolean } = $props();
+	// `titleId` is overridable so multiple instances (e.g. the header dialog and
+	// the bottom-bar More-sheet dialog on the same page) don't collide on one id.
+	let { open = $bindable(false), titleId = 'fb-title' }: { open?: boolean; titleId?: string } =
+		$props();
 
 	const TYPE_OPTIONS: { val: FeedbackType; key: keyof Messages }[] = [
 		{ val: 'bug', key: 'feedback.typeBug' },
@@ -84,17 +87,17 @@
 	}
 </script>
 
-<dialog bind:this={dialogEl} class="fb" aria-modal="true" aria-labelledby="fb-title" onclose={onClose}>
+<dialog bind:this={dialogEl} class="fb" aria-modal="true" aria-labelledby={titleId} onclose={onClose}>
 	{#if sent}
 		<div class="done">
 			<div class="check" aria-hidden="true">✓</div>
-			<h2 id="fb-title">{t('feedback.successTitle')}</h2>
+			<h2 id={titleId}>{t('feedback.successTitle')}</h2>
 			<a class="viewlink" href="/feedback" onclick={() => (open = false)}>{t('feedback.viewYours')}</a>
 		</div>
 	{:else}
 		<form onsubmit={submit}>
 			<div class="hd">
-				<h2 id="fb-title">{t('feedback.title')}</h2>
+				<h2 id={titleId}>{t('feedback.title')}</h2>
 				<button type="button" class="x" onclick={() => (open = false)} aria-label={t('feedback.close')}>✕</button>
 			</div>
 

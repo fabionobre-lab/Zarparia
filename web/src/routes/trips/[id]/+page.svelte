@@ -3,6 +3,8 @@
 	import TripView from '$lib/TripView.svelte';
 	import SharePanel from '$lib/SharePanel.svelte';
 	import TripPhotosPanel from '$lib/TripPhotosPanel.svelte';
+	import BottomBar from '$lib/nav/BottomBar.svelte';
+	import type { IconName } from '$lib/nav/NavIcon.svelte';
 	import { loc, type Trip } from '$lib/trip-engine';
 	import type { TripPhoto } from '$lib/photos';
 	import { t } from '$lib/i18n/store.svelte';
@@ -11,6 +13,48 @@
 	let showShare = $state(false);
 	let showPhotos = $state(false);
 	const canEdit = $derived(data.role === 'owner' || data.role === 'editor');
+
+	// Mobile bottom bar: Trips · (Share if owner) · (Edit if canEdit) · More.
+	// Photos moves into the More sheet (it's page-level state here, so trivially
+	// wirable). The ics/"Add to calendar" action lives inside TripView's hero and
+	// isn't exposed cross-component, so it's intentionally left out of More.
+	type BarItem = {
+		id: string;
+		label: string;
+		icon: IconName;
+		href?: string;
+		onclick?: () => void;
+		current?: boolean;
+	};
+	const barItems = $derived<BarItem[]>([
+		{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/' },
+		...(data.role === 'owner'
+			? [
+					{
+						id: 'share',
+						label: t('nav.share'),
+						icon: 'share' as IconName,
+						onclick: () => (showShare = !showShare),
+						current: showShare
+					}
+				]
+			: []),
+		...(canEdit
+			? [{ id: 'edit', label: t('nav.edit'), icon: 'edit' as IconName, href: `/trips/${data.trip.id}/edit` }]
+			: [])
+	]);
+	const barMoreRows = $derived(
+		canEdit
+			? [
+					{
+						id: 'photos',
+						label: t('tripbar.photos'),
+						icon: 'photos' as IconName,
+						onclick: () => (showPhotos = !showPhotos)
+					}
+				]
+			: []
+	);
 
 	// Photos load client-side only (SSR of a big trip's strips exceeds the
 	// Workers CPU limit) and are refetched after any mutation (import, move,
@@ -78,6 +122,8 @@
 			onphotoschanged={refreshPhotos}
 		/>
 	{/key}
+
+	<BottomBar user={data.user} items={barItems} moreRows={barMoreRows} />
 </div>
 
 <style>
@@ -93,6 +139,13 @@
 		justify-content: space-between;
 		align-items: center;
 		font-family: system-ui, sans-serif;
+	}
+	/* On mobile the bottom app bar carries All trips / Share / Edit / Photos, so
+	   the top action row is redundant — hide it below the desktop breakpoint. */
+	@media (max-width: 959.98px) {
+		.bar {
+			display: none;
+		}
 	}
 	/* Match the widened trip shell so the control bar doesn't sit 430px-wide
 	   above a 1060px shell. */

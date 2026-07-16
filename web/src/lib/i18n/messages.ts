@@ -29,6 +29,18 @@ export interface Messages {
 	'theme.dark': string;
 	'theme.light': string;
 
+	// ── Mobile bottom app bar + "More" sheet (lib/nav/*) ──
+	'nav.trips': string; // primary item → home trip list
+	'nav.newTrip': string; // primary item → /trips/new
+	'nav.import': string; // primary item → /trips/import
+	'nav.share': string; // primary item → toggle Share panel
+	'nav.edit': string; // primary item → /trips/[id]/edit
+	'nav.more': string; // the 4th item that opens the sheet
+	'nav.back': string; // demo primary item → home
+	'nav.primaryLabel': string; // aria-label for the bottom <nav>
+	'nav.moreLabel': string; // aria-label for the More sheet dialog
+	'nav.close': string; // aria-label for the sheet close control
+
 	// ── OAuth consent page (oauth/authorize) — MCP connector authorization ──
 	'consent.heading': string; // "{client} wants access to your Zarparia trips"
 	'consent.account': string; // "Signed in as {account}"
@@ -407,6 +419,17 @@ const enGB: Messages = {
 	'theme.dark': 'Theme: dark',
 	'theme.light': 'Theme: light',
 
+	'nav.trips': 'Trips',
+	'nav.newTrip': 'New trip',
+	'nav.import': 'Import',
+	'nav.share': 'Share',
+	'nav.edit': 'Edit',
+	'nav.more': 'More',
+	'nav.back': 'Back',
+	'nav.primaryLabel': 'Main navigation',
+	'nav.moreLabel': 'More options',
+	'nav.close': 'Close',
+
 	'consent.heading': '{client} wants access to your Zarparia trips',
 	'consent.account': 'Signed in as {account}',
 	'consent.scope': 'This lets it create, read, update and delete your trips on your behalf.',
@@ -772,6 +795,17 @@ const ptBR: Messages = {
 	'theme.system': 'Tema: sistema',
 	'theme.dark': 'Tema: escuro',
 	'theme.light': 'Tema: claro',
+
+	'nav.trips': 'Viagens',
+	'nav.newTrip': 'Nova viagem',
+	'nav.import': 'Importar',
+	'nav.share': 'Compartilhar',
+	'nav.edit': 'Editar',
+	'nav.more': 'Mais',
+	'nav.back': 'Voltar',
+	'nav.primaryLabel': 'Navegação principal',
+	'nav.moreLabel': 'Mais opções',
+	'nav.close': 'Fechar',
 
 	'consent.heading': '{client} quer acesso às suas viagens no Zarparia',
 	'consent.account': 'Conectado como {account}',
