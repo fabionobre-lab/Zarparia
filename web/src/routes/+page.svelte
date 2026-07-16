@@ -7,6 +7,7 @@
 	import { page } from '$app/state';
 	import { getNow } from '$lib/now';
 	import crestSvg from '$lib/assets/zarparia-crest.svg?raw';
+	import markSvg from '$lib/assets/zarparia-mark-cc.svg?raw';
 	import wordmarkSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
 	import {
 		type Trip,
@@ -255,9 +256,12 @@
 					<LocaleSwitcher />
 				</div>
 				<div class="auth-lockup">
-					<span class="auth-crest">{@html crestSvg}</span>
-					<span class="auth-wordmark">{@html wordmarkSvg}</span>
-					<p class="auth-tagline">{t('landing.tagline')}</p>
+					<div class="auth-lockup-row">
+						<span class="auth-mark">{@html markSvg}</span>
+						<span class="auth-wordmark">{@html wordmarkSvg}</span>
+					</div>
+					<!-- Brand tagline: part of the mark, so it stays English in both locales. -->
+					<p class="auth-tagline">Chart your journey.</p>
 				</div>
 				<a class="auth-google-btn" href="/auth/login/google">
 					<svg class="google-g" aria-hidden="true" viewBox="0 0 18 18" width="18" height="18">
@@ -528,24 +532,35 @@
 		flex-direction: column;
 		align-items: center;
 		text-align: center;
-		gap: 0.6rem;
 		margin-bottom: 1.75rem;
 	}
-	.auth-crest :global(svg) {
+	/* Horizontal lockup: mark + wordmark on one row, sized to the canonical
+	   lockup's proportions (wordmark caps top-aligned with the mark; the star
+	   tittle and descenders overshoot, hence the negative offset). */
+	.auth-lockup-row {
+		display: flex;
+		align-items: flex-start;
+		justify-content: center;
+		gap: 8px;
+	}
+	.auth-mark :global(svg) {
 		display: block;
-		width: 64px;
-		height: 64px;
+		height: 60px;
+		width: auto;
+	}
+	.auth-wordmark {
+		margin-top: -11px;
 	}
 	.auth-wordmark :global(svg) {
 		display: block;
-		height: 20px;
+		height: 55.5px;
 		width: auto;
 		color: var(--text);
 	}
 	.auth-tagline {
 		font-size: 0.85rem;
 		color: var(--text-muted);
-		margin: 0;
+		margin: 12px 0 0;
 	}
 	.auth-google-btn {
 		display: flex;
@@ -644,6 +659,18 @@
 		.auth-card {
 			padding: 1.5rem 1.25rem;
 			border-radius: 14px;
+		}
+		.auth-lockup-row {
+			gap: 6px;
+		}
+		.auth-mark :global(svg) {
+			height: 47px;
+		}
+		.auth-wordmark {
+			margin-top: -8.5px;
+		}
+		.auth-wordmark :global(svg) {
+			height: 43.5px;
 		}
 	}
 	/* Pending/rejected gate: a signed-in user whose account isn't approved yet.

@@ -50,7 +50,6 @@ export interface Messages {
 	'consent.genericClient': string; // fallback when a client sends no name
 
 	// ── Signed-out landing (+page.svelte) ──
-	'landing.tagline': string;
 	'landing.tryDemo': string;
 	'landing.tryDemoSub': string;
 	// Consent line under the Google sign-in button. Contains the literal tokens
@@ -510,7 +509,6 @@ const enGB: Messages = {
 	'consent.deny': 'Deny',
 	'consent.genericClient': 'An application',
 
-	'landing.tagline': 'A place for your travel itineraries.',
 	'landing.tryDemo': 'Try the demo',
 	'landing.tryDemoSub': 'Explore a sample trip — no account needed.',
 	'landing.consentText': 'By signing in you agree to the %TERMS% and %PRIVACY%.',
@@ -954,7 +952,6 @@ const ptBR: Messages = {
 	'consent.deny': 'Recusar',
 	'consent.genericClient': 'Um aplicativo',
 
-	'landing.tagline': 'Um lugar para os seus roteiros de viagem.',
 	'landing.tryDemo': 'Ver demonstração',
 	'landing.tryDemoSub': 'Explore uma viagem de exemplo — sem necessidade de conta.',
 	'landing.consentText': 'Ao entrar, você concorda com os %TERMS% e a %PRIVACY%.',
