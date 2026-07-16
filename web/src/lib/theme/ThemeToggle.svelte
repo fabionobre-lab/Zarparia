@@ -50,6 +50,10 @@
 		width: 34px;
 		height: 34px;
 		min-height: 34px;
+		/* The header row can't afford to crush this into an ellipse when space is
+		   tight — it must keep its circular tap target and let text elements
+		   (wordmark, sign-in label) give way instead. */
+		flex-shrink: 0;
 		padding: 0;
 		border: 1px solid var(--hairline-strong);
 		border-radius: 999px;

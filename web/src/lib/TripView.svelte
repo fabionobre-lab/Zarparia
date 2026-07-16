@@ -950,8 +950,13 @@
 	}
 	.hero-row1 {
 		display: flex;
-		justify-content: space-between;
+		/* Allow the actions to wrap onto their own line under the eyebrow when the
+		   two can't share one row (very narrow phones / wider system fonts). This
+		   is what keeps the EN|PT toggle from ever being clipped by the right edge:
+		   rather than overflow, the block reflows below and right-aligns. */
+		flex-wrap: wrap;
 		align-items: center;
+		gap: 4px 8px;
 		margin-bottom: 5px;
 	}
 	.trip-eyebrow {
@@ -960,11 +965,22 @@
 		text-transform: uppercase;
 		color: var(--hero-eyebrow);
 		opacity: 0.75;
+		/* Take the row's slack and shrink first, so the actions keep their size. */
+		flex: 1 1 auto;
+		min-width: 0;
 	}
 	.hero-actions {
 		display: flex;
 		align-items: center;
 		gap: 8px;
+		/* Hold together and stay pinned right, whether on the eyebrow's line or
+		   wrapped below it; never compress the ics button or the language pill. */
+		flex-shrink: 0;
+		margin-left: auto;
+	}
+	.ics-btn,
+	.lang-toggle {
+		flex-shrink: 0;
 	}
 	.ics-btn {
 		display: inline-flex;

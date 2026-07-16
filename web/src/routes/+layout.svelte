@@ -101,7 +101,10 @@
 					<button type="submit" class="signout">{t('header.signOut')}</button>
 				</form>
 			{:else}
-				<a class="signin" href="/auth/login/google">{t('header.signInGoogle')}</a>
+				<a class="signin" href="/auth/login/google">
+					<span class="signin-full">{t('header.signInGoogle')}</span>
+					<span class="signin-short">{t('header.signIn')}</span>
+				</a>
 			{/if}
 		</nav>
 	</div>
@@ -201,6 +204,16 @@
 			display: inline-flex;
 			align-items: center;
 		}
+		/* Signed-out row: the full "Sign in with Google" pill is too wide to share
+		   one row with the brand, locale switcher and theme toggle below ~412px —
+		   it wrapped to two lines and shoved the theme toggle behind it. Swap in
+		   the compact "Sign in" label so the whole row fits on a single line. */
+		.signin .signin-full {
+			display: none;
+		}
+		.signin .signin-short {
+			display: inline;
+		}
 		/* Feedback collapses to an icon-only ghost circle; the text label
 		   (still present for screen readers via aria-label) is visually hidden. */
 		.feedback {
@@ -226,10 +239,29 @@
 			text-underline-offset: 0.15em;
 		}
 	}
+	/* Safety valve for very narrow phones (below the 360px baseline): drop the
+	   wordmark so the crest stands alone, guaranteeing the row can't overflow even
+	   on the smallest devices. At >=360px the wordmark stays. */
+	@media (max-width: 359px) {
+		.wordmark {
+			display: none;
+		}
+	}
 	.feedback {
 		border-color: var(--hairline);
 		background: transparent;
 		color: var(--text-muted);
+	}
+	/* The Google sign-in pill is the widest control on the signed-out row. Keep
+	   it on a single line and hold its shape; below 520px it swaps its full label
+	   for a compact one (see the media block) so the theme toggle + locale
+	   switcher stay intact on one row without overlap or clipping. */
+	.signin {
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+	.signin-short {
+		display: none;
 	}
 	.signin,
 	button {

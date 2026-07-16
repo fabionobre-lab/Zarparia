@@ -22,6 +22,7 @@ export interface Messages {
 	// ── Header (+layout.svelte) ──
 	'header.signOut': string;
 	'header.signInGoogle': string;
+	'header.signIn': string; // compact sign-in label (narrow header, <520px)
 	'header.language': string; // aria-label for the switcher group
 	// ── Theme toggle (aria-label/title reflect the CURRENT mode) ──
 	'theme.system': string;
@@ -400,6 +401,7 @@ export interface Messages {
 const enGB: Messages = {
 	'header.signOut': 'Sign out',
 	'header.signInGoogle': 'Sign in with Google',
+	'header.signIn': 'Sign in',
 	'header.language': 'Language',
 	'theme.system': 'Theme: system',
 	'theme.dark': 'Theme: dark',
@@ -765,6 +767,7 @@ const enGB: Messages = {
 const ptBR: Messages = {
 	'header.signOut': 'Sair',
 	'header.signInGoogle': 'Entrar com Google',
+	'header.signIn': 'Entrar',
 	'header.language': 'Idioma',
 	'theme.system': 'Tema: sistema',
 	'theme.dark': 'Tema: escuro',
