@@ -1,0 +1,97 @@
+{
+	"updated": "2026-07-16",
+	"items": [
+		{
+			"id": "trips-editor",
+			"title": { "en": "Trips & itinerary editor", "pt": "Viagens e editor de roteiro" },
+			"status": "shipped"
+		},
+		{
+			"id": "import",
+			"title": { "en": "Import an itinerary from text", "pt": "Importar um roteiro a partir de texto" },
+			"status": "shipped"
+		},
+		{
+			"id": "sharing",
+			"title": { "en": "Sharing & share links", "pt": "Compartilhamento e links de compartilhamento" },
+			"status": "shipped"
+		},
+		{
+			"id": "google-photos",
+			"title": { "en": "Google Photos import", "pt": "Importação do Google Fotos" },
+			"status": "shipped"
+		},
+		{
+			"id": "offline",
+			"title": { "en": "Offline / installable app", "pt": "Aplicativo offline e instalável" },
+			"status": "shipped"
+		},
+		{
+			"id": "languages",
+			"title": { "en": "English & Portuguese", "pt": "Inglês e português" },
+			"status": "shipped"
+		},
+		{
+			"id": "dark-mode",
+			"title": { "en": "Dark mode", "pt": "Modo escuro" },
+			"status": "shipped"
+		},
+		{
+			"id": "demo",
+			"title": { "en": "Try-before-you-sign-in demo", "pt": "Demonstração sem necessidade de conta" },
+			"status": "shipped"
+		},
+		{
+			"id": "data-rights",
+			"title": { "en": "Export & delete your data", "pt": "Exportar e excluir seus dados" },
+			"status": "shipped"
+		},
+		{
+			"id": "mcp",
+			"title": { "en": "Connect an AI assistant (MCP)", "pt": "Conectar um assistente de IA (MCP)" },
+			"status": "shipped"
+		},
+		{
+			"id": "guide-roadmap",
+			"title": { "en": "User guide & roadmap", "pt": "Guia do usuário e roadmap" },
+			"status": "building",
+			"note": {
+				"en": "What you're reading right now.",
+				"pt": "O que você está lendo agora."
+			}
+		},
+		{
+			"id": "backups-ops",
+			"title": { "en": "Backups & reliability hardening", "pt": "Backups e reforço de confiabilidade" },
+			"status": "building"
+		},
+		{
+			"id": "approval-emails",
+			"title": { "en": "Email when your account is approved", "pt": "E-mail quando sua conta for aprovada" },
+			"status": "planned",
+			"note": {
+				"en": "Right now you have to check back yourself.",
+				"pt": "Por enquanto, você precisa checar por conta própria."
+			}
+		},
+		{
+			"id": "share-invite-emails",
+			"title": { "en": "Email when someone shares a trip with you", "pt": "E-mail quando alguém compartilhar uma viagem com você" },
+			"status": "planned"
+		},
+		{
+			"id": "ownership-transfer",
+			"title": { "en": "Transfer trip ownership", "pt": "Transferir a posse de uma viagem" },
+			"status": "planned",
+			"note": {
+				"en": "Today, a trip you own is deleted along with your account.",
+				"pt": "Hoje, uma viagem que você possui é excluída junto com sua conta."
+			}
+		},
+		{
+			"id": "app-store",
+			"title": { "en": "App-store distribution", "pt": "Distribuição em lojas de aplicativos" },
+			"status": "planned"
+		}
+	]
+}

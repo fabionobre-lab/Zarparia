@@ -15,7 +15,8 @@
 		| 'language'
 		| 'signout'
 		| 'signin'
-		| 'close';
+		| 'close'
+		| 'guide';
 </script>
 
 <script lang="ts">
@@ -100,6 +101,11 @@
 	{:else if name === 'close'}
 		<!-- x -->
 		<path d="M18 6 6 18M6 6l12 12" />
+	{:else if name === 'guide'}
+		<!-- open book -->
+		<path d="M12 6.5c-1.4-1.1-3.3-1.7-5.5-1.7A6 6 0 0 0 3 5.6v12.4c1.2-.6 2.6-.9 4-.9 2 0 3.8.6 5 1.6" />
+		<path d="M12 6.5c1.4-1.1 3.3-1.7 5.5-1.7A6 6 0 0 1 21 5.6v12.4c-1.2-.6-2.6-.9-4-.9-2 0-3.8.6-5 1.6" />
+		<path d="M12 6.5v12.6" />
 	{/if}
 </svg>
 

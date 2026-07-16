@@ -24,7 +24,7 @@
 		current?: boolean;
 	};
 	type MoreRow = { id: string; label: string; icon: IconName; onclick: () => void };
-	type SessionUser = { name?: string | null; email?: string | null };
+	type SessionUser = { name?: string | null; email?: string | null; status?: string };
 
 	let {
 		items,
@@ -42,6 +42,10 @@
 
 	let moreOpen = $state(false);
 	let feedbackOpen = $state(false);
+
+	// Mirrors the desktop header's approval gate: feedback is for approved
+	// accounts only (pending/rejected users keep sign-out and the toggles).
+	const showFeedback = $derived(!!user && user.status !== 'pending' && user.status !== 'rejected');
 
 	const THEME_LABEL: Record<string, keyof Messages> = {
 		system: 'theme.system',
@@ -145,12 +149,35 @@
 
 	{#if moreRows.length > 0}<div class="sheet-divider" role="separator"></div>{/if}
 
-	{#if user}
+	{#if showFeedback}
 		<button type="button" class="sheet-row" onclick={openFeedback}>
 			<NavIcon name="feedback" />
 			<span class="sheet-label">{t('feedback.button')}</span>
 		</button>
+		<a class="sheet-row" href="/account" onclick={() => (moreOpen = false)}>
+			<svg
+				class="mode-icon"
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				width="22"
+				height="22"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<circle cx="12" cy="8" r="4" />
+				<path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+			</svg>
+			<span class="sheet-label">{t('header.account')}</span>
+		</a>
 	{/if}
+
+	<a class="sheet-row" href="/guide" onclick={() => (moreOpen = false)}>
+		<NavIcon name="guide" />
+		<span class="sheet-label">{t('nav.guide')}</span>
+	</a>
 
 	<button
 		type="button"
@@ -206,7 +233,7 @@
 	{/if}
 </MoreSheet>
 
-{#if user}
+{#if showFeedback}
 	<FeedbackDialog bind:open={feedbackOpen} titleId="fb-title-nav" />
 {/if}
 
