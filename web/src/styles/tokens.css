@@ -131,6 +131,10 @@ html {
 	background: var(--bg);
 }
 body {
+	/* Reset the UA's default 8px margin so full-bleed chrome (the top header and
+	   the full-height desktop sidebar) sits flush to the viewport edges, matching
+	   the already edge-anchored fixed BottomBar. */
+	margin: 0;
 	background: var(--bg);
 	color: var(--text);
 }

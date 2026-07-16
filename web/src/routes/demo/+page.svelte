@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { untrack, onDestroy } from 'svelte';
 	import TripView from '$lib/TripView.svelte';
 	import BottomBar from '$lib/nav/BottomBar.svelte';
+	import { setSidebarAbout } from '$lib/nav/tripNav.svelte';
 	import { loc, type Trip } from '$lib/trip-engine';
 	import { t } from '$lib/i18n/store.svelte';
 	import DemoAboutDialog from './DemoAboutDialog.svelte';
@@ -24,6 +25,14 @@
 			aboutOpen = true;
 		}
 	});
+
+	// Expose the About dialog to the desktop sidebar's utilities (the sidebar lives
+	// in the root layout and can't see this page's local dialog state). Cleared on
+	// destroy so it doesn't leak to other routes. Label tracks the UI locale.
+	$effect(() => {
+		setSidebarAbout({ label: t('demo.about'), open: () => (aboutOpen = true) });
+	});
+	onDestroy(() => setSidebarAbout(null));
 </script>
 
 <svelte:head>

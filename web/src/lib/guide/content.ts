@@ -86,7 +86,7 @@ export const guide: GuideCatalog = {
 						id: 'account',
 						title: 'Account',
 						body: [
-							'Your account page: export everything Zarparia holds about you as one file, or permanently delete your account. Reached from the header (desktop) or the More sheet (mobile).'
+							'Your account page: export everything Zarparia holds about you as one file, or permanently delete your account. Reached from the sidebar (desktop) or the More sheet (mobile).'
 						]
 					}
 				]
@@ -141,7 +141,7 @@ export const guide: GuideCatalog = {
 						id: 'language-theme',
 						title: 'Switch language or theme',
 						body: [
-							'The EN | PT switcher changes the app\'s own language (a trip\'s content can be in different languages again, independently). The theme control cycles light, dark and system. Both live in the header on desktop and in the More sheet on mobile, and are remembered for next time.'
+							'The EN | PT switcher changes the app\'s own language (a trip\'s content can be in different languages again, independently). The theme control cycles light, dark and system. Both live in the sidebar on desktop and in the More sheet on mobile, and are remembered for next time.'
 						]
 					},
 					{
@@ -275,7 +275,7 @@ export const guide: GuideCatalog = {
 						id: 'account',
 						title: 'Conta',
 						body: [
-							'Sua página de conta: exporte tudo o que o Zarparia guarda sobre você em um único arquivo, ou exclua sua conta permanentemente. Acessada pelo cabeçalho (computador) ou pela bandeja "Mais" (celular).'
+							'Sua página de conta: exporte tudo o que o Zarparia guarda sobre você em um único arquivo, ou exclua sua conta permanentemente. Acessada pela barra lateral (computador) ou pela bandeja "Mais" (celular).'
 						]
 					}
 				]
@@ -330,7 +330,7 @@ export const guide: GuideCatalog = {
 						id: 'language-theme',
 						title: 'Trocar idioma ou tema',
 						body: [
-							'O seletor EN | PT muda o idioma do próprio aplicativo (o conteúdo de uma viagem pode estar em idiomas diferentes, de forma independente). O controle de tema alterna entre claro, escuro e sistema. Ambos ficam no cabeçalho no computador e na bandeja "Mais" no celular, e são lembrados para a próxima vez.'
+							'O seletor EN | PT muda o idioma do próprio aplicativo (o conteúdo de uma viagem pode estar em idiomas diferentes, de forma independente). O controle de tema alterna entre claro, escuro e sistema. Ambos ficam na barra lateral no computador e na bandeja "Mais" no celular, e são lembrados para a próxima vez.'
 						]
 					},
 					{

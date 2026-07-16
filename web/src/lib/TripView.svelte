@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { untrack, onDestroy } from 'svelte';
 	import { fly, slide } from 'svelte/transition';
 	import { prefersReducedMotion } from 'svelte/motion';
 	import {
@@ -31,6 +31,7 @@
 	import PhotoLightbox from './PhotoLightbox.svelte';
 	import { photoUrl, type TripPhoto } from './photos';
 	import { getNow } from './now';
+	import { setTripNav, type TripNavVM } from './nav/tripNav.svelte';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
 	// per trip id), so these initial reads are intentionally non-reactive.
@@ -103,12 +104,14 @@
 	const clampedIdx = $derived(Math.min(dayIdx, flatDays.length - 1));
 	const current = $derived(flatDays[clampedIdx]);
 
-	// ── Desktop day rail (≥1200px) ──
-	// The vertical rail groups the trip's days by segment (in trip order, using
-	// each segment's currently-selected plan) and carries the global flat-day
-	// index `gi` on every row, so a rail click reuses the exact same `dayIdx`
-	// state the horizontal `.daynav` sets. The loop mirrors computeFlatDays()
-	// one-for-one, so `gi` stays aligned with `flatDays`/`clampedIdx`.
+	// ── Day rail source (desktop sidebar, ≥960px) ──
+	// Groups the trip's days by segment (in trip order, using each segment's
+	// currently-selected plan) and carries the global flat-day index `gi` on every
+	// row, so a rail click reuses the exact same `dayIdx` state the horizontal
+	// `.daynav` sets. The loop mirrors computeFlatDays() one-for-one, so `gi` stays
+	// aligned with `flatDays`/`clampedIdx`. This structure is reshaped into the
+	// tripNav view-model below and rendered by the desktop Sidebar (the in-view
+	// rail moved out of TripView into the persistent sidebar).
 	interface RailDay {
 		day: Day;
 		gi: number;
@@ -523,6 +526,47 @@
 		if (Number.isNaN(instant.getTime())) return '';
 		return `${dayLabel(isoDateInTZ(instant, tz), localeFor(trip, lang))} · ${hhmmInTZ(instant, tz)}`;
 	}
+
+	// ── Publish the day rail to the desktop sidebar (≥960px) ──
+	// TripView stays the single source of truth for day + plan selection; it hands
+	// the sidebar a snapshot view-model (built from `railSegments` — no duplicated
+	// flat-day logic) plus callbacks that drive its own state. Re-published on every
+	// selection/language/"today" change; cleared on destroy so the sidebar drops the
+	// trip zone when the trip unmounts. Harmless below 960px (the sidebar is hidden).
+	$effect(() => {
+		const vm: TripNavVM = {
+			label: lang === 'pt' ? 'Dias da viagem' : 'Trip days',
+			segments: railSegments.map((group) => ({
+				id: group.seg.id,
+				title: L(group.seg.title),
+				subtitle: L(group.seg.subtitle),
+				pills:
+					group.seg.plans.length > 1
+						? group.seg.plans.map((p) => ({
+								id: p.id,
+								label: L(p.label) || p.id,
+								on: p.id === planOf(group.seg).id
+							}))
+						: [],
+				days: group.days.map(({ day, gi }) => ({
+					gi,
+					dateLabel: `${dowShort(day.date, localeFor(trip, lang))} ${dayNum(day.date)}`,
+					title: L(day.title),
+					today: day.date === todayISO,
+					active: gi === clampedIdx
+				}))
+			})),
+			selectDay: (gi: number) => {
+				dayIdx = gi;
+			},
+			selectPlan: (segId: string, planId: string) => {
+				const seg = trip.segments.find((s) => s.id === segId);
+				if (seg) setPlan(seg, planId);
+			}
+		};
+		setTripNav(vm);
+	});
+	onDestroy(() => setTripNav(null));
 </script>
 
 <div class="shell theme-{current?.seg.theme || 'tartan'}" style={themeStyle}>
@@ -601,50 +645,6 @@
 				{stuckDayLabel}
 			</div>
 		{/if}
-	</nav>
-
-	<!-- Desktop day rail (≥1200px): replaces the horizontal .daynav AND the hero
-	     .vtabs. Hidden below 1200px. Segment headers + (when a segment has >1 plan)
-	     variant pills + full-width day rows; clicking a row sets the same dayIdx a
-	     .daybtn does. -->
-	<nav class="day-rail" aria-label="Trip days">
-		{#each railSegments as group (group.seg.id)}
-			<div class="rail-seg">
-				<div class="rail-seg-hdr">
-					<div class="rail-seg-title">{L(group.seg.title)}</div>
-					{#if L(group.seg.subtitle)}<div class="rail-seg-sub">{L(group.seg.subtitle)}</div>{/if}
-				</div>
-				{#if group.seg.plans.length > 1}
-					<div class="rail-pills" role="group" aria-label={L(group.seg.title)}>
-						{#each group.seg.plans as p (p.id)}
-							{@const on = p.id === planOf(group.seg).id}
-							<button class="rail-pill" class:on aria-pressed={on} onclick={() => setPlan(group.seg, p.id)}>
-								{L(p.label) || p.id}
-							</button>
-						{/each}
-					</div>
-				{/if}
-				<div class="rail-days">
-					{#each group.days as { day, gi } (day.date)}
-						{@const on = gi === clampedIdx}
-						{@const today = day.date === todayISO}
-						<button
-							class="rail-day"
-							class:on
-							class:today
-							aria-current={on ? 'date' : undefined}
-							onclick={() => (dayIdx = gi)}
-						>
-							<span class="rail-day-date">
-								<span class="rail-dow">{dowShort(day.date, localeFor(trip, lang))} {dayNum(day.date)}</span>
-								{#if today}<span class="rail-today-dot" aria-hidden="true"></span>{/if}
-							</span>
-							<span class="rail-day-title">{L(day.title)}</span>
-						</button>
-					{/each}
-				</div>
-			</div>
-		{/each}
 	</nav>
 
 	<div class="scroll-area">
@@ -1316,11 +1316,6 @@
 		margin: 4px 0;
 		flex-shrink: 0;
 	}
-	/* The vertical day rail is a ≥1200px-only affordance; below that width it is
-	   fully removed and the horizontal .daynav + hero .vtabs drive navigation. */
-	.day-rail {
-		display: none;
-	}
 	.scroll-area {
 		padding-bottom: 20px;
 	}
@@ -1888,9 +1883,19 @@
 		.shell {
 			max-width: 1060px;
 		}
+		/* The horizontal day nav + hero variant tabs are superseded by the desktop
+		   sidebar's day rail at every width ≥960px; hide them here (they return
+		   below 960px, where the sidebar is gone and these drive navigation). */
+		.daynav,
+		.daynav-sentinel,
+		.vtabs {
+			display: none;
+		}
 		.day-content {
 			display: grid;
-			grid-template-columns: minmax(0, 1fr) 420px;
+			/* Map narrows on the 960–1199 tier so the timeline keeps its width next
+			   to the 240px sidebar; it returns to a fixed 420px at ≥1200 (below). */
+			grid-template-columns: minmax(0, 1fr) clamp(320px, 30vw, 420px);
 			gap: 0 24px;
 			padding: 0 24px 8px;
 			align-items: start;
@@ -1927,8 +1932,9 @@
 			grid-row: 1 / 5;
 			align-self: start;
 			position: sticky;
-			/* Clear the stuck day nav: pills row (~48px) + context line (~22px). */
-			top: 74px;
+			/* No sticky day nav to clear at ≥960px anymore; this offset keeps the map
+			   clear of the demo page's sticky "sample trip" banner. */
+			top: 72px;
 		}
 		.route-card {
 			display: block;
@@ -1939,190 +1945,14 @@
 		}
 	}
 
-	/* ── Wide desktop: vertical day rail (≥1200px) ──
-	   The shell widens and becomes a 2-track grid: a ~240px left rail column and
-	   the existing content column (which keeps its own inner two-pane grid — the
-	   timeline + sticky map — untouched, so the keyed .day-content fly transition
-	   still animates). The rail REPLACES both the horizontal .daynav and the hero
-	   .vtabs; those are hidden here. The rail is itself sticky + independently
-	   scrollable so long trips (16+ days) never push the map out of view. */
+	/* ── Wide desktop (≥1200px) ──
+	   The 240px sidebar leaves room for the full-width map again, so the day body's
+	   right column returns to a fixed 420px (it was narrowed on the 960–1199 tier).
+	   The former vertical day rail + shell grid moved out of TripView entirely — the
+	   persistent sidebar now carries the day rail at every width ≥960px. */
 	@media (min-width: 1200px) {
-		.shell {
-			max-width: 1340px;
-			display: grid;
-			grid-template-columns: 240px minmax(0, 1fr);
-			column-gap: 28px;
-			align-items: start;
-		}
-		/* Hero spans both tracks; the day nav + its sentinel + the hero variant
-		   tabs are all superseded by the rail at this width. */
-		.hero {
-			grid-column: 1 / -1;
-		}
-		.daynav,
-		.daynav-sentinel {
-			display: none;
-		}
-		.vtabs {
-			display: none;
-		}
-		.scroll-area {
-			grid-column: 2;
-			min-width: 0;
-		}
-		.day-rail {
-			grid-column: 1;
-			display: flex;
-			flex-direction: column;
-			gap: 20px;
-			/* Sticky + independently scrollable. The offset clears a page-level
-			   sticky bar (e.g. the demo banner) that may sit above the shell; the
-			   global site header is not sticky, so it simply scrolls away. */
-			position: sticky;
-			top: 72px;
-			max-height: calc(100vh - 88px);
-			overflow-y: auto;
-			overflow-x: hidden;
-			scrollbar-width: thin;
-			padding: 16px 6px 8px 16px;
-			box-sizing: border-box;
-		}
-		.rail-seg {
-			display: flex;
-			flex-direction: column;
-			gap: 4px;
-		}
-		.rail-seg-hdr {
-			padding: 0 6px 2px;
-		}
-		.rail-seg-title {
-			font-size: 10px;
-			letter-spacing: 0.14em;
-			text-transform: uppercase;
-			font-weight: 600;
-			color: var(--accent-text);
-		}
-		.rail-seg-sub {
-			font-size: 10.5px;
-			color: var(--text-muted);
-			margin-top: 1px;
-			line-height: 1.3;
-		}
-		.rail-pills {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 4px;
-			margin: 2px 4px 6px;
-		}
-		.rail-pill {
-			border: 1px solid var(--border);
-			background: var(--surface);
-			color: var(--text-muted);
-			border-radius: 20px;
-			padding: 4px 10px;
-			font-family: inherit;
-			font-size: 11px;
-			cursor: pointer;
-			line-height: 1.2;
-		}
-		.rail-pill.on {
-			background: var(--accent);
-			border-color: var(--accent);
-			color: #fff;
-			font-weight: 500;
-		}
-		@media (hover: hover) {
-			.rail-pill:not(.on):hover {
-				border-color: var(--accent-text);
-				color: var(--accent-text);
-				background: color-mix(in srgb, var(--accent-text) 8%, transparent);
-			}
-		}
-		.rail-days {
-			display: flex;
-			flex-direction: column;
-			gap: 2px;
-		}
-		.rail-day {
-			display: flex;
-			flex-direction: column;
-			gap: 1px;
-			width: 100%;
-			min-height: 40px;
-			box-sizing: border-box;
-			padding: 6px 10px;
-			border: none;
-			border-radius: 9px;
-			background: none;
-			cursor: pointer;
-			text-align: left;
-			font-family: inherit;
-			color: var(--text);
-		}
-		.rail-day-date {
-			display: flex;
-			align-items: center;
-			gap: 5px;
-			font-size: 10px;
-			letter-spacing: 0.04em;
-			text-transform: uppercase;
-			color: var(--stone);
-			font-variant-numeric: tabular-nums;
-		}
-		.rail-day-title {
-			font-family: 'Playfair Display', serif;
-			font-size: 13px;
-			font-weight: 500;
-			line-height: 1.25;
-			color: var(--ink);
-			display: -webkit-box;
-			-webkit-line-clamp: 2;
-			line-clamp: 2;
-			-webkit-box-orient: vertical;
-			overflow: hidden;
-		}
-		.rail-today-dot {
-			width: 5px;
-			height: 5px;
-			border-radius: 50%;
-			background: var(--accent-text);
-			flex-shrink: 0;
-		}
-		.rail-day.on {
-			background: var(--accent);
-		}
-		.rail-day.on .rail-day-date {
-			color: rgba(255, 255, 255, 0.75);
-		}
-		.rail-day.on .rail-day-title {
-			color: #fff;
-		}
-		.rail-day.on .rail-today-dot {
-			background: #fff;
-		}
-		@media (hover: hover) {
-			.rail-day:not(.on):hover {
-				background: color-mix(in srgb, var(--accent-text) 8%, transparent);
-			}
-		}
-		@media (prefers-reduced-motion: no-preference) {
-			.rail-pill,
-			.rail-day {
-				transition:
-					background 0.15s ease,
-					color 0.15s ease,
-					border-color 0.15s ease,
-					transform 0.1s ease;
-			}
-			.rail-pill:active,
-			.rail-day:active {
-				transform: scale(0.98);
-			}
-		}
-		/* No stuck daynav to clear at this width — align the sticky map with the
-		   rail's sticky top. */
-		.day-aside {
-			top: 72px;
+		.day-content {
+			grid-template-columns: minmax(0, 1fr) 420px;
 		}
 	}
 </style>

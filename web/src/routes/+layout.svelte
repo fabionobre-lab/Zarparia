@@ -9,6 +9,7 @@
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
 	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
+	import Sidebar from '$lib/nav/Sidebar.svelte';
 	import FeedbackDialog from '$lib/FeedbackDialog.svelte';
 	import { initLocale, t } from '$lib/i18n/store.svelte';
 	import { initTheme } from '$lib/theme/store.svelte';
@@ -38,6 +39,31 @@
 		'/feedback'
 	]);
 	const mobileHeaderless = $derived(MOBILE_HEADERLESS_ROUTES.has(page.route.id ?? ''));
+
+	// ── Desktop (≥960px) sidebar routes ──
+	// On these routes a persistent left sidebar replaces the top header entirely
+	// at ≥960px (the header keeps its normal mobile behaviour via mobileHeaderless
+	// below the breakpoint). Public / one-off pages (signed-out landing, the
+	// pending gate on `/`, legal, guide, roadmap, join, OAuth consent) keep the
+	// top header at every width. `/` is special: the sidebar is the approved
+	// signed-in home only — the signed-out landing and the pending/rejected gate
+	// (also route id `/`) keep the header. Derived from route id + session here
+	// (not signalled up from children) so the first SSR paint is already correct,
+	// exactly like mobileHeaderless.
+	const SIDEBAR_ROUTES = new Set([
+		'/demo',
+		'/trips/[id]',
+		'/trips/[id]/edit',
+		'/trips/new',
+		'/trips/import',
+		'/account',
+		'/feedback',
+		'/admin/approvals'
+	]);
+	const routeId = $derived(page.route.id ?? '');
+	const showSidebar = $derived(
+		SIDEBAR_ROUTES.has(routeId) || (routeId === '/' && data.user?.status === 'approved')
+	);
 
 	// Seed the UI locale synchronously (SSR + client) before children render, so
 	// the first paint is in the right language and there is no flash of English.
@@ -130,58 +156,87 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<header class:mobile-hidden={mobileHeaderless}>
-	<div class="bar" class:signed-in={!!data.user}>
-		<div class="left">
-			<a class="brand" href="/" aria-label="Zarparia — home">
-				{@html markSvg}
-				<span class="wordmark">{@html wordSvg}</span>
-			</a>
-			<LocaleSwitcher />
-			<ThemeToggle />
-		</div>
-		<nav>
-			{#if data.user}
-				{#if data.user.status === 'approved'}
-					<button
-						type="button"
-						class="feedback"
-						onclick={() => (feedbackOpen = true)}
-						aria-label={t('feedback.button')}
-						title={t('feedback.button')}
-					>
-						<svg class="feedback-icon" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M4 5.5h16a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9.5L5 19.5V16H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
-						</svg>
-						<span class="feedback-label">{t('feedback.button')}</span>
-					</button>
-					<a class="account-link" href="/account">{t('header.account')}</a>
-				{/if}
-				<span class="who">{data.user.name ?? data.user.email}</span>
-				<form method="POST" action="/auth/logout" onsubmit={onLogout}>
-					<button type="submit" class="signout">{t('header.signOut')}</button>
-				</form>
-			{:else}
-				<a class="signin" href="/auth/login/google">
-					<span class="signin-full">{t('header.signInGoogle')}</span>
-					<span class="signin-short">{t('header.signIn')}</span>
-				</a>
-			{/if}
-		</nav>
-	</div>
-</header>
+<div class="layout" class:sidebar-mode={showSidebar}>
+	{#if showSidebar}
+		<Sidebar user={data.user} onFeedback={() => (feedbackOpen = true)} />
+	{/if}
 
-{@render children()}
+	<div class="page-col">
+		<header class:mobile-hidden={mobileHeaderless} class:desktop-hidden={showSidebar}>
+			<div class="bar" class:signed-in={!!data.user}>
+				<div class="left">
+					<a class="brand" href="/" aria-label="Zarparia — home">
+						{@html markSvg}
+						<span class="wordmark">{@html wordSvg}</span>
+					</a>
+					<LocaleSwitcher />
+					<ThemeToggle />
+				</div>
+				<nav>
+					{#if data.user}
+						{#if data.user.status === 'approved'}
+							<button
+								type="button"
+								class="feedback"
+								onclick={() => (feedbackOpen = true)}
+								aria-label={t('feedback.button')}
+								title={t('feedback.button')}
+							>
+								<svg class="feedback-icon" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M4 5.5h16a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9.5L5 19.5V16H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
+								</svg>
+								<span class="feedback-label">{t('feedback.button')}</span>
+							</button>
+							<a class="account-link" href="/account">{t('header.account')}</a>
+						{/if}
+						<span class="who">{data.user.name ?? data.user.email}</span>
+						<form method="POST" action="/auth/logout" onsubmit={onLogout}>
+							<button type="submit" class="signout">{t('header.signOut')}</button>
+						</form>
+					{:else}
+						<a class="signin" href="/auth/login/google">
+							<span class="signin-full">{t('header.signInGoogle')}</span>
+							<span class="signin-short">{t('header.signIn')}</span>
+						</a>
+					{/if}
+				</nav>
+			</div>
+		</header>
+
+		{@render children()}
+	</div>
+</div>
 
 {#if data.user && data.user.status === 'approved'}
 	<FeedbackDialog bind:open={feedbackOpen} />
 {/if}
 
 <style>
+	/* ── App shell ──
+	   Default (mobile, and every desktop route that keeps the top header): a plain
+	   block flow — header then page. On a desktop sidebar route the shell becomes a
+	   two-track grid (fixed 240px sidebar + fluid content) at ≥960px; below that it
+	   stays block flow and the sidebar removes itself, so mobile is untouched. */
+	.page-col {
+		min-width: 0;
+	}
+	@media (min-width: 960px) {
+		.layout.sidebar-mode {
+			display: grid;
+			grid-template-columns: 240px minmax(0, 1fr);
+			align-items: start;
+		}
+	}
 	header {
 		border-bottom: 1px solid var(--hairline);
 		font-family: system-ui, sans-serif;
 		background: var(--surface);
+	}
+	/* Desktop sidebar routes: the sidebar replaces the header entirely at ≥960px. */
+	@media (min-width: 960px) {
+		header.desktop-hidden {
+			display: none;
+		}
 	}
 	.bar {
 		display: flex;
