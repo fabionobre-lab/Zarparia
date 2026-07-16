@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS oauth_tokens;
+DROP TABLE IF EXISTS oauth_codes;
+DROP TABLE IF EXISTS oauth_clients;
+DROP TABLE IF EXISTS trip_photos;
+DROP TABLE IF EXISTS feedback;
+DROP TABLE IF EXISTS trip_share_links;
+DROP TABLE IF EXISTS trip_shares;
+DROP TABLE IF EXISTS trips;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;

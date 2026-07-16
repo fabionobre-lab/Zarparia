@@ -1,0 +1,21 @@
+{
+	"name": "zarparia-backup",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev --test-scheduled",
+		"deploy": "wrangler deploy",
+		"cf-typegen": "wrangler types",
+		"check": "tsc --noEmit",
+		"db:migrate:local": "wrangler d1 migrations apply trips --local",
+		"d1:exec:local": "wrangler d1 execute trips --local",
+		"backup:dev": "wrangler dev --test-scheduled",
+		"backup:verify-local": "node scripts/verify-local.mjs",
+		"restore": "node restore.mjs"
+	},
+	"devDependencies": {
+		"typescript": "^6.0.3",
+		"wrangler": "^4.111.0"
+	}
+}

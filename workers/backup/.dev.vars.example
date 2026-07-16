@@ -1,0 +1,5 @@
+# Copy to `.dev.vars` (gitignored) for local development.
+# Bearer token for the manual-trigger endpoint (POST /trigger). Any long
+# random string is fine for local dev; production uses a real secret set via
+# `npx wrangler secret put TRIGGER_TOKEN` (never commit the value).
+TRIGGER_TOKEN=local-dev-trigger-token

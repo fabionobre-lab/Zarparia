@@ -1,0 +1,35 @@
+{
+	"$schema": "./node_modules/wrangler/config-schema.json",
+	"name": "zarparia-backup",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-07-16",
+	"observability": { "enabled": true },
+
+	// SAME D1 database as web/wrangler.jsonc (binding DB) — read-only usage here.
+	// migrations_dir points at the web app's migrations so `wrangler d1 migrations
+	// apply --local` can bootstrap a local dev DB with the real schema; this worker
+	// never writes to DB in production, only SELECTs.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "trips",
+			"database_id": "92ea4a9d-25c9-4039-912b-b711af1da8a6",
+			"migrations_dir": "../../web/migrations"
+		}
+	],
+
+	// Private backup bucket. Does NOT exist yet — config only.
+	// Orchestrator must run: npx wrangler r2 bucket create zarparia-backups
+	// (and set the lifecycle rule — see README.md) before first deploy.
+	"r2_buckets": [
+		{
+			"binding": "BACKUPS",
+			"bucket_name": "zarparia-backups"
+		}
+	],
+
+	// Daily at 03:00 UTC — quiet hour, low traffic.
+	"triggers": {
+		"crons": ["0 3 * * *"]
+	}
+}
