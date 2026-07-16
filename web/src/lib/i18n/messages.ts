@@ -39,11 +39,23 @@ export interface Messages {
 	// ── Signed-out landing (+page.svelte) ──
 	'landing.tagline': string;
 	'landing.tryDemo': string;
+	'landing.tryDemoSub': string;
 
 	// ── Public demo trip (routes/demo/+page.svelte) ──
 	'demo.banner': string;
 	'demo.signInCta': string;
 	'demo.back': string;
+	'demo.about': string;
+	'demo.aboutTag': string;
+	'demo.aboutTitle': string;
+	'demo.aboutIntro': string;
+	'demo.aboutInteractive': string;
+	'demo.tryHeading': string;
+	'demo.tryPlans': string;
+	'demo.tryLanguage': string;
+	'demo.trySchedule': string;
+	'demo.startExploring': string;
+	'demo.close': string;
 
 	// ── Home / trip list (+page.svelte) ──
 	'home.pageTitle': string;
@@ -402,10 +414,24 @@ const enGB: Messages = {
 
 	'landing.tagline': 'A place for your travel itineraries.',
 	'landing.tryDemo': 'Try the demo',
+	'landing.tryDemoSub': 'Explore a sample trip — no account needed.',
 
 	'demo.banner': "You're viewing a sample trip — everything is interactive but nothing is saved.",
 	'demo.signInCta': 'Sign in with Google',
 	'demo.back': '← Back',
+	'demo.about': 'About',
+	'demo.aboutTag': 'Demo',
+	'demo.aboutTitle': 'Meet Alex & Sam',
+	'demo.aboutIntro':
+		"You're looking at the itinerary of Alex and Sam, a fictional couple spending a week in Scotland in April 2026 — a few days in Edinburgh's Old Town, then a road trip through the Highlands. The places are real; the couple and their trip are invented.",
+	'demo.aboutInteractive':
+		'The demo is fully interactive. Browse anything you like — nothing is saved, and nothing here touches a real account.',
+	'demo.tryHeading': 'Things to try',
+	'demo.tryPlans': 'Highlands: flip between the Coastal route and the Whisky route to compare two plans for the same days.',
+	'demo.tryLanguage': 'Language: the whole trip is bilingual — switch it between English and Portuguese.',
+	'demo.trySchedule': 'Days: open any day for the hour-by-hour schedule, map links and travel notes.',
+	'demo.startExploring': 'Start exploring',
+	'demo.close': 'Close',
 
 	'home.pageTitle': 'Zarparia',
 	'home.yourTrips': 'Your trips',
@@ -753,10 +779,24 @@ const ptBR: Messages = {
 
 	'landing.tagline': 'Um lugar para os seus roteiros de viagem.',
 	'landing.tryDemo': 'Ver demonstração',
+	'landing.tryDemoSub': 'Explore uma viagem de exemplo — sem necessidade de conta.',
 
 	'demo.banner': 'Você está vendo uma viagem de exemplo — tudo é interativo, mas nada é salvo.',
 	'demo.signInCta': 'Entrar com o Google',
 	'demo.back': '← Voltar',
+	'demo.about': 'Sobre',
+	'demo.aboutTag': 'Demonstração',
+	'demo.aboutTitle': 'Conheça Alex & Sam',
+	'demo.aboutIntro':
+		'Você está vendo o roteiro de Alex e Sam, um casal fictício passando uma semana na Escócia em abril de 2026 — alguns dias na Cidade Velha de Edimburgo e depois uma road trip pelas Terras Altas. Os lugares são reais; o casal e a viagem são invenção.',
+	'demo.aboutInteractive':
+		'A demonstração é totalmente interativa. Explore o que quiser — nada é salvo, e nada aqui toca uma conta real.',
+	'demo.tryHeading': 'Coisas para experimentar',
+	'demo.tryPlans': 'Terras Altas: alterne entre a Rota costeira e a Rota do whisky para comparar dois planos para os mesmos dias.',
+	'demo.tryLanguage': 'Idioma: a viagem inteira é bilíngue — alterne entre inglês e português.',
+	'demo.trySchedule': 'Dias: abra qualquer dia para ver a programação hora a hora, links de mapa e notas de transporte.',
+	'demo.startExploring': 'Começar a explorar',
+	'demo.close': 'Fechar',
 
 	'home.pageTitle': 'Viagens',
 	'home.yourTrips': 'Suas viagens',
