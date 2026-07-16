@@ -3,6 +3,8 @@
 	import { t, formatDateRange } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import { getNow } from '$lib/now';
+	import crestSvg from '$lib/assets/zarparia-crest.svg?raw';
+	import wordmarkSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
 	import {
 		type Trip,
 		type Segment,
@@ -186,14 +188,30 @@
 			</div>
 		{/if}
 	{:else}
-		<h1>Zarparia</h1>
-		<p>{t('landing.tagline')}</p>
-		<div class="landing-actions">
-			<a class="landing-signin" href="/auth/login/google">{t('header.signInGoogle')}</a>
-			<a class="landing-demo" href="/demo">{t('landing.tryDemo')}</a>
-		</div>
-		<div class="landing-lang">
-			<LocaleSwitcher />
+		<div class="auth-shell">
+			<div class="auth-card">
+				<div class="auth-card-top">
+					<LocaleSwitcher />
+				</div>
+				<div class="auth-lockup">
+					<span class="auth-crest">{@html crestSvg}</span>
+					<span class="auth-wordmark">{@html wordmarkSvg}</span>
+					<p class="auth-tagline">{t('landing.tagline')}</p>
+				</div>
+				<a class="auth-google-btn" href="/auth/login/google">
+					<svg class="google-g" aria-hidden="true" viewBox="0 0 18 18" width="18" height="18">
+						<path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z" />
+						<path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.98v2.33A9 9 0 0 0 9 18z" />
+						<path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.16.28-1.7V4.97H.98A9 9 0 0 0 0 9c0 1.45.35 2.83.98 4.03l2.97-2.33z" />
+						<path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .98 4.97l2.97 2.33C4.66 5.17 6.65 3.58 9 3.58z" />
+					</svg>
+					{t('header.signInGoogle')}
+				</a>
+				<a class="auth-demo-callout" href="/demo">
+					<span class="auth-demo-title">{t('landing.tryDemo')}</span>
+					<span class="auth-demo-sub">{t('landing.tryDemoSub')}</span>
+				</a>
+			</div>
 		</div>
 	{/if}
 </main>
@@ -356,37 +374,118 @@
 		font-size: 0.8rem;
 		color: rgba(255, 255, 255, 0.78);
 	}
-	.landing-actions {
+	/* Signed-out landing: a single centered auth card rather than a hero +
+	   pill row. The site header already shows the brand mark for signed-out
+	   visitors too, so the card lockup can stay the visual focus without
+	   duplicating a full-bleed hero above it. */
+	.auth-shell {
 		display: flex;
-		flex-wrap: wrap;
 		align-items: center;
-		gap: 0.65rem;
-		margin-top: 0.75rem;
+		justify-content: center;
+		min-height: calc(100dvh - 6rem);
+		padding: 1.5rem 0;
 	}
-	.landing-signin,
-	.landing-demo {
-		font-size: 0.9rem;
-		text-decoration: none;
-		border-radius: 999px;
-		padding: 0.55rem 1.2rem;
-		font-weight: 600;
-	}
-	.landing-signin {
-		color: #fff;
-		background: var(--accent);
-		border: 1px solid var(--accent);
-	}
-	.landing-demo {
-		color: var(--accent-strong);
-		border: 1px solid var(--hairline-strong);
+	.auth-card {
+		position: relative;
+		width: 100%;
+		max-width: 400px;
 		background: var(--surface);
-		font-weight: 500;
+		border: 1px solid var(--hairline);
+		border-radius: 16px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		padding: 2rem;
 	}
-	.landing-demo:hover {
+	.auth-card-top {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 0.5rem;
+	}
+	.auth-lockup {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.6rem;
+		margin-bottom: 1.75rem;
+	}
+	.auth-crest :global(svg) {
+		display: block;
+		width: 64px;
+		height: 64px;
+	}
+	.auth-wordmark :global(svg) {
+		display: block;
+		height: 20px;
+		width: auto;
+		color: var(--text);
+	}
+	.auth-tagline {
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		margin: 0;
+	}
+	.auth-google-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.6rem;
+		width: 100%;
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: none;
+		color: var(--text);
+		background: var(--surface);
+		border: 1px solid var(--hairline-strong);
+		border-radius: 10px;
+		padding: 0.7rem 1rem;
+		box-sizing: border-box;
+	}
+	.auth-google-btn:hover {
 		background: var(--surface-sunken);
 	}
-	.landing-lang {
-		margin-top: 1.5rem;
+	.google-g {
+		flex-shrink: 0;
+	}
+	.auth-demo-callout {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 0.15rem;
+		text-decoration: none;
+		margin-top: 1rem;
+		padding: 0.5rem;
+	}
+	.auth-demo-title {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--accent-strong);
+	}
+	.auth-demo-sub {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+	.auth-demo-callout:hover .auth-demo-title {
+		text-decoration: underline;
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.auth-google-btn {
+			transition:
+				transform 0.1s ease,
+				background 0.15s ease;
+		}
+		.auth-google-btn:active {
+			transform: scale(0.98);
+		}
+	}
+	@media (max-width: 460px) {
+		.auth-shell {
+			padding: 1rem 0.5rem;
+		}
+		.auth-card {
+			padding: 1.5rem 1.25rem;
+			border-radius: 14px;
+		}
 	}
 	.cards {
 		margin-top: 1.25rem;
