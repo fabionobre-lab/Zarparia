@@ -7,7 +7,7 @@
  * Layout — shield at left (height 81 units, y 10..91), wordmark Georgia
  * Bold 66 at x=102 baseline 56 with the four-point star as the dotless-i
  * tittle, tagline Georgia Regular 30 centred under the wordmark span at
- * baseline 84.
+ * baseline 88 (cleared below the wordmark's p-descender).
  *
  * Build-time tool, not shipped. Usage (Windows, Georgia in C:\Windows\Fonts):
  *   npm i -D opentype.js   # one-off, or npx
@@ -78,7 +78,10 @@ const wordCx = 102 + advL / 2;             // centre of wordmark span
 
 const WM_L = path(bold, WORD, 102, 56, 66);
 const WM_S = path(bold, WORD, 0, 52, 48);
-const TAG_P = path(reg, TAG, wordCx - advT / 2, 84, 30);
+// baseline 88 (not the reference 84): the wordmark's "p" descender reaches
+// y=70.5 and would graze the tagline's x-height tops at 84 — "Zarparıa" has
+// descenders where the reference wordmark had none.
+const TAG_P = path(reg, TAG, wordCx - advT / 2, 88, 30);
 
 function lockup(pal, withTag) {
   const label = withTag ? 'Zarparia — Chart your journey' : 'Zarparia';
