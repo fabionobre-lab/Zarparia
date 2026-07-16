@@ -5,6 +5,7 @@ import { getPhotosBucket } from '$lib/server/photos';
 import { requireUser } from '$lib/server/guards';
 import { deleteAccount } from '$lib/server/account';
 import { deleteSessionCookie } from '$lib/server/session';
+import { clearPhotosTokenCookie } from '$lib/server/googlephotos';
 
 /** GDPR erasure — full cascade delete of the requesting user's account (see
  *  deleteAccount for the exact order/idempotency guarantees). Requires a
@@ -29,6 +30,9 @@ export const DELETE: RequestHandler = async ({ platform, locals, request, cookie
 	// this clears the browser's cookie too so the client doesn't keep sending
 	// a now-meaningless token.
 	deleteSessionCookie(cookies);
+	// Same reasoning for the Google Photos access-token cookie: the account
+	// (and anything it could authorize) is gone, so nothing should reuse it.
+	clearPhotosTokenCookie(cookies);
 
 	return json({ ok: true });
 };

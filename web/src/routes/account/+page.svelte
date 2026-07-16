@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t, locale } from '$lib/i18n/store.svelte';
+	import { purgeOnAccountDeleted, safeLocalStorage } from '$lib/client/userCacheReset';
 
 	let { data } = $props();
 	// This page never re-navigates without a full reload (deletion redirects
@@ -53,6 +54,14 @@
 				body: JSON.stringify({ confirm: confirmText.trim() })
 			});
 			if (res.ok) {
+				// The account is gone server-side; the offline caches (SSR pages,
+				// photos) and the last-user marker must not outlive it on this
+				// device. Awaited (and never-throwing) before navigating away, so
+				// the redirect can't abandon the purge mid-flight.
+				await purgeOnAccountDeleted({
+					caches: 'caches' in window ? window.caches : null,
+					storage: safeLocalStorage()
+				});
 				// The account (and its session row) is gone server-side; land on the
 				// signed-out home with a brief notice rather than staying on a page
 				// whose data no longer exists.

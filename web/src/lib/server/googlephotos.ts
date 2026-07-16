@@ -19,10 +19,16 @@ export const PHOTOS_SCOPE = 'https://www.googleapis.com/auth/photospicker.mediai
 
 const PICKER_BASE = 'https://photospicker.googleapis.com/v1';
 
-export function setPhotosTokenCookie(cookies: Cookies, token: string, expiresAt: Date): void {
+/** The cookie value is `<userId>.<token>` (httpOnly, so this format is
+ *  server-internal): binding the token to the user it was issued to means an
+ *  uncleared cookie is inert for anyone else who signs in on the same
+ *  browser, even if a sign-out path somewhere fails to clear it. `userId`
+ *  values are UUIDs (see users.ts) and never contain '.', while Google access
+ *  tokens do (e.g. "ya29.a0Af...") — splitting on the FIRST '.' is safe. */
+export function setPhotosTokenCookie(cookies: Cookies, userId: string, token: string, expiresAt: Date): void {
 	// 60s safety margin so the cookie never outlives the token.
 	const maxAge = Math.max(0, Math.floor((expiresAt.getTime() - Date.now()) / 1000) - 60);
-	cookies.set(PHOTOS_TOKEN_COOKIE, token, {
+	cookies.set(PHOTOS_TOKEN_COOKIE, `${userId}.${token}`, {
 		path: '/',
 		httpOnly: true,
 		sameSite: 'lax',
@@ -30,8 +36,21 @@ export function setPhotosTokenCookie(cookies: Cookies, token: string, expiresAt:
 	});
 }
 
-export function getPhotosToken(cookies: Cookies): string | null {
-	return cookies.get(PHOTOS_TOKEN_COOKIE) ?? null;
+/** Returns the Picker access token for `userId`, or null if there is none —
+ *  including when the cookie belongs to a *different* user (a stale cookie
+ *  left behind by an incomplete sign-out, or another account's session on a
+ *  shared browser). A mismatch also proactively clears the cookie so it
+ *  doesn't linger. See setPhotosTokenCookie for the `<userId>.<token>` format. */
+export function getPhotosToken(cookies: Cookies, userId: string): string | null {
+	const raw = cookies.get(PHOTOS_TOKEN_COOKIE);
+	if (!raw) return null;
+	const dot = raw.indexOf('.');
+	const uid = dot === -1 ? '' : raw.slice(0, dot);
+	if (dot === -1 || uid !== userId) {
+		clearPhotosTokenCookie(cookies);
+		return null;
+	}
+	return raw.slice(dot + 1);
 }
 
 export function clearPhotosTokenCookie(cookies: Cookies): void {

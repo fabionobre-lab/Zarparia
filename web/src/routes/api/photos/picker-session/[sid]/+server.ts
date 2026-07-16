@@ -10,8 +10,8 @@ import {
 /** Poll a picking session: done once the user hit "Done" in Google Photos
  *  (`mediaItemsSet`). Proxied so the OAuth token never reaches the client. */
 export const GET: RequestHandler = async ({ locals, cookies, params }) => {
-	requireUser(locals);
-	const token = getPhotosToken(cookies);
+	const user = requireUser(locals);
+	const token = getPhotosToken(cookies, user.id);
 	if (!token) return json({ reason: 'reconnect' }, { status: 401 });
 
 	const res = await getPickerSession(token, params.sid);

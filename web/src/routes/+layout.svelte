@@ -11,6 +11,7 @@
 	import FeedbackDialog from '$lib/FeedbackDialog.svelte';
 	import { initLocale, t } from '$lib/i18n/store.svelte';
 	import { initTheme } from '$lib/theme/store.svelte';
+	import { purgeUserCaches, syncUserMarker, safeLocalStorage } from '$lib/client/userCacheReset';
 
 	let { children, data } = $props();
 
@@ -80,13 +81,34 @@
 
 	// Cached pages and photos hold the previous user's data; drop both on logout.
 	// The external cache (map tiles, weather, Wikipedia) isn't per-user, so it stays.
-	function onLogout() {
-		if (browser && 'caches' in window) {
-			caches.delete('runtime');
-			caches.delete('photos');
+	// AWAITED before the form is submitted: a fire-and-forget delete raced the
+	// logout navigation and could be abandoned mid-purge, leaving the previous
+	// user's trips readable offline by the next account on this device.
+	// try/finally guarantees the logout itself always proceeds.
+	async function onLogout(event: SubmitEvent) {
+		event.preventDefault();
+		const form = event.currentTarget as HTMLFormElement;
+		try {
+			await purgeUserCaches(browser && 'caches' in window ? window.caches : null);
+		} finally {
+			form.submit(); // native submit: does not re-fire this handler
 		}
-		// no preventDefault: the normal POST to /auth/logout still proceeds.
 	}
+
+	// Detected user change (A never signed out; B signs in on this browser):
+	// purge A's cached pages/photos before recording B as the device's last
+	// user. A missing session deliberately does NOT purge — that would destroy
+	// the owner's offline access, the whole point of the PWA caches.
+	// (Out of scope: B browsing while A's session cookie is still live — see
+	// src/lib/client/userCacheReset.ts.)
+	$effect(() => {
+		const uid = data.user?.id;
+		if (!browser || !uid) return;
+		void syncUserMarker(uid, {
+			caches: 'caches' in window ? window.caches : null,
+			storage: safeLocalStorage()
+		});
+	});
 </script>
 
 <svelte:head>

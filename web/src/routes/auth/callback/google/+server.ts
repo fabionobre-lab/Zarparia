@@ -7,8 +7,14 @@ import { upsertGoogleUser } from '$lib/server/users';
 import { createSession, generateSessionToken, setSessionCookie } from '$lib/server/session';
 import { takeReturnTo } from '$lib/server/returnto';
 import { setPhotosTokenCookie } from '$lib/server/googlephotos';
+import { limit, clientIp, ipKey } from '$lib/server/ratelimit';
 
-export const GET: RequestHandler = async ({ locals, platform, url, cookies }) => {
+export const GET: RequestHandler = async ({ locals, platform, url, cookies, request }) => {
+	// Shared 20/min-per-IP budget with /auth/login/google — see that file.
+	const db = getDb(platform);
+	const rl = await limit(db, ipKey(clientIp(request), 'auth-google'), { max: 20, windowSeconds: 60 });
+	if (!rl.allowed) throw error(429, 'Too many requests. Please slow down.');
+
 	const code = url.searchParams.get('code');
 	const state = url.searchParams.get('state');
 	const storedState = cookies.get('google_oauth_state');
@@ -44,7 +50,7 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies }) =>
 		// token for the existing session and return to the trip page.
 		if (!locals.user) redirect(302, '/');
 		const expiresAt = accessTokenExpiresAt ?? new Date(Date.now() + 30 * 60 * 1000);
-		setPhotosTokenCookie(cookies, accessToken, expiresAt);
+		setPhotosTokenCookie(cookies, locals.user.id, accessToken, expiresAt);
 		cookies.delete('google_oauth_state', { path: '/' });
 		cookies.delete('google_code_verifier', { path: '/' });
 		redirect(303, takeReturnTo(cookies));
@@ -56,7 +62,6 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies }) =>
 	if (profile.email_verified === false)
 		throw error(403, 'Your Google account email is unverified. Verify it with Google and try again.');
 
-	const db = getDb(platform);
 	const user = await upsertGoogleUser(db, profile, platform);
 	const token = generateSessionToken();
 	await createSession(db, token, user.id);

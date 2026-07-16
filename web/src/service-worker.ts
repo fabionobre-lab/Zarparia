@@ -1,6 +1,7 @@
 /// <reference types="@sveltejs/kit" />
 /// <reference lib="webworker" />
 import { build, files, prerendered, version } from '$service-worker';
+import { RUNTIME_CACHE, PHOTOS_CACHE } from '$lib/cacheNames';
 
 // SvelteKit auto-registers this worker.
 //
@@ -18,16 +19,17 @@ import { build, files, prerendered, version } from '$service-worker';
 //    to look finished — OSM map tiles, open-meteo forecasts, Wikipedia
 //    thumbnails. Nothing here is per-user.
 //
-// RUNTIME and PHOTOS hold per-user data. `+layout.svelte` deletes both on logout
-// so the next user on this device starts clean; EXTERNAL and STATIC are shared
-// and survive.
+// RUNTIME and PHOTOS hold per-user data. Their names live in $lib/cacheNames
+// because the client purges them by name on sign-out / detected user change /
+// account deletion (see src/lib/client/userCacheReset.ts); EXTERNAL and
+// STATIC are shared and survive.
 //
 // Never cached: anything under /auth/, and every /api/ route except the photo
 // reads named above. Auth and per-user writes always go straight to the network.
 const sw = self as unknown as ServiceWorkerGlobalScope;
 const STATIC = `trips-${version}`;
-const RUNTIME = 'runtime';
-const PHOTOS = 'photos';
+const RUNTIME = RUNTIME_CACHE;
+const PHOTOS = PHOTOS_CACHE;
 const EXTERNAL = 'external';
 const OURS = new Set([STATIC, RUNTIME, PHOTOS, EXTERNAL]);
 // hashed JS/CSS + static assets (icons, manifest) + any prerendered pages

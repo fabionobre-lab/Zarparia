@@ -7,6 +7,6 @@ import { getPhotosToken } from '$lib/server/googlephotos';
  *  (The cookie's maxAge tracks the token's expiry, so presence ≈ validity;
  *  a revoked-but-unexpired token surfaces later as a reconnect error.) */
 export const GET: RequestHandler = async ({ locals, cookies }) => {
-	requireUser(locals);
-	return json({ connected: getPhotosToken(cookies) !== null });
+	const user = requireUser(locals);
+	return json({ connected: getPhotosToken(cookies, user.id) !== null });
 };

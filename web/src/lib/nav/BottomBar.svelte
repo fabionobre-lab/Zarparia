@@ -14,6 +14,7 @@
 	import { t } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import { theme, setTheme, nextTheme } from '$lib/theme/store.svelte';
+	import { purgeUserCaches } from '$lib/client/userCacheReset';
 
 	type NavItem = {
 		id: string;
@@ -68,10 +69,16 @@
 
 	// Cached pages + photos hold the previous user's data; drop both on logout —
 	// mirrors the header's onLogout so the sheet's Sign out behaves identically.
-	function onLogout() {
-		if (browser && 'caches' in window) {
-			caches.delete('runtime');
-			caches.delete('photos');
+	// AWAITED before the form is submitted (a fire-and-forget delete raced the
+	// logout navigation and could be abandoned); try/finally guarantees the
+	// logout itself always proceeds even if the Cache API fails.
+	async function onLogout(event: SubmitEvent) {
+		event.preventDefault();
+		const form = event.currentTarget as HTMLFormElement;
+		try {
+			await purgeUserCaches(browser && 'caches' in window ? window.caches : null);
+		} finally {
+			form.submit(); // native submit: does not re-fire this handler
 		}
 	}
 

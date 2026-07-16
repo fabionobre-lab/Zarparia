@@ -21,6 +21,7 @@ import {
 } from '$lib/server/photos';
 import { mapPhotoToTrip } from '$lib/photo-mapping';
 import type { Trip } from '$lib/trip-engine';
+import { limit, userKey } from '$lib/server/ratelimit';
 
 /** All photos linked to the trip (any role that can see the trip). */
 export const GET: RequestHandler = async ({ locals, platform, params }) => {
@@ -49,11 +50,18 @@ export const POST: RequestHandler = async ({ locals, platform, params, cookies, 
 	const db = getDb(platform);
 	const bucket = getPhotosBucket(platform);
 
+	// Fail fast, before the trip/token lookups: 30/min-per-user budget shared
+	// with picker-session creation (surface 'photo-picker').
+	const rl = await limit(db, userKey(user.id, 'photo-picker'), { max: 30, windowSeconds: 60 });
+	if (!rl.allowed) {
+		return json({ reason: 'rate_limited' }, { status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } });
+	}
+
 	const trip = await getTripForUser(db, user.id, params.id);
 	if (!trip) return json({ error: 'not_found' }, { status: 404 });
 	if (trip.role === 'viewer') return json({ error: 'forbidden' }, { status: 403 });
 
-	const token = getPhotosToken(cookies);
+	const token = getPhotosToken(cookies, user.id);
 	if (!token) return json({ reason: 'reconnect' }, { status: 401 });
 
 	let body: ImportBody;
@@ -73,6 +81,24 @@ export const POST: RequestHandler = async ({ locals, platform, params, cookies, 
 			return json({ reason: 'reconnect' }, { status: 401 });
 		}
 		return json({ reason: 'session_gone' }, { status: 410 });
+	}
+
+	// Daily R2-storage cap, separate from the per-minute budget above: 200
+	// imports/day/user. The exact number of R2 writes this call will cause isn't
+	// known until the page resolves (some items turn out 'existing'/'skipped'
+	// and never write to R2), so we use the page's item count as a conservative
+	// upper-bound cost estimate — a generous safety net, not precise billing.
+	const pageItemCount = (page.value.mediaItems ?? []).length;
+	const dailyRl = await limit(db, userKey(user.id, 'photo-import:day'), {
+		max: 200,
+		windowSeconds: 86400,
+		cost: pageItemCount
+	});
+	if (!dailyRl.allowed) {
+		return json(
+			{ reason: 'daily_cap_exceeded' },
+			{ status: 429, headers: { 'Retry-After': String(dailyRl.retryAfterSeconds) } }
+		);
 	}
 
 	const tripDoc = trip.doc as unknown as Trip;

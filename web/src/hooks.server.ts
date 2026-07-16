@@ -5,6 +5,7 @@ import {
 	setSessionCookie,
 	deleteSessionCookie
 } from '$lib/server/session';
+import { clearPhotosTokenCookie } from '$lib/server/googlephotos';
 import {
 	LOCALE_COOKIE,
 	LOCALE_COOKIE_MAX_AGE,
@@ -51,6 +52,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		} else {
 			event.locals.user = null;
 			deleteSessionCookie(event.cookies);
+			// The session cookie is gone; drop any leftover Photos token cookie
+			// too so it can't outlive the session it was scoped to.
+			clearPhotosTokenCookie(event.cookies);
 		}
 	} else {
 		event.locals.user = null;
