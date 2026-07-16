@@ -1,6 +1,6 @@
 /* ============================================================================
    Trips house design system — global tokens
-   Shared architecture with Nobria (same mechanism + token names; skins differ).
+   Shared architecture with a sibling app (same mechanism + token names; skins differ).
    Imported once, globally, from the root +layout.svelte.
 
    Mechanism: mode = light | dark | system.

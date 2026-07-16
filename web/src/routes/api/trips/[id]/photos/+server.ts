@@ -88,11 +88,33 @@ export const POST: RequestHandler = async ({ locals, platform, params, cookies, 
 	// known until the page resolves (some items turn out 'existing'/'skipped'
 	// and never write to R2), so we use the page's item count as a conservative
 	// upper-bound cost estimate — a generous safety net, not precise billing.
+	const DAILY_MAX = 200;
 	const pageItemCount = (page.value.mediaItems ?? []).length;
+
+	// A single batch bigger than the whole daily budget can never fit, no
+	// matter what's already been charged today. Reject it up front WITHOUT
+	// touching the counter — the client should split the selection into
+	// smaller pages and retry. (If this charged the counter like a normal
+	// denial does, it would poison the day's budget: a lone 250-photo
+	// selection would set count to 250 > 200, and every later import that
+	// day — including a retry of a properly-sized batch — would be denied
+	// too.)
+	if (pageItemCount > DAILY_MAX) {
+		return json({ reason: 'selection_too_large', max: DAILY_MAX }, { status: 413 });
+	}
+
+	// For a batch that fits within DAILY_MAX on its own, the charge must still
+	// be conditional on the *remaining* budget for the day: chargeOnDeny:false
+	// makes the increment atomic-and-guarded in the same UPSERT (see
+	// ratelimit.ts) — a batch that would push today's count over DAILY_MAX is
+	// denied without recording its cost, so a same-day retry of a smaller
+	// selection (or of this same batch, once other imports free up under the
+	// cap in a later window) can still succeed.
 	const dailyRl = await limit(db, userKey(user.id, 'photo-import:day'), {
-		max: 200,
+		max: DAILY_MAX,
 		windowSeconds: 86400,
-		cost: pageItemCount
+		cost: pageItemCount,
+		chargeOnDeny: false
 	});
 	if (!dailyRl.allowed) {
 		return json(

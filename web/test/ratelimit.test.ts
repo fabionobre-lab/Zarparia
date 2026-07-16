@@ -4,9 +4,17 @@ import { env } from 'cloudflare:workers';
 import { describe, expect, it, vi } from 'vitest';
 import { limit, clientIp, ipKey, userKey, tooManyRequests } from '../src/lib/server/ratelimit';
 import { POST as registerPOST } from '../src/routes/oauth/register/+server';
+import { POST as tripImportPOST } from '../src/routes/api/trips/import/+server';
+import { upsertGoogleUser, setUserStatus } from '../src/lib/server/users';
 
 function platformWith(db: D1Database) {
 	return { env: { DB: db } } as unknown as App.Platform;
+}
+
+async function approvedUser(email: string) {
+	const user = await upsertGoogleUser(env.DB, { sub: 'sub-' + email, email, name: 'Test User' }, undefined);
+	await setUserStatus(env.DB, user.id, 'approved');
+	return { ...user, status: 'approved' as const };
 }
 
 describe('limit()', () => {
@@ -54,6 +62,61 @@ describe('limit()', () => {
 		expect(first.allowed).toBe(true);
 		const second = await limit(env.DB, key, opts); // count 6 > 5
 		expect(second.allowed).toBe(false);
+	});
+
+	it('cost > 1 default (chargeOnDeny unset): the call that tips it over still charges, and overshoot never exceeds cost - 1', async () => {
+		// Documents the existing "always charge" semantics stay the default —
+		// only an explicit chargeOnDeny:false opts into the guarded behavior.
+		const key = 'test:default-charges-on-deny-' + crypto.randomUUID();
+		const result = await limit(env.DB, key, { max: 5, windowSeconds: 60, cost: 8 }); // 8 > 5
+		expect(result.allowed).toBe(false);
+		const row = await env.DB.prepare('SELECT count FROM rate_limits WHERE key = ?').bind(key).first<{ count: number }>();
+		expect(row?.count).toBe(8); // charged despite denial — old behavior, unchanged
+	});
+});
+
+describe('limit() — chargeOnDeny: false (guarded conditional charge)', () => {
+	it('a single call whose cost alone exceeds max is denied and the counter stays untouched (no row created); a later small call still succeeds', async () => {
+		const key = 'test:guarded-oversized-' + crypto.randomUUID();
+		const opts = { max: 200, windowSeconds: 86400, chargeOnDeny: false as const };
+
+		const big = await limit(env.DB, key, { ...opts, cost: 250 }); // 250 > 200 on an empty counter
+		expect(big.allowed).toBe(false);
+		const row = await env.DB.prepare('SELECT count FROM rate_limits WHERE key = ?').bind(key).first<{ count: number }>();
+		expect(row).toBeNull(); // nothing was ever written — the guarded INSERT arm never ran
+
+		const small = await limit(env.DB, key, { ...opts, cost: 5 });
+		expect(small.allowed).toBe(true);
+	});
+
+	it('a batch that would exceed the remaining budget is denied without charging; a smaller one that fits still succeeds afterwards', async () => {
+		const key = 'test:guarded-remaining-budget-' + crypto.randomUUID();
+		const opts = { max: 200, windowSeconds: 86400, chargeOnDeny: false as const };
+
+		const first = await limit(env.DB, key, { ...opts, cost: 180 }); // count -> 180
+		expect(first.allowed).toBe(true);
+
+		const tooMuch = await limit(env.DB, key, { ...opts, cost: 30 }); // 180 + 30 = 210 > 200
+		expect(tooMuch.allowed).toBe(false);
+		const afterDeny = await env.DB.prepare('SELECT count FROM rate_limits WHERE key = ?').bind(key).first<{ count: number }>();
+		expect(afterDeny?.count).toBe(180); // untouched by the denied call
+
+		const fits = await limit(env.DB, key, { ...opts, cost: 20 }); // 180 + 20 = 200 <= 200
+		expect(fits.allowed).toBe(true);
+		const afterFits = await env.DB.prepare('SELECT count FROM rate_limits WHERE key = ?').bind(key).first<{ count: number }>();
+		expect(afterFits?.count).toBe(200);
+	});
+
+	it('cost=1 callers are unaffected by chargeOnDeny:false — deny-at-max-plus-one behaves the same as the default', async () => {
+		const key = 'test:guarded-cost1-' + crypto.randomUUID();
+		const opts = { max: 3, windowSeconds: 60, chargeOnDeny: false as const };
+		expect((await limit(env.DB, key, opts)).allowed).toBe(true); // 1
+		expect((await limit(env.DB, key, opts)).allowed).toBe(true); // 2
+		expect((await limit(env.DB, key, opts)).allowed).toBe(true); // 3 == max
+		const fourth = await limit(env.DB, key, opts); // would be 4 > 3, guard blocks it
+		expect(fourth.allowed).toBe(false);
+		const row = await env.DB.prepare('SELECT count FROM rate_limits WHERE key = ?').bind(key).first<{ count: number }>();
+		expect(row?.count).toBe(3); // stayed at 3, not bumped to 4
 	});
 
 	it('opportunistic cleanup never deletes a live long-window row, even when triggered by a short-window call', async () => {
@@ -141,5 +204,56 @@ describe('POST /oauth/register — rate limited end to end', () => {
 		expect(sixth.headers.get('Retry-After')).toBeTruthy();
 		const body = (await sixth.json()) as { error: string };
 		expect(body.error).toBe('rate_limited');
+	});
+});
+
+describe('POST /api/trips/import — rate limited end to end', () => {
+	// The endpoint checks the rate limits before touching ANTHROPIC_API_KEY (unset
+	// in this test env, so a call that clears rate limiting still falls through to
+	// a 501 "not configured" response) — that lets this test assert the limiter
+	// fires strictly before any paid Anthropic call is attempted, without needing
+	// a real key or mocking the import pipeline.
+	const makeRequest = () =>
+		new Request('https://example.com/api/trips/import', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ text: 'Day 1: arrive in London' })
+		});
+
+	it('allows 3 imports per minute per user, then 429s with reason rate_limited on the 4th', async () => {
+		const user = await approvedUser('trip-import-min-' + crypto.randomUUID() + '@example.com');
+		for (let i = 0; i < 3; i++) {
+			const res = await tripImportPOST({
+				request: makeRequest(),
+				platform: platformWith(env.DB),
+				locals: { user }
+			} as never);
+			expect(res.status).not.toBe(429); // 501 (no ANTHROPIC_API_KEY in test env) — not rate limited
+		}
+
+		const fourth = await tripImportPOST({
+			request: makeRequest(),
+			platform: platformWith(env.DB),
+			locals: { user }
+		} as never);
+		expect(fourth.status).toBe(429);
+		expect(fourth.headers.get('Retry-After')).toBeTruthy();
+		const body = (await fourth.json()) as { error: string };
+		expect(body.error).toBe('rate_limited');
+	});
+
+	it('the daily cap (20/day/user) denies the 21st call, using the same key/limits the endpoint wires up', async () => {
+		// Driven directly against limit() with the endpoint's exact key/params,
+		// rather than 21 real HTTP round trips through the route: the route's
+		// own per-minute cap (max 3/60s, tested above) would otherwise mask the
+		// daily-cap-specific denial after the first few calls.
+		const user = await approvedUser('trip-import-day-' + crypto.randomUUID() + '@example.com');
+		const opts = { max: 20, windowSeconds: 86400 };
+		for (let i = 0; i < 20; i++) {
+			const res = await limit(env.DB, userKey(user.id, 'trip-import:day'), opts);
+			expect(res.allowed).toBe(true);
+		}
+		const twentyFirst = await limit(env.DB, userKey(user.id, 'trip-import:day'), opts);
+		expect(twentyFirst.allowed).toBe(false);
 	});
 });

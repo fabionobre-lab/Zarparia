@@ -1,7 +1,7 @@
 /**
  * Phase 5.4 — client-side error monitoring, DORMANT scaffold.
  *
- * The proven pattern (♻️ Nobria): build the scrubber before the DSN exists,
+ * The proven pattern (♻️ sibling app): build the scrubber before the DSN exists,
  * so PII can never leak — there is no window where the SDK ships events
  * without this filter already wired in. `initSentryIfConfigured()` is a
  * complete no-op (no import, no network, no bundle weight beyond this tiny

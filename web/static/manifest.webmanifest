@@ -1,7 +1,7 @@
 {
-	"name": "Zarparia — Fabio & Liana",
+	"name": "Zarparia",
 	"short_name": "Zarparia",
-	"description": "Personal travel itineraries",
+	"description": "Plan and share travel itineraries",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",

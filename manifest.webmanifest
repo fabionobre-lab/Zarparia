@@ -1,7 +1,7 @@
 {
-  "name": "Trips — Fabio & Liana",
+  "name": "Trips",
   "short_name": "Trips",
-  "description": "Trip itineraries for Fabio & Liana",
+  "description": "Plan and share travel itineraries",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

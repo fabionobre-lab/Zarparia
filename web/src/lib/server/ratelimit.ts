@@ -39,6 +39,25 @@ export interface RateLimitOptions {
 	/** How many units this call consumes. Default 1. Lets a single call (e.g. a
 	 *  photo-import batch) consume more than one unit of the budget. */
 	cost?: number;
+	/** When false, the charge is applied atomically only if the resulting count
+	 *  would stay <= max — a denied call leaves the stored counter completely
+	 *  untouched. Default true (existing "always charge, even the call that
+	 *  tips it over" semantics — harmless for cost:1 callers, since the worst
+	 *  overshoot is max+1).
+	 *
+	 *  Needed for variable-cost callers (e.g. the photo-import daily cap,
+	 *  cost = batch size): charging a denied call would permanently poison the
+	 *  window — a single oversized batch could push count past max, and every
+	 *  later call that day (including a retry of the same, now-trimmed batch)
+	 *  would keep being denied.
+	 *
+	 *  Implementation: both the INSERT arm (brand-new key) and the
+	 *  ON CONFLICT DO UPDATE arm (existing key) carry their own WHERE guard, so
+	 *  this holds even for a single call whose cost alone exceeds max against
+	 *  an empty counter — callers do not need a separate pre-check, though
+	 *  they're still free to reject an obviously-oversized request earlier for
+	 *  a cheaper/clearer error response. */
+	chargeOnDeny?: boolean;
 }
 
 export interface RateLimitResult {
@@ -51,24 +70,54 @@ export interface RateLimitResult {
  *  D1 error (returns allowed: true) — see module header for rationale. */
 export async function limit(db: D1Database, key: string, opts: RateLimitOptions): Promise<RateLimitResult> {
 	const cost = opts.cost ?? 1;
+	const chargeOnDeny = opts.chargeOnDeny ?? true;
 	try {
 		const nowSec = Math.floor(Date.now() / 1000);
 		const windowStart = nowSec - (nowSec % opts.windowSeconds);
 
-		const row = await db
-			.prepare(
-				`INSERT INTO rate_limits (key, window_start, count)
-				 VALUES (?, ?, ?)
-				 ON CONFLICT(key) DO UPDATE SET
-				   count = CASE
-				     WHEN excluded.window_start = rate_limits.window_start THEN rate_limits.count + excluded.count
-				     ELSE excluded.count
-				   END,
-				   window_start = excluded.window_start
-				 RETURNING count, window_start`
-			)
-			.bind(key, windowStart, cost)
-			.first<{ count: number; window_start: number }>();
+		// chargeOnDeny:false swaps the plain `VALUES (?, ?, ?)` INSERT source for
+		// a `SELECT ... WHERE cost <= max` one (still valid as an upsert source —
+		// the ON CONFLICT clause attaches the same way) and adds a matching WHERE
+		// guard to the DO UPDATE arm. Whichever arm actually applies, the
+		// increment only commits when it keeps the window's count <= max — a
+		// single round-trip UPSERT, still atomic (D1/SQLite executes one
+		// statement to completion with no interleaving from another request), so
+		// there is no read-then-write race window here, unlike a separate
+		// SELECT-then-conditional-UPDATE would have.
+		const stmt = chargeOnDeny
+			? db
+					.prepare(
+						`INSERT INTO rate_limits (key, window_start, count)
+						 VALUES (?, ?, ?)
+						 ON CONFLICT(key) DO UPDATE SET
+						   count = CASE
+						     WHEN excluded.window_start = rate_limits.window_start THEN rate_limits.count + excluded.count
+						     ELSE excluded.count
+						   END,
+						   window_start = excluded.window_start
+						 RETURNING count, window_start`
+					)
+					.bind(key, windowStart, cost)
+			: db
+					.prepare(
+						`INSERT INTO rate_limits (key, window_start, count)
+						 SELECT ?, ?, ?
+						 WHERE ? <= ?
+						 ON CONFLICT(key) DO UPDATE SET
+						   count = CASE
+						     WHEN excluded.window_start = rate_limits.window_start THEN rate_limits.count + excluded.count
+						     ELSE excluded.count
+						   END,
+						   window_start = excluded.window_start
+						 WHERE (CASE
+						     WHEN excluded.window_start = rate_limits.window_start THEN rate_limits.count + excluded.count
+						     ELSE excluded.count
+						   END) <= ?
+						 RETURNING count, window_start`
+					)
+					.bind(key, windowStart, cost, cost, opts.max, opts.max);
+
+		const row = await stmt.first<{ count: number; window_start: number }>();
 
 		// Opportunistic cleanup — best-effort, never allowed to affect the result.
 		// The DELETE is global (every key, every surface), so the staleness
@@ -93,6 +142,15 @@ export async function limit(db: D1Database, key: string, opts: RateLimitOptions)
 		}
 
 		if (!row) {
+			if (!chargeOnDeny) {
+				// Expected outcome, not an error: the WHERE guard blocked the
+				// update because charging this call's cost would have pushed the
+				// window over max. Nothing was written — the counter is untouched.
+				return {
+					allowed: false,
+					retryAfterSeconds: Math.max(1, windowStart + opts.windowSeconds - nowSec)
+				};
+			}
 			console.error('rate limit check failed', new Error('UPSERT returned no row'));
 			return { allowed: true, retryAfterSeconds: 0 };
 		}

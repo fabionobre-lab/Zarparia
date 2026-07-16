@@ -4,10 +4,28 @@ import { getDb } from '$lib/server/db';
 import { requireUser } from '$lib/server/guards';
 import { createTrip } from '$lib/server/trips';
 import { getAnthropicKey, importItinerary, MAX_TEXT_CHARS } from '$lib/server/import';
+import { limit, userKey } from '$lib/server/ratelimit';
 
 export const POST: RequestHandler = async ({ platform, locals, request }) => {
 	const user = requireUser(locals);
 	const db = getDb(platform);
+
+	// Each request can trigger up to two paid Anthropic calls (16k max_tokens) —
+	// mirrors the photo-import per-minute + daily budget pattern.
+	const minuteRl = await limit(db, userKey(user.id, 'trip-import:min'), { max: 3, windowSeconds: 60 });
+	if (!minuteRl.allowed) {
+		return json(
+			{ error: 'rate_limited' },
+			{ status: 429, headers: { 'Retry-After': String(minuteRl.retryAfterSeconds) } }
+		);
+	}
+	const dailyRl = await limit(db, userKey(user.id, 'trip-import:day'), { max: 20, windowSeconds: 86400 });
+	if (!dailyRl.allowed) {
+		return json(
+			{ error: 'rate_limited' },
+			{ status: 429, headers: { 'Retry-After': String(dailyRl.retryAfterSeconds) } }
+		);
+	}
 
 	const apiKey = getAnthropicKey(platform);
 	if (!apiKey) {

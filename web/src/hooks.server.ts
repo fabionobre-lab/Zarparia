@@ -32,10 +32,25 @@ function isCrossOriginFormForbidden(event: Parameters<Handle>[0]['event']): bool
 	return origin !== event.url.origin;
 }
 
+// Baseline security headers applied to every response (including error
+// responses), set directly on the Response object after resolve() rather
+// than via setHeaders() in individual load functions — the latter can only
+// reach page responses, not API routes, static assets, or error pages.
+// Deliberately no full CSP (script-src etc.) here: frame-ancestors only,
+// to keep this a low-risk addition. /oauth/authorize sets its own
+// X-Frame-Options/CSP via setHeaders for the same values; harmless overlap.
+function applySecurityHeaders(response: Response): Response {
+	response.headers.set('X-Content-Type-Options', 'nosniff');
+	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+	response.headers.set('X-Frame-Options', 'DENY');
+	response.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
+	return response;
+}
+
 /** Resolve the session cookie to a user on every request. */
 export const handle: Handle = async ({ event, resolve }) => {
 	if (isCrossOriginFormForbidden(event)) {
-		return new Response('Cross-site form submissions are forbidden', { status: 403 });
+		return applySecurityHeaders(new Response('Cross-site form submissions are forbidden', { status: 403 }));
 	}
 
 	const token = event.cookies.get(SESSION_COOKIE);
@@ -85,8 +100,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// Stamp <html lang="%lang%"%theme-attr%> so the very first server-rendered
 	// byte carries the right language + palette (no post-hydration correction).
-	return resolve(event, {
+	const response = await resolve(event, {
 		transformPageChunk: ({ html }) =>
 			html.replace('%lang%', locale).replace('%theme-attr%', themeAttr(theme))
 	});
+	return applySecurityHeaders(response);
 };
