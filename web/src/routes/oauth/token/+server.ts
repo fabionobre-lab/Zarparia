@@ -9,7 +9,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { consumeAuthCode, getClient, verifyPkceS256 } from '$lib/server/mcp/oauth';
-import { issueTokenPair, rotateRefreshToken } from '$lib/server/mcp/tokens';
+import { issueTokenPair, rotateRefreshToken, UserNotApprovedError } from '$lib/server/mcp/tokens';
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' };
 
@@ -37,6 +37,23 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	const db = getDb(platform);
 	const p = await readParams(request);
 	const grantType = p.grant_type;
+
+	try {
+		return await handleGrant(db, p, grantType);
+	} catch (e) {
+		// Issuance refuses tokens for non-approved accounts (defense-in-depth;
+		// /mcp also rechecks status on every call).
+		if (e instanceof UserNotApprovedError)
+			return oauthError('invalid_grant', 'Account is not approved.');
+		throw e;
+	}
+};
+
+async function handleGrant(
+	db: D1Database,
+	p: Record<string, string>,
+	grantType: string | undefined
+): Promise<Response> {
 
 	if (grantType === 'authorization_code') {
 		const { code, redirect_uri, client_id, code_verifier } = p;
@@ -110,7 +127,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 
 	return oauthError('unsupported_grant_type', `Unsupported grant_type: ${grantType ?? '(none)'}.`);
-};
+}
 
 export const OPTIONS: RequestHandler = async () =>
 	new Response(null, {

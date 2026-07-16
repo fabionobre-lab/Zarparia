@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { formatDate, t } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import type { FeedbackAdminRow, FeedbackRow, FeedbackStatus } from '$lib/feedback';
@@ -56,7 +57,12 @@
 
 <main>
 	<a class="back" href="/">{t('feedback.back')}</a>
-	<h1>{data.admin ? t('feedback.adminHeading') : t('feedback.heading')}</h1>
+	<div class="head-row">
+		<h1>{data.admin ? t('feedback.adminHeading') : t('feedback.heading')}</h1>
+		{#if data.admin}
+			<a class="approvals-link" href="/admin/approvals">{t('feedback.adminApprovalsLink')}</a>
+		{/if}
+	</div>
 
 	{#if items.length === 0}
 		<p class="empty">{t('feedback.empty')}</p>
@@ -93,6 +99,8 @@
 	{/if}
 </main>
 
+<BottomBar user={data.user} items={[{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/' }]} />
+
 <style>
 	main {
 		font-family: system-ui, sans-serif;
@@ -106,9 +114,26 @@
 		text-decoration: none;
 		color: var(--text-muted);
 	}
+	.head-row {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		margin: 0.5rem 0 1.25rem;
+	}
 	h1 {
 		font-size: var(--type-h1);
-		margin: 0.5rem 0 1.25rem;
+		margin: 0;
+	}
+	.approvals-link {
+		font-size: 0.82rem;
+		color: var(--accent-strong);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+	.approvals-link:hover {
+		text-decoration: underline;
 	}
 	.empty {
 		color: var(--text-muted);

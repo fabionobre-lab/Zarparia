@@ -57,7 +57,7 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies }) =>
 		throw error(403, 'Your Google account email is unverified. Verify it with Google and try again.');
 
 	const db = getDb(platform);
-	const user = await upsertGoogleUser(db, profile);
+	const user = await upsertGoogleUser(db, profile, platform);
 	const token = generateSessionToken();
 	await createSession(db, token, user.id);
 	setSessionCookie(cookies, token);

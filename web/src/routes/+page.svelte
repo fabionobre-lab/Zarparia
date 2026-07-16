@@ -1,8 +1,10 @@
 <script lang="ts">
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
+	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
 	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { t, formatDateRange } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
+	import { page } from '$app/state';
 	import { getNow } from '$lib/now';
 	import crestSvg from '$lib/assets/zarparia-crest.svg?raw';
 	import wordmarkSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
@@ -81,6 +83,18 @@
 	);
 	let heroThemeStyle = $state('');
 
+	// Phase 2: after self-service account deletion, the client lands here with
+	// ?accountDeleted=1 (the account/session are already gone server-side, so a
+	// query param — not server state — is what carries the notice across the
+	// redirect). Read once; no need to react to later navigations.
+	// svelte-ignore state_referenced_locally
+	const accountDeleted = page.url.searchParams.get('accountDeleted') === '1';
+
+	// Phase 1 (legal pack): consent line under the Google sign-in button. The
+	// %TERMS%/%PRIVACY% tokens in the message are swapped for real <a> links to
+	// /terms and /privacy below, instead of injecting raw HTML.
+	const consentParts = $derived(t('landing.consentText').split(/(%TERMS%|%PRIVACY%)/));
+
 	$effect(() => {
 		const id = activeTrip?.id;
 		activeDetail = null;
@@ -143,7 +157,29 @@
 </svelte:head>
 
 <main>
-	{#if data.user}
+	{#if data.user && data.gateStatus}
+		<div class="gate-shell">
+			<div class="gate-card">
+				<span class="gate-crest">{@html crestSvg}</span>
+				<h1 class="gate-heading">
+					{data.gateStatus === 'rejected' ? t('pending.rejectedHeading') : t('pending.heading')}
+				</h1>
+				<p class="gate-body">
+					{data.gateStatus === 'rejected' ? t('pending.rejectedBody') : t('pending.body')}
+				</p>
+				<form method="POST" action="/auth/logout">
+					<button type="submit" class="gate-signout">{t('header.signOut')}</button>
+				</form>
+				<div class="gate-legal">
+					<a href="/guide">{t('nav.guide')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/privacy">{t('legal.privacy')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/terms">{t('legal.terms')}</a>
+				</div>
+			</div>
+		</div>
+	{:else if data.user}
 		<div class="head">
 			<h1>{t('home.yourTrips')}</h1>
 			<div class="actions">
@@ -175,7 +211,16 @@
 		{/if}
 
 		{#if ownedAll.length === 0}
-			<p class="empty">{t('home.noTrips')} <a href="/trips/new">{t('home.createFirst')}</a></p>
+			<div class="empty">
+				<p>{t('home.noTrips')} <a href="/trips/new">{t('home.createFirst')}</a></p>
+				<div class="empty-links">
+					<a href="/trips/import">{t('home.importItinerary')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/demo">{t('landing.tryDemo')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/guide">{t('home.readGuide')}</a>
+				</div>
+			</div>
 		{:else if owned.length > 0}
 			<div class="cards">
 				{#each owned as trip (trip.id)}{@render card(trip)}{/each}
@@ -200,7 +245,13 @@
 	{:else}
 		<div class="auth-shell">
 			<div class="auth-card">
+				{#if accountDeleted}
+					<p class="deleted-notice" role="status">{t('account.deletedNotice')}</p>
+				{/if}
 				<div class="auth-card-top">
+					<!-- Mobile has no site header, so the card carries the theme toggle
+					     itself (hidden >=960px where the full header provides it). -->
+					<span class="card-theme"><ThemeToggle /></span>
 					<LocaleSwitcher />
 				</div>
 				<div class="auth-lockup">
@@ -217,10 +268,26 @@
 					</svg>
 					{t('header.signInGoogle')}
 				</a>
+				<p class="auth-consent">
+					{#each consentParts as part, i (i)}
+						{#if part === '%TERMS%'}<a href="/terms">{t('legal.terms')}</a
+							>{:else if part === '%PRIVACY%'}<a href="/privacy">{t('legal.privacy')}</a
+							>{:else}{part}{/if}
+					{/each}
+				</p>
 				<a class="auth-demo-callout" href="/demo">
 					<span class="auth-demo-title">{t('landing.tryDemo')}</span>
 					<span class="auth-demo-sub">{t('landing.tryDemoSub')}</span>
 				</a>
+				<div class="auth-legal-footer">
+					<a href="/guide">{t('nav.guide')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/roadmap">{t('nav.roadmap')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/privacy">{t('legal.privacy')}</a>
+					<span aria-hidden="true">·</span>
+					<a href="/terms">{t('legal.terms')}</a>
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -322,6 +389,24 @@
 		color: var(--text-muted);
 		margin-top: 1.5rem;
 	}
+	.empty p {
+		margin: 0;
+	}
+	.empty-links {
+		margin-top: 0.6rem;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem;
+		font-size: 0.85rem;
+	}
+	.empty-links a {
+		color: var(--accent-strong);
+		text-decoration: none;
+	}
+	.empty-links a:hover {
+		text-decoration: underline;
+	}
 	/* Active-trip hero: a single prominent card above the regular grid.
 	   --ha-* custom properties default to the app's "active" green (matching
 	   .chip.active below) and are overridden inline once the trip's own
@@ -407,8 +492,36 @@
 	}
 	.auth-card-top {
 		display: flex;
-		justify-content: flex-end;
+		align-items: center;
+		justify-content: space-between;
 		margin-bottom: 0.5rem;
+	}
+	.deleted-notice {
+		font-size: 0.82rem;
+		text-align: center;
+		color: var(--pill-go-fg);
+		background: var(--pill-go-bg);
+		border-radius: 8px;
+		padding: 0.55rem 0.7rem;
+		margin: 0 0 0.75rem;
+	}
+	/* Card-corner theme toggle: mobile only (the >=960px header already has one).
+	   Bumped to a 44px tap target — the header sizing (34px) is too small for the
+	   card, which is the only chrome on the mobile landing. */
+	.card-theme :global(.theme-toggle) {
+		width: 44px;
+		height: 44px;
+		min-height: 44px;
+	}
+	@media (min-width: 960px) {
+		.card-theme {
+			display: none;
+		}
+		/* With the theme slot gone, flex-end keeps EN|PT pinned right exactly as
+		   the card looked before (space-between would drift it left). */
+		.auth-card-top {
+			justify-content: flex-end;
+		}
 	}
 	.auth-lockup {
 		display: flex;
@@ -456,6 +569,42 @@
 	.google-g {
 		flex-shrink: 0;
 	}
+	/* Consent line: small and muted, directly under the sign-in button — the
+	   Terms/Privacy words are real links into /terms and /privacy. */
+	.auth-consent {
+		font-size: 0.72rem;
+		line-height: 1.5;
+		color: var(--text-muted);
+		text-align: center;
+		margin: 0.6rem 0 0;
+	}
+	.auth-consent a {
+		color: var(--text-muted);
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
+	}
+	.auth-consent a:hover {
+		color: var(--accent-strong);
+	}
+	/* Unobtrusive legal footer at the very bottom of the signed-out card. */
+	.auth-legal-footer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		margin-top: 1.25rem;
+		font-size: 0.72rem;
+		color: var(--text-muted);
+	}
+	.auth-legal-footer a {
+		color: var(--text-muted);
+		text-decoration: none;
+	}
+	.auth-legal-footer a:hover {
+		color: var(--accent-strong);
+		text-decoration: underline;
+	}
 	.auth-demo-callout {
 		display: flex;
 		flex-direction: column;
@@ -493,6 +642,81 @@
 			padding: 1rem 0.5rem;
 		}
 		.auth-card {
+			padding: 1.5rem 1.25rem;
+			border-radius: 14px;
+		}
+	}
+	/* Pending/rejected gate: a signed-in user whose account isn't approved yet.
+	   Reuses the auth-card's centered-card language so the screen still reads
+	   as "part of the app", not an error page. */
+	.gate-shell {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: calc(100dvh - 6rem);
+		padding: 1.5rem 0;
+	}
+	.gate-card {
+		width: 100%;
+		max-width: 420px;
+		background: var(--surface);
+		border: 1px solid var(--hairline);
+		border-radius: 16px;
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		padding: 2rem;
+		text-align: center;
+	}
+	.gate-crest :global(svg) {
+		display: block;
+		width: 56px;
+		height: 56px;
+		margin: 0 auto 1rem;
+	}
+	.gate-heading {
+		font-size: var(--type-h1);
+		margin: 0 0 0.6rem;
+	}
+	.gate-body {
+		color: var(--text-muted);
+		line-height: 1.5;
+		margin: 0 0 1.5rem;
+	}
+	.gate-signout {
+		font: inherit;
+		font-size: 0.85rem;
+		padding: 0.5rem 1.1rem;
+		border: 1px solid var(--hairline-strong);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text);
+		cursor: pointer;
+	}
+	.gate-signout:hover {
+		background: var(--surface-sunken);
+	}
+	.gate-legal {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+		gap: 0.4rem;
+		margin-top: 1.1rem;
+		font-size: 0.72rem;
+		color: var(--text-muted);
+	}
+	.gate-legal a {
+		color: var(--text-muted);
+		text-decoration: none;
+	}
+	.gate-legal a:hover {
+		color: var(--accent-strong);
+		text-decoration: underline;
+	}
+	@media (max-width: 460px) {
+		.gate-shell {
+			padding: 1rem 0.5rem;
+		}
+		.gate-card {
 			padding: 1.5rem 1.25rem;
 			border-radius: 14px;
 		}

@@ -5,7 +5,7 @@ import { isAdmin } from '$lib/server/admin';
 import { listAllFeedback, listFeedbackForUser } from '$lib/server/feedback';
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
-	if (!locals.user) throw redirect(302, '/');
+	if (!locals.user || locals.user.status !== 'approved') throw redirect(302, '/');
 	const db = getDb(platform);
 	const admin = isAdmin(locals.user, platform);
 	const items = admin

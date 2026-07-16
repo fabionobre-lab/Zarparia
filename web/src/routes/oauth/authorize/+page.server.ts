@@ -60,6 +60,13 @@ export const load: PageServerLoad = async ({ url, locals, platform, cookies, set
 		throw redirect(302, '/auth/login/google');
 	}
 
+	// Phase 3 approval gate: a pending/rejected user is signed in but must not
+	// see (or be able to approve) the consent screen — that would hand an MCP
+	// client a token before the account itself is trusted.
+	if (locals.user.status !== 'approved') {
+		throw error(403, 'Your Zarparia account is pending approval. You can authorize this connector once approved.');
+	}
+
 	return {
 		clientName: client.client_name,
 		account: locals.user.email,
@@ -78,6 +85,7 @@ export const load: PageServerLoad = async ({ url, locals, platform, cookies, set
 export const actions: Actions = {
 	approve: async ({ request, locals, platform }) => {
 		if (!locals.user) throw error(401, 'Sign in required.');
+		if (locals.user.status !== 'approved') throw error(403, 'Account pending approval.');
 		const db = getDb(platform);
 		const form = await request.formData();
 		const clientId = String(form.get('client_id') ?? '');

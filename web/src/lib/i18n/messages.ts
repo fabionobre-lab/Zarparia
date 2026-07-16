@@ -53,6 +53,10 @@ export interface Messages {
 	'landing.tagline': string;
 	'landing.tryDemo': string;
 	'landing.tryDemoSub': string;
+	// Consent line under the Google sign-in button. Contains the literal tokens
+	// %TERMS% and %PRIVACY% — the page splits on them and swaps in <a> links to
+	// /terms and /privacy, so translations must keep both tokens verbatim.
+	'landing.consentText': string;
 
 	// ── Public demo trip (routes/demo/+page.svelte) ──
 	'demo.banner': string;
@@ -408,6 +412,75 @@ export interface Messages {
 	'photos.delete': string;
 	'photos.confirmDelete': string;
 	'photos.errSave': string;
+
+	// ── Access-gate pending/rejected screen (home '/' when signed in but not
+	// approved — routes/+page.svelte) ──
+	'pending.heading': string;
+	'pending.body': string;
+	'pending.rejectedHeading': string;
+	'pending.rejectedBody': string;
+
+	// ── Admin approvals queue (routes/admin/approvals) ──
+	'admin.approvals.pageTitle': string;
+	'admin.approvals.heading': string;
+	'admin.approvals.pendingHeading': string;
+	'admin.approvals.pendingEmpty': string;
+	'admin.approvals.recentHeading': string;
+	'admin.approvals.recentEmpty': string;
+	'admin.approvals.approve': string;
+	'admin.approvals.reject': string;
+	'admin.approvals.undo': string;
+	'admin.approvals.statusApproved': string;
+	'admin.approvals.statusRejected': string;
+	'admin.approvals.requestedLabel': string; // "Requested {date}"
+	'admin.approvals.decidedLabel': string; // "Decided {date}"
+	'feedback.adminApprovalsLink': string; // nav affordance on the feedback admin view
+
+	// ── Header/nav entry point to the account page (Phase 2) ──
+	'header.account': string; // link label, desktop header + mobile More sheet
+
+	// ── Account page (routes/account) — GDPR export + deletion (Phase 2) ──
+	'account.pageTitle': string;
+	'account.heading': string;
+	'account.yourDataHeading': string;
+	'account.exportDescription': string;
+	'account.exportButton': string;
+	'account.dangerHeading': string;
+	'account.dangerDescription': string;
+	'account.deleteButton': string;
+	'account.deleteDialogTitle': string;
+	'account.deleteWarning': string;
+	'account.deleteConfirmLabel': string;
+	'account.deleteConfirmPlaceholder': string;
+	'account.deleteCancel': string;
+	'account.deleteConfirmButton': string;
+	'account.deleting': string;
+	'account.deleteError': string;
+	// Shown on the signed-out landing after a successful self-deletion.
+	'account.deletedNotice': string;
+	'account.legalHeading': string; // "Legal" row linking to /privacy and /terms
+
+	// ── Legal pack (routes/privacy, routes/terms — Phase 1) ──
+	'legal.back': string; // back link on the legal pages themselves (→ '/')
+	'legal.lastUpdated': string; // label prefixed to the formatted policy date
+	'legal.privacy': string; // "Privacy" — nav/footer link label + inline link text
+	'legal.terms': string; // "Terms" — nav/footer link label + inline link text
+	'privacy.pageTitle': string;
+	'terms.pageTitle': string;
+
+	// ── Guide & roadmap (routes/guide, routes/roadmap — Phase 4) ──
+	'nav.guide': string; // "Guide" — footer/More-sheet/empty-state link label
+	'nav.roadmap': string; // "Roadmap" — footer link label + guide footer link
+	'guide.pageTitle': string;
+	'guide.heading': string;
+	'guide.tocLabel': string; // aria-label for the anchor table-of-contents
+	'roadmap.pageTitle': string;
+	'roadmap.heading': string;
+	'roadmap.intro': string;
+	'roadmap.statusShipped': string;
+	'roadmap.statusBuilding': string;
+	'roadmap.statusPlanned': string;
+	'home.readGuide': string; // empty-state link → /guide
 }
 
 const enGB: Messages = {
@@ -440,6 +513,7 @@ const enGB: Messages = {
 	'landing.tagline': 'A place for your travel itineraries.',
 	'landing.tryDemo': 'Try the demo',
 	'landing.tryDemoSub': 'Explore a sample trip — no account needed.',
+	'landing.consentText': 'By signing in you agree to the %TERMS% and %PRIVACY%.',
 
 	'demo.banner': "You're viewing a sample trip — everything is interactive but nothing is saved.",
 	'demo.signInCta': 'Sign in with Google',
@@ -784,7 +858,73 @@ const enGB: Messages = {
 	'photos.unassigned': 'Not on the itinerary',
 	'photos.delete': 'Remove',
 	'photos.confirmDelete': 'Remove this photo from the trip? (It stays in your Google Photos.)',
-	'photos.errSave': 'Could not save. Please try again.'
+	'photos.errSave': 'Could not save. Please try again.',
+
+	'pending.heading': 'Your access request is being reviewed',
+	'pending.body':
+		"Thanks for signing in. Zarparia is in a small, invite-only beta right now — an admin needs to approve your account before you can create or view trips. There's nothing else to do; check back soon.",
+	'pending.rejectedHeading': 'Access not available',
+	'pending.rejectedBody': "This account doesn't have access to Zarparia at the moment.",
+
+	'admin.approvals.pageTitle': 'Approvals — Zarparia',
+	'admin.approvals.heading': 'Approvals',
+	'admin.approvals.pendingHeading': 'Awaiting approval',
+	'admin.approvals.pendingEmpty': 'No sign-ups waiting on a decision.',
+	'admin.approvals.recentHeading': 'Recently decided',
+	'admin.approvals.recentEmpty': 'No decisions yet.',
+	'admin.approvals.approve': 'Approve',
+	'admin.approvals.reject': 'Reject',
+	'admin.approvals.undo': 'Undo → pending',
+	'admin.approvals.statusApproved': 'Approved',
+	'admin.approvals.statusRejected': 'Rejected',
+	'admin.approvals.requestedLabel': 'Requested {date}',
+	'admin.approvals.decidedLabel': 'Decided {date}',
+	'feedback.adminApprovalsLink': 'Manage approvals',
+
+	'header.account': 'Account',
+
+	'account.pageTitle': 'Account — Zarparia',
+	'account.heading': 'Account',
+	'account.yourDataHeading': 'Your data',
+	'account.exportDescription':
+		'Download everything Zarparia holds about you — your trips, shares, feedback and photo records — as one JSON file.',
+	'account.exportButton': 'Export my data',
+	'account.dangerHeading': 'Delete account',
+	'account.dangerDescription':
+		'Permanently erase your account. Trips you own are deleted for everyone they were shared with, and any shares you received elsewhere are revoked. This cannot be undone.',
+	'account.deleteButton': 'Delete my account…',
+	'account.deleteDialogTitle': 'Delete your account?',
+	'account.deleteWarning':
+		'This permanently deletes your account and everything in it. Trips you own are deleted, including for anyone you shared them with. Trips shared with you are removed from your access. This cannot be undone.',
+	'account.deleteConfirmLabel': 'Type DELETE or your account email to confirm',
+	'account.deleteConfirmPlaceholder': 'DELETE',
+	'account.deleteCancel': 'Cancel',
+	'account.deleteConfirmButton': 'Permanently delete',
+	'account.deleting': 'Deleting…',
+	'account.deleteError': 'Could not delete your account. Please try again.',
+	'account.deletedNotice': 'Your account and its data have been permanently deleted.',
+	'account.legalHeading': 'Legal',
+
+	'legal.back': '← Home',
+	'legal.lastUpdated': 'Last updated',
+	'legal.privacy': 'Privacy',
+	'legal.terms': 'Terms',
+	'privacy.pageTitle': 'Privacy Policy — Zarparia',
+	'terms.pageTitle': 'Terms of Service — Zarparia',
+
+	'nav.guide': 'Guide',
+	'nav.roadmap': 'Roadmap',
+	'guide.pageTitle': 'Guide — Zarparia',
+	'guide.heading': 'Guide',
+	'guide.tocLabel': 'On this page',
+	'roadmap.pageTitle': 'Roadmap — Zarparia',
+	'roadmap.heading': 'Roadmap',
+	'roadmap.intro':
+		"What's shipped, what's being built, and what's planned next. Use the feedback button in the app if there's something you'd like to see here.",
+	'roadmap.statusShipped': 'Shipped',
+	'roadmap.statusBuilding': 'In progress',
+	'roadmap.statusPlanned': 'Planned',
+	'home.readGuide': 'Read the guide'
 };
 
 const ptBR: Messages = {
@@ -817,6 +957,7 @@ const ptBR: Messages = {
 	'landing.tagline': 'Um lugar para os seus roteiros de viagem.',
 	'landing.tryDemo': 'Ver demonstração',
 	'landing.tryDemoSub': 'Explore uma viagem de exemplo — sem necessidade de conta.',
+	'landing.consentText': 'Ao entrar, você concorda com os %TERMS% e a %PRIVACY%.',
 
 	'demo.banner': 'Você está vendo uma viagem de exemplo — tudo é interativo, mas nada é salvo.',
 	'demo.signInCta': 'Entrar com o Google',
@@ -1162,7 +1303,73 @@ const ptBR: Messages = {
 	'photos.unassigned': 'Fora do roteiro',
 	'photos.delete': 'Remover',
 	'photos.confirmDelete': 'Remover esta foto da viagem? (Ela continua no seu Google Fotos.)',
-	'photos.errSave': 'Não foi possível salvar. Tente novamente.'
+	'photos.errSave': 'Não foi possível salvar. Tente novamente.',
+
+	'pending.heading': 'Sua solicitação de acesso está em análise',
+	'pending.body':
+		'Obrigado por entrar. No momento, o Zarparia está em um beta pequeno, só por convite — um administrador precisa aprovar sua conta antes que você possa criar ou ver viagens. Não há mais nada a fazer; volte a checar em breve.',
+	'pending.rejectedHeading': 'Acesso não disponível',
+	'pending.rejectedBody': 'No momento, esta conta não tem acesso ao Zarparia.',
+
+	'admin.approvals.pageTitle': 'Aprovações — Zarparia',
+	'admin.approvals.heading': 'Aprovações',
+	'admin.approvals.pendingHeading': 'Aguardando aprovação',
+	'admin.approvals.pendingEmpty': 'Nenhum cadastro aguardando decisão.',
+	'admin.approvals.recentHeading': 'Decididos recentemente',
+	'admin.approvals.recentEmpty': 'Ainda não há decisões.',
+	'admin.approvals.approve': 'Aprovar',
+	'admin.approvals.reject': 'Rejeitar',
+	'admin.approvals.undo': 'Desfazer → pendente',
+	'admin.approvals.statusApproved': 'Aprovado',
+	'admin.approvals.statusRejected': 'Rejeitado',
+	'admin.approvals.requestedLabel': 'Solicitado {date}',
+	'admin.approvals.decidedLabel': 'Decidido {date}',
+	'feedback.adminApprovalsLink': 'Gerenciar aprovações',
+
+	'header.account': 'Conta',
+
+	'account.pageTitle': 'Conta — Zarparia',
+	'account.heading': 'Conta',
+	'account.yourDataHeading': 'Seus dados',
+	'account.exportDescription':
+		'Baixe tudo o que o Zarparia guarda sobre você — suas viagens, compartilhamentos, feedback e registros de fotos — em um único arquivo JSON.',
+	'account.exportButton': 'Exportar meus dados',
+	'account.dangerHeading': 'Excluir conta',
+	'account.dangerDescription':
+		'Apaga sua conta permanentemente. As viagens que você possui são excluídas para todos com quem foram compartilhadas, e qualquer compartilhamento que você recebeu em outras viagens é revogado. Isso não pode ser desfeito.',
+	'account.deleteButton': 'Excluir minha conta…',
+	'account.deleteDialogTitle': 'Excluir sua conta?',
+	'account.deleteWarning':
+		'Isso exclui permanentemente sua conta e tudo o que ela contém. As viagens que você possui são excluídas, inclusive para quem você compartilhou. As viagens compartilhadas com você deixam de estar acessíveis. Isso não pode ser desfeito.',
+	'account.deleteConfirmLabel': 'Digite DELETE ou o e-mail da sua conta para confirmar',
+	'account.deleteConfirmPlaceholder': 'DELETE',
+	'account.deleteCancel': 'Cancelar',
+	'account.deleteConfirmButton': 'Excluir permanentemente',
+	'account.deleting': 'Excluindo…',
+	'account.deleteError': 'Não foi possível excluir sua conta. Tente novamente.',
+	'account.deletedNotice': 'Sua conta e seus dados foram permanentemente excluídos.',
+	'account.legalHeading': 'Informações legais',
+
+	'legal.back': '← Início',
+	'legal.lastUpdated': 'Última atualização',
+	'legal.privacy': 'Privacidade',
+	'legal.terms': 'Termos',
+	'privacy.pageTitle': 'Política de Privacidade — Zarparia',
+	'terms.pageTitle': 'Termos de Serviço — Zarparia',
+
+	'nav.guide': 'Guia',
+	'nav.roadmap': 'Roadmap',
+	'guide.pageTitle': 'Guia — Zarparia',
+	'guide.heading': 'Guia',
+	'guide.tocLabel': 'Nesta página',
+	'roadmap.pageTitle': 'Roadmap — Zarparia',
+	'roadmap.heading': 'Roadmap',
+	'roadmap.intro':
+		'O que já foi lançado, o que está sendo construído e o que vem a seguir. Use o botão de feedback dentro do aplicativo se houver algo que você gostaria de ver aqui.',
+	'roadmap.statusShipped': 'Lançado',
+	'roadmap.statusBuilding': 'Em desenvolvimento',
+	'roadmap.statusPlanned': 'Planejado',
+	'home.readGuide': 'Ler o guia'
 };
 
 export const catalogs: Record<Locale, Messages> = {

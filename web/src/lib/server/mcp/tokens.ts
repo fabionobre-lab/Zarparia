@@ -4,6 +4,7 @@
 // family id so that reuse of a rotated token revokes the whole family.
 
 import { randomHex, sha256Hex } from './oauth';
+import type { UserStatus } from '$lib/types';
 
 const ACCESS_TTL_MS = 60 * 60 * 1000; // 1 hour
 const REFRESH_TTL_MS = 60 * 24 * 60 * 60 * 1000; // 60 days
@@ -18,12 +19,30 @@ export interface IssuedTokens {
 	scope: string;
 }
 
+/** Thrown when token issuance is refused because the account is not approved.
+ *  Defense-in-depth: /mcp rechecks status per call, but a non-approved account
+ *  should not be able to mint tokens at all. */
+export class UserNotApprovedError extends Error {
+	constructor() {
+		super('Account is not approved.');
+		this.name = 'UserNotApprovedError';
+	}
+}
+
 /** Issue a fresh access+refresh pair. Pass an existing familyId when rotating so
- *  the new refresh token stays in the same lineage; omit it for a first issue. */
+ *  the new refresh token stays in the same lineage; omit it for a first issue.
+ *  Refuses (UserNotApprovedError) unless the account is currently approved —
+ *  this is the single issuance choke point for both OAuth grants. */
 export async function issueTokenPair(
 	db: D1Database,
 	opts: { clientId: string; userId: string; scope: string; familyId?: string }
 ): Promise<IssuedTokens> {
+	const owner = await db
+		.prepare('SELECT status FROM users WHERE id = ?')
+		.bind(opts.userId)
+		.first<{ status: UserStatus }>();
+	if (!owner || owner.status !== 'approved') throw new UserNotApprovedError();
+
 	const familyId = opts.familyId ?? crypto.randomUUID();
 	const now = Date.now();
 
@@ -62,10 +81,15 @@ export interface AccessContext {
 	userId: string;
 	clientId: string;
 	scope: string;
+	/** The token owner's current approval status (Phase 3 gate), joined from
+	 *  users so callers (the /mcp handler) can reject a still-valid token for
+	 *  an account that is pending/rejected/deleted-since-issue without a
+	 *  second round-trip. */
+	userStatus: UserStatus;
 }
 
 /** Resolve a bearer access token to its owner, or null if missing/invalid/
- *  expired/revoked. */
+ *  expired/revoked/orphaned (user row gone). */
 export async function validateAccessToken(
 	db: D1Database,
 	token: string
@@ -74,15 +98,24 @@ export async function validateAccessToken(
 	const hash = await sha256Hex(token);
 	const row = await db
 		.prepare(
-			`SELECT user_id AS userId, client_id AS clientId, scope, expires_at AS expiresAt, revoked
-			 FROM oauth_tokens WHERE token_hash = ? AND kind = 'access'`
+			`SELECT t.user_id AS userId, t.client_id AS clientId, t.scope, t.expires_at AS expiresAt,
+			        t.revoked, u.status AS userStatus
+			 FROM oauth_tokens t JOIN users u ON u.id = t.user_id
+			 WHERE t.token_hash = ? AND t.kind = 'access'`
 		)
 		.bind(hash)
-		.first<{ userId: string; clientId: string; scope: string; expiresAt: string; revoked: number }>();
+		.first<{
+			userId: string;
+			clientId: string;
+			scope: string;
+			expiresAt: string;
+			revoked: number;
+			userStatus: UserStatus;
+		}>();
 	if (!row) return null;
 	if (row.revoked) return null;
 	if (Date.now() >= new Date(row.expiresAt).getTime()) return null;
-	return { userId: row.userId, clientId: row.clientId, scope: row.scope };
+	return { userId: row.userId, clientId: row.clientId, scope: row.scope, userStatus: row.userStatus };
 }
 
 export type RefreshOutcome =

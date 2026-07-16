@@ -269,6 +269,17 @@ export const POST: RequestHandler = async ({ request, platform, url }) => {
 			'WWW-Authenticate': wwwAuthenticate(url.origin)
 		});
 	}
+	// Phase 3 approval gate: the token itself can be perfectly valid while the
+	// account behind it is pending/rejected (grant predates the gate, or an
+	// admin revoked approval after the token was issued). Re-checked on every
+	// call — not just at OAuth-consent time — so approval status changes take
+	// effect immediately without waiting for the token to expire.
+	if (ctx.userStatus !== 'approved') {
+		return jsonResponse(
+			{ error: 'access_denied', message: 'This Zarparia account is not approved to use the connector.' },
+			403
+		);
+	}
 
 	// ── Parse JSON-RPC ──
 	let body: unknown;

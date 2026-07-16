@@ -23,6 +23,11 @@ export const load: PageServerLoad = async ({ params, locals, platform, cookies }
 		throw redirect(302, '/auth/login/google');
 	}
 
+	// A pending/rejected user is signed in but must not redeem a share (that
+	// would grant trip access before the account itself is trusted). Send them
+	// to '/', which renders the pending screen instead of the invite.
+	if (locals.user.status !== 'approved') throw redirect(302, '/');
+
 	const db = getDb(platform);
 	const result = await redeemShareLink(db, params.token, locals.user.id);
 	if (!result) return { state: 'invalid' as const };

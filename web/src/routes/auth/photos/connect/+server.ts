@@ -13,7 +13,7 @@ const TEN_MINUTES = 60 * 10;
  *  cookie. Requires an existing app session — this grants a capability to a
  *  signed-in user, it does not sign anyone in. */
 export const GET: RequestHandler = async ({ locals, platform, url, cookies }) => {
-	if (!locals.user) redirect(302, '/');
+	if (!locals.user || locals.user.status !== 'approved') redirect(302, '/');
 
 	const google = getGoogle(platform, url.origin);
 	const state = generateState();

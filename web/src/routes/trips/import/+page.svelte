@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { t } from '$lib/i18n/store.svelte';
+
+	let { data } = $props();
 
 	const MAX = 20000;
 	const PLACEHOLDER =
@@ -88,6 +91,8 @@
 		</div>
 	{/if}
 </main>
+
+<BottomBar user={data.user} items={[{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/' }]} />
 
 <style>
 	main {

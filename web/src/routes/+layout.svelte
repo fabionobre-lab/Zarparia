@@ -16,19 +16,25 @@
 
 	let feedbackOpen = $state(false);
 
-	// Routes that render the mobile BottomBar (signed-in home, trip view, demo).
-	// Only there does the mobile header slim to crest + wordmark — the bar's More
-	// sheet carries locale/theme/feedback/sign-out instead. Every other route
-	// (signed-out landing, editor, import, new trip, feedback, join…) keeps the
-	// full header at all widths, since it is the only chrome those screens have.
+	// Routes with no top header on mobile (<960px): every signed-in page renders
+	// the BottomBar (whose More sheet carries locale/theme/feedback/sign-out),
+	// the demo does too, and the signed-out landing's auth card carries its own
+	// chrome (crest, wordmark, EN|PT, theme) — so on all of these the header row
+	// would be dead weight. Transient flows outside this set (join invite, OAuth
+	// consent) keep the full header at all widths, as do ALL routes on desktop.
 	// Derived from route id here (not signalled up from children) because the
 	// header renders before children during SSR — a child-set flag would arrive
 	// too late for the first paint.
-	const hasBottomBar = $derived(
-		page.route.id === '/trips/[id]' ||
-			page.route.id === '/demo' ||
-			(page.route.id === '/' && !!data.user)
-	);
+	const MOBILE_HEADERLESS_ROUTES = new Set([
+		'/',
+		'/demo',
+		'/trips/[id]',
+		'/trips/[id]/edit',
+		'/trips/new',
+		'/trips/import',
+		'/feedback'
+	]);
+	const mobileHeaderless = $derived(MOBILE_HEADERLESS_ROUTES.has(page.route.id ?? ''));
 
 	// Seed the UI locale synchronously (SSR + client) before children render, so
 	// the first paint is in the right language and there is no flash of English.
@@ -87,7 +93,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<header class:slim={hasBottomBar}>
+<header class:mobile-hidden={mobileHeaderless}>
 	<div class="bar" class:signed-in={!!data.user}>
 		<div class="left">
 			<a class="brand" href="/" aria-label="Zarparia — home">
@@ -99,18 +105,21 @@
 		</div>
 		<nav>
 			{#if data.user}
-				<button
-					type="button"
-					class="feedback"
-					onclick={() => (feedbackOpen = true)}
-					aria-label={t('feedback.button')}
-					title={t('feedback.button')}
-				>
-					<svg class="feedback-icon" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M4 5.5h16a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9.5L5 19.5V16H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
-					</svg>
-					<span class="feedback-label">{t('feedback.button')}</span>
-				</button>
+				{#if data.user.status === 'approved'}
+					<button
+						type="button"
+						class="feedback"
+						onclick={() => (feedbackOpen = true)}
+						aria-label={t('feedback.button')}
+						title={t('feedback.button')}
+					>
+						<svg class="feedback-icon" aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M4 5.5h16a1 1 0 0 1 1 1V15a1 1 0 0 1-1 1H9.5L5 19.5V16H4a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
+						</svg>
+						<span class="feedback-label">{t('feedback.button')}</span>
+					</button>
+					<a class="account-link" href="/account">{t('header.account')}</a>
+				{/if}
 				<span class="who">{data.user.name ?? data.user.email}</span>
 				<form method="POST" action="/auth/logout" onsubmit={onLogout}>
 					<button type="submit" class="signout">{t('header.signOut')}</button>
@@ -127,7 +136,7 @@
 
 {@render children()}
 
-{#if data.user}
+{#if data.user && data.user.status === 'approved'}
 	<FeedbackDialog bind:open={feedbackOpen} />
 {/if}
 
@@ -188,6 +197,25 @@
 		display: none;
 		flex-shrink: 0;
 	}
+	/* Desktop-only entry point to /account (mobile reaches it via the
+	   BottomBar's More sheet instead — see lib/nav/BottomBar.svelte — so this
+	   never competes for space in the narrow-phone header row). */
+	.account-link {
+		display: none;
+		font-size: 0.85rem;
+		color: var(--text-muted);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+	.account-link:hover {
+		color: var(--accent-strong);
+		text-decoration: underline;
+	}
+	@media (min-width: 960px) {
+		.account-link {
+			display: inline;
+		}
+	}
 	.who {
 		font-size: 0.85rem;
 		color: var(--text-muted);
@@ -196,18 +224,11 @@
 		text-overflow: ellipsis;
 		max-width: 12ch;
 	}
-	/* Mobile (< desktop breakpoint) on BottomBar routes only (header.slim — set
-	   for signed-in home, trip view and demo): the bar's More sheet carries
-	   locale, theme, feedback and sign in/out, so the top header slims to just
-	   the crest + wordmark (still a link home). Routes without the bar (signed-out
-	   landing, editor, import, new trip…) keep the full header at every width —
-	   it is the only chrome they have. Desktop (>=960px) is unchanged everywhere. */
+	/* Mobile (< desktop breakpoint): headerless routes drop the top header
+	   entirely — the BottomBar (or the landing's auth card) is the chrome there.
+	   Desktop (>=960px) keeps the full header on every route, unchanged. */
 	@media (max-width: 959.98px) {
-		header.slim nav {
-			display: none;
-		}
-		header.slim .left :global(.locale-switch),
-		header.slim .left :global(.theme-toggle) {
+		header.mobile-hidden {
 			display: none;
 		}
 	}
@@ -269,18 +290,18 @@
 			text-underline-offset: 0.15em;
 		}
 	}
-	/* Full-header (non-slim) narrow-phone fallbacks — these only matter where the
-	   complete control row still renders (routes without the BottomBar). Signed-in
-	   rows carry two 40px circles (theme + feedback) plus "Sign out", measuring
-	   ~368px of minimum content — they genuinely cannot fit at 360. When the row
-	   can't fit, flexbox shrinks the .left CONTAINER below its (un-shrinkable)
-	   children's width and they visually overflow it, painting the theme toggle
-	   under the feedback circle. Hide the wordmark (crest-only brand) below 380px:
-	   measured stop-fitting point 368px + headroom for Android font metrics.
-	   Signed-out fits at 360 and keeps its wordmark. Slim headers (BottomBar
-	   routes) always keep the wordmark — crest + wordmark alone always fit. */
+	/* Narrow-phone fallbacks for the routes that still show the full mobile
+	   header (join invite, OAuth consent — everything else is headerless on
+	   mobile, where these rules are moot because the header is display:none).
+	   Signed-in rows carry two 40px circles (theme + feedback) plus "Sign out",
+	   measuring ~368px of minimum content — they genuinely cannot fit at 360.
+	   When the row can't fit, flexbox shrinks the .left CONTAINER below its
+	   (un-shrinkable) children's width and they visually overflow it, painting
+	   the theme toggle under the feedback circle. Hide the wordmark (crest-only
+	   brand) below 380px: measured stop-fitting point 368px + headroom for
+	   Android font metrics. Signed-out fits at 360 and keeps its wordmark. */
 	@media (max-width: 379px) {
-		header:not(.slim) .bar.signed-in .wordmark {
+		.bar.signed-in .wordmark {
 			display: none;
 		}
 	}
@@ -289,7 +310,7 @@
 	   overflow even on the smallest devices. At >=360px the (signed-out) wordmark
 	   stays. */
 	@media (max-width: 359px) {
-		header:not(.slim) .wordmark {
+		.wordmark {
 			display: none;
 		}
 	}

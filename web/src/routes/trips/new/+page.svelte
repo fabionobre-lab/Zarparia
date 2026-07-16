@@ -1,8 +1,11 @@
 <script lang="ts">
 	import TripEditor from '$lib/editor/TripEditor.svelte';
 	import CreationWizard from '$lib/editor/CreationWizard.svelte';
+	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import type { Trip } from '$lib/trip-engine';
 	import { t } from '$lib/i18n/store.svelte';
+
+	let { data } = $props();
 
 	// The landing is a two-step creation wizard. "Start from a blank trip" drops
 	// straight into the old blank editor; "Create trip" scaffolds a draft and
@@ -27,3 +30,5 @@
 {:else}
 	<TripEditor initial={scaffolded} mode="new" />
 {/if}
+
+<BottomBar user={data.user} items={[{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/' }]} />

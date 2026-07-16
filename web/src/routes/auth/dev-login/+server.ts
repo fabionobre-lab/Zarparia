@@ -17,11 +17,15 @@ export const GET: RequestHandler = async ({ platform, cookies, url }) => {
 
 	const email = url.searchParams.get('email') || 'dev@example.com';
 	const db = getDb(platform);
-	const user = await upsertGoogleUser(db, {
-		sub: 'dev:' + email,
-		email,
-		name: 'Dev User'
-	});
+	const user = await upsertGoogleUser(
+		db,
+		{
+			sub: 'dev:' + email,
+			email,
+			name: 'Dev User'
+		},
+		platform
+	);
 	const token = generateSessionToken();
 	await createSession(db, token, user.id);
 	setSessionCookie(cookies, token);

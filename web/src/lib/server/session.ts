@@ -46,11 +46,19 @@ export async function validateSessionToken(
 	const id = await hashToken(token);
 	const row = await db
 		.prepare(
-			`SELECT s.expires_at AS expiresAt, u.id AS id, u.email AS email, u.name AS name, u.avatar_url AS avatarUrl
+			`SELECT s.expires_at AS expiresAt, u.id AS id, u.email AS email, u.name AS name,
+			        u.avatar_url AS avatarUrl, u.status AS status
 			 FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ?`
 		)
 		.bind(id)
-		.first<{ expiresAt: string; id: string; email: string; name: string | null; avatarUrl: string | null }>();
+		.first<{
+			expiresAt: string;
+			id: string;
+			email: string;
+			name: string | null;
+			avatarUrl: string | null;
+			status: SessionUser['status'];
+		}>();
 	if (!row) return null;
 
 	const expiresMs = new Date(row.expiresAt).getTime();
@@ -71,7 +79,7 @@ export async function validateSessionToken(
 			.bind(new Date(now).toISOString())
 			.run();
 	}
-	const user = { id: row.id, email: row.email, name: row.name, avatarUrl: row.avatarUrl };
+	const user = { id: row.id, email: row.email, name: row.name, avatarUrl: row.avatarUrl, status: row.status };
 	return { user, renewed };
 }
 
