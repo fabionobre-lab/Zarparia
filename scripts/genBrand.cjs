@@ -20,7 +20,7 @@ const bold = opentype.parse(fs.readFileSync('C:/Windows/Fonts/georgiab.ttf').buf
 const reg = opentype.parse(fs.readFileSync('C:/Windows/Fonts/georgia.ttf').buffer);
 
 const WORD = 'Zarparıa'; // dotless i; the star is its tittle
-const TAG = 'Chart your journey';
+const TAG = 'Chart your journey.';
 
 // ---- source mark geometry (the shipped app asset) ----
 const src = fs.readFileSync('web/src/lib/assets/zarparia-crest.svg', 'utf8');
@@ -84,7 +84,7 @@ const WM_S = path(bold, WORD, 0, 52, 48);
 const TAG_P = path(reg, TAG, wordCx - advT / 2, 88, 30);
 
 function lockup(pal, withTag) {
-  const label = withTag ? 'Zarparia — Chart your journey' : 'Zarparia';
+  const label = withTag ? `Zarparia — ${TAG}` : 'Zarparia';
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="12 6 ${W_LOCK} 90" role="img" aria-label="${label}">\n`;
   s += '  ' + shield(16, 10, 81, pal.tile, pal.gold) + '\n';
   s += `  <path d="${WM_L}" fill="${pal.word}"/>\n`;
