@@ -150,6 +150,13 @@ export const guide: GuideCatalog = {
 						body: [
 							'Advanced/optional: Zarparia has an MCP connector that lets an AI assistant (for example, Claude) read and edit your trips on your behalf, once you approve the connection through a standard OAuth screen. Access tokens are stored hashed, and a pending account cannot use this even with a valid connection.'
 						]
+					},
+					{
+						id: 'send-feedback',
+						title: 'Send feedback',
+						body: [
+							'Use the feedback button — a speech-bubble icon in the sidebar (desktop) or the "More" sheet (mobile) — to send a bug report, an idea, or anything else. Your submissions are listed on the Feedback page (/feedback); deleting your account deletes them along with the rest of your data.'
+						]
 					}
 				]
 			},
@@ -338,6 +345,13 @@ export const guide: GuideCatalog = {
 						title: 'Conectar um assistente de IA',
 						body: [
 							'Avançado/opcional: o Zarparia tem um conector MCP que permite a um assistente de IA (por exemplo, o Claude) ler e editar suas viagens em seu nome, depois que você aprova a conexão em uma tela padrão de OAuth. Os tokens de acesso são armazenados com hash, e uma conta pendente não consegue usar isso mesmo com uma conexão válida.'
+						]
+					},
+					{
+						id: 'send-feedback',
+						title: 'Enviar feedback',
+						body: [
+							'Use o botão de feedback — um ícone de balão de fala na barra lateral (computador) ou na bandeja "Mais" (celular) — para enviar um relato de erro, uma ideia, ou qualquer outra coisa. Seus envios ficam listados na página de Feedback (/feedback); excluir sua conta também exclui esses envios junto com o restante dos seus dados.'
 						]
 					}
 				]

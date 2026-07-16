@@ -42,6 +42,7 @@ export interface Messages {
 	'nav.close': string; // aria-label for the sheet close control
 
 	// ── OAuth consent page (oauth/authorize) — MCP connector authorization ──
+	'consent.pageTitle': string;
 	'consent.heading': string; // "{client} wants access to your Zarparia trips"
 	'consent.account': string; // "Signed in as {account}"
 	'consent.scope': string;
@@ -347,6 +348,7 @@ export interface Messages {
 	'import.err422': string;
 
 	// ── Join / invite pages (join/[token]/+page.svelte) ──
+	'join.pageTitle': string;
 	'join.signInHeading': string;
 	'join.signInBody': string;
 	'join.signInDev': string;
@@ -418,6 +420,14 @@ export interface Messages {
 	'pending.body': string;
 	'pending.rejectedHeading': string;
 	'pending.rejectedBody': string;
+
+	// ── Error page (routes/+error.svelte) ──
+	'error.pageTitle404': string;
+	'error.pageTitleGeneric': string;
+	'error.notFoundHeading': string;
+	'error.notFoundBody': string;
+	'error.genericHeading': string;
+	'error.genericBody': string;
 
 	// ── Admin approvals queue (routes/admin/approvals) ──
 	'admin.approvals.pageTitle': string;
@@ -502,6 +512,7 @@ const enGB: Messages = {
 	'nav.moreLabel': 'More options',
 	'nav.close': 'Close',
 
+	'consent.pageTitle': 'Authorize — Zarparia',
 	'consent.heading': '{client} wants access to your Zarparia trips',
 	'consent.account': 'Signed in as {account}',
 	'consent.scope': 'This lets it create, read, update and delete your trips on your behalf.',
@@ -791,6 +802,7 @@ const enGB: Messages = {
 	'import.errEmpty': 'Paste an itinerary to import.',
 	'import.err422': "We couldn't turn that into a trip.",
 
+	'join.pageTitle': 'Join trip — Zarparia',
 	'join.signInHeading': 'Sign in to open this invite',
 	'join.signInBody': 'You need to sign in before you can join this trip.',
 	'join.signInDev': 'Sign in (dev)',
@@ -863,6 +875,13 @@ const enGB: Messages = {
 		"Thanks for signing in. Zarparia is in a small, invite-only beta right now — an admin needs to approve your account before you can create or view trips. There's nothing else to do; check back soon.",
 	'pending.rejectedHeading': 'Access not available',
 	'pending.rejectedBody': "This account doesn't have access to Zarparia at the moment.",
+
+	'error.pageTitle404': 'Page not found — Zarparia',
+	'error.pageTitleGeneric': 'Something went wrong — Zarparia',
+	'error.notFoundHeading': 'Page not found',
+	'error.notFoundBody': "The page you're looking for doesn't exist, or may have moved.",
+	'error.genericHeading': 'Something went wrong',
+	'error.genericBody': 'An unexpected error occurred. Please try again, or head back home.',
 
 	'admin.approvals.pageTitle': 'Approvals — Zarparia',
 	'admin.approvals.heading': 'Approvals',
@@ -945,6 +964,7 @@ const ptBR: Messages = {
 	'nav.moreLabel': 'Mais opções',
 	'nav.close': 'Fechar',
 
+	'consent.pageTitle': 'Autorizar — Zarparia',
 	'consent.heading': '{client} quer acesso às suas viagens no Zarparia',
 	'consent.account': 'Conectado como {account}',
 	'consent.scope': 'Isso permite criar, ler, atualizar e excluir as suas viagens em seu nome.',
@@ -1235,6 +1255,7 @@ const ptBR: Messages = {
 	'import.errEmpty': 'Cole um roteiro para importar.',
 	'import.err422': 'Não conseguimos transformar isso em uma viagem.',
 
+	'join.pageTitle': 'Participar da viagem — Zarparia',
 	'join.signInHeading': 'Entre para abrir este convite',
 	'join.signInBody': 'Você precisa entrar antes de participar desta viagem.',
 	'join.signInDev': 'Entrar (dev)',
@@ -1307,6 +1328,13 @@ const ptBR: Messages = {
 		'Obrigado por entrar. No momento, o Zarparia está em um beta pequeno, só por convite — um administrador precisa aprovar sua conta antes que você possa criar ou ver viagens. Não há mais nada a fazer; volte a checar em breve.',
 	'pending.rejectedHeading': 'Acesso não disponível',
 	'pending.rejectedBody': 'No momento, esta conta não tem acesso ao Zarparia.',
+
+	'error.pageTitle404': 'Página não encontrada — Zarparia',
+	'error.pageTitleGeneric': 'Algo deu errado — Zarparia',
+	'error.notFoundHeading': 'Página não encontrada',
+	'error.notFoundBody': 'A página que você procura não existe, ou pode ter sido movida.',
+	'error.genericHeading': 'Algo deu errado',
+	'error.genericBody': 'Ocorreu um erro inesperado. Tente novamente, ou volte para o início.',
 
 	'admin.approvals.pageTitle': 'Aprovações — Zarparia',
 	'admin.approvals.heading': 'Aprovações',

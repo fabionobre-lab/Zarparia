@@ -42,6 +42,52 @@ npx wrangler secret put GOOGLE_CLIENT_SECRET
 
 Never set `DEV_AUTH` in production (it would let anyone forge a session).
 
+**Deploy order matters:** always run `npm run db:migrate:remote` **before**
+`npm run deploy`. New Worker code can read columns/tables a pending migration
+adds — deploying the Worker first breaks all requests (sign-ins included)
+until the migration lands (see LAUNCH_PLAN.md:84 for the incident this rule
+comes from).
+
+### Rollback
+
+```bash
+npx wrangler deployments list             # find the previous version-id
+npx wrangler rollback [version-id]        # revert the Worker to it
+```
+
+`wrangler rollback` only reverts the **Worker code** — it does not touch D1.
+
+> **CRITICAL:** D1 migrations in this app are forward-only — there are no
+> down migrations in `web/migrations/`. If a bad *migration* (not just bad
+> Worker code) shipped, rolling back the Worker is **not enough**: the schema
+> stays changed underneath the old code, which can be just as broken. In that
+> case, restore the D1 database from the backup worker instead — see the
+> restore procedure in
+> [`../workers/backup/README.md`](../workers/backup/README.md#restore-procedure-tested-locally--see-local-verification-below).
+> Rolling back the Worker is the right first move only when the deployed
+> *code* is bad and the schema is fine.
+
+### Monitoring & alerting
+
+Manual, one-time setup steps still owed (not code — external accounts):
+
+1. **Uptime monitor** — free [UptimeRobot](https://uptimerobot.com) monitor:
+   - Type: HTTP(s), URL `https://trips.fabionobre-ai.workers.dev/api/health`
+   - Alert condition: keyword check for `"ok":true` missing from the response
+     (or simpler: alert on status code != 200)
+   - Interval: 5 minutes
+2. **Client error monitoring (optional)** — the client Sentry scaffold
+   (`web/src/lib/client/sentry.ts`) is dormant until a DSN is configured:
+   ```bash
+   npx wrangler secret put PUBLIC_SENTRY_DSN
+   ```
+   (or set it as a dashboard variable). Until set, no Sentry code runs or
+   loads.
+3. **Backup worker exceptions (optional)** — Cloudflare dashboard →
+   Workers & Pages → `zarparia-backup` → Notifications → add a "Worker
+   exceptions" notification so a failed nightly backup surfaces without
+   having to check manually.
+
 ### Google Photos linking
 
 Linking photos to trips additionally needs, one time:

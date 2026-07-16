@@ -3,7 +3,7 @@
 // (see vitest.config.ts / test/apply-migrations.ts), not a mock.
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import { upsertGoogleUser } from '../src/lib/server/users';
+import { listPendingUsers, upsertGoogleUser } from '../src/lib/server/users';
 
 describe('upsertGoogleUser — approval status', () => {
 	it('a brand-new sign-up starts pending', async () => {
@@ -51,5 +51,34 @@ describe('upsertGoogleUser — approval status', () => {
 		expect(second.status).toBe('pending');
 		expect(second.name).toBe('Second Name');
 		expect(second.id).toBe(first.id);
+	});
+});
+
+describe('listPendingUsers — bounded query', () => {
+	it('caps the result to the requested limit when more pending rows exist', async () => {
+		// D1 storage is shared across tests within this file (not per-test
+		// isolated — see the "respects an explicit limit" failure this test
+		// replaced), so measure the baseline rather than assuming a clean table.
+		const before = await listPendingUsers(env.DB);
+		const marker = 'limit-test-' + crypto.randomUUID();
+		for (let i = 0; i < 5; i++) {
+			await upsertGoogleUser(
+				env.DB,
+				{ sub: `google-sub-${marker}-${i}`, email: `${marker}-${i}@example.com`, name: 'Pending' },
+				undefined
+			);
+		}
+		const totalNow = before.length + 5;
+		const tightLimit = Math.max(1, totalNow - 3); // strictly less than the total, so LIMIT must bind
+		const limited = await listPendingUsers(env.DB, tightLimit);
+		expect(limited.length).toBe(tightLimit);
+
+		const unlimited = await listPendingUsers(env.DB, totalNow + 100);
+		expect(unlimited.length).toBe(totalNow);
+	});
+
+	it('defaults to a limit of 200 when none is passed', async () => {
+		const rows = await listPendingUsers(env.DB);
+		expect(rows.length).toBeLessThanOrEqual(200);
 	});
 });

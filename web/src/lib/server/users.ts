@@ -86,10 +86,14 @@ export interface AdminUserRow {
 const ADMIN_USER_COLUMNS =
 	'id, email, name, avatar_url AS avatarUrl, status, created_at AS createdAt, approved_at AS approvedAt';
 
-/** Pending sign-ups awaiting a decision, oldest first (first-come, first-approved). */
-export async function listPendingUsers(db: D1Database): Promise<AdminUserRow[]> {
+/** Pending sign-ups awaiting a decision, oldest first (first-come, first-approved).
+ *  Bounded like listRecentlyDecidedUsers below — an unbounded queue is a launch-
+ *  time nicety, not a promise: a spam/bot wave against sign-up would otherwise
+ *  make this a full unindexed-by-limit scan returned in one admin page load. */
+export async function listPendingUsers(db: D1Database, limit = 200): Promise<AdminUserRow[]> {
 	const rows = await db
-		.prepare(`SELECT ${ADMIN_USER_COLUMNS} FROM users WHERE status = 'pending' ORDER BY created_at ASC`)
+		.prepare(`SELECT ${ADMIN_USER_COLUMNS} FROM users WHERE status = 'pending' ORDER BY created_at ASC LIMIT ?`)
+		.bind(limit)
 		.all<AdminUserRow>();
 	return rows.results;
 }

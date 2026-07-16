@@ -12,6 +12,45 @@ const REFRESH_TTL_MS = 60 * 24 * 60 * 60 * 1000; // 60 days
 export const ACCESS_PREFIX = 'gna_';
 export const REFRESH_PREFIX = 'gnr_';
 
+// oauth_codes and oauth_tokens are indexed on expires_at (migrations/0006) but
+// nothing ever deletes stale rows: single-use auth codes are deleted at
+// exchange (consumeAuthCode), but an abandoned/never-exchanged code just sits
+// there, and every access/refresh token row (used or not) is permanent until
+// this sweep.
+//
+// PRUNE_GRACE_MS is measured PAST each row's OWN expires_at, not a flat
+// row-age cutoff — expires_at is fixed at issuance and is never pushed out by
+// rotation, so this cannot weaken refresh-token reuse detection:
+// rotateRefreshToken() (below) looks a presented refresh token up by its
+// token_hash and treats an already-revoked/replaced row as "reuse" (burning
+// the whole family) for as long as that row exists — it never re-derives that
+// from expires_at. A rotated-out (replaced_by set) or family-revoked row is
+// therefore still fully detectable for its entire natural refresh-token
+// lifetime (up to REFRESH_TTL_MS) plus this grace window. Only pruning rows
+// whose own TTL lapsed a week ago means an attacker replaying a token would
+// need to wait until it's been expired-and-useless for 7+ days first — by
+// which point a normal expiry check already denies it, so reuse detection
+// loses nothing pruning wouldn't have already made moot.
+const PRUNE_GRACE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days past expires_at
+const PRUNE_PROBABILITY = 0.05; // ~1 in 20 issuances — issuance is infrequent enough (per auth-code exchange or per refresh) that an unconditional sweep isn't needed
+
+/** Opportunistic best-effort deletion of long-expired oauth_codes/oauth_tokens
+ *  rows (see PRUNE_GRACE_MS above for why the threshold is safe for reuse
+ *  detection). Mirrors the pattern in ratelimit.ts's cleanup: awaited (not
+ *  fire-and-forget) so it's deterministically testable, but its own failure
+ *  is swallowed and never allowed to affect the caller's result. */
+export async function pruneExpiredOAuthRows(db: D1Database): Promise<void> {
+	try {
+		const staleBefore = new Date(Date.now() - PRUNE_GRACE_MS).toISOString();
+		await db.batch([
+			db.prepare('DELETE FROM oauth_codes WHERE expires_at < ?').bind(staleBefore),
+			db.prepare('DELETE FROM oauth_tokens WHERE expires_at < ?').bind(staleBefore)
+		]);
+	} catch (error) {
+		console.error('oauth prune failed', error);
+	}
+}
+
 export interface IssuedTokens {
 	accessToken: string;
 	refreshToken: string;
@@ -68,6 +107,14 @@ export async function issueTokenPair(
 			)
 			.bind(refreshHash, opts.clientId, opts.userId, opts.scope, familyId, refreshExp, nowIso)
 	]);
+
+	// Opportunistic cleanup, piggybacked on the natural entry point every OAuth
+	// grant/refresh already passes through (same idea as the rate_limits sweep
+	// in ratelimit.ts). Probabilistic so a normal token issuance isn't paying
+	// for a DELETE round trip on every call.
+	if (Math.random() < PRUNE_PROBABILITY) {
+		await pruneExpiredOAuthRows(db);
+	}
 
 	return {
 		accessToken,

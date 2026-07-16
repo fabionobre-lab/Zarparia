@@ -22,8 +22,13 @@ rule (below), and `RETENTION_DAYS` in `src/index.ts`.
 
 ## Deploy recipe
 
-Run from `workers/backup/`. None of this has been run by the build — the
-bucket does not exist yet and nothing has been deployed.
+**Status: DEPLOYED 2026-07-16.** The bucket `zarparia-backups` exists (35-day
+lifecycle rule active), `TRIGGER_TOKEN` is set, the worker is live as
+`zarparia-backup` with the `0 3 * * *` cron registered, and a first production
+backup has been taken, downloaded, and content-verified. The steps below are
+kept as reference/runbook for re-running any of them (e.g. rotating the
+token, or standing up a fresh environment) — they don't need to be repeated
+for normal operation.
 
 ```bash
 npm install
@@ -225,13 +230,14 @@ curl "http://127.0.0.1:8787/__scheduled?cron=0+3+*+*+*"
   `web/wrangler.jsonc` (`92ea4a9d-25c9-4039-912b-b711af1da8a6`) — intentional,
   per the task brief ("the SAME D1 database"). This worker only ever runs
   `SELECT` against it.
-- **Not done (explicitly out of scope per the task)**: creating the
-  `zarparia-backups` bucket, setting the lifecycle rule, setting the
-  `TRIGGER_TOKEN` secret, registering the cron, or deploying. All of that is
-  the "Deploy recipe" above, for the orchestrator to run.
+- **Done (was explicitly out of scope for the build, completed by the
+  orchestrator 2026-07-16)**: created the `zarparia-backups` bucket, set the
+  35-day lifecycle rule, set the `TRIGGER_TOKEN` secret, deployed the worker
+  (registering the `0 3 * * *` cron as part of `wrangler deploy`), and ran the
+  production smoke test — see "Deploy recipe" above.
 - **Open question for the orchestrator**: the deploy recipe assumes the
   worker gets its own `workers.dev` subdomain
   (`zarparia-backup.<subdomain>.workers.dev`) for the `/trigger` smoke test —
-  confirm that's fine to expose (Bearer-token gated, no other route
-  responds) or whether it should be pinned to a route/zone once the custom
-  domain lands in Phase 7.
+  confirmed fine to expose (Bearer-token gated, no other route responds) for
+  now; revisit pinning it to a route/zone once the custom domain lands in
+  Phase 7.

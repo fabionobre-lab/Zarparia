@@ -6,6 +6,23 @@
 		<meta name="text-scale" content="scale" />
 		<meta name="theme-color" content="#faf6ee" media="(prefers-color-scheme: light)" />
 		<meta name="theme-color" content="#16120d" media="(prefers-color-scheme: dark)" />
+		<!-- Static defaults for every route — SvelteKit pages set their own
+		     <title> via <svelte:head>, which does not conflict with these; there
+		     is no per-page Open Graph infrastructure, by design. -->
+		<meta
+			name="description"
+			content="Zarparia — plan and share travel itineraries. Early-access, invite-only beta."
+		/>
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content="Zarparia" />
+		<meta property="og:title" content="Zarparia — Chart your journey." />
+		<meta
+			property="og:description"
+			content="Zarparia — plan and share travel itineraries. Early-access, invite-only beta."
+		/>
+		<!-- TODO(Phase 7): swap for the custom domain once it lands. -->
+		<meta property="og:image" content="https://trips.fabionobre-ai.workers.dev/icon-512.png" />
+		<meta name="twitter:card" content="summary" />
 		<script>
 			// Belt-and-braces: reconcile <html data-theme> from localStorage before
 			// first paint, so a cached/prerendered page whose SSR cookie is stale

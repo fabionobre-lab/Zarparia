@@ -89,14 +89,14 @@ Currently any verified Google account gets an account instantly (`web/src/routes
 
 ♻️ the sibling app verdict on the guide: "close to a prerequisite, not a nice-to-have" — approval gates and demos assume a stranger understands the app without the owner explaining it.
 
-- [ ] **4.1 User guide** — dedicated nav destination (e.g. `/guide`).
+- [x] **4.1 User guide** — (shipped) `/guide` (`web/src/lib/guide/content.ts`), bilingual, deployed.
   - Structure ♻️: **Getting started · The screens · How do I… · Glossary**; bilingual; content in its own module (not the main i18n dictionary); lazy-loaded chunk; "Learn more" deep links from empty states.
   - Deliberately NOT: first-run tour, search, external docs site, PDF. ♻️ (evidence-based call)
   - Adopt the house rule in CLAUDE.md: *a user-visible feature is not done until its Guide entry is updated.* ♻️
-- [ ] **4.2 Public roadmap page** — e.g. `/roadmap`, sourced from triaged feedback.
+- [x] **4.2 Public roadmap page** — (shipped) `/roadmap` (`web/src/lib/roadmap/roadmap.json`), bilingual, deployed.
   - Mechanism ♻️: bundled JSON snapshot regenerated at triage time and committed — no live DB exposure, and it structurally enforces that **only admin-triaged items ever go public** (the sibling app had a real incident validating this).
   - Triage-note hygiene ♻️: notes are user-visible — plain language, no commit hashes/internal jargon.
-- [ ] **4.3 Onboarding pass** — first-run empty states for a brand-new approved user (no trips yet): create-first-trip prompt, demo link, guide link.
+- [x] **4.3 Onboarding pass** — (shipped) verified in `web/src/routes/+page.svelte` (~lines 214-224): the `ownedAll.length === 0` empty state renders "No trips yet." + a create-first-trip link (`/trips/new`), plus Import / Try the demo (`/demo`) / Read the guide (`/guide`) links — all three items this task specifies, bilingual (`home.noTrips`/`home.createFirst`/`home.readGuide`/`landing.tryDemo*` in `web/src/lib/i18n/messages.ts`).
 
 **Exit criteria:** a stranger can be approved, land, and understand the app unaided.
 
@@ -122,6 +122,7 @@ Currently any verified Google account gets an account instantly (`web/src/routes
 - [x] **5.5 Health endpoint** — BUILT 2026-07-16: `GET /api/health` made public (was behind `requireUser`, previously leaking table names to any signed-in user) — now returns only `{ ok: true }` after a `SELECT 1` D1 ping, or `{ ok: false }`/503 on failure. Rate-limited 30/min/ip via the existing `ratelimit.ts` — see the code comment for the write-amplification reasoning: `limit()` always writes a counter row per call whether allowed or denied, so the limiter check runs BEFORE the ping, meaning a client already over budget gets a fast 429 without a second D1 hit. 4 new tests (`web/test/health.test.ts`). Free UptimeRobot check itself is a manual external-account step, not code — still open for Fabio.
 - [~] **5.6 Dependency & security pass** — `npm audit` DONE 2026-07-16 in both `web/` and `workers/backup/`: `workers/backup/` is clean (0 vulnerabilities). `web/` has 3 low-severity findings, all the same advisory (`cookie` <0.7.0, GHSA-pxg6-pf52-xh8x) via `@sveltejs/kit` → `@sveltejs/adapter-cloudflare` — no non-breaking fix exists yet: even the latest patch (`@sveltejs/kit@2.69.3`, newer than the installed 2.69.1) still pins `cookie@^0.6.0`; the fix only lands in `@sveltejs/kit@3.0.0` (currently a prerelease, a semver-major bump), and `npm audit fix --force`'s own suggestion — downgrading to `@sveltejs/kit@0.0.30` — is not viable. Left as-is (no `--force`); revisit once SvelteKit 3.0 stabilizes. Also set `ADMIN_EMAIL` explicitly in `wrangler.jsonc` `vars` (the 5.3 leak-audit info item) — verified `.dev.vars` still overrides it for local dev. Still open: the pre-ship review of auth/share-link/MCP-token constant-time comparisons.
 - [ ] **5.7 Analytics (optional)** — Cloudflare Web Analytics: cookieless, free, no consent banner needed. ♻️
+- **2026-07-16 deep audit + blocker fixes** (commit `a854e55`): security headers hardened, `manifest.webmanifest` scrubbed of leaked internals, Google Photos import rate limits added, photo-cap fix, `DEV_AUTH` re-verified unset in the deployed prod env.
 
 **Exit criteria:** backed up, rate-limited (app-level), monitored, and audited for cross-user leaks — all at £0/mo.
 

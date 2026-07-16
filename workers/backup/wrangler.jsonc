@@ -18,9 +18,10 @@
 		}
 	],
 
-	// Private backup bucket. Does NOT exist yet — config only.
-	// Orchestrator must run: npx wrangler r2 bucket create zarparia-backups
-	// (and set the lifecycle rule — see README.md) before first deploy.
+	// Private backup bucket. DEPLOYED 2026-07-16 — bucket created, 35-day
+	// lifecycle rule active, worker live (zarparia-backup, 03:00 cron), first
+	// prod backup taken and content-verified. See README.md for the recipe
+	// (kept as reference/runbook, e.g. for standing up a fresh environment).
 	"r2_buckets": [
 		{
 			"binding": "BACKUPS",

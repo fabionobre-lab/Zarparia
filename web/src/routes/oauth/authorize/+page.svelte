@@ -6,6 +6,10 @@
 	const clientLabel = $derived(data.clientName || t('consent.genericClient'));
 </script>
 
+<svelte:head>
+	<title>{t('consent.pageTitle')}</title>
+</svelte:head>
+
 <div class="panel">
 	<h1>{t('consent.heading', { client: clientLabel })}</h1>
 	<p class="account">{t('consent.account', { account: data.account })}</p>

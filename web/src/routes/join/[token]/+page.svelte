@@ -5,6 +5,10 @@
 		$props();
 </script>
 
+<svelte:head>
+	<title>{t('join.pageTitle')}</title>
+</svelte:head>
+
 <div class="panel">
 	{#if data.state === 'dev-login'}
 		<h1>{t('join.signInHeading')}</h1>

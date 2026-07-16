@@ -54,10 +54,10 @@
 		{
 			"id": "guide-roadmap",
 			"title": { "en": "User guide & roadmap", "pt": "Guia do usuário e roadmap" },
-			"status": "building",
+			"status": "shipped",
 			"note": {
-				"en": "What you're reading right now.",
-				"pt": "O que você está lendo agora."
+				"en": "This roadmap and the guide you can reach from the nav.",
+				"pt": "Este roadmap e o guia que você acessa pelo menu."
 			}
 		},
 		{
