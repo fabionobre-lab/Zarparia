@@ -5,6 +5,7 @@
 	import wordSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
 	import { browser } from '$app/environment';
 	import { page } from '$app/state';
+	import { env as publicEnv } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
 	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
@@ -12,6 +13,7 @@
 	import { initLocale, t } from '$lib/i18n/store.svelte';
 	import { initTheme } from '$lib/theme/store.svelte';
 	import { purgeUserCaches, syncUserMarker, safeLocalStorage } from '$lib/client/userCacheReset';
+	import { initSentryIfConfigured } from '$lib/client/sentry';
 
 	let { children, data } = $props();
 
@@ -77,6 +79,19 @@
 			navigator.serviceWorker.removeEventListener('controllerchange', onChange);
 			removeEventListener('online', warm);
 		};
+	});
+
+	onMount(() => {
+		// Phase 5.4 — Sentry, dormant unless PUBLIC_SENTRY_DSN is set (see
+		// lib/client/sentry.ts). Deferred to idle time, after first paint, so a
+		// configured DSN never delays interactivity; requestIdleCallback isn't
+		// available in every browser (notably Safari), hence the setTimeout
+		// fallback.
+		const idle: (cb: () => void) => void =
+			typeof requestIdleCallback === 'function' ? requestIdleCallback : (cb) => setTimeout(cb, 1);
+		idle(() => {
+			void initSentryIfConfigured(publicEnv.PUBLIC_SENTRY_DSN);
+		});
 	});
 
 	// Cached pages and photos hold the previous user's data; drop both on logout.

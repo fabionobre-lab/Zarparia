@@ -10,6 +10,11 @@
 		"directory": ".svelte-kit/cloudflare"
 	},
 	"observability": { "enabled": true },
+	// Leak-audit info item (LAUNCH_PLAN.md 5.3): make the admin identity
+	// explicit in prod config instead of relying on the DEFAULT_ADMIN_EMAIL
+	// source fallback in src/lib/server/admin.ts. Same value as that fallback
+	// — this is a config-explicitness change, not a behaviour change.
+	"vars": { "ADMIN_EMAIL": "fabionobre.ai@gmail.com" },
 	"d1_databases": [
 		{
 			"binding": "DB",
