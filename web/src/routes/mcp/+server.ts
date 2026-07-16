@@ -6,6 +6,7 @@
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { validateAccessToken } from '$lib/server/mcp/tokens';
+import { limit, clientIp, ipKey, userKey } from '$lib/server/ratelimit';
 import {
 	listTripsForUser,
 	getTripForUser,
@@ -255,6 +256,16 @@ export const OPTIONS: RequestHandler = async () =>
 export const POST: RequestHandler = async ({ request, platform, url }) => {
 	const db = getDb(platform);
 
+	// ── Rate limit (per IP, pre-auth) ──
+	const ipRl = await limit(db, ipKey(clientIp(request), 'mcp'), { max: 120, windowSeconds: 60 });
+	if (!ipRl.allowed) {
+		return jsonResponse(
+			rpcError(null, -32029, 'Rate limit exceeded. Please slow down.'),
+			429,
+			{ 'Retry-After': String(ipRl.retryAfterSeconds) }
+		);
+	}
+
 	// ── Auth: Bearer access token required for every call ──
 	const authz = request.headers.get('authorization') ?? '';
 	const bearer = authz.toLowerCase().startsWith('bearer ') ? authz.slice(7).trim() : '';
@@ -278,6 +289,16 @@ export const POST: RequestHandler = async ({ request, platform, url }) => {
 		return jsonResponse(
 			{ error: 'access_denied', message: 'This Zarparia account is not approved to use the connector.' },
 			403
+		);
+	}
+
+	// ── Rate limit (per user, post-auth) ──
+	const userRl = await limit(db, userKey(ctx.userId, 'mcp'), { max: 60, windowSeconds: 60 });
+	if (!userRl.allowed) {
+		return jsonResponse(
+			rpcError(null, -32029, 'Rate limit exceeded. Please slow down.'),
+			429,
+			{ 'Retry-After': String(userRl.retryAfterSeconds) }
 		);
 	}
 

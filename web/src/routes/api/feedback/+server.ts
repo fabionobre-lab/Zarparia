@@ -4,10 +4,18 @@ import { getDb } from '$lib/server/db';
 import { requireUser } from '$lib/server/guards';
 import { isAdmin } from '$lib/server/admin';
 import { createFeedback, listAllFeedback, listFeedbackForUser } from '$lib/server/feedback';
+import { limit, userKey } from '$lib/server/ratelimit';
 
 export const POST: RequestHandler = async ({ platform, locals, request }) => {
 	const user = requireUser(locals);
 	const db = getDb(platform);
+	const rl = await limit(db, userKey(user.id, 'feedback'), { max: 5, windowSeconds: 60 });
+	if (!rl.allowed) {
+		return json(
+			{ error: 'rate_limited' },
+			{ status: 429, headers: { 'Retry-After': String(rl.retryAfterSeconds) } }
+		);
+	}
 	const body = (await request.json().catch(() => null)) as
 		| { type?: string; message?: string; page?: string }
 		| null;

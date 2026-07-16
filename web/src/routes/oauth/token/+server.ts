@@ -10,6 +10,7 @@ import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { consumeAuthCode, getClient, verifyPkceS256 } from '$lib/server/mcp/oauth';
 import { issueTokenPair, rotateRefreshToken, UserNotApprovedError } from '$lib/server/mcp/tokens';
+import { limit, clientIp, ipKey, tooManyRequests } from '$lib/server/ratelimit';
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' };
 
@@ -35,6 +36,8 @@ async function readParams(request: Request): Promise<Record<string, string>> {
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const db = getDb(platform);
+	const rl = await limit(db, ipKey(clientIp(request), 'oauth-token'), { max: 20, windowSeconds: 60 });
+	if (!rl.allowed) return tooManyRequests(rl);
 	const p = await readParams(request);
 	const grantType = p.grant_type;
 

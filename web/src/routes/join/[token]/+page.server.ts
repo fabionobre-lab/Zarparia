@@ -1,11 +1,16 @@
-import { redirect } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { getDb } from '$lib/server/db';
 import { getAuthEnv } from '$lib/server/authenv';
 import { setReturnTo } from '$lib/server/returnto';
 import { redeemShareLink } from '$lib/server/share-links';
+import { limit, clientIp, ipKey } from '$lib/server/ratelimit';
 
-export const load: PageServerLoad = async ({ params, locals, platform, cookies }) => {
+export const load: PageServerLoad = async ({ params, locals, platform, cookies, request }) => {
+	const db = getDb(platform);
+	const rl = await limit(db, ipKey(clientIp(request), 'join-token'), { max: 30, windowSeconds: 60 });
+	if (!rl.allowed) throw error(429, 'Too many requests. Please slow down.');
+
 	const returnTo = `/join/${params.token}`;
 
 	// Unauthenticated visitors are sent to sign-in and returned here afterwards.
@@ -28,7 +33,6 @@ export const load: PageServerLoad = async ({ params, locals, platform, cookies }
 	// to '/', which renders the pending screen instead of the invite.
 	if (locals.user.status !== 'approved') throw redirect(302, '/');
 
-	const db = getDb(platform);
 	const result = await redeemShareLink(db, params.token, locals.user.id);
 	if (!result) return { state: 'invalid' as const };
 	throw redirect(303, `/trips/${result.tripId}`);

@@ -16,6 +16,7 @@ import { getDb } from '$lib/server/db';
 import { getAuthEnv } from '$lib/server/authenv';
 import { setReturnTo } from '$lib/server/returnto';
 import { getClient, createAuthCode, SUPPORTED_SCOPE } from '$lib/server/mcp/oauth';
+import { limit, clientIp, ipKey } from '$lib/server/ratelimit';
 
 /** Append an OAuth error to the client's redirect_uri and bounce there. */
 function redirectWithError(redirectUri: string, err: string, state: string | null): never {
@@ -25,11 +26,13 @@ function redirectWithError(redirectUri: string, err: string, state: string | nul
 	throw redirect(302, u.toString());
 }
 
-export const load: PageServerLoad = async ({ url, locals, platform, cookies, setHeaders }) => {
+export const load: PageServerLoad = async ({ url, locals, platform, cookies, setHeaders, request }) => {
 	// This page must never be framed (clickjacking of the Approve button).
 	setHeaders({ 'X-Frame-Options': 'DENY', 'Content-Security-Policy': "frame-ancestors 'none'" });
 
 	const db = getDb(platform);
+	const rl = await limit(db, ipKey(clientIp(request), 'oauth-authorize'), { max: 30, windowSeconds: 60 });
+	if (!rl.allowed) throw error(429, 'Too many requests. Please slow down.');
 	const clientId = url.searchParams.get('client_id');
 	const redirectUri = url.searchParams.get('redirect_uri');
 	const responseType = url.searchParams.get('response_type');

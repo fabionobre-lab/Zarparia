@@ -7,11 +7,19 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { registerClient } from '$lib/server/mcp/oauth';
+import { limit, clientIp, ipKey } from '$lib/server/ratelimit';
 
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' };
 
 export const POST: RequestHandler = async ({ request, platform }) => {
 	const db = getDb(platform);
+	const rl = await limit(db, ipKey(clientIp(request), 'oauth-register'), { max: 5, windowSeconds: 60 });
+	if (!rl.allowed) {
+		return json(
+			{ error: 'rate_limited', error_description: 'Too many requests. Please slow down.' },
+			{ status: 429, headers: { ...CORS, 'Retry-After': String(rl.retryAfterSeconds) } }
+		);
+	}
 	const body = (await request.json().catch(() => null)) as {
 		client_name?: unknown;
 		redirect_uris?: unknown;
