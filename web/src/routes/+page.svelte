@@ -188,7 +188,10 @@
 	{:else}
 		<h1>Zarparia</h1>
 		<p>{t('landing.tagline')}</p>
-		<p><a href="/auth/login/google">{t('header.signInGoogle')}</a> {t('landing.toGetStarted')}</p>
+		<div class="landing-actions">
+			<a class="landing-signin" href="/auth/login/google">{t('header.signInGoogle')}</a>
+			<a class="landing-demo" href="/demo">{t('landing.tryDemo')}</a>
+		</div>
 		<div class="landing-lang">
 			<LocaleSwitcher />
 		</div>
@@ -352,6 +355,35 @@
 		border-top: 1px solid rgba(255, 255, 255, 0.18);
 		font-size: 0.8rem;
 		color: rgba(255, 255, 255, 0.78);
+	}
+	.landing-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.65rem;
+		margin-top: 0.75rem;
+	}
+	.landing-signin,
+	.landing-demo {
+		font-size: 0.9rem;
+		text-decoration: none;
+		border-radius: 999px;
+		padding: 0.55rem 1.2rem;
+		font-weight: 600;
+	}
+	.landing-signin {
+		color: #fff;
+		background: var(--accent);
+		border: 1px solid var(--accent);
+	}
+	.landing-demo {
+		color: var(--accent-strong);
+		border: 1px solid var(--hairline-strong);
+		background: var(--surface);
+		font-weight: 500;
+	}
+	.landing-demo:hover {
+		background: var(--surface-sunken);
 	}
 	.landing-lang {
 		margin-top: 1.5rem;

@@ -38,7 +38,12 @@ export interface Messages {
 
 	// ── Signed-out landing (+page.svelte) ──
 	'landing.tagline': string;
-	'landing.toGetStarted': string;
+	'landing.tryDemo': string;
+
+	// ── Public demo trip (routes/demo/+page.svelte) ──
+	'demo.banner': string;
+	'demo.signInCta': string;
+	'demo.back': string;
 
 	// ── Home / trip list (+page.svelte) ──
 	'home.pageTitle': string;
@@ -396,7 +401,11 @@ const enGB: Messages = {
 	'consent.genericClient': 'An application',
 
 	'landing.tagline': 'A place for your travel itineraries.',
-	'landing.toGetStarted': 'to get started.',
+	'landing.tryDemo': 'Try the demo',
+
+	'demo.banner': "You're viewing a sample trip — everything is interactive but nothing is saved.",
+	'demo.signInCta': 'Sign in with Google',
+	'demo.back': '← Back',
 
 	'home.pageTitle': 'Zarparia',
 	'home.yourTrips': 'Your trips',
@@ -743,7 +752,11 @@ const ptBR: Messages = {
 	'consent.genericClient': 'Um aplicativo',
 
 	'landing.tagline': 'Um lugar para os seus roteiros de viagem.',
-	'landing.toGetStarted': 'para começar.',
+	'landing.tryDemo': 'Ver demonstração',
+
+	'demo.banner': 'Você está vendo uma viagem de exemplo — tudo é interativo, mas nada é salvo.',
+	'demo.signInCta': 'Entrar com o Google',
+	'demo.back': '← Voltar',
 
 	'home.pageTitle': 'Viagens',
 	'home.yourTrips': 'Suas viagens',

@@ -1,0 +1,1431 @@
+{
+  "id": "demo-scotland-2026",
+  "title": {
+    "en": "Scotland Spring Escape",
+    "pt": "Escapada de Primavera na Escócia"
+  },
+  "eyebrow": {
+    "en": "April 2026 · Sample trip",
+    "pt": "Abril de 2026 · Viagem de exemplo"
+  },
+  "languages": [
+    "en",
+    "pt"
+  ],
+  "defaultLanguage": "en",
+  "cover": "🏰",
+  "locales": {
+    "en": "en-GB",
+    "pt": "pt-BR"
+  },
+  "home": {
+    "name": "Bloomsbury hotel, central London",
+    "lat": 51.5194,
+    "lon": -0.127
+  },
+  "tags": {
+    "s": {
+      "label": {
+        "en": "Sightseeing",
+        "pt": "Passeio"
+      },
+      "style": "sight"
+    },
+    "bkf": {
+      "label": {
+        "en": "Breakfast",
+        "pt": "Café da manhã"
+      },
+      "style": "food"
+    },
+    "lun": {
+      "label": {
+        "en": "Lunch",
+        "pt": "Almoço"
+      },
+      "style": "food"
+    },
+    "din": {
+      "label": {
+        "en": "Dinner",
+        "pt": "Jantar"
+      },
+      "style": "food"
+    },
+    "cof": {
+      "label": {
+        "en": "Coffee",
+        "pt": "Café"
+      },
+      "style": "food"
+    },
+    "bkd": {
+      "label": {
+        "en": "Book ahead",
+        "pt": "Reserve antes"
+      },
+      "style": "booking"
+    },
+    "tra": {
+      "label": {
+        "en": "Travel",
+        "pt": "Transporte"
+      },
+      "style": "logistics"
+    },
+    "log": {
+      "label": {
+        "en": "Logistics",
+        "pt": "Logística"
+      },
+      "style": "logistics"
+    },
+    "ful": {
+      "label": {
+        "en": "Full day",
+        "pt": "Dia inteiro"
+      },
+      "style": "fullday"
+    }
+  },
+  "segments": [
+    {
+      "id": "edinburgh",
+      "title": {
+        "en": "Edinburgh",
+        "pt": "Edimburgo"
+      },
+      "subtitle": {
+        "en": "Old Town & Castle",
+        "pt": "Cidade Velha e Castelo"
+      },
+      "theme": "tartan",
+      "weather": {
+        "lat": 55.9533,
+        "lon": -3.1883,
+        "granularity": "daily",
+        "timezone": "Europe/London"
+      },
+      "footer": {
+        "en": "Edinburgh · April 2026 · Alex & Sam",
+        "pt": "Edimburgo · abril de 2026 · Alex & Sam"
+      },
+      "plans": [
+        {
+          "id": "main",
+          "days": [
+            {
+              "date": "2026-04-20",
+              "title": {
+                "en": "Arrival & the Old Town",
+                "pt": "Chegada e a Cidade Velha"
+              },
+              "note": {
+                "en": "Ease in gently — the Castle is the one timed thing today.",
+                "pt": "Comece com calma — o Castelo é o único horário marcado hoje."
+              },
+              "routeMode": "walking",
+              "kmTotal": 6,
+              "staticWeather": {
+                "hi": 13,
+                "lo": 6,
+                "emoji": "🌤️"
+              },
+              "blocks": [
+                {
+                  "time": "09:30",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Arrive & check in",
+                    "pt": "Chegada e check-in"
+                  },
+                  "tags": [
+                    "tra"
+                  ],
+                  "description": {
+                    "en": "Taxi from Waverley to the hotel on the Royal Mile. Drop bags, no unpacking marathon.",
+                    "pt": "Táxi da Waverley até o hotel na Royal Mile. Deixar as malas, sem maratona de desfazer."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Edinburgh+Waverley+Station",
+                  "coords": {
+                    "lat": 55.952,
+                    "lon": -3.1883
+                  }
+                },
+                {
+                  "time": "11:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Edinburgh Castle",
+                    "pt": "Castelo de Edimburgo"
+                  },
+                  "tags": [
+                    "s",
+                    "bkd"
+                  ],
+                  "description": {
+                    "en": "Crown Jewels · Great Hall · One O’Clock Gun · views over New Town.",
+                    "pt": "Joias da Coroa · Great Hall · Canhão da Uma Hora · vista sobre a New Town."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Edinburgh+Castle",
+                  "warning": {
+                    "en": "Timed-entry tickets sell out by mid-morning in April — book online the day before.",
+                    "pt": "Ingressos com horário marcado esgotam no meio da manhã em abril — reserve online no dia anterior."
+                  },
+                  "waypoints": [
+                    {
+                      "query": "Great+Hall+Edinburgh+Castle",
+                      "name": {
+                        "en": "Great Hall",
+                        "pt": "Great Hall"
+                      }
+                    },
+                    {
+                      "query": "St+Margarets+Chapel+Edinburgh+Castle",
+                      "name": {
+                        "en": "St Margaret's Chapel",
+                        "pt": "Capela St Margaret"
+                      }
+                    }
+                  ],
+                  "coords": {
+                    "lat": 55.9486,
+                    "lon": -3.2008
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Castle Esplanade approach",
+                      "mapsUrl": "https://maps.google.com/?q=Edinburgh+Castle+Esplanade",
+                      "wiki": "Edinburgh Castle"
+                    },
+                    {
+                      "name": "View from Half Moon Battery",
+                      "mapsUrl": "https://maps.google.com/?q=Half+Moon+Battery+Edinburgh+Castle",
+                      "wiki": "Edinburgh Castle"
+                    }
+                  ]
+                },
+                {
+                  "time": "13:15",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch on the Royal Mile",
+                    "pt": "Almoço na Royal Mile"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Quick pub lunch — haggis, neeps and tatties if feeling brave.",
+                    "pt": "Almoço rápido no pub — haggis, neeps and tatties para os corajosos."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Royal+Mile+Edinburgh",
+                  "km": 0.8
+                },
+                {
+                  "time": "15:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "St Giles' Cathedral & Grassmarket",
+                    "pt": "Catedral St Giles e Grassmarket"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Crown spire, Thistle Chapel, then wander down through Victoria Street to Grassmarket.",
+                    "pt": "Torre em coroa, Capela do Cardo, depois desça pela Victoria Street até o Grassmarket."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=St+Giles+Cathedral+Edinburgh",
+                  "km": 1.1,
+                  "coords": {
+                    "lat": 55.9497,
+                    "lon": -3.191
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Victoria Street curved view",
+                      "mapsUrl": "https://maps.google.com/?q=Victoria+Street+Edinburgh",
+                      "wiki": "Victoria Street, Edinburgh"
+                    }
+                  ]
+                },
+                {
+                  "time": "17:30",
+                  "dotColor": "#4a5324",
+                  "title": {
+                    "en": "Arthur's Seat sunset climb",
+                    "pt": "Subida ao Arthur’s Seat ao pôr do sol"
+                  },
+                  "tags": [
+                    "s",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "45 min up from Dunsapie Loch. Windy at the top — bring a layer.",
+                    "pt": "45 min de subida a partir do Dunsapie Loch. Ventoso no topo — leve um casaco."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Arthurs+Seat+Edinburgh",
+                  "note": {
+                    "en": "Sunset ~20:15 in late April — start the climb by 19:15 at the latest.",
+                    "pt": "Pôr do sol por volta das 20:15 no fim de abril — comece a subida até as 19:15 no máximo."
+                  },
+                  "coords": {
+                    "lat": 55.9445,
+                    "lon": -3.1618
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Arthur's Seat summit panorama",
+                      "mapsUrl": "https://maps.google.com/?q=Arthurs+Seat+Edinburgh",
+                      "wiki": "Arthur's Seat"
+                    }
+                  ]
+                },
+                {
+                  "time": "20:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Dinner in the Old Town",
+                    "pt": "Jantar na Cidade Velha"
+                  },
+                  "tags": [
+                    "din"
+                  ],
+                  "description": {
+                    "en": "Table booked near the hotel — early night after the climb.",
+                    "pt": "Mesa reservada perto do hotel — noite tranquila depois da subida."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Grassmarket+Edinburgh"
+                }
+              ]
+            },
+            {
+              "date": "2026-04-21",
+              "title": {
+                "en": "Georgian New Town",
+                "pt": "New Town Georgiana"
+              },
+              "note": {
+                "en": "Flatter day — good one for tired legs.",
+                "pt": "Dia mais plano — bom para pernas cansadas."
+              },
+              "routeMode": "walking",
+              "kmTotal": 7.5,
+              "staticWeather": {
+                "hi": 12,
+                "lo": 5,
+                "emoji": "⛅"
+              },
+              "banner": {
+                "en": "Preview ceilidh dance night at the Assembly Rooms tonight",
+                "pt": "Noite de dança ceilidh no Assembly Rooms hoje à noite"
+              },
+              "blocks": [
+                {
+                  "time": "09:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Coffee near the hotel",
+                    "pt": "Café perto do hotel"
+                  },
+                  "tags": [
+                    "cof"
+                  ],
+                  "description": {
+                    "en": "Slow start before the museum.",
+                    "pt": "Começo tranquilo antes do museu."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Cockburn+Street+Edinburgh"
+                },
+                {
+                  "time": "10:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "National Museum of Scotland",
+                    "pt": "Museu Nacional da Escócia"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Free entry. Grand hall roof, Lewis Chessmen, Dolly the Sheep.",
+                    "pt": "Entrada grátis. Teto do grande salão, Peças de Xadrez de Lewis, a ovelha Dolly."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=National+Museum+of+Scotland",
+                  "coords": {
+                    "lat": 55.9469,
+                    "lon": -3.1917
+                  }
+                },
+                {
+                  "time": "12:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch in New Town",
+                    "pt": "Almoço na New Town"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Georgian-square café, easy walk to Princes Street after.",
+                    "pt": "Café numa praça georgiana, caminho fácil até a Princes Street depois."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=George+Street+Edinburgh",
+                  "km": 1.4
+                },
+                {
+                  "time": "14:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Scott Monument & Princes Street Gardens",
+                    "pt": "Scott Monument e Princes Street Gardens"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Climb the 287 steps for the view, then stroll the gardens below the Castle.",
+                    "pt": "Suba os 287 degraus para a vista, depois passeie pelos jardins abaixo do Castelo."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Scott+Monument+Edinburgh",
+                  "km": 0.6,
+                  "coords": {
+                    "lat": 55.9529,
+                    "lon": -3.1958
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Castle from the gardens",
+                      "mapsUrl": "https://maps.google.com/?q=Princes+Street+Gardens+Edinburgh",
+                      "wiki": "Princes Street Gardens"
+                    }
+                  ]
+                },
+                {
+                  "time": "16:00",
+                  "dotColor": "#4a5324",
+                  "title": {
+                    "en": "Calton Hill",
+                    "pt": "Calton Hill"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "National Monument, Nelson Monument, and the best skyline view in the city.",
+                    "pt": "National Monument, Nelson Monument e a melhor vista da cidade."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Calton+Hill+Edinburgh",
+                  "km": 1.2,
+                  "coords": {
+                    "lat": 55.9556,
+                    "lon": -3.1817
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Panorama west to the Castle",
+                      "mapsUrl": "https://maps.google.com/?q=Calton+Hill+Edinburgh",
+                      "wiki": "Calton Hill"
+                    }
+                  ]
+                },
+                {
+                  "time": "19:30",
+                  "dotColor": "#c17817",
+                  "title": {
+                    "en": "Ceilidh night at the Assembly Rooms",
+                    "pt": "Noite de ceilidh no Assembly Rooms"
+                  },
+                  "tags": [
+                    "din",
+                    "bkd"
+                  ],
+                  "description": {
+                    "en": "Live band, a caller who forgives beginners, and a big supper hall.",
+                    "pt": "Banda ao vivo, um mestre de cerimônias tolerante com iniciantes e um grande salão de jantar."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Assembly+Rooms+Edinburgh",
+                  "note": {
+                    "en": "Comfortable shoes — this is a dancing dinner, not a sitting one.",
+                    "pt": "Sapatos confortáveis — é um jantar dançante, não sentado."
+                  }
+                }
+              ]
+            },
+            {
+              "date": "2026-04-22",
+              "title": {
+                "en": "Free morning & drive north",
+                "pt": "Manhã livre e viagem para o norte"
+              },
+              "note": {
+                "en": "Pack the night before — checkout is 10am.",
+                "pt": "Arrume as malas na noite anterior — checkout é às 10h."
+              },
+              "routeMode": "driving",
+              "kmTotal": 3,
+              "staticWeather": {
+                "hi": 12,
+                "lo": 6,
+                "emoji": "🌦️"
+              },
+              "blocks": [
+                {
+                  "time": "08:30",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Breakfast & pack up",
+                    "pt": "Café da manhã e arrumar malas"
+                  },
+                  "tags": [
+                    "bkf"
+                  ],
+                  "description": {
+                    "en": "Last hotel breakfast before three nights on the road.",
+                    "pt": "Último café da manhã no hotel antes de três noites na estrada."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Royal+Mile+Edinburgh"
+                },
+                {
+                  "time": "09:30",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Dean Village stroll",
+                    "pt": "Passeio pelo Dean Village"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Quiet riverside village hidden below street level — 20 minutes, no ticket needed.",
+                    "pt": "Vilarejo tranquilo à beira do rio, escondido abaixo do nível da rua — 20 minutos, sem ingresso."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Dean+Village+Edinburgh",
+                  "km": 1.5,
+                  "coords": {
+                    "lat": 55.9557,
+                    "lon": -3.2183
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Dean Bridge from the riverbank",
+                      "mapsUrl": "https://maps.google.com/?q=Dean+Bridge+Edinburgh",
+                      "wiki": "Dean Bridge"
+                    }
+                  ]
+                },
+                {
+                  "time": "11:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Collect the hire car",
+                    "pt": "Retirada do carro alugado"
+                  },
+                  "tags": [
+                    "log"
+                  ],
+                  "description": {
+                    "en": "Rental desk near Haymarket. Confirm the collision waiver before driving off.",
+                    "pt": "Balcão de aluguel perto de Haymarket. Confirme a cobertura de danos antes de sair."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Haymarket+Edinburgh",
+                  "warning": {
+                    "en": "UK driving is on the left — allow a few minutes in the car park before joining traffic.",
+                    "pt": "No Reino Unido dirige-se pela esquerda — reserve alguns minutos no estacionamento antes de entrar no trânsito."
+                  }
+                },
+                {
+                  "time": "12:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Depart for the Highlands",
+                    "pt": "Partida para as Terras Altas"
+                  },
+                  "tags": [
+                    "tra",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "A82 north toward Glencoe — reckon on 3 hours with a stop.",
+                    "pt": "A82 rumo ao norte até Glencoe — conte com 3 horas com uma parada."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Glencoe+Scotland"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "highlands",
+      "title": {
+        "en": "Highlands Road Trip",
+        "pt": "Road Trip pelas Terras Altas"
+      },
+      "subtitle": {
+        "en": "Two ways to see it",
+        "pt": "Duas formas de ver"
+      },
+      "theme": "olive",
+      "weather": {
+        "lat": 57.4778,
+        "lon": -4.2247,
+        "granularity": "daily",
+        "timezone": "Europe/London"
+      },
+      "footer": {
+        "en": "Highlands · April 2026 · Alex & Sam",
+        "pt": "Terras Altas · abril de 2026 · Alex & Sam"
+      },
+      "defaultPlan": "coastal",
+      "plans": [
+        {
+          "id": "coastal",
+          "label": {
+            "en": "Coastal route",
+            "pt": "Rota costeira"
+          },
+          "days": [
+            {
+              "date": "2026-04-23",
+              "title": {
+                "en": "Glencoe & Glenfinnan",
+                "pt": "Glencoe e Glenfinnan"
+              },
+              "note": {
+                "en": "Long driving day, but the views do the entertaining.",
+                "pt": "Dia longo de estrada, mas a paisagem entretém sozinha."
+              },
+              "routeMode": "driving",
+              "kmTotal": 145,
+              "staticWeather": {
+                "hi": 11,
+                "lo": 3,
+                "emoji": "🌥️"
+              },
+              "blocks": [
+                {
+                  "time": "09:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Depart Edinburgh area",
+                    "pt": "Partida da região de Edimburgo"
+                  },
+                  "tags": [
+                    "tra"
+                  ],
+                  "description": {
+                    "en": "Fuel up before leaving — options thin out past Glencoe.",
+                    "pt": "Abasteça antes de sair — as opções diminuem depois de Glencoe."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Stirling+Scotland"
+                },
+                {
+                  "time": "11:15",
+                  "dotColor": "#4a5324",
+                  "title": {
+                    "en": "Glencoe viewpoint",
+                    "pt": "Mirante de Glencoe"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Pull-off with the classic Three Sisters view. Fifteen minutes is enough.",
+                    "pt": "Parada com a clássica vista das Three Sisters. Quinze minutos são suficientes."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Glencoe+Viewpoint+Scotland",
+                  "km": 0.3,
+                  "coords": {
+                    "lat": 56.6558,
+                    "lon": -5.0997
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Three Sisters from the viewpoint layby",
+                      "mapsUrl": "https://maps.google.com/?q=Glencoe+Viewpoint+Scotland",
+                      "wiki": "Glen Coe"
+                    }
+                  ]
+                },
+                {
+                  "time": "13:00",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch in Fort William",
+                    "pt": "Almoço em Fort William"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Café on the high street — last proper town before the wilder roads.",
+                    "pt": "Café na rua principal — última cidade de fato antes das estradas mais isoladas."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Fort+William+Scotland",
+                  "km": 0.5
+                },
+                {
+                  "time": "15:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Glenfinnan Viaduct",
+                    "pt": "Viaduto de Glenfinnan"
+                  },
+                  "tags": [
+                    "s",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "The Harry Potter viaduct — walk up to the monument-side viewpoint for the full curve.",
+                    "pt": "O viaduto de Harry Potter — suba até o mirante do lado do monumento para ver a curva completa."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Glenfinnan+Viaduct",
+                  "warning": {
+                    "en": "The Jacobite steam train crosses around midday and mid-afternoon — check the day’s timetable so you catch it crossing.",
+                    "pt": "O trem a vapor Jacobite cruza por volta do meio-dia e no início da tarde — confira o horário do dia para vê-lo passando."
+                  },
+                  "coords": {
+                    "lat": 56.8809,
+                    "lon": -5.4356
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Viaduct curve from the monument path",
+                      "mapsUrl": "https://maps.google.com/?q=Glenfinnan+Monument",
+                      "wiki": "Glenfinnan Viaduct",
+                      "fallbackImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Glenfinnan_Viaduct_from_the_air.jpg/330px-Glenfinnan_Viaduct_from_the_air.jpg"
+                    }
+                  ]
+                },
+                {
+                  "time": "18:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Check in & dinner near Fort William",
+                    "pt": "Check-in e jantar perto de Fort William"
+                  },
+                  "tags": [
+                    "din"
+                  ],
+                  "description": {
+                    "en": "Loch-side guesthouse — ask for a room facing the water.",
+                    "pt": "Pousada à beira do loch — peça um quarto de frente para a água."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Fort+William+Scotland"
+                }
+              ]
+            },
+            {
+              "date": "2026-04-24",
+              "title": {
+                "en": "Skye coastal drive",
+                "pt": "Estrada costeira até Skye"
+              },
+              "note": {
+                "en": "The Bealach na Bà pass is spectacular but slow — no rush.",
+                "pt": "O passo de Bealach na Bà é espetacular mas lento — sem pressa."
+              },
+              "routeMode": "driving",
+              "kmTotal": 180,
+              "staticWeather": {
+                "hi": 10,
+                "lo": 4,
+                "emoji": "🌦️"
+              },
+              "blocks": [
+                {
+                  "time": "09:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Depart for Eilean Donan",
+                    "pt": "Partida para Eilean Donan"
+                  },
+                  "tags": [
+                    "tra"
+                  ],
+                  "description": {
+                    "en": "A830 then A87 — classic loch-and-mountain driving.",
+                    "pt": "A830 depois A87 — estrada clássica entre lochs e montanhas."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Eilean+Donan+Castle"
+                },
+                {
+                  "time": "10:30",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Eilean Donan Castle",
+                    "pt": "Castelo de Eilean Donan"
+                  },
+                  "tags": [
+                    "s",
+                    "bkd"
+                  ],
+                  "description": {
+                    "en": "The most photographed castle in Scotland — arrive early to beat the coach groups.",
+                    "pt": "O castelo mais fotografado da Escócia — chegue cedo para evitar os grupos de ônibus."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Eilean+Donan+Castle",
+                  "km": 0.4,
+                  "coords": {
+                    "lat": 57.274,
+                    "lon": -5.5163
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Castle from the footbridge",
+                      "mapsUrl": "https://maps.google.com/?q=Eilean+Donan+Castle",
+                      "wiki": "Eilean Donan"
+                    }
+                  ]
+                },
+                {
+                  "time": "13:00",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch in Kyle of Lochalsh",
+                    "pt": "Almoço em Kyle of Lochalsh"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Harbourside chippy before crossing the bridge onto Skye.",
+                    "pt": "Peixaria à beira do porto antes de atravessar a ponte para Skye."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Kyle+of+Lochalsh"
+                },
+                {
+                  "time": "15:00",
+                  "dotColor": "#4a5324",
+                  "title": {
+                    "en": "Old Man of Storr",
+                    "pt": "Old Man of Storr"
+                  },
+                  "tags": [
+                    "s",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "Steep but short hike to the famous rock pinnacle. Boots on.",
+                    "pt": "Trilha íngreme mas curta até o famoso pináculo de rocha. Use botas."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Old+Man+of+Storr",
+                  "km": 3.8,
+                  "coords": {
+                    "lat": 57.5058,
+                    "lon": -6.1789
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Pinnacle against the sea loch",
+                      "mapsUrl": "https://maps.google.com/?q=Old+Man+of+Storr",
+                      "wiki": "Old Man of Storr"
+                    }
+                  ]
+                },
+                {
+                  "time": "19:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Dinner in Portree harbour",
+                    "pt": "Jantar no porto de Portree"
+                  },
+                  "tags": [
+                    "din"
+                  ],
+                  "description": {
+                    "en": "Colourful harbourfront, fresh seafood, early night before Talisker tomorrow.",
+                    "pt": "Orla colorida do porto, frutos do mar frescos, noite tranquila antes de Talisker amanhã."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Portree+Harbour",
+                  "coords": {
+                    "lat": 57.4128,
+                    "lon": -6.1954
+                  }
+                }
+              ]
+            },
+            {
+              "date": "2026-04-25",
+              "title": {
+                "en": "Skye highlights & the long drive back",
+                "pt": "Destaques de Skye e a longa volta"
+              },
+              "note": {
+                "en": "Early start — it’s the longest driving day of the trip.",
+                "pt": "Início cedo — é o dia de estrada mais longo da viagem."
+              },
+              "routeMode": "driving",
+              "kmTotal": 320,
+              "staticWeather": {
+                "hi": 11,
+                "lo": 4,
+                "emoji": "🌤️"
+              },
+              "blocks": [
+                {
+                  "time": "08:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Breakfast in Portree",
+                    "pt": "Café da manhã em Portree"
+                  },
+                  "tags": [
+                    "bkf"
+                  ],
+                  "description": {
+                    "en": "Harbourfront bakery — grab extra for the road.",
+                    "pt": "Padaria à beira do porto — pegue extra para a estrada."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Portree+Harbour"
+                },
+                {
+                  "time": "09:30",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Fairy Pools",
+                    "pt": "Fairy Pools"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Turquoise pools below the Cuillin — short walk in, paddling optional (and cold).",
+                    "pt": "Piscinas turquesa abaixo das Cuillin — caminhada curta, banho opcional (e gelado)."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Fairy+Pools+Skye",
+                  "km": 2.5,
+                  "coords": {
+                    "lat": 57.2456,
+                    "lon": -6.2597
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Pools with the Cuillin behind",
+                      "mapsUrl": "https://maps.google.com/?q=Fairy+Pools+Skye",
+                      "wiki": "Fairy Pools"
+                    }
+                  ]
+                },
+                {
+                  "time": "12:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch & fuel up before the drive",
+                    "pt": "Almoço e abastecer antes da estrada"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Last easy stop before the long haul south.",
+                    "pt": "Última parada fácil antes do longo trajeto para o sul."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Broadford+Skye"
+                },
+                {
+                  "time": "14:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Drive south to Edinburgh",
+                    "pt": "Viagem para o sul, até Edimburgo"
+                  },
+                  "tags": [
+                    "tra",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "Via Glen Coe and Loch Lomond — roughly 5.5 hours with stops.",
+                    "pt": "Via Glen Coe e Loch Lomond — cerca de 5h30 com paradas."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Edinburgh+Scotland",
+                  "note": {
+                    "en": "Swap drivers at the Green Welly Stop in Tyndrum — good coffee, clean loos.",
+                    "pt": "Troque de motorista no Green Welly Stop em Tyndrum — bom café, banheiros limpos."
+                  }
+                },
+                {
+                  "time": "20:00",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Drop off the car & final dinner",
+                    "pt": "Devolução do carro e jantar final"
+                  },
+                  "tags": [
+                    "din",
+                    "log"
+                  ],
+                  "description": {
+                    "en": "Return the hire car near Haymarket, then a last supper back in the Old Town.",
+                    "pt": "Devolva o carro alugado perto de Haymarket, depois uma última refeição na Cidade Velha."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Haymarket+Edinburgh"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "whisky",
+          "label": {
+            "en": "Whisky route",
+            "pt": "Rota do whisky"
+          },
+          "diffLabels": {
+            "added": {
+              "en": "+ ",
+              "pt": "+ "
+            },
+            "changed": {
+              "en": "~ ",
+              "pt": "~ "
+            },
+            "kept": {
+              "en": "Coastal pick — ",
+              "pt": "Escolha costeira — "
+            }
+          },
+          "days": [
+            {
+              "date": "2026-04-23",
+              "title": {
+                "en": "Glencoe & Glenfinnan",
+                "pt": "Glencoe e Glenfinnan"
+              },
+              "note": {
+                "en": "Long driving day, but the views do the entertaining.",
+                "pt": "Dia longo de estrada, mas a paisagem entretém sozinha."
+              },
+              "routeMode": "driving",
+              "kmTotal": 145,
+              "staticWeather": {
+                "hi": 11,
+                "lo": 3,
+                "emoji": "🌥️"
+              },
+              "blocks": [
+                {
+                  "time": "09:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Depart Edinburgh area",
+                    "pt": "Partida da região de Edimburgo"
+                  },
+                  "tags": [
+                    "tra"
+                  ],
+                  "description": {
+                    "en": "Fuel up before leaving — options thin out past Glencoe.",
+                    "pt": "Abasteça antes de sair — as opções diminuem depois de Glencoe."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Stirling+Scotland"
+                },
+                {
+                  "time": "11:15",
+                  "dotColor": "#4a5324",
+                  "title": {
+                    "en": "Glencoe viewpoint",
+                    "pt": "Mirante de Glencoe"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Pull-off with the classic Three Sisters view. Fifteen minutes is enough.",
+                    "pt": "Parada com a clássica vista das Three Sisters. Quinze minutos são suficientes."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Glencoe+Viewpoint+Scotland",
+                  "km": 0.3,
+                  "coords": {
+                    "lat": 56.6558,
+                    "lon": -5.0997
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Three Sisters from the viewpoint layby",
+                      "mapsUrl": "https://maps.google.com/?q=Glencoe+Viewpoint+Scotland",
+                      "wiki": "Glen Coe"
+                    }
+                  ]
+                },
+                {
+                  "time": "13:00",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch in Fort William",
+                    "pt": "Almoço em Fort William"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Café on the high street — last proper town before the wilder roads.",
+                    "pt": "Café na rua principal — última cidade de fato antes das estradas mais isoladas."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Fort+William+Scotland",
+                  "km": 0.5
+                },
+                {
+                  "time": "15:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Glenfinnan Viaduct",
+                    "pt": "Viaduto de Glenfinnan"
+                  },
+                  "tags": [
+                    "s",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "The Harry Potter viaduct — walk up to the monument-side viewpoint for the full curve.",
+                    "pt": "O viaduto de Harry Potter — suba até o mirante do lado do monumento para ver a curva completa."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Glenfinnan+Viaduct",
+                  "warning": {
+                    "en": "The Jacobite steam train crosses around midday and mid-afternoon — check the day’s timetable so you catch it crossing.",
+                    "pt": "O trem a vapor Jacobite cruza por volta do meio-dia e no início da tarde — confira o horário do dia para vê-lo passando."
+                  },
+                  "coords": {
+                    "lat": 56.8809,
+                    "lon": -5.4356
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Viaduct curve from the monument path",
+                      "mapsUrl": "https://maps.google.com/?q=Glenfinnan+Monument",
+                      "wiki": "Glenfinnan Viaduct",
+                      "fallbackImg": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Glenfinnan_Viaduct_from_the_air.jpg/330px-Glenfinnan_Viaduct_from_the_air.jpg"
+                    }
+                  ]
+                },
+                {
+                  "time": "18:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Check in & dinner near Fort William",
+                    "pt": "Check-in e jantar perto de Fort William"
+                  },
+                  "tags": [
+                    "din"
+                  ],
+                  "description": {
+                    "en": "Loch-side guesthouse — ask for a room facing the water.",
+                    "pt": "Pousada à beira do loch — peça um quarto de frente para a água."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Fort+William+Scotland"
+                }
+              ]
+            },
+            {
+              "date": "2026-04-24",
+              "title": {
+                "en": "Speyside detour & Loch Ness",
+                "pt": "Desvio por Speyside e Loch Ness"
+              },
+              "note": {
+                "en": "Trades the coast for distilleries and the loch — book the Dalwhinnie tour ahead.",
+                "pt": "Troca a costa por destilarias e o loch — reserve o tour de Dalwhinnie com antecedência."
+              },
+              "routeMode": "driving",
+              "kmTotal": 210,
+              "staticWeather": {
+                "hi": 10,
+                "lo": 3,
+                "emoji": "🌥️"
+              },
+              "blocks": [
+                {
+                  "time": "09:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Depart for Dalwhinnie",
+                    "pt": "Partida para Dalwhinnie"
+                  },
+                  "tags": [
+                    "tra"
+                  ],
+                  "description": {
+                    "en": "Backtrack briefly on the A82/A9 to reach Scotland’s highest distillery.",
+                    "pt": "Retorna brevemente pela A82/A9 para chegar à destilaria mais alta da Escócia."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Dalwhinnie+Distillery",
+                  "diff": {
+                    "kind": "changed",
+                    "reason": {
+                      "en": "Replaces the Eilean Donan drive — the whisky route heads inland instead of west.",
+                      "pt": "Substitui o trajeto até Eilean Donan — a rota do whisky segue para o interior em vez de oeste."
+                    }
+                  }
+                },
+                {
+                  "time": "11:00",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Dalwhinnie Distillery tour",
+                    "pt": "Tour da Destilaria Dalwhinnie"
+                  },
+                  "tags": [
+                    "s",
+                    "bkd"
+                  ],
+                  "description": {
+                    "en": "Warehouse tour and a dram at 1,073 feet — the highest distillery in Scotland.",
+                    "pt": "Tour pelo armazém e uma dose a 327 metros de altitude — a destilaria mais alta da Escócia."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Dalwhinnie+Distillery",
+                  "km": 0.2,
+                  "coords": {
+                    "lat": 56.9336,
+                    "lon": -4.2333
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "White-washed distillery buildings",
+                      "mapsUrl": "https://maps.google.com/?q=Dalwhinnie+Distillery",
+                      "wiki": "Dalwhinnie distillery"
+                    }
+                  ],
+                  "diff": {
+                    "kind": "added",
+                    "reason": {
+                      "en": "Added: the signature stop of the whisky route.",
+                      "pt": "Adicionado: a parada principal da rota do whisky."
+                    }
+                  }
+                },
+                {
+                  "time": "13:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch in Aviemore",
+                    "pt": "Almoço em Aviemore"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Cairngorms gateway town — quick bite before Loch Ness.",
+                    "pt": "Cidade porta de entrada dos Cairngorms — refeição rápida antes de Loch Ness."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Aviemore+Scotland",
+                  "diff": {
+                    "kind": "added",
+                    "reason": {
+                      "en": "Added: lunch stop replacing the Kyle of Lochalsh chippy.",
+                      "pt": "Adicionado: parada de almoço no lugar da peixaria de Kyle of Lochalsh."
+                    }
+                  }
+                },
+                {
+                  "time": "16:00",
+                  "dotColor": "#4a5324",
+                  "title": {
+                    "en": "Urquhart Castle & Loch Ness",
+                    "pt": "Castelo de Urquhart e Loch Ness"
+                  },
+                  "tags": [
+                    "s",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "Ruined castle on the loch shore — keep half an eye on the water, just in case.",
+                    "pt": "Castelo em ruínas à beira do loch — fique de olho na água, só por precaução."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Urquhart+Castle",
+                  "km": 0.6,
+                  "coords": {
+                    "lat": 57.3241,
+                    "lon": -4.4407
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Castle ruins over the loch",
+                      "mapsUrl": "https://maps.google.com/?q=Urquhart+Castle",
+                      "wiki": "Urquhart Castle"
+                    }
+                  ],
+                  "diff": {
+                    "kind": "changed",
+                    "reason": {
+                      "en": "Replaces the Old Man of Storr hike — no time left to also reach Skye today.",
+                      "pt": "Substitui a caminhada até Old Man of Storr — não sobra tempo para também chegar a Skye hoje."
+                    }
+                  }
+                },
+                {
+                  "time": "19:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Dinner in Inverness",
+                    "pt": "Jantar em Inverness"
+                  },
+                  "tags": [
+                    "din"
+                  ],
+                  "description": {
+                    "en": "Riverside restaurant in the Highland capital, whisky flight optional.",
+                    "pt": "Restaurante à beira-rio na capital das Terras Altas, degustação de whisky opcional."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Inverness+Scotland",
+                  "diff": {
+                    "kind": "changed",
+                    "reason": {
+                      "en": "Replaces Portree harbour — overnight in Inverness instead of Skye.",
+                      "pt": "Substitui o porto de Portree — pernoite em Inverness em vez de Skye."
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "date": "2026-04-25",
+              "title": {
+                "en": "Cairngorms return",
+                "pt": "Volta pelos Cairngorms"
+              },
+              "note": {
+                "en": "Shorter drive than the coastal route — more time for one last distillery.",
+                "pt": "Trajeto mais curto que a rota costeira — mais tempo para uma última destilaria."
+              },
+              "routeMode": "driving",
+              "kmTotal": 230,
+              "staticWeather": {
+                "hi": 11,
+                "lo": 3,
+                "emoji": "🌤️"
+              },
+              "blocks": [
+                {
+                  "time": "08:30",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Breakfast in Inverness",
+                    "pt": "Café da manhã em Inverness"
+                  },
+                  "tags": [
+                    "bkf"
+                  ],
+                  "description": {
+                    "en": "Riverside café before the drive south.",
+                    "pt": "Café à beira-rio antes da viagem para o sul."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Inverness+Scotland",
+                  "diff": {
+                    "kind": "changed",
+                    "reason": {
+                      "en": "Replaces the Portree breakfast — starting point is Inverness on this route.",
+                      "pt": "Substitui o café da manhã em Portree — o ponto de partida nesta rota é Inverness."
+                    }
+                  }
+                },
+                {
+                  "time": "10:30",
+                  "dotColor": "#1e3a5f",
+                  "title": {
+                    "en": "Cairngorms National Park stop",
+                    "pt": "Parada no Parque Nacional dos Cairngorms"
+                  },
+                  "tags": [
+                    "s"
+                  ],
+                  "description": {
+                    "en": "Short reindeer-centre walk and a view over the highest plateau in Britain.",
+                    "pt": "Caminhada curta no centro de renas e vista sobre o planalto mais alto da Grã-Bretanha."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Cairngorms+National+Park",
+                  "km": 2,
+                  "coords": {
+                    "lat": 57.1364,
+                    "lon": -3.6725
+                  },
+                  "photoSpots": [
+                    {
+                      "name": "Plateau view from the visitor centre",
+                      "mapsUrl": "https://maps.google.com/?q=Cairngorms+National+Park",
+                      "wiki": "Cairngorms National Park"
+                    }
+                  ],
+                  "diff": {
+                    "kind": "added",
+                    "reason": {
+                      "en": "Added: swaps the Fairy Pools for a Cairngorms stop, closer to this route’s path.",
+                      "pt": "Adicionado: troca as Fairy Pools por uma parada nos Cairngorms, mais próxima do trajeto desta rota."
+                    }
+                  }
+                },
+                {
+                  "time": "13:00",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Lunch in Pitlochry",
+                    "pt": "Almoço em Pitlochry"
+                  },
+                  "tags": [
+                    "lun"
+                  ],
+                  "description": {
+                    "en": "Pretty Victorian town, good bakeries, last stop before the motorway.",
+                    "pt": "Cidade vitoriana charmosa, boas padarias, última parada antes da rodovia."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Pitlochry+Scotland",
+                  "diff": {
+                    "kind": "changed",
+                    "reason": {
+                      "en": "Replaces the Broadford/Skye lunch stop — this route never reaches Skye.",
+                      "pt": "Substitui a parada de almoço em Broadford/Skye — esta rota nunca chega a Skye."
+                    }
+                  }
+                },
+                {
+                  "time": "15:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Drive south to Edinburgh",
+                    "pt": "Viagem para o sul, até Edimburgo"
+                  },
+                  "tags": [
+                    "tra",
+                    "ful"
+                  ],
+                  "description": {
+                    "en": "Via the A9 — roughly 2.5 hours, noticeably shorter than the coastal return.",
+                    "pt": "Via A9 — cerca de 2h30, visivelmente mais curto que a volta costeira."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Edinburgh+Scotland",
+                  "diff": {
+                    "kind": "kept",
+                    "reason": {
+                      "en": "Same destination as the coastal route, just a shorter final leg.",
+                      "pt": "Mesmo destino da rota costeira, apenas com o trecho final mais curto."
+                    }
+                  }
+                },
+                {
+                  "time": "18:30",
+                  "dotColor": "#3d5a3d",
+                  "title": {
+                    "en": "Drop off the car & final dinner",
+                    "pt": "Devolução do carro e jantar final"
+                  },
+                  "tags": [
+                    "din",
+                    "log"
+                  ],
+                  "description": {
+                    "en": "Return the hire car near Haymarket, then a last supper back in the Old Town.",
+                    "pt": "Devolva o carro alugado perto de Haymarket, depois uma última refeição na Cidade Velha."
+                  },
+                  "mapsUrl": "https://maps.google.com/?q=Haymarket+Edinburgh"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
