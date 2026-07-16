@@ -73,7 +73,7 @@
 </svelte:head>
 
 <header>
-	<div class="bar">
+	<div class="bar" class:signed-in={!!data.user}>
 		<div class="left">
 			<a class="brand" href="/" aria-label="Zarparia — home">
 				{@html markSvg}
@@ -239,9 +239,21 @@
 			text-underline-offset: 0.15em;
 		}
 	}
+	/* Signed-in rows carry two 40px circles (theme + feedback) plus "Sign out",
+	   which measures ~368px of minimum content — it genuinely cannot fit at 360.
+	   When the row can't fit, flexbox shrinks the .left CONTAINER below its
+	   (un-shrinkable) children's width and they visually overflow it, painting
+	   the theme toggle under the feedback circle. Hide the wordmark (crest-only
+	   brand) below 380px: measured stop-fitting point 368px + headroom for
+	   Android font metrics. Signed-out fits at 360 and keeps its wordmark. */
+	@media (max-width: 379px) {
+		.bar.signed-in .wordmark {
+			display: none;
+		}
+	}
 	/* Safety valve for very narrow phones (below the 360px baseline): drop the
 	   wordmark so the crest stands alone, guaranteeing the row can't overflow even
-	   on the smallest devices. At >=360px the wordmark stays. */
+	   on the smallest devices. At >=360px the (signed-out) wordmark stays. */
 	@media (max-width: 359px) {
 		.wordmark {
 			display: none;
@@ -277,5 +289,11 @@
 	}
 	form {
 		margin: 0;
+		/* The logout form is a flex child of nav; without a guard it gets crushed
+		   and "Sign out" wraps onto two lines. It must hold its one-line width. */
+		flex-shrink: 0;
+	}
+	.signout {
+		white-space: nowrap;
 	}
 </style>
