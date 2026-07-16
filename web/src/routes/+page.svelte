@@ -258,10 +258,14 @@
 				<div class="auth-lockup">
 					<div class="auth-lockup-row">
 						<span class="auth-mark">{@html markSvg}</span>
-						<span class="auth-wordmark">{@html wordmarkSvg}</span>
+						<span class="auth-wordmark-col">
+							<span class="auth-wordmark">{@html wordmarkSvg}</span>
+							<!-- Brand tagline: part of the mark, so it stays English in both locales.
+							     Centered under the wordmark only (not the mark), matching
+							     brand/zarparia-lockup-tagline-*.svg. -->
+							<p class="auth-tagline">Chart your journey.</p>
+						</span>
 					</div>
-					<!-- Brand tagline: part of the mark, so it stays English in both locales. -->
-					<p class="auth-tagline">Chart your journey.</p>
 				</div>
 				<a class="auth-google-btn" href="/auth/login/google">
 					<svg class="google-g" aria-hidden="true" viewBox="0 0 18 18" width="18" height="18">
@@ -533,6 +537,13 @@
 		align-items: center;
 		text-align: center;
 		margin-bottom: 1.75rem;
+	}
+	/* Wordmark + tagline stack: the tagline centers under the wordmark alone,
+	   per the canonical tagline lockup asset. */
+	.auth-wordmark-col {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
 	/* Horizontal lockup: mark + wordmark on one row, sized to the canonical
 	   lockup's proportions (wordmark caps top-aligned with the mark; the star
