@@ -562,7 +562,7 @@ const enGB: Messages = {
 	'landing.orDivider': 'or',
 
 	'demo.banner': "You're viewing a sample trip — everything is interactive but nothing is saved.",
-	'demo.signInCta': 'Sign in with Google',
+	'demo.signInCta': 'Continue with Google',
 	'demo.back': '← Back',
 	'demo.about': 'About',
 	'demo.aboutTag': 'Demo',
@@ -1047,7 +1047,7 @@ const ptBR: Messages = {
 	'landing.orDivider': 'ou',
 
 	'demo.banner': 'Você está vendo uma viagem de exemplo — tudo é interativo, mas nada é salvo.',
-	'demo.signInCta': 'Entrar com o Google',
+	'demo.signInCta': 'Continuar com o Google',
 	'demo.back': '← Voltar',
 	'demo.about': 'Sobre',
 	'demo.aboutTag': 'Demonstração',
