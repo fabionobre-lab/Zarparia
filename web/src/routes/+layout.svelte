@@ -225,5 +225,14 @@
 			grid-template-columns: 240px minmax(0, 1fr);
 			align-items: start;
 		}
+		/* Family "Demo banner" anatomy (DESIGN.md): the strip is pinned
+		   full-width and fixed above this grid (see routes/demo/+page.svelte),
+		   so it no longer occupies flow space. Push BOTH columns — sidebar and
+		   content — down by its measured height (published as --demo-banner-h)
+		   so nothing starts underneath it. No-op (0px) on every other route,
+		   where <body> never gets the has-demo-banner class. */
+		:global(body.has-demo-banner) .layout.sidebar-mode {
+			padding-top: var(--demo-banner-h, 0px);
+		}
 	}
 </style>

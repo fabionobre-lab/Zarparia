@@ -33,6 +33,39 @@
 		setSidebarAbout({ label: t('demo.about'), open: () => (aboutOpen = true) });
 	});
 	onDestroy(() => setSidebarAbout(null));
+
+	// Family "Demo banner" anatomy (DESIGN.md): the strip spans the FULL
+	// viewport width at ≥960px — above the sidebar, never clipped to the
+	// content column. Below 960px there's no sidebar and the banner stays
+	// in-flow (sticky), so this is a no-op there in practice (the CSS var and
+	// body class are only consumed by the ≥960px rules).
+	let demoBannerEl = $state<HTMLDivElement | null>(null);
+
+	// Publish the banner's measured height (it can wrap onto two lines at
+	// narrower desktop widths) as --demo-banner-h so the layout can push the
+	// sidebar + content column below it. Mirrors Nobria's --demo-h. Cleared on
+	// unmount so a later route's layout isn't left with a stale offset.
+	$effect(() => {
+		const el = demoBannerEl;
+		if (!el) return;
+		const root = document.documentElement;
+		const set = () => root.style.setProperty('--demo-banner-h', `${el.offsetHeight}px`);
+		set();
+		const ro = new ResizeObserver(set);
+		ro.observe(el);
+		return () => {
+			ro.disconnect();
+			root.style.removeProperty('--demo-banner-h');
+		};
+	});
+
+	// Stamp <body class="has-demo-banner"> while this page is mounted, so the
+	// root layout's grid (and the sticky sidebar) know to offset below the
+	// fixed banner. Removed on destroy.
+	$effect(() => {
+		document.body.classList.add('has-demo-banner');
+		return () => document.body.classList.remove('has-demo-banner');
+	});
 </script>
 
 <svelte:head>
@@ -40,7 +73,7 @@
 </svelte:head>
 
 <div class="page">
-	<div class="demo-banner">
+	<div class="demo-banner" bind:this={demoBannerEl}>
 		<div class="demo-banner-inner">
 			<span class="demo-banner-text">{t('demo.banner')}</span>
 			<div class="demo-banner-actions">
@@ -80,6 +113,26 @@
 		   local --surface-raised alias (see tokens.css). */
 		background: var(--an-surface-raised);
 		border-bottom: 1px solid var(--hairline);
+	}
+	/* Family "Demo banner" anatomy (DESIGN.md): "The strip spans the FULL
+	   viewport width at every breakpoint — above/with any rail or sidebar,
+	   never clipped to the content column; navigation chrome starts below
+	   it." Below 960px the banner lives inside normal block flow (no
+	   sidebar exists there, so the sticky behaviour above already spans the
+	   full viewport). At ≥960px the root layout becomes a 240px-sidebar +
+	   content grid and this element sits inside the content column, so
+	   `position: sticky` alone would start it at x=240 — pin it to the
+	   viewport instead. z-index clears the Sidebar (default stacking, no
+	   explicit z-index) but stays below Toast (1050) / MoreSheet (1100) /
+	   dialogs, matching the app's z-index ladder. */
+	@media (min-width: 960px) {
+		.demo-banner {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			z-index: 1000;
+		}
 	}
 	/* Background stays full-bleed; the content is centered and capped to the trip
 	   shell width so the actions line up with the (up to 1060px) shell instead of

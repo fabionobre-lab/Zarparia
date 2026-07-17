@@ -239,6 +239,16 @@
 			border-right: 1px solid var(--hairline);
 			font-family: var(--font-ui);
 		}
+		/* Demo banner (DESIGN.md): the banner is fixed above this sticky
+		   sidebar (see routes/demo/+page.svelte + root +layout.svelte's
+		   padding-top). Without this, scrolling would re-stick the sidebar
+		   to y=0 — underneath the fixed banner's z-index — clipping its
+		   brand zone. Offset both the sticky anchor and the height by the
+		   published --demo-banner-h so it sticks below the banner instead. */
+		:global(body.has-demo-banner) .sidebar {
+			top: var(--demo-banner-h, 0px);
+			height: calc(100vh - var(--demo-banner-h, 0px));
+		}
 	}
 
 	/* ── Zone 1: brand ── */
