@@ -3,7 +3,7 @@
 // (see vitest.config.ts / test/apply-migrations.ts), not a mock.
 import { env } from 'cloudflare:workers';
 import { describe, expect, it } from 'vitest';
-import { listPendingUsers, upsertGoogleUser } from '../src/lib/server/users';
+import { listPendingUsers, upsertFirebaseUser, upsertGoogleUser } from '../src/lib/server/users';
 
 describe('upsertGoogleUser — approval status', () => {
 	it('a brand-new sign-up starts pending', async () => {
@@ -51,6 +51,75 @@ describe('upsertGoogleUser — approval status', () => {
 		expect(second.status).toBe('pending');
 		expect(second.name).toBe('Second Name');
 		expect(second.id).toBe(first.id);
+	});
+});
+
+describe('upsertFirebaseUser — approval status + account linking', () => {
+	it('a brand-new email+password sign-up starts pending', async () => {
+		const user = await upsertFirebaseUser(
+			env.DB,
+			{ uid: 'firebase-uid-newbie', email: 'fb-newbie@example.com', name: null },
+			undefined
+		);
+		expect(user.status).toBe('pending');
+		expect(user.email).toBe('fb-newbie@example.com');
+	});
+
+	it('a sign-up matching the default admin email is auto-approved', async () => {
+		const user = await upsertFirebaseUser(
+			env.DB,
+			{ uid: 'firebase-uid-admin', email: 'fabionobre.ai@gmail.com', name: null },
+			undefined
+		);
+		expect(user.status).toBe('approved');
+	});
+
+	it('repeat login by the same Firebase uid returns the same user', async () => {
+		const first = await upsertFirebaseUser(
+			env.DB,
+			{ uid: 'firebase-uid-repeat', email: 'fb-repeat@example.com', name: null },
+			undefined
+		);
+		const second = await upsertFirebaseUser(
+			env.DB,
+			{ uid: 'firebase-uid-repeat', email: 'fb-repeat@example.com', name: null },
+			undefined
+		);
+		expect(second.id).toBe(first.id);
+		expect(second.status).toBe(first.status);
+	});
+
+	it('links to an existing Google-linked account by verified email, without touching its provider', async () => {
+		const googleUser = await upsertGoogleUser(
+			env.DB,
+			{ sub: 'google-sub-linktest', email: 'shared-identity@example.com', name: 'Shared Person' },
+			undefined
+		);
+
+		const linked = await upsertFirebaseUser(
+			env.DB,
+			{ uid: 'firebase-uid-linktest', email: 'shared-identity@example.com', name: 'Shared Person' },
+			undefined
+		);
+
+		// Same account (same id), status carried over from the Google row —
+		// not re-created as a separate pending Firebase-provider row.
+		expect(linked.id).toBe(googleUser.id);
+		expect(linked.status).toBe(googleUser.status);
+
+		// A later Firebase login must still resolve by uid → provider row, i.e.
+		// no 'firebase' provider row was ever created for this uid; confirm no
+		// duplicate account exists for the email.
+		const rows = await env.DB.prepare('SELECT COUNT(*) as n FROM users WHERE email = ?')
+			.bind('shared-identity@example.com')
+			.first<{ n: number }>();
+		expect(rows?.n).toBe(1);
+
+		const row = await env.DB.prepare('SELECT provider, provider_user_id FROM users WHERE id = ?')
+			.bind(googleUser.id)
+			.first<{ provider: string; provider_user_id: string }>();
+		expect(row?.provider).toBe('google');
+		expect(row?.provider_user_id).toBe('google-sub-linktest');
 	});
 });
 

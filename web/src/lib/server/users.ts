@@ -71,6 +71,92 @@ export async function upsertGoogleUser(
 	return { id, email, name, avatarUrl: avatar, status };
 }
 
+export interface FirebaseProfile {
+	uid: string;
+	email: string;
+	name?: string | null;
+}
+
+/** Find-or-create a user from a verified Firebase ID token, keyed on the
+ *  stable `uid` (the token's `sub` claim). Same approval-status rules as
+ *  upsertGoogleUser: a brand-new sign-up starts 'pending' EXCEPT when the
+ *  email matches the platform admin, which is auto-approved. Callers must
+ *  have already confirmed `email_verified` on the token before calling this
+ *  — it is not re-checked here.
+ *
+ *  Account linking: if no row is keyed by this Firebase uid yet, but a row
+ *  already exists with the same (normalized) email under a different
+ *  provider — e.g. that address signed in with Google before — that existing
+ *  row is returned AS-IS, without touching its provider/provider_user_id.
+ *  Because the caller only reaches this path with a verified email, this is
+ *  "same person, different sign-in method reaching the same account," not an
+ *  account-takeover surface: the email column is UNIQUE, so only whoever
+ *  proved control of that address (via Firebase's own verification email)
+ *  gets in this way. */
+export async function upsertFirebaseUser(
+	db: D1Database,
+	profile: FirebaseProfile,
+	platform: App.Platform | undefined
+): Promise<SessionUser> {
+	const email = profile.email.trim().toLowerCase();
+	const name = profile.name ?? null;
+
+	const existing = await db
+		.prepare('SELECT id, status FROM users WHERE provider = ? AND provider_user_id = ?')
+		.bind('firebase', profile.uid)
+		.first<{ id: string; status: UserStatus }>();
+
+	if (existing) {
+		try {
+			await db.prepare('UPDATE users SET email = ? WHERE id = ?').bind(email, existing.id).run();
+			return { id: existing.id, email, name, avatarUrl: null, status: existing.status };
+		} catch (e) {
+			if (!isUniqueViolation(e)) throw e;
+			// Another account already claims this email — keep the stored email.
+			const row = await db
+				.prepare('SELECT email, name, avatar_url AS avatarUrl FROM users WHERE id = ?')
+				.bind(existing.id)
+				.first<{ email: string; name: string | null; avatarUrl: string | null }>();
+			return {
+				id: existing.id,
+				email: row?.email ?? email,
+				name: row?.name ?? name,
+				avatarUrl: row?.avatarUrl ?? null,
+				status: existing.status
+			};
+		}
+	}
+
+	const byEmail = await db
+		.prepare('SELECT id, email, name, avatar_url AS avatarUrl, status FROM users WHERE email = ?')
+		.bind(email)
+		.first<{ id: string; email: string; name: string | null; avatarUrl: string | null; status: UserStatus }>();
+	if (byEmail) {
+		// Link by verified email — the row (and its existing provider) is
+		// returned unchanged; this login just reaches the same account.
+		return { id: byEmail.id, email: byEmail.email, name: byEmail.name, avatarUrl: byEmail.avatarUrl, status: byEmail.status };
+	}
+
+	const isAdminEmail = email === getAdminEmail(platform);
+	const status: UserStatus = isAdminEmail ? 'approved' : 'pending';
+	const approvedAt = isAdminEmail ? new Date().toISOString() : null;
+
+	const id = crypto.randomUUID();
+	try {
+		await db
+			.prepare(
+				`INSERT INTO users (id, email, name, avatar_url, provider, provider_user_id, status, approved_at)
+				 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+			)
+			.bind(id, email, name, null, 'firebase', profile.uid, status, approvedAt)
+			.run();
+	} catch (e) {
+		if (isUniqueViolation(e)) throw error(409, 'Another account already uses this email address.');
+		throw e;
+	}
+	return { id, email, name, avatarUrl: null, status };
+}
+
 // ── Admin: approval queue (web/src/routes/admin/approvals) ────────────────
 
 export interface AdminUserRow {

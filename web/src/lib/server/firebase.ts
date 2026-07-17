@@ -53,6 +53,15 @@ function base64UrlToBytes(b64url: string): Uint8Array {
 	return bytes;
 }
 
+/** Copies a Uint8Array's bytes into a plain ArrayBuffer. Some TS lib versions
+ *  type `Uint8Array<ArrayBufferLike>` (as returned by `new Uint8Array(n)` /
+ *  `TextEncoder#encode`) as incompatible with the `BufferSource` that
+ *  `crypto.subtle.verify` expects, which wants an `ArrayBuffer` specifically
+ *  — this sidesteps that mismatch instead of fighting the lib types. */
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer {
+	return bytes.slice().buffer as ArrayBuffer;
+}
+
 function decodeJwtSegment<T>(segment: string): T {
 	const bytes = base64UrlToBytes(segment);
 	return JSON.parse(new TextDecoder().decode(bytes)) as T;
@@ -127,6 +136,7 @@ async function getJwks(): Promise<Jwk[]> {
 	const res = await fetch(JWKS_URL);
 	if (!res.ok) throw new Error(`firebase jwks fetch failed: ${res.status}`);
 	const body = (await res.json()) as { keys: Jwk[] };
+	if (!Array.isArray(body.keys)) throw new Error('firebase jwks response missing keys array');
 	const maxAgeSeconds = parseMaxAgeSeconds(res.headers.get('cache-control'));
 	jwksCache = { keys: body.keys, expiresAtMs: now + maxAgeSeconds * 1000 };
 	return body.keys;
@@ -136,15 +146,18 @@ async function getJwks(): Promise<Jwk[]> {
  *  trying the key matching the token's `kid` first (then falling back to the
  *  rest — Google rotates these keys and a just-rotated cache could still hold
  *  the previous set for a moment). */
-async function verifySignature(token: string, kid: string | undefined): Promise<boolean> {
+async function verifySignature(
+	headerB64: string,
+	payloadB64: string,
+	signature: Uint8Array,
+	kid: string | undefined
+): Promise<boolean> {
 	const keys = await getJwks();
 	const matching = kid ? keys.filter((k) => k.kid === kid) : [];
 	const rest = kid ? keys.filter((k) => k.kid !== kid) : keys;
 	const ordered = [...matching, ...rest];
 
-	const [headerB64, payloadB64, sigB64] = splitToken(token);
 	const data = new TextEncoder().encode(`${headerB64}.${payloadB64}`);
-	const signature = base64UrlToBytes(sigB64);
 
 	for (const jwk of ordered) {
 		try {
@@ -155,7 +168,12 @@ async function verifySignature(token: string, kid: string | undefined): Promise<
 				false,
 				['verify']
 			);
-			const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, signature, data);
+			const valid = await crypto.subtle.verify(
+				'RSASSA-PKCS1-v1_5',
+				key,
+				toArrayBuffer(signature),
+				toArrayBuffer(data)
+			);
 			if (valid) return true;
 		} catch {
 			// Malformed/incompatible key — try the next one.
@@ -186,8 +204,19 @@ export async function verifyFirebaseIdToken(
 
 	if (header.alg !== 'RS256' || !header.kid) return { ok: false, error: 'unsupported_algorithm' };
 
+	// Decoded separately from (and before) the JWKS/network try-block below, so
+	// a malformed signature segment is reported as invalid-signature rather
+	// than misattributed to a JWKS-unavailable failure.
+	const [headerB64, payloadB64, sigB64] = splitToken(token);
+	let signature: Uint8Array;
 	try {
-		const validSignature = await verifySignature(token, header.kid);
+		signature = base64UrlToBytes(sigB64);
+	} catch {
+		return { ok: false, error: 'invalid_signature' };
+	}
+
+	try {
+		const validSignature = await verifySignature(headerB64, payloadB64, signature, header.kid);
 		if (!validSignature) return { ok: false, error: 'invalid_signature' };
 	} catch {
 		return { ok: false, error: 'jwks_unavailable' };

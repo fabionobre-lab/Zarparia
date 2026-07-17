@@ -1,0 +1,36 @@
+// Client-side Firebase config for email+password sign-in. Identity only —
+// the Worker never talks to Firebase directly; it verifies the ID token this
+// SDK produces (see src/lib/server/firebase.ts) and issues its own session.
+//
+// The firebase/app and firebase/auth packages are only ever reached through
+// the dynamic import() in getFirebaseAuth() below, so the SDK never lands in
+// the main bundle for the (majority of) signed-out visitors who use Google
+// sign-in instead.
+// TODO: paste Firebase web-app config after provisioning
+const firebaseConfig = {
+	apiKey: '',
+	authDomain: '',
+	projectId: '',
+	appId: ''
+};
+
+/** False until firebaseConfig is filled in — gates the email/password UI so a
+ *  not-yet-provisioned deploy shows only the Google button, never a form that
+ *  can't actually work. Mirrors the server-side firebaseProjectId gate in
+ *  src/lib/server/authenv.ts. */
+export const firebaseEnabled = firebaseConfig.projectId !== '';
+
+let authPromise: Promise<import('firebase/auth').Auth> | null = null;
+
+/** Lazily initializes the Firebase app + Auth instance, once. */
+export function getFirebaseAuth(): Promise<import('firebase/auth').Auth> {
+	if (!authPromise) {
+		authPromise = (async () => {
+			const { initializeApp, getApps, getApp } = await import('firebase/app');
+			const { getAuth } = await import('firebase/auth');
+			const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+			return getAuth(app);
+		})();
+	}
+	return authPromise;
+}

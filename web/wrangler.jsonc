@@ -14,7 +14,11 @@
 	// explicit in prod config instead of relying on the DEFAULT_ADMIN_EMAIL
 	// source fallback in src/lib/server/admin.ts. Same value as that fallback
 	// — this is a config-explicitness change, not a behaviour change.
-	"vars": { "ADMIN_EMAIL": "fabionobre.ai@gmail.com" },
+	"vars": {
+		"ADMIN_EMAIL": "fabionobre.ai@gmail.com",
+		// TODO: set after Firebase provisioning
+		"FIREBASE_PROJECT_ID": ""
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",

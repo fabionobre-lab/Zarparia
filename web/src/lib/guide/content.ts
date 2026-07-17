@@ -28,6 +28,14 @@ export const guide: GuideCatalog = {
 						]
 					},
 					{
+						id: 'sign-in-email',
+						title: 'Sign in with email and password',
+						body: [
+							'Where available, you can also create an account with just an email address and a password instead of using Google. Create an account from the sign-in card, then check your inbox for a verification link — you need to verify your email before you can sign in.',
+							"Forgot your password? Use the \"Forgot password?\" link on the sign-in card to get a reset email. If you sign in with Google using the same email address you used for email+password, both reach the same account — Zarparia treats a verified email as one identity no matter which way you sign in with it."
+						]
+					},
+					{
 						id: 'approval-wait',
 						title: 'Why do I have to wait for approval?',
 						body: [
@@ -230,6 +238,14 @@ export const guide: GuideCatalog = {
 						title: 'Entrar com o Google',
 						body: [
 							'O Zarparia só permite entrar com uma conta do Google — não há senha separada para criar ou lembrar. Seu nome, e-mail e avatar vêm do Google; nada mais na sua conta do Google é acessado, a menos que você conecte o Google Fotos separadamente.'
+						]
+					},
+					{
+						id: 'sign-in-email',
+						title: 'Entrar com e-mail e senha',
+						body: [
+							'Quando disponível, você também pode criar uma conta usando apenas um e-mail e uma senha, em vez do Google. Crie uma conta a partir do cartão de login e depois verifique sua caixa de entrada para um link de confirmação — é preciso confirmar o e-mail antes de conseguir entrar.',
+							'Esqueceu a senha? Use o link "Esqueceu a senha?" no cartão de login para receber um e-mail de redefinição. Se você entrar com o Google usando o mesmo e-mail que usou no cadastro por e-mail e senha, os dois caminhos chegam à mesma conta — o Zarparia trata um e-mail verificado como uma única identidade, não importa por qual caminho você entra com ele.'
 						]
 					},
 					{

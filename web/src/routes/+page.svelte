@@ -2,6 +2,8 @@
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
 	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
 	import BottomBar from '$lib/nav/BottomBar.svelte';
+	import AuthEmailForm from './AuthEmailForm.svelte';
+	import { firebaseEnabled } from '$lib/firebase';
 	import { t, formatDateRange } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import { page } from '$app/state';
@@ -272,6 +274,9 @@
 					</svg>
 					{t('header.signInGoogle')}
 				</a>
+				{#if firebaseEnabled}
+					<AuthEmailForm />
+				{/if}
 				<p class="auth-consent">
 					{#each consentParts as part, i (i)}
 						{#if part === '%TERMS%'}<a href="/terms">{t('legal.terms')}</a
