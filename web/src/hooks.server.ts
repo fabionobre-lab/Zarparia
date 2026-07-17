@@ -8,6 +8,7 @@ import {
 import { clearPhotosTokenCookie } from '$lib/server/googlephotos';
 import {
 	LOCALE_COOKIE,
+	LEGACY_LOCALE_COOKIE,
 	LOCALE_COOKIE_MAX_AGE,
 	isLocale,
 	resolveLocale
@@ -84,10 +85,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// ── UI locale ──
 	// Cookie wins; first visit derives from Accept-Language (pt* → pt-BR, else
 	// en-GB) and is persisted so the choice is stable on later requests.
-	const cookieLocale = event.cookies.get(LOCALE_COOKIE);
+	// Migration: the cookie was renamed from `ui-locale` to `zarparia-lang`
+	// (Aria Nobre storage-key convention, round-2 sweep — same pattern as the
+	// theme cookie below). Prefer the new cookie; fall back to the legacy one
+	// once and immediately re-issue it under the new name.
+	const newLocaleCookie = event.cookies.get(LOCALE_COOKIE);
+	const cookieLocale = newLocaleCookie ?? event.cookies.get(LEGACY_LOCALE_COOKIE);
 	const locale = resolveLocale(cookieLocale, event.request.headers.get('accept-language'));
 	event.locals.locale = locale;
-	if (!isLocale(cookieLocale)) {
+	if (!isLocale(newLocaleCookie)) {
 		event.cookies.set(LOCALE_COOKIE, locale, {
 			path: '/',
 			sameSite: 'lax',

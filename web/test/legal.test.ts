@@ -90,8 +90,8 @@ describe('privacy policy content', () => {
 			expect(cookies, `${locale} cookies section`).toBeDefined();
 			const text = (cookies!.bullets ?? []).join(' ');
 			expect(text).toContain('session');
-			expect(text).toContain('ui-locale');
-			expect(text).toContain('trips-theme');
+			expect(text).toContain('zarparia-lang');
+			expect(text).toContain('zarparia-theme');
 		}
 	});
 

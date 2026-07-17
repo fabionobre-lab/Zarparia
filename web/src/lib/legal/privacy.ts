@@ -39,7 +39,7 @@ export const privacy: LegalCatalog = {
 				],
 				bullets: [
 					'session — keeps you signed in. Set only once you sign in with Google; httpOnly, so no page script can read it.',
-					"ui-locale — remembers whether you're using the app in English or Portuguese.",
+					"zarparia-lang — remembers whether you're using the app in English or Portuguese (renamed from ui-locale; an older visit's cookie is carried over and re-issued under the new name).",
 					'zarparia-theme — remembers your light/dark/system theme preference.'
 				]
 			},
@@ -140,7 +140,7 @@ export const privacy: LegalCatalog = {
 				],
 				bullets: [
 					'session — mantém você conectado. Definido somente depois que você entra com o Google; é httpOnly, então nenhum script da página consegue lê-lo.',
-					'ui-locale — lembra se você está usando o aplicativo em inglês ou em português.',
+					'zarparia-lang — lembra se você está usando o aplicativo em inglês ou em português (renomeado de ui-locale; o cookie de uma visita antiga é migrado e reemitido com o novo nome).',
 					'zarparia-theme — lembra sua preferência de tema claro/escuro/sistema.'
 				]
 			},

@@ -33,6 +33,10 @@
 	let busy = $state(false);
 	let errMsg = $state('');
 	let deleteConfirmOpen = $state(false);
+	/* Snapshot of the photo the user actually confirmed for deletion. `photo`
+	   is derived from `index`, so without this, arrow-navigating while the
+	   confirm dialog is open would retarget the delete to a different photo. */
+	let deleteTarget: TripPhoto | null = $state(null);
 
 	function prev() {
 		if (index > 0) index--;
@@ -41,6 +45,11 @@
 		if (index < photos.length - 1) index++;
 	}
 	function onKeydown(e: KeyboardEvent) {
+		/* While the delete confirm (a native <dialog>) is open it owns the
+		   keyboard: its own Escape closes just the dialog, and that same
+		   keydown must not also reach here and dismiss the whole lightbox;
+		   arrows must not keep navigating underneath it. */
+		if (deleteConfirmOpen) return;
 		if (e.key === 'Escape') onclose();
 		else if (e.key === 'ArrowLeft') prev();
 		else if (e.key === 'ArrowRight') next();
@@ -68,15 +77,18 @@
 
 	function remove() {
 		if (!photo) return;
+		deleteTarget = photo;
 		deleteConfirmOpen = true;
 	}
 
 	async function confirmRemove() {
-		if (!photo) return;
+		const target = deleteTarget;
+		deleteTarget = null;
+		if (!target) return;
 		busy = true;
 		errMsg = '';
 		try {
-			const res = await fetch(`/api/trips/${tripId}/photos/${photo.id}`, { method: 'DELETE' });
+			const res = await fetch(`/api/trips/${tripId}/photos/${target.id}`, { method: 'DELETE' });
 			if (res.ok) {
 				onchanged();
 				onclose();
