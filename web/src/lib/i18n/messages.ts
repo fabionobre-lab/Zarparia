@@ -57,6 +57,7 @@ export interface Messages {
 	// %TERMS% and %PRIVACY% — the page splits on them and swaps in <a> links to
 	// /terms and /privacy, so translations must keep both tokens verbatim.
 	'landing.consentText': string;
+	'landing.orDivider': string; // the word "or", between the Google button and the email/password form
 
 	// ── Public demo trip (routes/demo/+page.svelte) ──
 	'demo.banner': string;
@@ -490,6 +491,29 @@ export interface Messages {
 	'roadmap.statusBuilding': string;
 	'roadmap.statusPlanned': string;
 	'home.readGuide': string; // empty-state link → /guide
+
+	// ── Email+password sign-in (AuthEmailForm.svelte, shown only when Firebase
+	// is provisioned — see $lib/firebase.ts firebaseEnabled) ──
+	'authEmail.email': string;
+	'authEmail.password': string;
+	'authEmail.signInSubmit': string;
+	'authEmail.signUpSubmit': string;
+	'authEmail.resetSubmit': string;
+	'authEmail.working': string; // submit button while a request is in flight
+	'authEmail.linkCreateAccount': string;
+	'authEmail.linkForgotPassword': string;
+	'authEmail.linkBackToSignIn': string;
+	'authEmail.verifyNotice': string;
+	'authEmail.resend': string;
+	'authEmail.resendSent': string;
+	'authEmail.signupSuccess': string;
+	'authEmail.resetSent': string; // neutral message shown for every reset attempt (enumeration-safe)
+	'authEmail.errInvalidEmail': string;
+	'authEmail.errEmailInUse': string;
+	'authEmail.errWeakPassword': string;
+	'authEmail.errBadCredentials': string; // wrong-password/user-not-found/invalid-credential/missing-password
+	'authEmail.errTooManyRequests': string;
+	'authEmail.errGeneric': string;
 }
 
 const enGB: Messages = {
@@ -523,6 +547,7 @@ const enGB: Messages = {
 	'landing.tryDemo': 'Try the demo',
 	'landing.tryDemoSub': 'Explore a sample trip — no account needed.',
 	'landing.consentText': 'By signing in you agree to the %TERMS% and %PRIVACY%.',
+	'landing.orDivider': 'or',
 
 	'demo.banner': "You're viewing a sample trip — everything is interactive but nothing is saved.",
 	'demo.signInCta': 'Sign in with Google',
@@ -941,7 +966,29 @@ const enGB: Messages = {
 	'roadmap.statusShipped': 'Shipped',
 	'roadmap.statusBuilding': 'In progress',
 	'roadmap.statusPlanned': 'Planned',
-	'home.readGuide': 'Read the guide'
+	'home.readGuide': 'Read the guide',
+
+	'authEmail.email': 'Email',
+	'authEmail.password': 'Password',
+	'authEmail.signInSubmit': 'Sign in',
+	'authEmail.signUpSubmit': 'Create account',
+	'authEmail.resetSubmit': 'Send reset link',
+	'authEmail.working': 'Working…',
+	'authEmail.linkCreateAccount': 'Create account',
+	'authEmail.linkForgotPassword': 'Forgot password?',
+	'authEmail.linkBackToSignIn': 'Back to sign in',
+	'authEmail.verifyNotice':
+		"Please verify your email before continuing — we've sent a verification link to your inbox.",
+	'authEmail.resend': 'Resend verification email',
+	'authEmail.resendSent': 'Verification email sent',
+	'authEmail.signupSuccess': 'Check your inbox to verify your email, then sign in.',
+	'authEmail.resetSent': 'If an account exists for that email, a reset link is on its way.',
+	'authEmail.errInvalidEmail': 'That email address looks invalid.',
+	'authEmail.errEmailInUse': 'An account already exists with that email address.',
+	'authEmail.errWeakPassword': 'Choose a password with at least 6 characters.',
+	'authEmail.errBadCredentials': 'Incorrect email or password.',
+	'authEmail.errTooManyRequests': 'Too many attempts. Please wait a moment and try again.',
+	'authEmail.errGeneric': 'Something went wrong. Please try again.'
 };
 
 const ptBR: Messages = {
@@ -975,6 +1022,7 @@ const ptBR: Messages = {
 	'landing.tryDemo': 'Ver demonstração',
 	'landing.tryDemoSub': 'Explore uma viagem de exemplo — sem necessidade de conta.',
 	'landing.consentText': 'Ao entrar, você concorda com os %TERMS% e a %PRIVACY%.',
+	'landing.orDivider': 'ou',
 
 	'demo.banner': 'Você está vendo uma viagem de exemplo — tudo é interativo, mas nada é salvo.',
 	'demo.signInCta': 'Entrar com o Google',
@@ -1394,7 +1442,29 @@ const ptBR: Messages = {
 	'roadmap.statusShipped': 'Lançado',
 	'roadmap.statusBuilding': 'Em desenvolvimento',
 	'roadmap.statusPlanned': 'Planejado',
-	'home.readGuide': 'Ler o guia'
+	'home.readGuide': 'Ler o guia',
+
+	'authEmail.email': 'E-mail',
+	'authEmail.password': 'Senha',
+	'authEmail.signInSubmit': 'Entrar',
+	'authEmail.signUpSubmit': 'Criar conta',
+	'authEmail.resetSubmit': 'Enviar link de redefinição',
+	'authEmail.working': 'Processando…',
+	'authEmail.linkCreateAccount': 'Criar conta',
+	'authEmail.linkForgotPassword': 'Esqueceu a senha?',
+	'authEmail.linkBackToSignIn': 'Voltar para o login',
+	'authEmail.verifyNotice':
+		'Verifique seu e-mail antes de continuar — enviamos um link de verificação para sua caixa de entrada.',
+	'authEmail.resend': 'Reenviar e-mail de verificação',
+	'authEmail.resendSent': 'E-mail de verificação enviado',
+	'authEmail.signupSuccess': 'Verifique seu e-mail para confirmar a conta e depois faça login.',
+	'authEmail.resetSent': 'Se existir uma conta com esse e-mail, um link de redefinição está a caminho.',
+	'authEmail.errInvalidEmail': 'Esse endereço de e-mail parece inválido.',
+	'authEmail.errEmailInUse': 'Já existe uma conta com esse endereço de e-mail.',
+	'authEmail.errWeakPassword': 'Escolha uma senha com pelo menos 6 caracteres.',
+	'authEmail.errBadCredentials': 'E-mail ou senha incorretos.',
+	'authEmail.errTooManyRequests': 'Muitas tentativas. Aguarde um momento e tente novamente.',
+	'authEmail.errGeneric': 'Algo deu errado. Tente novamente.'
 };
 
 export const catalogs: Record<Locale, Messages> = {

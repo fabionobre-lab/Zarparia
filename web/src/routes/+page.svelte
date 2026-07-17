@@ -7,8 +7,8 @@
 	import { page } from '$app/state';
 	import { getNow } from '$lib/now';
 	import crestSvg from '$lib/assets/zarparia-crest.svg?raw';
-	import markSvg from '$lib/assets/zarparia-mark-cc.svg?raw';
-	import wordmarkSvg from '$lib/assets/zarparia-wordmark-cc.svg?raw';
+	import lockupLightSvg from '$lib/assets/zarparia-lockup-tagline-light.svg?raw';
+	import lockupDarkSvg from '$lib/assets/zarparia-lockup-tagline-dark.svg?raw';
 	import {
 		type Trip,
 		type Segment,
@@ -255,17 +255,13 @@
 					<span class="card-theme"><ThemeToggle /></span>
 					<LocaleSwitcher />
 				</div>
+				<!-- Canonical lockup-with-tagline brand assets, verbatim (tagline is part
+				     of the artwork, so it stays English in both locales). Colors are baked
+				     into each variant, so theming is done by swapping files: explicit
+				     data-theme wins; with no attribute (system) prefers-color-scheme picks. -->
 				<div class="auth-lockup">
-					<div class="auth-lockup-row">
-						<span class="auth-mark">{@html markSvg}</span>
-						<span class="auth-wordmark-col">
-							<span class="auth-wordmark">{@html wordmarkSvg}</span>
-							<!-- Brand tagline: part of the mark, so it stays English in both locales.
-							     Centered under the wordmark only (not the mark), matching
-							     brand/zarparia-lockup-tagline-*.svg. -->
-							<p class="auth-tagline">Chart your journey.</p>
-						</span>
-					</div>
+					<span class="auth-lockup-light">{@html lockupLightSvg}</span>
+					<span class="auth-lockup-dark">{@html lockupDarkSvg}</span>
 				</div>
 				<a class="auth-google-btn" href="/auth/login/google">
 					<svg class="google-g" aria-hidden="true" viewBox="0 0 18 18" width="18" height="18">
@@ -533,45 +529,38 @@
 	}
 	.auth-lockup {
 		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-align: center;
+		justify-content: center;
 		margin-bottom: 1.75rem;
 	}
-	/* Wordmark + tagline stack: the tagline centers under the wordmark alone,
-	   per the canonical tagline lockup asset. */
-	.auth-wordmark-col {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+	/* Width lives on the span (the flex item) — sizing the svg by percentage
+	   would be circular, since the span's own width comes from its content. */
+	.auth-lockup-light,
+	.auth-lockup-dark {
+		width: min(100%, 320px);
 	}
-	/* Horizontal lockup: mark + wordmark on one row, sized to the canonical
-	   lockup's proportions (wordmark caps top-aligned with the mark; the star
-	   tittle and descenders overshoot, hence the negative offset). */
-	.auth-lockup-row {
-		display: flex;
-		align-items: flex-start;
-		justify-content: center;
-		gap: 8px;
-	}
-	.auth-mark :global(svg) {
+	.auth-lockup :global(svg) {
 		display: block;
-		height: 60px;
-		width: auto;
+		width: 100%;
+		height: auto;
 	}
-	.auth-wordmark {
-		margin-top: -11px;
+	/* Theme swap: light is the default; an explicit data-theme="dark" wins, and
+	   with no attribute (theme = system) prefers-color-scheme decides. */
+	.auth-lockup-dark {
+		display: none;
 	}
-	.auth-wordmark :global(svg) {
+	:global(html[data-theme='dark']) .auth-lockup-light {
+		display: none;
+	}
+	:global(html[data-theme='dark']) .auth-lockup-dark {
 		display: block;
-		height: 55.5px;
-		width: auto;
-		color: var(--text);
 	}
-	.auth-tagline {
-		font-size: 0.85rem;
-		color: var(--text-muted);
-		margin: 12px 0 0;
+	@media (prefers-color-scheme: dark) {
+		:global(html:not([data-theme='light'])) .auth-lockup-light {
+			display: none;
+		}
+		:global(html:not([data-theme='light'])) .auth-lockup-dark {
+			display: block;
+		}
 	}
 	.auth-google-btn {
 		display: flex;
@@ -671,17 +660,9 @@
 			padding: 1.5rem 1.25rem;
 			border-radius: 14px;
 		}
-		.auth-lockup-row {
-			gap: 6px;
-		}
-		.auth-mark :global(svg) {
-			height: 47px;
-		}
-		.auth-wordmark {
-			margin-top: -8.5px;
-		}
-		.auth-wordmark :global(svg) {
-			height: 43.5px;
+		.auth-lockup-light,
+		.auth-lockup-dark {
+			width: min(100%, 260px);
 		}
 	}
 	/* Pending/rejected gate: a signed-in user whose account isn't approved yet.
