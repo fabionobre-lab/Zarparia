@@ -250,8 +250,8 @@
 					<p class="deleted-notice" role="status">{t('account.deletedNotice')}</p>
 				{/if}
 				<div class="auth-card-top">
-					<!-- Mobile has no site header, so the card carries the theme toggle
-					     itself (hidden >=960px where the full header provides it). -->
+					<!-- There is no site-wide top bar, so the card carries the theme
+					     toggle (and EN|PT) itself at every width. -->
 					<span class="card-theme"><ThemeToggle /></span>
 					<LocaleSwitcher />
 				</div>
@@ -478,9 +478,8 @@
 		color: rgba(255, 255, 255, 0.78);
 	}
 	/* Signed-out landing: a single centered auth card rather than a hero +
-	   pill row. The site header already shows the brand mark for signed-out
-	   visitors too, so the card lockup can stay the visual focus without
-	   duplicating a full-bleed hero above it. */
+	   pill row. With no site-wide top bar, the card is the page's only chrome,
+	   so its lockup stays the visual focus at every width. */
 	.auth-shell {
 		display: flex;
 		align-items: center;
@@ -513,23 +512,13 @@
 		padding: 0.55rem 0.7rem;
 		margin: 0 0 0.75rem;
 	}
-	/* Card-corner theme toggle: mobile only (the >=960px header already has one).
-	   Bumped to a 44px tap target — the header sizing (34px) is too small for the
-	   card, which is the only chrome on the mobile landing. */
+	/* Card-corner theme toggle at all widths — with no top bar anywhere, the
+	   card is the landing's only chrome. Bumped to a 44px tap target (the old
+	   header sizing, 34px, is too small for the card). */
 	.card-theme :global(.theme-toggle) {
 		width: 44px;
 		height: 44px;
 		min-height: 44px;
-	}
-	@media (min-width: 960px) {
-		.card-theme {
-			display: none;
-		}
-		/* With the theme slot gone, flex-end keeps EN|PT pinned right exactly as
-		   the card looked before (space-between would drift it left). */
-		.auth-card-top {
-			justify-content: flex-end;
-		}
 	}
 	.auth-lockup {
 		display: flex;
