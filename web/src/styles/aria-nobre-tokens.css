@@ -1,4 +1,4 @@
-/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ 2521266 — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
+/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ 2bac568 — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
 
 /* ============================================================================
    Aria Nobre — family design token contract
@@ -49,9 +49,16 @@
      Saldaria's charcoal ramp for dark); dark ink from Nobria's dark
      --color-text (C:\AI\Nobria\src\styles\tokens.css:120).
      -------------------------------------------------------------------- */
-  --an-bg: light-dark(#F5F2EC, #19150F);
-  --an-surface: light-dark(#FAF7F1, #262019);
-  --an-surface-raised: light-dark(#ECE7DD, #322A20);
+  /* DARK SURFACES ARE NAVY (decision 2026-07-17, Fabio — supersedes the
+     original charcoal ramp): the family dark ground is the brand navy
+     lineage (#141B28 bg / #1A2332 card / #232E42 raised), pairing with the
+     navy+gold crests. The INK stays warm cream and --an-muted stays warm
+     grey deliberately — cream-on-navy is the crest/band look; do not swap
+     them for blue-greys. Contrast on navy (computed): ink 14.2:1, gold-300
+     7.4:1, oxblood-300 6.1:1, muted 5.4:1 — all AA-clear. */
+  --an-bg: light-dark(#F5F2EC, #141B28);
+  --an-surface: light-dark(#FAF7F1, #1A2332);
+  --an-surface-raised: light-dark(#ECE7DD, #232E42);
   --an-ink: light-dark(#1A2332, #EDE8DE);
   /* CONFLICT FLAG: sources disagree on the dark muted value by one hex digit.
      House site (C:\AI\AriaNobre\style.css:21,30) uses #9A9488; Nobria
@@ -198,7 +205,7 @@
      dark-mode gold-300. Light uses gold-600 (#8A6F43, 4.24:1 on --an-bg),
      NOT gold-500 (#A68B5B, 2.91:1 — fails WCAG 1.4.11's 3:1 non-text
      minimum for focus indicators on the canonical cream). Dark gold-300 is
-     7.74:1 on the dark bg. Ratios verified by computation 2026-07-17.
+     7.4:1 on the navy dark bg. Ratios verified by computation 2026-07-17.
      -------------------------------------------------------------------- */
   --an-focus-ring: 2px solid light-dark(var(--an-gold-600), var(--an-gold-300));
 

@@ -494,7 +494,9 @@
 		   DARK: --surface-sunken's own dark branch (color-mix(black 22%, bg)) was
 		   tried first but measures only ~1.04:1 luminance contrast against --bg —
 		   effectively invisible against the already-near-black canon dark bg
-		   (#19150F). Using the task-specified fallback instead — a small mix of
+		   (#141B28; still ~1.04:1 after the navy re-canon — near-black colors
+		   keep a similar ratio under a proportional darken). Using the
+		   task-specified fallback instead — a small mix of
 		   --text into --bg — nearly doubles that delta (~1.09:1), still subtle
 		   (matching the "subtle diagonal gradient" spec) but perceptible. */
 		background: linear-gradient(

@@ -40,7 +40,7 @@
 	   --surface-sunken: the canon's "raised" step works as "sunken" in
 	   LIGHT mode only (both name the darkest-of-three step there:
 	   #ECE7DD < bg #F5F2EC < surface #FAF7F1). In DARK mode the canon
-	   ramp goes the other way (raised #322A20 is the LIGHTEST of the
+	   ramp goes the other way (raised #232E42 is the LIGHTEST of the
 	   three), so mapping sunken onto raised would invert the recessed
 	   look — recessed wells would render lighter than their containers.
 	   Dark therefore mixes black into the canon bg to sit below it,
