@@ -155,9 +155,9 @@
 		margin: 0 auto 1rem;
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 0.9rem 1rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	h3 {
 		font-size: 0.95rem;
@@ -184,7 +184,7 @@
 		border: 1px solid var(--accent);
 		background: var(--accent);
 		color: #fff;
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.4rem 0.8rem;
 		cursor: pointer;
 		text-decoration: none;

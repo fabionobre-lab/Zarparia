@@ -162,7 +162,7 @@
 <style>
 	.seg {
 		border: 1px solid var(--hairline-strong);
-		border-radius: 10px;
+		border-radius: var(--radius-lg);
 		margin-bottom: 0.75rem;
 		background: var(--surface);
 	}
@@ -175,7 +175,7 @@
 		cursor: pointer;
 		list-style: none;
 		background: var(--surface-sunken);
-		border-radius: 10px 10px 0 0;
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 	}
 	summary::-webkit-details-marker {
 		display: none;
@@ -240,7 +240,7 @@
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.fhint {
 		font-size: 0.6rem;
@@ -280,7 +280,7 @@
 		font-size: 0.8rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
 	}

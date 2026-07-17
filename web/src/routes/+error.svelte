@@ -35,15 +35,15 @@
 		justify-content: center;
 		min-height: calc(100dvh - 6rem);
 		padding: 1.5rem 0;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.error-card {
 		width: 100%;
 		max-width: 420px;
 		background: var(--surface);
 		border: 1px solid var(--hairline);
-		border-radius: 16px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--elevation-2);
 		padding: 2rem;
 		margin: 0 1.5rem;
 		text-align: center;
@@ -69,7 +69,7 @@
 		font-size: 0.85rem;
 		padding: 0.5rem 1.1rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		background: var(--surface);
 		color: var(--text);
 		text-decoration: none;
@@ -83,7 +83,7 @@
 		}
 		.error-card {
 			padding: 1.5rem 1.25rem;
-			border-radius: 14px;
+			border-radius: var(--radius-lg);
 			margin: 0;
 		}
 	}

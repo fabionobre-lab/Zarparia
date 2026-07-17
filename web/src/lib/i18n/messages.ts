@@ -40,6 +40,7 @@ export interface Messages {
 	'nav.primaryLabel': string; // aria-label for the bottom <nav>
 	'nav.moreLabel': string; // aria-label for the More sheet dialog
 	'nav.close': string; // aria-label for the sheet close control
+	'nav.loading': string; // aria-label for the layout's client-navigation skeleton overlay
 
 	// ── OAuth consent page (oauth/authorize) — MCP connector authorization ──
 	'consent.pageTitle': string;
@@ -219,6 +220,14 @@ export interface Messages {
 	'editor.errSaveFailed': string;
 	'editor.errNetworkSave': string;
 	'editor.discardConfirm': string;
+	'editor.discardTitle': string; // ConfirmDialog title (body reuses editor.discardConfirm)
+
+	// ── Shared toast + confirm-dialog vocabulary (lib/toast, lib/dialog) ──
+	'toast.dismiss': string; // aria-label for the toast's close button
+	'toast.tripSaved': string;
+	'toast.tripImported': string;
+	'toast.photoDeleted': string;
+	'dialog.discard': string; // danger confirm-button label for the discard-changes dialog
 
 	// ── Segment editor (SegmentEditor.svelte) ──
 	'seg.dragReorder': string;
@@ -413,6 +422,7 @@ export interface Messages {
 	'photos.unassigned': string;
 	'photos.delete': string;
 	'photos.confirmDelete': string;
+	'photos.deleteTitle': string; // ConfirmDialog title (body reuses photos.confirmDelete)
 	'photos.errSave': string;
 
 	// ── Access-gate pending/rejected screen (home '/' when signed in but not
@@ -496,6 +506,7 @@ export interface Messages {
 	// is provisioned — see $lib/firebase.ts firebaseEnabled) ──
 	'authEmail.email': string;
 	'authEmail.password': string;
+	'authEmail.passwordHint': string; // shown under the password field in sign-up mode only
 	'authEmail.signInSubmit': string;
 	'authEmail.signUpSubmit': string;
 	'authEmail.resetSubmit': string;
@@ -518,7 +529,7 @@ export interface Messages {
 
 const enGB: Messages = {
 	'header.signOut': 'Sign out',
-	'header.signInGoogle': 'Sign in with Google',
+	'header.signInGoogle': 'Continue with Google',
 	'header.signIn': 'Sign in',
 	'header.language': 'Language',
 	'theme.system': 'Theme: system',
@@ -535,6 +546,7 @@ const enGB: Messages = {
 	'nav.primaryLabel': 'Main navigation',
 	'nav.moreLabel': 'More options',
 	'nav.close': 'Close',
+	'nav.loading': 'Loading…',
 
 	'consent.pageTitle': 'Authorize — Zarparia',
 	'consent.heading': '{client} wants access to your Zarparia trips',
@@ -703,6 +715,13 @@ const enGB: Messages = {
 	'editor.errSaveFailed': 'Save failed ({status})',
 	'editor.errNetworkSave': 'Network error while saving.',
 	'editor.discardConfirm': 'Discard unsaved changes?',
+	'editor.discardTitle': 'Discard changes?',
+
+	'toast.dismiss': 'Dismiss',
+	'toast.tripSaved': 'Trip saved.',
+	'toast.tripImported': 'Trip imported.',
+	'toast.photoDeleted': 'Photo deleted.',
+	'dialog.discard': 'Discard',
 
 	'seg.dragReorder': 'Drag to reorder segment',
 	'seg.moveUp': 'Move segment up',
@@ -893,11 +912,12 @@ const enGB: Messages = {
 	'photos.unassigned': 'Not on the itinerary',
 	'photos.delete': 'Remove',
 	'photos.confirmDelete': 'Remove this photo from the trip? (It stays in your Google Photos.)',
+	'photos.deleteTitle': 'Remove photo?',
 	'photos.errSave': 'Could not save. Please try again.',
 
 	'pending.heading': 'Your access request is being reviewed',
 	'pending.body':
-		"Thanks for signing in. Zarparia is in a small, invite-only beta right now — an admin needs to approve your account before you can create or view trips. There's nothing else to do; check back soon.",
+		"Thanks for signing in. Zarparia is in a small, invite-only beta — an admin needs to approve your account before you can get started. There's nothing else to do; check back soon.",
 	'pending.rejectedHeading': 'Access not available',
 	'pending.rejectedBody': "This account doesn't have access to Zarparia at the moment.",
 
@@ -970,6 +990,7 @@ const enGB: Messages = {
 
 	'authEmail.email': 'Email',
 	'authEmail.password': 'Password',
+	'authEmail.passwordHint': 'At least 8 characters',
 	'authEmail.signInSubmit': 'Sign in',
 	'authEmail.signUpSubmit': 'Create account',
 	'authEmail.resetSubmit': 'Send reset link',
@@ -993,7 +1014,7 @@ const enGB: Messages = {
 
 const ptBR: Messages = {
 	'header.signOut': 'Sair',
-	'header.signInGoogle': 'Entrar com Google',
+	'header.signInGoogle': 'Continuar com o Google',
 	'header.signIn': 'Entrar',
 	'header.language': 'Idioma',
 	'theme.system': 'Tema: sistema',
@@ -1010,6 +1031,7 @@ const ptBR: Messages = {
 	'nav.primaryLabel': 'Navegação principal',
 	'nav.moreLabel': 'Mais opções',
 	'nav.close': 'Fechar',
+	'nav.loading': 'Carregando…',
 
 	'consent.pageTitle': 'Autorizar — Zarparia',
 	'consent.heading': '{client} quer acesso às suas viagens no Zarparia',
@@ -1178,6 +1200,13 @@ const ptBR: Messages = {
 	'editor.errSaveFailed': 'Falha ao salvar ({status})',
 	'editor.errNetworkSave': 'Erro de rede ao salvar.',
 	'editor.discardConfirm': 'Descartar as alterações não salvas?',
+	'editor.discardTitle': 'Descartar alterações?',
+
+	'toast.dismiss': 'Dispensar',
+	'toast.tripSaved': 'Viagem salva.',
+	'toast.tripImported': 'Viagem importada.',
+	'toast.photoDeleted': 'Foto excluída.',
+	'dialog.discard': 'Descartar',
 
 	'seg.dragReorder': 'Arraste para reordenar o trecho',
 	'seg.moveUp': 'Mover trecho para cima',
@@ -1369,11 +1398,12 @@ const ptBR: Messages = {
 	'photos.unassigned': 'Fora do roteiro',
 	'photos.delete': 'Remover',
 	'photos.confirmDelete': 'Remover esta foto da viagem? (Ela continua no seu Google Fotos.)',
+	'photos.deleteTitle': 'Remover foto?',
 	'photos.errSave': 'Não foi possível salvar. Tente novamente.',
 
 	'pending.heading': 'Sua solicitação de acesso está em análise',
 	'pending.body':
-		'Obrigado por entrar. No momento, o Zarparia está em um beta pequeno, só por convite — um administrador precisa aprovar sua conta antes que você possa criar ou ver viagens. Não há mais nada a fazer; volte a checar em breve.',
+		'Obrigado por entrar. O Zarparia está em um beta fechado, apenas por convite — um administrador precisa aprovar sua conta antes de você começar. Não há mais nada a fazer; volte em breve.',
 	'pending.rejectedHeading': 'Acesso não disponível',
 	'pending.rejectedBody': 'No momento, esta conta não tem acesso ao Zarparia.',
 
@@ -1446,6 +1476,7 @@ const ptBR: Messages = {
 
 	'authEmail.email': 'E-mail',
 	'authEmail.password': 'Senha',
+	'authEmail.passwordHint': 'Pelo menos 8 caracteres',
 	'authEmail.signInSubmit': 'Entrar',
 	'authEmail.signUpSubmit': 'Criar conta',
 	'authEmail.resetSubmit': 'Enviar link de redefinição',

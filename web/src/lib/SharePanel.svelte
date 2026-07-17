@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ShareRow, SharePermission } from '$lib/server/shares';
 	import { t } from '$lib/i18n/store.svelte';
+	import { busyButton } from '$lib/actions/busyButton';
 
 	let { tripId }: { tripId: string } = $props();
 
@@ -155,7 +156,7 @@
 		{#if link}
 			<div class="linkrow">
 				<input class="linkurl" type="text" readonly value={link.url} aria-label={t('share.shareableLink')} />
-				<button type="button" class="copy" onclick={copyLink} disabled={linkBusy}>
+				<button type="button" class="copy" onclick={copyLink} use:busyButton={linkBusy}>
 					{copied ? t('share.copied') : t('share.copy')}
 				</button>
 			</div>
@@ -170,7 +171,7 @@
 			<option value="viewer">{t('share.optionCanView')}</option>
 			<option value="editor">{t('share.optionCanEdit')}</option>
 		</select>
-		<button type="submit" disabled={busy}>{t('share.shareButton')}</button>
+		<button type="submit" use:busyButton={busy}>{t('share.shareButton')}</button>
 	</form>
 	{#if error}<p class="err">{error}</p>{/if}
 
@@ -184,7 +185,7 @@
 				<li>
 					<span class="who">{s.name ?? s.email}</span>
 					<span class="perm">{s.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
-					<button type="button" class="rm" onclick={() => remove(s.userId)} disabled={busy}>{t('share.remove')}</button>
+					<button type="button" class="rm" onclick={() => remove(s.userId)} use:busyButton={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
 		</ul>
@@ -198,9 +199,9 @@
 		margin: 0 auto 1rem;
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 0.9rem 1rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	h3 {
 		font-size: 0.95rem;
@@ -223,7 +224,7 @@
 		font-size: 0.85rem;
 		padding: 0.4rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 		color: var(--text);
 	}
@@ -239,7 +240,7 @@
 		font-size: 0.8rem;
 		padding: 0.4rem 0.55rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 		color: var(--text);
 	}
@@ -269,7 +270,7 @@
 		font-size: 0.85rem;
 		padding: 0.4rem 0.55rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 		color: var(--text);
 	}
@@ -278,7 +279,7 @@
 		font-size: 0.85rem;
 		padding: 0.4rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 		color: var(--text);
 	}
@@ -288,7 +289,7 @@
 		border: 1px solid var(--accent);
 		background: var(--accent);
 		color: #fff;
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.4rem 0.8rem;
 		cursor: pointer;
 	}
@@ -328,7 +329,7 @@
 		font-size: 0.72rem;
 		color: var(--text-muted);
 		background: var(--surface-sunken);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 0.15rem 0.5rem;
 	}
 	.rm {

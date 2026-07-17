@@ -31,7 +31,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 680px;
 		margin: 2rem auto;
 		padding: 0 1.5rem 4rem;

@@ -246,7 +246,7 @@
 		max-width: 640px;
 		margin: 0 auto;
 		padding: 1.5rem 1.5rem 3rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		color: var(--text);
 	}
 	.head {
@@ -275,7 +275,7 @@
 	.stepdot {
 		font-size: 0.78rem;
 		padding: 0.25rem 0.7rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--surface-sunken);
 		color: var(--text-muted);
 	}
@@ -285,7 +285,7 @@
 	}
 	.card {
 		border: 1px solid var(--hairline-strong);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		background: var(--surface);
 		padding: 1.1rem 1.1rem 1rem;
 	}
@@ -322,7 +322,7 @@
 		color: var(--text);
 		padding: 0.45rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 7px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 	}
 	.inline {
@@ -345,7 +345,7 @@
 		align-items: center;
 		gap: 0.25rem;
 		background: var(--surface-sunken);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 0.2rem 0.6rem;
 		font-size: 0.8rem;
 		text-transform: none;
@@ -372,7 +372,7 @@
 		color: var(--text);
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.stops-hd {
 		display: flex;
@@ -394,7 +394,7 @@
 		color: var(--text);
 		padding: 0.45rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 7px;
+		border-radius: var(--radius-md);
 		min-width: 0;
 	}
 	.nights {
@@ -414,7 +414,7 @@
 		color: var(--text);
 		padding: 0.45rem 0.4rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 7px;
+		border-radius: var(--radius-md);
 	}
 	.rowctl {
 		display: flex;
@@ -442,7 +442,7 @@
 		font-size: 0.9rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.1rem;
 		cursor: pointer;
 	}
@@ -461,7 +461,7 @@
 		font-size: 0.8rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.25rem 0.6rem;
 		cursor: pointer;
 	}
@@ -470,7 +470,7 @@
 		font-size: 0.8rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.3rem 0.5rem;
 		cursor: pointer;
 	}

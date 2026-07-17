@@ -12,7 +12,13 @@ import {
 	isLocale,
 	resolveLocale
 } from '$lib/i18n';
-import { THEME_COOKIE, resolveTheme, themeAttr } from '$lib/theme';
+import {
+	THEME_COOKIE,
+	LEGACY_THEME_COOKIE,
+	THEME_COOKIE_MAX_AGE,
+	resolveTheme,
+	themeAttr
+} from '$lib/theme';
 
 // Cross-origin form-POST guard, re-implemented here because SvelteKit's built-in
 // check (csrf.checkOrigin) is disabled in vite.config so the OAuth token/register
@@ -93,10 +99,24 @@ export const handle: Handle = async ({ event, resolve }) => {
 	// ── Theme ──
 	// Cookie holds light|dark|system (default system). For an explicit mode we
 	// stamp data-theme on <html> so the first server-rendered byte carries the
-	// right palette (no flash); `system` stamps nothing and lets the @media
-	// (prefers-color-scheme) rules in tokens.css decide.
-	const theme = resolveTheme(event.cookies.get(THEME_COOKIE));
+	// right palette (no flash); `system` stamps nothing and lets the canon's
+	// light-dark()/color-scheme rules (aria-nobre-tokens.css) decide.
+	// Migration: the cookie was renamed from `trips-theme` to `zarparia-theme`
+	// (Aria Nobre storage-key convention). Prefer the new cookie; fall back to
+	// the legacy one once and immediately re-issue it under the new name so
+	// later requests skip the fallback.
+	const newThemeCookie = event.cookies.get(THEME_COOKIE);
+	const rawTheme = newThemeCookie ?? event.cookies.get(LEGACY_THEME_COOKIE);
+	const theme = resolveTheme(rawTheme);
 	event.locals.theme = theme;
+	if (!newThemeCookie && rawTheme) {
+		event.cookies.set(THEME_COOKIE, theme, {
+			path: '/',
+			sameSite: 'lax',
+			httpOnly: false, // the client store rewrites this cookie via document.cookie
+			maxAge: THEME_COOKIE_MAX_AGE
+		});
+	}
 
 	// Stamp <html lang="%lang%"%theme-attr%> so the very first server-rendered
 	// byte carries the right language + palette (no post-hydration correction).

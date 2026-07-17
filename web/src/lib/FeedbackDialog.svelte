@@ -2,6 +2,7 @@
 	import { t } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import { FEEDBACK_MAX_LEN, type FeedbackType } from '$lib/feedback';
+	import { busyButton } from '$lib/actions/busyButton';
 
 	// `open` is bindable so the header button can toggle it. A native <dialog>
 	// gives us the modal focus trap, Escape-to-close, and focus-return-to-trigger
@@ -126,7 +127,7 @@
 
 			<div class="row">
 				<span class="counter" class:over>{message.length} / {FEEDBACK_MAX_LEN}</span>
-				<button type="submit" class="send" disabled={!canSubmit}>
+				<button type="submit" class="send" disabled={!canSubmit} use:busyButton={{ busy, disable: false }}>
 					{busy ? t('feedback.sending') : t('feedback.submit')}
 				</button>
 			</div>
@@ -143,11 +144,11 @@
 		box-sizing: border-box;
 		width: min(440px, calc(100vw - 2rem));
 		border: 1px solid var(--hairline-strong);
-		border-radius: 14px;
+		border-radius: var(--radius-lg);
 		padding: 1.1rem 1.2rem;
 		background: var(--surface);
 		color: var(--text);
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.fb::backdrop {
 		background: rgba(10, 7, 3, 0.55);
@@ -183,7 +184,7 @@
 		font-size: 0.85rem;
 		padding: 0.45rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		background: var(--bg);
 		color: var(--text);
 		cursor: pointer;
@@ -201,15 +202,11 @@
 		line-height: 1.45;
 		padding: 0.6rem 0.7rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		background: var(--bg);
 		color: var(--text);
 		resize: vertical;
 		min-height: 110px;
-	}
-	textarea:focus {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 1px;
 	}
 	.row {
 		display: flex;
@@ -233,7 +230,7 @@
 		background: var(--accent);
 		color: #fff;
 		border: none;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.3rem;
 		cursor: pointer;
 	}
@@ -260,7 +257,7 @@
 		width: 44px;
 		height: 44px;
 		margin: 0 auto 0.6rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--pill-go-bg);
 		color: var(--pill-go-fg);
 		font-size: 1.4rem;

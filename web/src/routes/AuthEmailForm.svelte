@@ -192,8 +192,9 @@
 					bind:value={password}
 					required
 					autocomplete={mode === 'signup' ? 'new-password' : 'current-password'}
-					minlength={mode === 'signup' ? 6 : undefined}
+					minlength={mode === 'signup' ? 8 : undefined}
 				/>
+				{#if mode === 'signup'}<span class="field-hint">{t('authEmail.passwordHint')}</span>{/if}
 			</label>
 		{/if}
 		{#if errorMessage}<p class="err">{errorMessage}</p>{/if}
@@ -249,13 +250,13 @@
 		color: var(--text);
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		padding: 0.55rem 0.65rem;
 		box-sizing: border-box;
 	}
-	.field input:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 1px;
+	.field-hint {
+		font-size: 0.7rem;
+		color: var(--text-muted);
 	}
 	.submit-btn {
 		font: inherit;
@@ -264,7 +265,7 @@
 		color: #fff;
 		background: var(--accent);
 		border: none;
-		border-radius: 10px;
+		border-radius: var(--radius-button);
 		padding: 0.65rem 1rem;
 		cursor: pointer;
 	}
@@ -291,7 +292,7 @@
 		font-size: 0.85rem;
 		color: var(--text);
 		background: var(--surface-sunken);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		padding: 0.6rem 0.75rem;
 		margin: 0 0 0.6rem;
 		line-height: 1.4;
@@ -306,7 +307,7 @@
 		color: var(--accent-strong);
 		background: none;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.4rem 0.9rem;
 		cursor: pointer;
 	}

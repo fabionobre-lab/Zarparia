@@ -151,7 +151,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 640px;
 		margin: 2rem auto;
 		padding: 0 1.5rem 3rem;
@@ -185,14 +185,14 @@
 		gap: 0.85rem;
 		background: var(--surface);
 		border: 1px solid var(--hairline);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 1rem 1.1rem;
 	}
 	.avatar {
 		flex-shrink: 0;
 		width: 56px;
 		height: 56px;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		object-fit: cover;
 		background: var(--surface-sunken);
 	}
@@ -225,7 +225,7 @@
 		text-decoration: none;
 		color: var(--accent-strong);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.1rem;
 	}
 	.export-btn:hover {
@@ -233,7 +233,7 @@
 	}
 	.danger {
 		border: 1px solid var(--pill-bug-fg);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 1rem 1.1rem;
 		background: var(--pill-bug-bg);
 	}
@@ -248,7 +248,7 @@
 		background: var(--pill-bug-fg);
 		color: var(--surface);
 		border: none;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.1rem;
 		cursor: pointer;
 	}
@@ -283,11 +283,11 @@
 		box-sizing: border-box;
 		width: min(440px, calc(100vw - 2rem));
 		border: 1px solid var(--hairline-strong);
-		border-radius: 14px;
+		border-radius: var(--radius-lg);
 		padding: 1.1rem 1.2rem;
 		background: var(--surface);
 		color: var(--text);
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.confirm-dialog::backdrop {
 		background: rgba(10, 7, 3, 0.55);
@@ -315,13 +315,9 @@
 		font-size: 0.9rem;
 		padding: 0.55rem 0.7rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		background: var(--bg);
 		color: var(--text);
-	}
-	.confirm-dialog input:focus {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 1px;
 	}
 	.err {
 		color: var(--pill-bug-fg);
@@ -338,7 +334,7 @@
 	.confirm {
 		font: inherit;
 		font-size: 0.88rem;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.1rem;
 		cursor: pointer;
 	}

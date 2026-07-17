@@ -40,7 +40,7 @@ export const privacy: LegalCatalog = {
 				bullets: [
 					'session — keeps you signed in. Set only once you sign in with Google; httpOnly, so no page script can read it.',
 					"ui-locale — remembers whether you're using the app in English or Portuguese.",
-					'trips-theme — remembers your light/dark/system theme preference.'
+					'zarparia-theme — remembers your light/dark/system theme preference.'
 				]
 			},
 			{
@@ -141,7 +141,7 @@ export const privacy: LegalCatalog = {
 				bullets: [
 					'session — mantém você conectado. Definido somente depois que você entra com o Google; é httpOnly, então nenhum script da página consegue lê-lo.',
 					'ui-locale — lembra se você está usando o aplicativo em inglês ou em português.',
-					'trips-theme — lembra sua preferência de tema claro/escuro/sistema.'
+					'zarparia-theme — lembra sua preferência de tema claro/escuro/sistema.'
 				]
 			},
 			{

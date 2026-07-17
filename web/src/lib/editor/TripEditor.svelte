@@ -10,6 +10,8 @@
 	import { dndzone, dndId, fromItems, grabHandle, FLIP_MS } from './dnd';
 	import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
 	import { t } from '$lib/i18n/store.svelte';
+	import ConfirmDialog from '$lib/dialog/ConfirmDialog.svelte';
+	import { toast } from '$lib/toast';
 
 	let {
 		initial,
@@ -37,9 +39,45 @@
 	let justSaved = $state(false);
 	const dirty = $derived(!justSaved && serialize() !== savedSnapshot);
 
+	// Styled replacement for the native confirm() (Phase 3 task 3). A SPA
+	// navigation is cancelled up front, then re-issued with goto() if the
+	// user confirms the discard; browser-close/reload ("leave" navigations,
+	// where nav.to is null) fall through to the native beforeunload prompt
+	// below instead, since there's no in-app dialog that can block a tab close.
+	let discardOpen = $state(false);
+	let pendingNavHref: string | null = null;
+	// Guard bypass for the confirmed-discard goto(): `dirty` is still true when
+	// confirmDiscard() re-issues the navigation, so without this flag the guard
+	// below would cancel its own re-issued goto() and re-open the dialog (or
+	// silently strand the user on the page, depending on effect timing) —
+	// mirroring how save() passes through via `justSaved`.
+	let bypassGuard = false;
 	beforeNavigate((nav) => {
-		if (dirty && !confirm(t('editor.discardConfirm'))) nav.cancel();
+		if (bypassGuard) {
+			bypassGuard = false;
+			return;
+		}
+		if (!dirty) return;
+		if (!nav.to) return; // "leave" navigation — beforeunload handles this
+		nav.cancel();
+		pendingNavHref = nav.to.url.href;
+		discardOpen = true;
 	});
+	function confirmDiscard() {
+		const href = pendingNavHref;
+		pendingNavHref = null;
+		if (href) {
+			bypassGuard = true;
+			// Reset the flag once the navigation settles either way, so a failed
+			// goto() can't leave a stale bypass that lets a later dirty-nav slip.
+			goto(href).finally(() => {
+				bypassGuard = false;
+			});
+		}
+	}
+	function cancelDiscard() {
+		pendingNavHref = null;
+	}
 	$effect(() => {
 		if (!dirty) return;
 		const handler = (e: BeforeUnloadEvent) => e.preventDefault();
@@ -221,6 +259,7 @@
 				if (data.updatedAt) base = data.updatedAt;
 				savedSnapshot = serialize();
 				justSaved = true;
+				toast(t('toast.tripSaved'));
 				await goto(`/trips/${data.id}`);
 			} else {
 				const e = (await res.json()) as { error?: string; details?: string[] };
@@ -365,12 +404,22 @@
 	</div>
 </div>
 
+<ConfirmDialog
+	bind:open={discardOpen}
+	title={t('editor.discardTitle')}
+	body={t('editor.discardConfirm')}
+	cancelLabel={t('common.cancel')}
+	confirmLabel={t('dialog.discard')}
+	onconfirm={confirmDiscard}
+	oncancel={cancelDiscard}
+/>
+
 <style>
 	.editor {
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 1rem 1.5rem 3rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.form {
 		min-width: 0;
@@ -404,7 +453,7 @@
 		background: var(--accent);
 		color: #fff;
 		border: none;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.2rem;
 		cursor: pointer;
 	}
@@ -414,7 +463,7 @@
 	.errors {
 		background: var(--pill-bug-bg);
 		border: 1px solid var(--pill-bug-bg);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		padding: 0.6rem 0.8rem;
 		margin-bottom: 0.75rem;
 		font-size: 0.85rem;
@@ -425,7 +474,7 @@
 	}
 	.settings {
 		border: 1px solid var(--hairline-strong);
-		border-radius: 10px;
+		border-radius: var(--radius-lg);
 		margin-bottom: 1rem;
 		background: var(--surface);
 	}
@@ -453,7 +502,7 @@
 		align-items: center;
 		gap: 0.25rem;
 		background: var(--surface-sunken);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 0.2rem 0.6rem;
 		font-size: 0.8rem;
 	}
@@ -496,7 +545,7 @@
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.homebase {
 		margin-top: 0.75rem;
@@ -523,7 +572,7 @@
 		color: var(--text);
 		padding: 0.3rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.tagsvocab {
 		margin-top: 0.75rem;
@@ -544,7 +593,7 @@
 		color: var(--text);
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.miniform .keyf .hint {
 		font-size: 0.6rem;
@@ -573,7 +622,7 @@
 		font-family: ui-monospace, monospace;
 		font-size: 0.8rem;
 		background: var(--surface-sunken);
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: 0.3rem 0.4rem;
 		margin-top: 0.3rem;
 	}
@@ -591,7 +640,7 @@
 		font-size: 0.82rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.25rem 0.6rem;
 		cursor: pointer;
 	}
@@ -613,7 +662,7 @@
 		max-width: 430px;
 		margin: 0 auto;
 		border: 1px dashed var(--hairline-strong);
-		border-radius: 14px;
+		border-radius: var(--radius-lg);
 		background: var(--surface);
 		color: var(--text-muted);
 		font-size: 0.85rem;

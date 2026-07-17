@@ -217,7 +217,7 @@
 		margin: 8px 13px 2px;
 		height: 200px;
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		overflow: hidden;
 	}
 	.map-canvas {
@@ -258,13 +258,13 @@
 		font-weight: 600;
 		line-height: 1;
 		border: 2px solid #fff;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+		box-shadow: var(--elevation-1);
 		box-sizing: border-box;
 	}
 	:global(.daymap-popup) {
 		font-family: 'Source Serif 4', Georgia, serif;
 		font-size: 12px;
-		color: #1a1208;
+		color: var(--text);
 	}
 	:global(.daymap-photo-marker) {
 		cursor: pointer;
@@ -278,11 +278,11 @@
 	:global(.daymap-photo img) {
 		width: 30px;
 		height: 30px;
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		object-fit: cover;
 		border: 2px solid #fff;
 		box-sizing: border-box;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+		box-shadow: var(--elevation-1);
 	}
 	:global(.daymap-photo-count) {
 		position: absolute;
@@ -291,10 +291,10 @@
 		min-width: 15px;
 		height: 15px;
 		padding: 0 3px;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--accent);
 		color: #fff;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		font-size: 9px;
 		font-weight: 700;
 		line-height: 15px;

@@ -84,7 +84,7 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 0.5rem 0.75rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 1060px;
 		margin: 0 auto;
 		padding: 0.6rem 1rem;
@@ -105,7 +105,7 @@
 		font: inherit;
 		font-size: 0.85rem;
 		text-decoration: none;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.4rem 0.9rem;
 		white-space: nowrap;
 		cursor: pointer;

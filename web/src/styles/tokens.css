@@ -1,11 +1,22 @@
 /* ============================================================================
    Trips house design system — global tokens
    Shared architecture with a sibling app (same mechanism + token names; skins differ).
-   Imported once, globally, from the root +layout.svelte.
+   Imported once, globally, from the root +layout.svelte, AFTER
+   `./aria-nobre-tokens.css` (the Aria Nobre family canon — see
+   C:\AI\AriaNobre\design\DESIGN.md). This file is the Phase 1 "adoption"
+   layer: it remaps Zarparia's own semantic tokens onto the canonical --an-*
+   primitives so screens pick up the unified values with minimal rule churn.
+   App-specific tokens (accent-fill green, status pills, motion durations that
+   don't align with the canon, fluid type scale) stay local by design — see
+   DESIGN.md's tier list for what must match vs what is app voice.
 
    Mechanism: mode = light | dark | system.
      - Explicit mode  → <html data-theme="light|dark"> (set by SSR + the store)
-     - system         → no attribute; @media (prefers-color-scheme) supplies dark
+     - system         → no attribute; canon's `color-scheme: light dark` on
+       :root plus light-dark() below lets the UA/OS decide.
+   `color-scheme` itself is declared once, keyed on `data-theme`, in the canon
+   file (aria-nobre-tokens.css) — this file must NOT redeclare it, or the
+   cascade would fight the canon's system-mode default.
    See docs/DESIGN_SYSTEM.md for the full spec.
    ========================================================================== */
 
@@ -21,38 +32,116 @@
 }
 
 :root {
-	/* ── Semantic surface + text (LIGHT) ── */
-	--bg: #faf6ee;
-	--surface: #fffdf7;
-	--surface-sunken: #f3eee2;
-	--text: #1a1208;
-	--text-muted: #7a6e5f;
-	--hairline: rgba(122, 110, 95, 0.28);
-	--hairline-strong: rgba(122, 110, 95, 0.5);
-	--accent: #2b4a2b; /* saturated brand green — fills with light text */
-	--accent-strong: #2b4a2b; /* text-level accent (dark-legible in light mode) */
-	--brand-tile: #1a2332; /* Zarparia crest shield fill (navy; always dark — never inverts) */
-	--brand-gold: #c1a374; /* Zarparia crest Z + border — constant across themes */
+	/* ── Semantic surface + text — remapped onto the Aria Nobre canon ──
+	   Both light and dark values now live in ONE declaration each via the
+	   canon's light-dark() tokens; the old duplicated
+	   `:root[data-theme='dark']` block and `@media (prefers-color-scheme:
+	   dark) :root:not([data-theme])` block are gone (Phase 1 task 3).
+	   --surface-sunken: the canon's "raised" step works as "sunken" in
+	   LIGHT mode only (both name the darkest-of-three step there:
+	   #ECE7DD < bg #F5F2EC < surface #FAF7F1). In DARK mode the canon
+	   ramp goes the other way (raised #322A20 is the LIGHTEST of the
+	   three), so mapping sunken onto raised would invert the recessed
+	   look — recessed wells would render lighter than their containers.
+	   Dark therefore mixes black into the canon bg to sit below it,
+	   preserving the required ordering (surface > bg > surface-sunken)
+	   in both themes. */
+	--bg: var(--an-bg);
+	--surface: var(--an-surface);
+	--surface-sunken: light-dark(
+		var(--an-surface-raised),
+		color-mix(in srgb, #000 22%, var(--an-bg))
+	);
+	--text: var(--an-ink);
+	--text-muted: var(--an-muted);
+	--hairline: var(--an-hairline);
+	--hairline-strong: var(--an-hairline-strong);
 
-	/* ── Status pills (home cards + feedback list; outside the trip shell) ── */
-	--pill-neutral-bg: #ede8e0;
-	--pill-neutral-fg: #7a6e5f;
-	--pill-info-bg: #dce8f5;
-	--pill-info-fg: #1e3a5f;
-	--pill-go-bg: #daf0e5;
-	--pill-go-fg: #1a5a34;
-	--pill-warn-bg: #f5edd5;
-	--pill-warn-fg: #7a5a10;
-	--pill-bug-bg: #fbe3df;
-	--pill-bug-fg: #8a2b20;
+	/* --accent stays a LITERAL constant (not aliased to --an-accent-zarparia)
+	   because it is a fill token — components paint it as a background with
+	   fixed light (#fff) text on top (e.g. LocaleSwitcher's .ls-btn.on) and
+	   must not flip to the canon's light dark-mode branch (#9FBF9F), which
+	   would fail contrast against white text. --accent-strong (a TEXT-level
+	   accent, never a fill) is exactly what --an-accent-zarparia encodes —
+	   #2B4A2B light / #9FBF9F dark, verified 9.3:1 on --bg — so it aliases
+	   directly with zero value change. See DESIGN-CONSISTENCY-PLAN.md's
+	   accent-assignments section for the canon source. */
+	--accent: #2b4a2b; /* saturated brand green — fills with light text, constant across themes */
+	--accent-strong: var(--an-accent-zarparia); /* text-level accent; light-dark() already matches prior values exactly */
+	--brand-tile: var(--an-navy-tile); /* Zarparia crest shield fill — canon: brand constants never theme-swap */
+	--brand-gold: var(--an-brand-gold); /* Zarparia crest Z + border — constant across themes */
 
-	/* ── Motion ── */
-	--dur-fast: 120ms;
+	/* ── Status pills (home cards + feedback list; outside the trip shell) ──
+	   App-specific palette, untouched values — only the mechanism changed
+	   (single light-dark() declarations instead of three duplicated blocks). */
+	--pill-neutral-bg: light-dark(#ede8e0, rgba(236, 228, 212, 0.08));
+	--pill-neutral-fg: light-dark(#7a6e5f, #a3957f);
+	--pill-info-bg: light-dark(#dce8f5, rgba(120, 160, 210, 0.2));
+	--pill-info-fg: light-dark(#1e3a5f, #bcd4f0);
+	--pill-go-bg: light-dark(#daf0e5, rgba(90, 170, 120, 0.2));
+	--pill-go-fg: light-dark(#1a5a34, #a9d9bf);
+	--pill-warn-bg: light-dark(#f5edd5, rgba(200, 170, 90, 0.18));
+	--pill-warn-fg: light-dark(#7a5a10, #e0c987);
+	--pill-bug-bg: light-dark(#fbe3df, rgba(200, 90, 80, 0.18));
+	--pill-bug-fg: light-dark(#8a2b20, #eaa89f);
+
+	/* ── Shape — canon scale + Zarparia's pill-button voice token ──
+	   Decision 4: Zarparia keeps pill buttons, so --radius-button points at
+	   --an-radius-pill (Nobria/Saldaria point theirs at --an-radius-md
+	   instead — see DESIGN.md's component rules). Values only; the
+	   radius/shadow component sweep itself is Phase 3, out of scope here. */
+	--radius-sm: var(--an-radius-sm);
+	--radius-md: var(--an-radius-md);
+	--radius-lg: var(--an-radius-lg);
+	--radius-pill: var(--an-radius-pill);
+	--radius-button: var(--an-radius-pill);
+
+	/* ── Spacing — canon scale ── */
+	--space-1: var(--an-space-1);
+	--space-2: var(--an-space-2);
+	--space-3: var(--an-space-3);
+	--space-4: var(--an-space-4);
+	--space-5: var(--an-space-5);
+	--space-6: var(--an-space-6);
+	--space-7: var(--an-space-7);
+	--space-8: var(--an-space-8);
+
+	/* ── Elevation — canon scale ── */
+	--elevation-1: var(--an-elevation-1);
+	--elevation-2: var(--an-elevation-2);
+	--elevation-3: var(--an-elevation-3);
+
+	/* ── Focus ring — the family signature (Phase 3 task 5). Every
+	   focus-visible rule in the app should resolve to this 2px gold ring
+	   instead of a per-component accent color. ── */
+	--focus-ring: var(--an-focus-ring);
+
+	/* ── UI chrome font — Phase 3 task 5. Inter for chrome (headers, nav,
+	   dialogs, buttons, BottomBar/Sidebar/MoreSheet); trip CONTENT keeps
+	   Source Serif 4 (--an-font-serif) untouched. Inter 400/500/600 are
+	   already imported in +layout.svelte (Phase 1). ── */
+	--font-ui: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+	/* ── Fixed chrome height — the mobile BottomBar's own height (see
+	   lib/nav/BottomBar.svelte's .bar-item/.bar-spacer), exposed as a token
+	   so other fixed-position elements (the Toast) can clear it without
+	   duplicating the literal. Safe-area inset is added at each use-site,
+	   not baked in here, since not every consumer sits flush to the edge. ── */
+	--bb-h: 56px;
+
+	/* ── Motion ──
+	   --dur-fast aligns exactly with the canon (120ms) and is mapped;
+	   --dur-base (180ms) and --dur-slow (240ms) don't align with the canon's
+	   single --an-duration-standard (250ms) step, so they stay local literals
+	   per task instructions ("map ... where values align; keep extras
+	   local"). --ease-out is Zarparia's own curve (no canon equivalent). */
+	--dur-fast: var(--an-duration-fast);
 	--dur-base: 180ms;
 	--dur-slow: 240ms;
 	--ease-out: cubic-bezier(0.2, 0.7, 0.3, 1);
 
-	/* ── Fluid type (clamp: min at ~430px, grows on wider chrome) ── */
+	/* ── Fluid type (clamp: min at ~430px, grows on wider chrome) ──
+	   Zarparia-specific scale; untouched by this remap. */
 	--type-display: clamp(30px, 2.2rem + 1.5vw, 42px);
 	--type-h1: clamp(24px, 1.35rem + 1vw, 30px);
 	--type-body: clamp(16px, 0.95rem + 0.3vw, 18px);
@@ -65,65 +154,10 @@
 	--stone: var(--text-muted);
 	--border: var(--hairline-strong);
 
-	color-scheme: light;
-}
-
-/* ── Dark palette: "candlelit paper" — warm, never gray ── */
-:root[data-theme='dark'] {
-	--bg: #16120d;
-	--surface: #1f1913;
-	--surface-sunken: #120f0b;
-	--text: #ece4d4;
-	--text-muted: #a3957f;
-	--hairline: rgba(236, 228, 212, 0.12);
-	--hairline-strong: rgba(236, 228, 212, 0.28);
-	--accent: #2b4a2b; /* fills only */
-	--accent-strong: #9fbf9f; /* text-level; 9.3:1 on --bg (verified) */
-	--brand-tile: #2b231b; /* crest shield: raised-surface tone, stays dark; gold carries the mark */
-	--brand-gold: #c1a374;
-
-	--pill-neutral-bg: rgba(236, 228, 212, 0.08);
-	--pill-neutral-fg: #a3957f;
-	--pill-info-bg: rgba(120, 160, 210, 0.2);
-	--pill-info-fg: #bcd4f0;
-	--pill-go-bg: rgba(90, 170, 120, 0.2);
-	--pill-go-fg: #a9d9bf;
-	--pill-warn-bg: rgba(200, 170, 90, 0.18);
-	--pill-warn-fg: #e0c987;
-	--pill-bug-bg: rgba(200, 90, 80, 0.18);
-	--pill-bug-fg: #eaa89f;
-
-	color-scheme: dark;
-}
-
-/* system mode (no explicit attribute) follows the OS preference */
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme]) {
-		--bg: #16120d;
-		--surface: #1f1913;
-		--surface-sunken: #120f0b;
-		--text: #ece4d4;
-		--text-muted: #a3957f;
-		--hairline: rgba(236, 228, 212, 0.12);
-		--hairline-strong: rgba(236, 228, 212, 0.28);
-		--accent: #2b4a2b;
-		--accent-strong: #9fbf9f;
-		--brand-tile: #2b231b;
-		--brand-gold: #c1a374;
-
-		--pill-neutral-bg: rgba(236, 228, 212, 0.08);
-		--pill-neutral-fg: #a3957f;
-		--pill-info-bg: rgba(120, 160, 210, 0.2);
-		--pill-info-fg: #bcd4f0;
-		--pill-go-bg: rgba(90, 170, 120, 0.2);
-		--pill-go-fg: #a9d9bf;
-		--pill-warn-bg: rgba(200, 170, 90, 0.18);
-		--pill-warn-fg: #e0c987;
-		--pill-bug-bg: rgba(200, 90, 80, 0.18);
-		--pill-bug-fg: #eaa89f;
-
-		color-scheme: dark;
-	}
+	/* NOTE: no `color-scheme` declaration here — the canon file
+	   (aria-nobre-tokens.css) declares it once, keyed on [data-theme], and is
+	   imported before this file. Redeclaring it here would re-introduce the
+	   exact "three hand-synced dark palettes" problem this remap removes. */
 }
 
 /* ── Global baseline ── */
@@ -137,4 +171,15 @@ body {
 	margin: 0;
 	background: var(--bg);
 	color: var(--text);
+}
+
+/* ── Focus ring — family signature, one rule for the whole app (Phase 3
+   task 5). Per-component `outline: 2px solid var(--accent-strong)` rules
+   are being removed in favor of this; a component only needs its own
+   :focus-visible rule again if it must OMIT the ring (rare) or restyle
+   something other than outline (e.g. TripView's icon-circle border-color
+   swap, which isn't an outline and is unaffected by this). */
+:focus-visible {
+	outline: var(--focus-ring);
+	outline-offset: 2px;
 }

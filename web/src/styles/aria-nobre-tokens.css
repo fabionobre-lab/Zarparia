@@ -1,0 +1,228 @@
+/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ 2521266 — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
+
+/* ============================================================================
+   Aria Nobre — family design token contract
+   ----------------------------------------------------------------------------
+   Purpose: the single source of truth for color, type, spacing, radius,
+   elevation, motion, and focus across the four family surfaces — the house
+   site (AriaNobre), Nobria, Saldaria (repo: Rachid), and Zarparia (repo:
+   TravelApp/UK-Spring-2026/web).
+
+   EDIT HERE, then run `node design/sync-tokens.mjs` to copy the result into
+   each repo's `src/styles/` (or equivalent). Never hand-edit the generated
+   copies — they carry a "do not edit" banner with the source git hash.
+
+   Every token is prefixed `--an-` (Aria Nobre namespace) so it can never
+   collide with an app's own semantic vars. Apps map their local semantic
+   tokens (e.g. Nobria's --color-bg) onto these; they do not consume --an-*
+   directly in component CSS. See design/DESIGN.md for the full contract,
+   including which tokens are Tier 1 "identical" vs Tier 2 "same kit,
+   app-tuned voice."
+
+   Created: 2026-07-17 (Phase 0 of DESIGN-CONSISTENCY-PLAN.md).
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   THEME MECHANISM
+   Explicit `data-theme` pins the color-scheme (and therefore which branch of
+   every light-dark() below resolves); no attribute present = follow the OS
+   (`color-scheme: light dark` on :root lets the UA pick, and light-dark()
+   resolves against whichever scheme is active). This is the one mechanism
+   for all four apps — it replaces every hand-duplicated
+   `@media (prefers-color-scheme: dark)` block and `[data-theme='dark']`
+   copy-paste block that existed before this contract.
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: light dark;
+}
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+:root {
+  /* --------------------------------------------------------------------
+     a) NEUTRALS — canonical bg/surface/ink/muted/hairline.
+     Source: DESIGN-CONSISTENCY-PLAN.md decision point 2 (bg/surface light,
+     Saldaria's charcoal ramp for dark); dark ink from Nobria's dark
+     --color-text (C:\AI\Nobria\src\styles\tokens.css:120).
+     -------------------------------------------------------------------- */
+  --an-bg: light-dark(#F5F2EC, #19150F);
+  --an-surface: light-dark(#FAF7F1, #262019);
+  --an-surface-raised: light-dark(#ECE7DD, #322A20);
+  --an-ink: light-dark(#1A2332, #EDE8DE);
+  /* CONFLICT FLAG: sources disagree on the dark muted value by one hex digit.
+     House site (C:\AI\AriaNobre\style.css:21,30) uses #9A9488; Nobria
+     (C:\AI\Nobria\src\styles\tokens.css:121,163) uses #9A9489. This file
+     adopts Nobria's #9A9489 for consistency with the dark-ink source above —
+     flagging rather than silently picking; verify against a fresh contrast
+     check before Phase 1 adoption and reconcile the house site's value. */
+  --an-muted: light-dark(#6B6660, #9A9489);
+
+  /* Hairlines derive from ink via color-mix (plan requirement: "use
+     color-mix so it derives from ink") rather than a separate literal per
+     theme. Rachid's own hand-tuned hairline uses a muted-vs-text RGB split
+     per theme (styles.css:110,239) — this is a deliberate simplification for
+     the shared canon; component-level overrides remain possible. */
+  --an-hairline: color-mix(in srgb, var(--an-ink) 15%, transparent);
+  --an-hairline-strong: color-mix(in srgb, var(--an-ink) 32%, transparent);
+
+  /* --------------------------------------------------------------------
+     b) BRAND CONSTANTS — never theme-swapped (crests/logos only).
+     Source: DESIGN-CONSISTENCY-PLAN.md §Phase 0, "Brand constants."
+     -------------------------------------------------------------------- */
+  --an-navy-tile: #1A2332;
+  --an-brand-gold: #C4A572;
+
+  /* --------------------------------------------------------------------
+     c) GOLD SCALE — copied exactly from Saldaria's tier-1 primitives.
+     Source: C:\AI\Rachid\src\styles.css:76-81.
+     CONFLICT FLAG: the plan text (and this task's own instructions) describe
+     the ramp as "#6B4A1E … #D6B87B" with "gold-700" as a step to verify —
+     neither is accurate. Saldaria has no gold-700; the real 6 steps are
+     900/600/500/400/300/200, and gold-300 is #C7A468, NOT #D6B87B (#D6B87B
+     is actually gold-200). Rachid's own dark-mode remap confirms gold-300 is
+     the correct interactive-gold-in-dark step (styles.css:251:
+     `--gold: var(--gold-300)`), so this file follows the real values, not
+     the plan's stated hexes.
+     -------------------------------------------------------------------- */
+  --an-gold-900: #6B4A1E;
+  --an-gold-600: #8A6F43;
+  --an-gold-500: #A68B5B;
+  --an-gold-400: #C4A572; /* same hex as --an-brand-gold; kept as a separate step for scale completeness */
+  --an-gold-300: #C7A468;
+  --an-gold-200: #D6B87B;
+
+  /* --------------------------------------------------------------------
+     d) OXBLOOD SCALE — copied exactly from Saldaria's tier-1 primitives.
+     Source: C:\AI\Rachid\src\styles.css:68-71. Only four steps exist
+     (700/600/300/200) — there is no oxblood-900/500.
+     -------------------------------------------------------------------- */
+  --an-oxblood-700: #6B2737;
+  --an-oxblood-600: #7A3646;
+  --an-oxblood-300: #C68A96;
+  --an-oxblood-200: #D49CA7;
+
+  /* --------------------------------------------------------------------
+     e) FOREST / SUCCESS SCALE + Zarparia's standalone accent green.
+     Source: C:\AI\Rachid\src\styles.css:73-74 (forest-700/forest-300);
+     C:\AI\TravelApp\UK-Spring-2026\web\src\styles\tokens.css:32,81
+     (Zarparia's --accent / --accent-strong, light and dark).
+     -------------------------------------------------------------------- */
+  --an-forest-700: #2D4A3E;
+  --an-forest-300: #7FAF95;
+  --an-accent-zarparia: light-dark(#2B4A2B, #9FBF9F);
+
+  /* --------------------------------------------------------------------
+     f) PER-APP ACCENT TOKENS.
+     Source: DESIGN-CONSISTENCY-PLAN.md decision point 1 + §Phase 0
+     "Accent assignments."
+     -------------------------------------------------------------------- */
+  --an-accent-nobria: light-dark(var(--an-gold-500), var(--an-gold-300));
+  --an-accent-saldaria: light-dark(var(--an-oxblood-700), var(--an-oxblood-300));
+  /* --an-accent-zarparia already declared above (single canonical value). */
+
+  /* --------------------------------------------------------------------
+     g) SEMANTIC STATUS — oxblood is the family danger color, forest is
+     the family success color (plan §Accent assignments).
+     -------------------------------------------------------------------- */
+  --an-danger: light-dark(var(--an-oxblood-700), var(--an-oxblood-300));
+  --an-success: light-dark(var(--an-forest-700), var(--an-forest-300));
+
+  /* --------------------------------------------------------------------
+     h) SHAPE. Source: Nobria's tokens.css:56-59 (identical values already
+     shared by Nobria and this plan). NOTE: button radius is a per-app
+     VOICE token, not part of this shared file — apps define their own
+     --radius-button pointing at --an-radius-md (Nobria/Saldaria rectangles)
+     or --an-radius-pill (Zarparia keeps pills; decision point 4).
+     -------------------------------------------------------------------- */
+  --an-radius-sm: 4px;
+  --an-radius-md: 6px;
+  --an-radius-lg: 12px;
+  --an-radius-pill: 999px;
+
+  /* --------------------------------------------------------------------
+     i) SPACING.
+     CONFLICT FLAG: this task's own brief (and by extension the plan's
+     framing) proposed 4/8/16/24/40/64/84/104 as the shared 8-step scale.
+     That is NOT what the two source files actually share. The real,
+     verified, shared scale is:
+       Rachid  (C:\AI\Rachid\src\styles.css:187-194, in rem):
+         0.25rem/0.5rem/0.75rem/1.25rem/2rem/3rem/4.5rem/6.5rem
+         = 4px/8px/12px/20px/32px/48px/72px/104px
+       Nobria  (C:\AI\Nobria\src\styles\tokens.css:46-53, in px):
+         4px/8px/12px/20px/32px/48px/72px/104px
+     These two are identical in px. This file copies THAT scale exactly,
+     not the proposed 16/24/40/64/84 values, which do not appear in either
+     source file.
+     -------------------------------------------------------------------- */
+  --an-space-1: 4px;
+  --an-space-2: 8px;
+  --an-space-3: 12px;
+  --an-space-4: 20px;
+  --an-space-5: 32px;
+  --an-space-6: 48px;
+  --an-space-7: 72px;
+  --an-space-8: 104px;
+
+  /* --------------------------------------------------------------------
+     j) ELEVATION — copied exactly from Saldaria's --elevation-1/2/3.
+     Source: C:\AI\Rachid\src\styles.css:149-151. Saldaria expresses these
+     as rgba(var(--shadow-rgb), alpha) where --shadow-rgb is
+     --navy-900-rgb (26,35,50) in light and --black-rgb (0,0,0) in dark
+     (styles.css:111,240) — reproduced here with light-dark() driving the
+     same two rgb bases so the shadow color itself switches with theme,
+     exactly as Saldaria's does.
+     -------------------------------------------------------------------- */
+  /* light-dark() is a color function — it must sit in the color slot of the
+     shadow, not wrap the whole shadow list (wrapping the list would make
+     `box-shadow: var(--an-elevation-*)` invalid at computed-value time and
+     silently drop the shadow). */
+  --an-elevation-1: 0 2px 6px light-dark(rgba(26, 35, 50, 0.09), rgba(0, 0, 0, 0.09));
+  --an-elevation-2: 0 4px 14px light-dark(rgba(26, 35, 50, 0.12), rgba(0, 0, 0, 0.12));
+  --an-elevation-3: 0 20px 60px light-dark(rgba(26, 35, 50, 0.3), rgba(0, 0, 0, 0.3));
+
+  /* --------------------------------------------------------------------
+     k) MOTION. Source: C:\AI\Rachid\src\styles.css:165-168 (identical
+     values already specified by the plan).
+     -------------------------------------------------------------------- */
+  --an-duration-fast: 120ms;
+  --an-duration-standard: 250ms;
+  --an-ease-standard: ease;
+  --an-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+
+  /* --------------------------------------------------------------------
+     l) FOCUS — the family signature: a 2px gold ring, light-mode gold-600 /
+     dark-mode gold-300. Light uses gold-600 (#8A6F43, 4.24:1 on --an-bg),
+     NOT gold-500 (#A68B5B, 2.91:1 — fails WCAG 1.4.11's 3:1 non-text
+     minimum for focus indicators on the canonical cream). Dark gold-300 is
+     7.74:1 on the dark bg. Ratios verified by computation 2026-07-17.
+     -------------------------------------------------------------------- */
+  --an-focus-ring: 2px solid light-dark(var(--an-gold-600), var(--an-gold-300));
+
+  /* --------------------------------------------------------------------
+     m) TYPOGRAPHY.
+     Font stacks: Source Serif 4 (display/headings, and Zarparia trip
+     content) + Inter (body/UI chrome), self-hosted family-wide — see
+     DESIGN.md. Fallback chain kept short per this task's brief; individual
+     apps may still list their own licensed-font fallbacks ahead of these
+     (e.g. Nobria's 'Tiempos Text'/'Söhne') without violating the contract,
+     since Source Serif 4 / Inter are the ones actually shipped.
+     Fluid type scale copied exactly from Nobria's tokens.css:23-31 (its
+     canonical clamp() scale, --type-display through --type-micro).
+     -------------------------------------------------------------------- */
+  --an-font-serif: 'Source Serif 4', Georgia, serif;
+  --an-font-sans: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --an-type-display: clamp(1.875rem, 1.55rem + 1.35vw, 2.625rem); /* 30 → 42px */
+  --an-type-h1: clamp(1.5rem, 1.32rem + 0.78vw, 1.875rem); /* 24 → 30px */
+  --an-type-h2: clamp(1.125rem, 1.02rem + 0.45vw, 1.3125rem); /* 18 → 21px */
+  --an-type-h3: clamp(1rem, 0.94rem + 0.25vw, 1.125rem); /* 16 → 18px */
+  --an-type-eyebrow: 0.75rem; /* 12px — uppercase + tracked labels only */
+  --an-type-body: clamp(1rem, 0.94rem + 0.25vw, 1.125rem); /* 16 → 18px */
+  --an-type-figure: clamp(1rem, 0.94rem + 0.25vw, 1.125rem); /* 16 → 18px numerals */
+  --an-type-small: clamp(0.8125rem, 0.8rem + 0.06vw, 0.875rem); /* 13 → 14px */
+  --an-type-micro: 0.6875rem; /* 11px captions, footnotes */
+}

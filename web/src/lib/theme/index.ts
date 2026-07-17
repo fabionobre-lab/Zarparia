@@ -9,11 +9,20 @@ export const THEME_MODES: ThemeMode[] = ['system', 'dark', 'light'];
 export const DEFAULT_THEME: ThemeMode = 'system';
 
 /** Cookie holding the chosen theme (client-writable, so NOT httpOnly). Read on
- *  the server to stamp `data-theme` into the first byte of HTML (no flash). */
-export const THEME_COOKIE = 'trips-theme';
+ *  the server to stamp `data-theme` into the first byte of HTML (no flash).
+ *  Renamed from the legacy `trips-theme` per the Aria Nobre storage-key
+ *  convention (`<app>.theme` / cookie `<app>-theme` — see
+ *  C:\AI\AriaNobre\design\DESIGN.md "Conventions"). */
+export const THEME_COOKIE = 'zarparia-theme';
+/** Legacy cookie name, pre-Phase-1. Read once as a fallback when the new
+ *  cookie is absent; never written. */
+export const LEGACY_THEME_COOKIE = 'trips-theme';
 /** localStorage key — the belt-and-braces client copy read by the inline
  *  bootstrap script in app.html for cached/prerendered pages. */
-export const THEME_STORAGE_KEY = 'trips.theme';
+export const THEME_STORAGE_KEY = 'zarparia.theme';
+/** Legacy localStorage key, pre-Phase-1. Read once as a fallback when the new
+ *  key is absent; never written. */
+export const LEGACY_THEME_STORAGE_KEY = 'trips.theme';
 /** One year, in seconds. */
 export const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 

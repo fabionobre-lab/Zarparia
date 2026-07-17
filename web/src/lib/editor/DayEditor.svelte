@@ -179,7 +179,7 @@
 <style>
 	.day {
 		border: 1px solid var(--hairline-strong);
-		border-radius: 9px;
+		border-radius: var(--radius-md);
 		margin-bottom: 0.5rem;
 		background: var(--surface);
 	}
@@ -258,7 +258,7 @@
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.check {
 		display: flex;
@@ -288,7 +288,7 @@
 		font-size: 0.8rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
 	}

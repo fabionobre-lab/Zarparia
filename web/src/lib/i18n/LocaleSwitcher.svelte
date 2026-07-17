@@ -25,7 +25,7 @@
 		display: inline-flex;
 		flex-shrink: 0;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		overflow: hidden;
 		background: var(--bg);
 	}

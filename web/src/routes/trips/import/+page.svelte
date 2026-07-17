@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { t } from '$lib/i18n/store.svelte';
+	import { toast } from '$lib/toast';
 
 	let { data } = $props();
 
@@ -32,6 +33,7 @@
 			});
 			if (res.ok) {
 				const data = (await res.json()) as { id: string };
+				toast(t('toast.tripImported'));
 				await goto(`/trips/${data.id}/edit`);
 				return;
 			}
@@ -96,7 +98,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 760px;
 		margin: 2rem auto;
 		padding: 0 1.5rem;
@@ -123,15 +125,11 @@
 		line-height: 1.5;
 		padding: 0.9rem 1rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		background: var(--surface);
 		color: var(--text);
 		resize: vertical;
 		min-height: 240px;
-	}
-	textarea:focus {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 1px;
 	}
 	.row {
 		display: flex;
@@ -155,7 +153,7 @@
 		background: var(--accent);
 		color: #fff;
 		border: none;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.55rem 1.4rem;
 		cursor: pointer;
 	}
@@ -173,7 +171,7 @@
 		background: var(--pill-bug-bg);
 		border: 1px solid var(--pill-bug-bg);
 		color: var(--pill-bug-fg);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 0.75rem 1rem;
 	}
 	.error p {

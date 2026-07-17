@@ -64,7 +64,7 @@
 		text-transform: uppercase;
 		color: var(--text-muted);
 		background: var(--surface-sunken);
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		padding: 0.25rem 0.35rem;
 		margin-top: 0.35rem;
 	}
@@ -76,7 +76,7 @@
 		font-size: 0.85rem;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 		color: var(--text);
 		resize: vertical;

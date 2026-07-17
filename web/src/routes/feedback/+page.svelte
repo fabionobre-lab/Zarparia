@@ -4,6 +4,7 @@
 	import type { Messages } from '$lib/i18n';
 	import type { FeedbackAdminRow, FeedbackRow, FeedbackStatus } from '$lib/feedback';
 	import { FEEDBACK_STATUSES } from '$lib/feedback';
+	import EmptyState from '$lib/ui/empty/EmptyState.svelte';
 
 	let { data } = $props();
 
@@ -65,7 +66,7 @@
 	</div>
 
 	{#if items.length === 0}
-		<p class="empty">{t('feedback.empty')}</p>
+		<EmptyState kind="inbox"><p>{t('feedback.empty')}</p></EmptyState>
 	{:else}
 		<ul class="list">
 			{#each items as item (item.id)}
@@ -103,7 +104,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 760px;
 		margin: 2rem auto;
 		padding: 0 1.5rem;
@@ -135,9 +136,6 @@
 	.approvals-link:hover {
 		text-decoration: underline;
 	}
-	.empty {
-		color: var(--text-muted);
-	}
 	.list {
 		list-style: none;
 		margin: 0;
@@ -149,7 +147,7 @@
 	.item {
 		background: var(--surface);
 		border: 1px solid var(--hairline);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 0.8rem 1rem;
 	}
 	.top {
@@ -163,7 +161,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		padding: 0.15rem 0.5rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--pill-neutral-bg);
 		color: var(--pill-neutral-fg);
 	}
@@ -195,7 +193,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		padding: 0.15rem 0.55rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--pill-neutral-bg);
 		color: var(--pill-neutral-fg);
 	}
@@ -220,7 +218,7 @@
 		font-size: 0.8rem;
 		padding: 0.25rem 0.4rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 		color: var(--text);
 	}

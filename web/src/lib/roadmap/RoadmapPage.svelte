@@ -47,7 +47,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 680px;
 		margin: 2rem auto;
 		padding: 0 1.5rem 4rem;
@@ -84,7 +84,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		padding: 0.25rem 0.65rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		margin: 0 0 0.9rem;
 	}
 	.status.shipped {
@@ -110,7 +110,7 @@
 	li {
 		background: var(--surface);
 		border: 1px solid var(--hairline);
-		border-radius: 10px;
+		border-radius: var(--radius-md);
 		padding: 0.7rem 0.9rem;
 	}
 	.item-title {

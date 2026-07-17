@@ -27,9 +27,9 @@
 		margin: 3rem auto;
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 1.4rem 1.2rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		text-align: center;
 	}
 	h1 {
@@ -49,7 +49,7 @@
 		border: 1px solid var(--accent);
 		background: var(--accent);
 		color: #fff;
-		border-radius: 8px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1rem;
 	}
 </style>

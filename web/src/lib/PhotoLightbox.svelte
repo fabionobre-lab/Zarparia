@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { photoUrl, type TripPhoto } from '$lib/photos';
 	import { t } from '$lib/i18n/store.svelte';
+	import ConfirmDialog from '$lib/dialog/ConfirmDialog.svelte';
+	import { toast } from '$lib/toast';
 
 	interface DayOption {
 		date: string;
@@ -30,6 +32,7 @@
 	const photo = $derived(photos[Math.min(index, photos.length - 1)]);
 	let busy = $state(false);
 	let errMsg = $state('');
+	let deleteConfirmOpen = $state(false);
 
 	function prev() {
 		if (index > 0) index--;
@@ -63,8 +66,13 @@
 		}
 	}
 
-	async function remove() {
-		if (!photo || !confirm(t('photos.confirmDelete'))) return;
+	function remove() {
+		if (!photo) return;
+		deleteConfirmOpen = true;
+	}
+
+	async function confirmRemove() {
+		if (!photo) return;
 		busy = true;
 		errMsg = '';
 		try {
@@ -72,6 +80,7 @@
 			if (res.ok) {
 				onchanged();
 				onclose();
+				toast(t('toast.photoDeleted'));
 			} else {
 				errMsg = t('photos.errSave');
 			}
@@ -118,6 +127,15 @@
 	</div>
 {/if}
 
+<ConfirmDialog
+	bind:open={deleteConfirmOpen}
+	title={t('photos.deleteTitle')}
+	body={t('photos.confirmDelete')}
+	cancelLabel={t('common.cancel')}
+	confirmLabel={t('photos.delete')}
+	onconfirm={confirmRemove}
+/>
+
 <style>
 	.overlay {
 		position: fixed;
@@ -145,15 +163,15 @@
 		max-width: 100%;
 		max-height: calc(88vh - 84px);
 		object-fit: contain;
-		border-radius: 10px;
-		box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+		border-radius: var(--radius-md);
+		box-shadow: var(--elevation-3);
 	}
 	.chrome {
 		padding: 10px 2px 0;
 		display: flex;
 		flex-direction: column;
 		gap: 6px;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.caption {
 		color: #f0ead9;
@@ -173,14 +191,14 @@
 		font-size: 0.8rem;
 		max-width: 15rem;
 		padding: 0.2rem 0.35rem;
-		border-radius: 7px;
+		border-radius: var(--radius-md);
 	}
 	.del {
 		font-size: 0.78rem;
 		color: #f3b6ab;
 		background: rgba(200, 64, 64, 0.18);
 		border: 1px solid rgba(220, 120, 110, 0.45);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.2rem 0.7rem;
 		cursor: pointer;
 	}

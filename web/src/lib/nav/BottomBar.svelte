@@ -45,6 +45,17 @@
 	let moreOpen = $state(false);
 	let feedbackOpen = $state(false);
 
+	// Advertise our presence to other fixed-bottom chrome (the Toast region
+	// keys its mobile bottom offset off this class): BottomBar is opted into
+	// per-route, so a blanket mobile media query in Toast.svelte would float
+	// toasts ~--bb-h above the true bottom edge on bar-less routes
+	// (account, join, admin, legal...). Body-class scoping keeps the offset
+	// exactly where the bar actually renders.
+	$effect(() => {
+		document.body.classList.add('has-bottombar');
+		return () => document.body.classList.remove('has-bottombar');
+	});
+
 	// Mirrors the desktop sidebar's approval gate: feedback is for approved
 	// accounts only (pending/rejected users keep sign-out and the toggles).
 	const showFeedback = $derived(!!user && user.status !== 'pending' && user.status !== 'rejected');
@@ -285,7 +296,7 @@
 		background: var(--surface);
 		border-top: 1px solid var(--hairline);
 		padding-bottom: env(safe-area-inset-bottom);
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.bottom-bar.hidden {
 		display: none;
@@ -298,7 +309,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 3px;
-		min-height: 56px;
+		min-height: var(--bb-h);
 		padding: 6px 4px;
 		border: none;
 		background: transparent;
@@ -330,7 +341,7 @@
 
 	/* Reserve the bar's height in normal flow so nothing hides behind it. */
 	.bar-spacer {
-		height: calc(56px + env(safe-area-inset-bottom));
+		height: calc(var(--bb-h) + env(safe-area-inset-bottom));
 	}
 
 	/* ── Sheet rows ── */

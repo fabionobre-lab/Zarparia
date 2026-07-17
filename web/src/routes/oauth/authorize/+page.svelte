@@ -37,9 +37,9 @@
 		margin: 3rem auto;
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 1.6rem 1.4rem;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	h1 {
 		font-size: 1.2rem;
@@ -66,7 +66,7 @@
 		font-size: 0.9rem;
 		font-family: inherit;
 		cursor: pointer;
-		border-radius: 8px;
+		border-radius: var(--radius-button);
 		padding: 0.55rem 1.1rem;
 		border: 1px solid var(--hairline-strong);
 	}

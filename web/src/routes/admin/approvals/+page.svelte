@@ -3,6 +3,7 @@
 	import { t } from '$lib/i18n/store.svelte';
 	import { locale } from '$lib/i18n/store.svelte';
 	import type { AdminUserRow } from '$lib/server/users';
+	import EmptyState from '$lib/ui/empty/EmptyState.svelte';
 
 	let { data } = $props();
 
@@ -38,7 +39,7 @@
 	<section>
 		<h2>{t('admin.approvals.pendingHeading')}</h2>
 		{#if data.pending.length === 0}
-			<p class="empty">{t('admin.approvals.pendingEmpty')}</p>
+			<EmptyState kind="approvals"><p>{t('admin.approvals.pendingEmpty')}</p></EmptyState>
 		{:else}
 			<ul class="list">
 				{#each data.pending as row (row.id)}
@@ -76,7 +77,7 @@
 	<section>
 		<h2>{t('admin.approvals.recentHeading')}</h2>
 		{#if data.recent.length === 0}
-			<p class="empty">{t('admin.approvals.recentEmpty')}</p>
+			<EmptyState kind="approvals"><p>{t('admin.approvals.recentEmpty')}</p></EmptyState>
 		{:else}
 			<ul class="list">
 				{#each data.recent as row (row.id)}
@@ -118,7 +119,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 760px;
 		margin: 2rem auto;
 		padding: 0 1.5rem;
@@ -140,9 +141,6 @@
 		font-size: 1.05rem;
 		margin: 0 0 0.75rem;
 	}
-	.empty {
-		color: var(--text-muted);
-	}
 	.list {
 		list-style: none;
 		margin: 0;
@@ -159,7 +157,7 @@
 		flex-wrap: wrap;
 		background: var(--surface);
 		border: 1px solid var(--hairline);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 0.7rem 0.9rem;
 	}
 	.who {
@@ -172,7 +170,7 @@
 		flex-shrink: 0;
 		width: 36px;
 		height: 36px;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		object-fit: cover;
 		background: var(--surface-sunken);
 	}
@@ -209,7 +207,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		padding: 0.1rem 0.45rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 	}
 	.chip.approved {
 		background: var(--pill-go-bg);
@@ -233,7 +231,7 @@
 		font: inherit;
 		font-size: 0.82rem;
 		padding: 0.4rem 0.8rem;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		cursor: pointer;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);

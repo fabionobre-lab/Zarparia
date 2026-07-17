@@ -130,15 +130,19 @@
 		right: 0;
 		bottom: 0;
 		background: var(--surface);
+		/* Kept as a local literal, not var(--radius-lg): 18px is this sheet's
+		   signature top-corner curve, and snapping to the 12px lg token would be
+		   a ~33% visible flattening of a prominent full-width edge. Phase 3 flag. */
 		border-top-left-radius: 18px;
 		border-top-right-radius: 18px;
 		border-top: 1px solid var(--hairline);
-		box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.22);
+		/* Upward bottom-sheet shadow — elevation tokens are downward-only, so this stays a local literal (Phase 3 flag). */
+		box-shadow: 0 -8px 30px light-dark(rgba(26, 35, 50, 0.22), rgba(0, 0, 0, 0.3));
 		padding: 0.4rem 0.9rem calc(0.9rem + env(safe-area-inset-bottom));
 		max-height: 85vh;
 		overflow-y: auto;
 		transform: translateY(100%);
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.sheet-root.open .panel {
 		transform: translateY(0);
@@ -161,7 +165,7 @@
 	.grabber {
 		width: 40px;
 		height: 4px;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		background: var(--hairline-strong);
 	}
 	.close {
@@ -178,7 +182,7 @@
 		background: transparent;
 		color: var(--text-muted);
 		cursor: pointer;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 	}
 	.close:hover {
 		color: var(--accent-strong);

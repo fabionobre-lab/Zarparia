@@ -919,14 +919,14 @@
 		--map-filter: none;
 		font-family: 'Source Serif 4', Georgia, serif;
 		color: var(--text);
-		border-radius: 14px;
+		border-radius: var(--radius-lg);
 		/* `clip`, not `hidden`: still clips content to the rounded corners, but
 		   (unlike `hidden`) doesn't turn .shell into a scroll container — which
 		   would otherwise become the sticky day nav's containing block and
 		   break position: sticky, since .shell itself never actually scrolls
 		   (the page does). */
 		overflow: clip;
-		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+		box-shadow: var(--elevation-2);
 	}
 	.shell.theme-navy {
 		--theme-base: #1e3054;
@@ -1058,7 +1058,7 @@
 		padding: 4px 12px;
 		min-height: 44px;
 		box-sizing: border-box;
-		border-radius: 20px;
+		border-radius: var(--radius-button);
 		border: 1px solid rgba(255, 255, 255, 0.18);
 		background: rgba(0, 0, 0, 0.2);
 		color: rgba(255, 255, 255, 0.75);
@@ -1075,7 +1075,7 @@
 	}
 	.lang-toggle {
 		display: flex;
-		border-radius: 20px;
+		border-radius: var(--radius-pill);
 		overflow: hidden;
 		border: 1px solid rgba(255, 255, 255, 0.18);
 	}
@@ -1119,7 +1119,7 @@
 		}
 	}
 	.trip-title {
-		font-family: 'Playfair Display', Georgia, serif;
+		font-family: 'Source Serif 4', Georgia, serif;
 		font-size: 25px;
 		font-weight: 700;
 		color: #fff;
@@ -1132,7 +1132,7 @@
 	}
 	.vtabs {
 		display: flex;
-		border-radius: 10px 10px 0 0;
+		border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 		overflow: hidden;
 		gap: 1px;
 		background: rgba(0, 0, 0, 0.2);
@@ -1194,7 +1194,7 @@
 		transition: box-shadow 0.15s ease;
 	}
 	.daynav.stuck {
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+		box-shadow: var(--elevation-1);
 	}
 	.daynav-scroll {
 		display: flex;
@@ -1291,7 +1291,7 @@
 		font-size: 15px;
 		font-weight: 500;
 		color: var(--stone);
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		line-height: 1;
 		font-variant-numeric: tabular-nums;
 	}
@@ -1322,7 +1322,7 @@
 	.day-hdr {
 		margin: 10px 13px 0;
 		background: var(--hero-bg);
-		border-radius: 13px;
+		border-radius: var(--radius-lg);
 		/* Slimmed: tighter padding + smaller title + a single compact weather row
 		   trims the header from ~107px toward ~80px, so more of the timeline is
 		   visible on first paint. Keeps the theme colour band identity. */
@@ -1337,7 +1337,7 @@
 		margin-bottom: 1px;
 	}
 	.dh-title {
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-size: 16px;
 		color: #fff;
 		font-weight: 700;
@@ -1351,10 +1351,10 @@
 	}
 	.bday-strip {
 		background: var(--heather);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		padding: 6px 11px;
 		margin-top: 8px;
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-style: italic;
 		font-size: 12px;
 		color: #fff;
@@ -1482,7 +1482,7 @@
 		gap: 6px;
 	}
 	.tb-title {
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-size: 14px;
 		font-weight: 500;
 		color: var(--ink);
@@ -1542,7 +1542,7 @@
 	.tb-tag {
 		font-size: 10px;
 		padding: 2px 7px;
-		border-radius: 20px;
+		border-radius: var(--radius-pill);
 		white-space: nowrap;
 	}
 	.tb-tag.sight {
@@ -1579,7 +1579,7 @@
 	.tb-warn {
 		background: var(--warn-bg);
 		border-left: 2.5px solid var(--warn-bar);
-		border-radius: 0 7px 7px 0;
+		border-radius: 0 var(--radius-md) var(--radius-md) 0;
 		padding: 5px 9px;
 		margin-top: 5px;
 		font-size: 11px;
@@ -1588,7 +1588,7 @@
 	}
 	.tb-note {
 		background: var(--note-bg);
-		border-radius: 7px;
+		border-radius: var(--radius-md);
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
@@ -1598,7 +1598,7 @@
 	.diff-added {
 		background: var(--add-bg);
 		border-left: 2.5px solid var(--moss);
-		border-radius: 0 7px 7px 0;
+		border-radius: 0 var(--radius-md) var(--radius-md) 0;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
@@ -1608,7 +1608,7 @@
 	.diff-changed {
 		background: var(--chg-bg);
 		border-left: 2.5px solid var(--gold);
-		border-radius: 0 7px 7px 0;
+		border-radius: 0 var(--radius-md) var(--radius-md) 0;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
@@ -1618,7 +1618,7 @@
 	.diff-kept {
 		background: var(--note-bg);
 		border-left: 2.5px solid var(--accent-text);
-		border-radius: 0 7px 7px 0;
+		border-radius: 0 var(--radius-md) var(--radius-md) 0;
 		padding: 5px 9px;
 		margin-top: 4px;
 		font-size: 11px;
@@ -1631,7 +1631,7 @@
 		font-size: 10px;
 		color: var(--text-muted);
 		opacity: 0.7;
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-style: italic;
 		letter-spacing: 0.05em;
 	}
@@ -1643,7 +1643,7 @@
 		margin: 10px 13px 4px;
 		background: var(--surface-sunken);
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 12px 14px 10px;
 		text-decoration: none;
 		color: var(--text);
@@ -1661,10 +1661,10 @@
 		box-sizing: border-box;
 		padding: 6px 12px;
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius-button);
 		background: var(--surface-sunken);
 		color: var(--accent-text);
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-size: 12px;
 		text-decoration: none;
 	}
@@ -1688,7 +1688,7 @@
 	@media (hover: hover) {
 		.route-card:hover {
 			border-color: var(--accent-text);
-			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+			box-shadow: var(--elevation-1);
 		}
 	}
 	@media (prefers-reduced-motion: no-preference) {
@@ -1706,7 +1706,7 @@
 		display: flex;
 		align-items: center;
 		gap: 6px;
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-size: 13px;
 		font-weight: 600;
 		color: var(--accent-text);
@@ -1781,7 +1781,7 @@
 		font-size: 10px;
 		color: var(--text-muted);
 		background: var(--surface-sunken);
-		border-radius: 10px;
+		border-radius: var(--radius-md);
 		padding: 1px 7px;
 	}
 	.tb-photos {
@@ -1802,7 +1802,7 @@
 		height: 56px;
 		padding: 0;
 		border: 1px solid var(--border);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		background: var(--surface-sunken);
 		overflow: hidden;
 		cursor: pointer;
@@ -1818,7 +1818,7 @@
 		margin: 10px 13px 4px;
 		padding: 10px 12px;
 		border: 1px solid var(--border);
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 	}
 	.day-photos-unmatched {
 		margin: 14px 13px;
@@ -1842,7 +1842,7 @@
 		width: 80px;
 		height: 55px;
 		object-fit: cover;
-		border-radius: 5px;
+		border-radius: var(--radius-sm);
 		display: block;
 		filter: var(--photo-filter);
 	}

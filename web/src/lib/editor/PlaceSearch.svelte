@@ -217,7 +217,7 @@
 		color: var(--text);
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		background: var(--surface);
 	}
 	.menu {
@@ -231,14 +231,14 @@
 		list-style: none;
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
-		box-shadow: 0 6px 18px rgba(30, 22, 8, 0.12);
+		border-radius: var(--radius-md);
+		box-shadow: var(--elevation-2);
 		max-height: 15rem;
 		overflow-y: auto;
 	}
 	.opt {
 		padding: 0.35rem 0.45rem;
-		border-radius: 4px;
+		border-radius: var(--radius-sm);
 		font-size: 0.8rem;
 		color: var(--text);
 		cursor: pointer;

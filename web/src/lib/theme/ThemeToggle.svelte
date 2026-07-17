@@ -56,7 +56,7 @@
 		flex-shrink: 0;
 		padding: 0;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		background: transparent;
 		color: var(--text-muted);
 		cursor: pointer;

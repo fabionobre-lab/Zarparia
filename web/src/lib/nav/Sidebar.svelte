@@ -237,7 +237,7 @@
 			box-sizing: border-box;
 			background: var(--surface);
 			border-right: 1px solid var(--hairline);
-			font-family: system-ui, sans-serif;
+			font-family: var(--font-ui);
 		}
 	}
 
@@ -284,7 +284,7 @@
 		min-height: 40px;
 		padding: 0.4rem 0.65rem;
 		border: none;
-		border-radius: 9px;
+		border-radius: var(--radius-md);
 		background: none;
 		color: var(--text);
 		font: inherit;
@@ -349,7 +349,7 @@
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
 		color: var(--text-muted);
-		border-radius: 20px;
+		border-radius: var(--radius-pill);
 		padding: 4px 10px;
 		font-family: inherit;
 		font-size: 11px;
@@ -381,7 +381,7 @@
 		box-sizing: border-box;
 		padding: 6px 10px;
 		border: none;
-		border-radius: 9px;
+		border-radius: var(--radius-md);
 		background: none;
 		cursor: pointer;
 		text-align: left;
@@ -399,7 +399,7 @@
 		font-variant-numeric: tabular-nums;
 	}
 	.rail-day-title {
-		font-family: 'Playfair Display', serif;
+		font-family: 'Source Serif 4', serif;
 		font-size: 13px;
 		font-weight: 500;
 		line-height: 1.25;
@@ -449,7 +449,7 @@
 		min-height: 40px;
 		padding: 0.35rem 0.65rem;
 		border: none;
-		border-radius: 9px;
+		border-radius: var(--radius-md);
 		background: none;
 		color: var(--text);
 		font: inherit;
@@ -494,15 +494,8 @@
 		margin: 0;
 	}
 
-	/* Focus states per house tokens. */
-	.nav-row:focus-visible,
-	.util-row:focus-visible,
-	.rail-day:focus-visible,
-	.rail-pill:focus-visible,
-	.brand:focus-visible {
-		outline: 2px solid var(--accent-strong);
-		outline-offset: 2px;
-	}
+	/* Focus states: the global gold ring (tokens.css) covers these now —
+	   see DESIGN.md's focus-ring rule (family signature, no per-app accent). */
 
 	@media (prefers-reduced-motion: no-preference) {
 		.nav-row,

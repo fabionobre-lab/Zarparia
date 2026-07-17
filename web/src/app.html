@@ -4,8 +4,8 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
-		<meta name="theme-color" content="#faf6ee" media="(prefers-color-scheme: light)" />
-		<meta name="theme-color" content="#16120d" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#F5F2EC" media="(prefers-color-scheme: light)" />
+		<meta name="theme-color" content="#19150F" media="(prefers-color-scheme: dark)" />
 		<!-- Static defaults for every route — SvelteKit pages set their own
 		     <title> via <svelte:head>, which does not conflict with these; there
 		     is no per-page Open Graph infrastructure, by design. -->
@@ -30,7 +30,16 @@
 			// stamped the attribute from the cookie; this only corrects divergence.
 			(function () {
 				try {
-					var m = localStorage.getItem('trips.theme');
+					// Migration: 'zarparia.theme' is the current key; 'trips.theme' is
+					// the legacy key (pre-Phase-1). Read the new key first, fall back to
+					// the old one once, and backfill the new key so future loads skip
+					// the fallback. See src/lib/theme/index.ts for the cookie-side twin
+					// of this migration.
+					var m = localStorage.getItem('zarparia.theme');
+					if (m === null) {
+						m = localStorage.getItem('trips.theme');
+						if (m !== null) localStorage.setItem('zarparia.theme', m);
+					}
 					var el = document.documentElement;
 					if (m === 'dark' || m === 'light') el.setAttribute('data-theme', m);
 					else if (m === 'system') el.removeAttribute('data-theme');
@@ -40,11 +49,9 @@
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<link rel="icon" href="/icon-192.png" />
 		<link rel="apple-touch-icon" href="/icon-192.png" />
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,500&display=swap"
-			rel="stylesheet"
-		/>
+		<!-- Fonts are self-hosted via @fontsource (imported in +layout.svelte) —
+		     no Google Fonts network request. See DESIGN-CONSISTENCY-PLAN.md
+		     Phase 1 / DESIGN.md "Typography." -->
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

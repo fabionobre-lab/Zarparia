@@ -138,7 +138,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	/* On mobile the bottom app bar carries All trips / Share / Edit / Photos, so
 	   the top action row is redundant — hide it below the desktop breakpoint. */
@@ -164,11 +164,11 @@
 		font-size: 0.85rem;
 		text-decoration: none;
 		color: var(--accent-strong);
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.btn {
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.3rem 0.8rem;
 		background: var(--surface);
 		cursor: pointer;
@@ -179,7 +179,7 @@
 		letter-spacing: 0.04em;
 		color: var(--pill-warn-fg);
 		background: var(--pill-warn-bg);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 0.2rem 0.6rem;
 	}
 </style>

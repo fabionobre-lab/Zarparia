@@ -189,7 +189,7 @@
 <style>
 	.block {
 		border: 1px solid var(--hairline-strong);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		margin-bottom: 0.4rem;
 		background: var(--surface);
 	}
@@ -264,7 +264,7 @@
 		min-width: 0;
 		padding: 0.35rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.lbl {
 		font-size: 0.7rem;
@@ -281,7 +281,7 @@
 	.chip {
 		font-size: 0.72rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 0.2rem 0.55rem;
 		cursor: pointer;
 		display: inline-flex;
@@ -322,7 +322,7 @@
 		color: var(--text);
 		padding: 0.3rem 0.45rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 		flex: 1;
 		min-width: 8rem;
 	}
@@ -331,7 +331,7 @@
 		font-size: 0.8rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
 	}

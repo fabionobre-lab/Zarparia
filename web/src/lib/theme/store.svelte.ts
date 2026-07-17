@@ -1,9 +1,10 @@
 // Reactive theme-mode store for Svelte 5 runes.
 //
 // A single module-level $state holds the active mode. It is seeded from layout
-// data (which comes from the `trips-theme` cookie on the server) at the top of
-// the root +layout.svelte, synchronously, BEFORE any child renders — so SSR and
-// hydration agree and there is no flash of the wrong theme.
+// data (which comes from the `zarparia-theme` cookie on the server, falling
+// back to the legacy `trips-theme` cookie once — see hooks.server.ts) at the
+// top of the root +layout.svelte, synchronously, BEFORE any child renders —
+// so SSR and hydration agree and there is no flash of the wrong theme.
 //
 // Applying a mode does two things: writes the persistence (cookie for the next
 // SSR render + localStorage for the inline bootstrap on cached pages) and

@@ -53,11 +53,11 @@
 		box-sizing: border-box;
 		width: min(480px, calc(100vw - 2rem));
 		border: 1px solid var(--hairline-strong);
-		border-radius: 14px;
+		border-radius: var(--radius-lg);
 		padding: 1.1rem 1.3rem 1.2rem;
 		background: var(--surface);
 		color: var(--text);
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 	}
 	.about::backdrop {
 		background: rgba(10, 7, 3, 0.55);
@@ -125,7 +125,7 @@
 		background: var(--accent);
 		color: #fff;
 		border: none;
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.5rem 1.3rem;
 		cursor: pointer;
 	}

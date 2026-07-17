@@ -1,13 +1,38 @@
 <script lang="ts">
+	// Aria Nobre family canon (C:\AI\AriaNobre\design\DESIGN.md) — must load
+	// BEFORE tokens.css so this app's semantic remap (Phase 1 of
+	// DESIGN-CONSISTENCY-PLAN.md) can reference --an-* custom properties.
+	import '../styles/aria-nobre-tokens.css';
 	import '../styles/tokens.css';
+	// Self-hosted fonts (offline-first: no Google Fonts network request).
+	// Only the weights actually used in the app are imported, and only the
+	// 'latin' subset (en-GB/pt-BR locales only — Portuguese diacritics live in
+	// the Latin-1 Supplement range the 'latin' subset already covers), mirroring
+	// Saldaria's rationale (C:\AI\Rachid\src\main.jsx). Inter is the UI-chrome
+	// font (adopted here for Phase 3's chrome sweep; today's chrome still says
+	// system-ui in most components — see DESIGN-CONSISTENCY-PLAN.md Phase 3).
+	// Source Serif 4 replaces Playfair Display for trip content + headings
+	// (decision point 3); 700 is imported in addition to the spec's 400/500/600
+	// because trip headings (.trip-title, .dh-title) use font-weight: 700 and
+	// would otherwise synthetic-bold.
+	import '@fontsource/inter/latin-400.css';
+	import '@fontsource/inter/latin-500.css';
+	import '@fontsource/inter/latin-600.css';
+	import '@fontsource/source-serif-4/latin-400.css';
+	import '@fontsource/source-serif-4/latin-500.css';
+	import '@fontsource/source-serif-4/latin-600.css';
+	import '@fontsource/source-serif-4/latin-700.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { browser } from '$app/environment';
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/state';
 	import { env as publicEnv } from '$env/dynamic/public';
 	import { onMount } from 'svelte';
 	import Sidebar from '$lib/nav/Sidebar.svelte';
 	import FeedbackDialog from '$lib/FeedbackDialog.svelte';
-	import { initLocale } from '$lib/i18n/store.svelte';
+	import Toast from '$lib/toast/Toast.svelte';
+	import TripListSkeleton from '$lib/ui/skeletons/TripListSkeleton.svelte';
+	import DaySkeleton from '$lib/ui/skeletons/DaySkeleton.svelte';
+	import { initLocale, t } from '$lib/i18n/store.svelte';
 	import { initTheme } from '$lib/theme/store.svelte';
 	import { syncUserMarker, safeLocalStorage } from '$lib/client/userCacheReset';
 	import { initSentryIfConfigured } from '$lib/client/sentry';
@@ -26,6 +51,39 @@
 	// `/` is special: the sidebar is the approved signed-in home only.
 	// Derived from route id + session here (not signalled up from children) so
 	// the first SSR paint is already correct.
+
+	// Client-side navigation skeletons (Phase 3 task 4): SvelteKit keeps the
+	// OUTGOING page mounted until the destination's `load()` resolves, so a
+	// layout-level overlay — keyed on the destination route id — is the only
+	// place that can show a "the new page is loading" state at all. Limited to
+	// the two initial-content-load routes named in scope: the home trip list
+	// and a trip's day content; every other route just shows the stale page
+	// until the swap (unchanged, existing behaviour).
+	const navTarget = $derived.by(() => {
+		const to = navigating.to?.route.id;
+		if (to === '/') return 'list';
+		if (to === '/trips/[id]') return 'day';
+		return null;
+	});
+	// Flash guard: only show the skeleton if the navigation is still pending
+	// after 150ms — instant/cached transitions swap directly with no skeleton
+	// blink. The timer is cancelled (via $effect cleanup) the moment
+	// `navigating` resolves or the target changes.
+	let navSkeleton = $state<'list' | 'day' | null>(null);
+	$effect(() => {
+		const target = navTarget;
+		if (!target) {
+			navSkeleton = null;
+			return;
+		}
+		const timer = setTimeout(() => {
+			navSkeleton = target;
+		}, 150);
+		return () => {
+			clearTimeout(timer);
+			navSkeleton = null;
+		};
+	});
 	const SIDEBAR_ROUTES = new Set([
 		'/demo',
 		'/trips/[id]',
@@ -126,13 +184,25 @@
 	{/if}
 
 	<div class="page-col">
-		{@render children()}
+		{#if navSkeleton}
+			<div class="nav-skeleton" role="status" aria-label={t('nav.loading')}>
+				{#if navSkeleton === 'list'}
+					<TripListSkeleton />
+				{:else}
+					<DaySkeleton />
+				{/if}
+			</div>
+		{:else}
+			{@render children()}
+		{/if}
 	</div>
 </div>
 
 {#if data.user && data.user.status === 'approved'}
 	<FeedbackDialog bind:open={feedbackOpen} />
 {/if}
+
+<Toast />
 
 <style>
 	/* ── App shell ──
@@ -143,6 +213,11 @@
 	   removes itself, so mobile is untouched. */
 	.page-col {
 		min-width: 0;
+	}
+	.nav-skeleton {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 1rem 1.5rem 3rem;
 	}
 	@media (min-width: 960px) {
 		.layout.sidebar-mode {

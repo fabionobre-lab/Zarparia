@@ -3,6 +3,7 @@
 	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
 	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import AuthEmailForm from './AuthEmailForm.svelte';
+	import EmptyState from '$lib/ui/empty/EmptyState.svelte';
 	import { firebaseEnabled } from '$lib/firebase';
 	import { t, formatDateRange } from '$lib/i18n/store.svelte';
 	import type { Messages } from '$lib/i18n';
@@ -214,7 +215,7 @@
 		{/if}
 
 		{#if ownedAll.length === 0}
-			<div class="empty">
+			<EmptyState kind="trips">
 				<p>{t('home.noTrips')} <a href="/trips/new">{t('home.createFirst')}</a></p>
 				<div class="empty-links">
 					<a href="/trips/import">{t('home.importItinerary')}</a>
@@ -223,7 +224,7 @@
 					<span aria-hidden="true">·</span>
 					<a href="/guide">{t('home.readGuide')}</a>
 				</div>
-			</div>
+			</EmptyState>
 		{:else if owned.length > 0}
 			<div class="cards">
 				{#each owned as trip (trip.id)}{@render card(trip)}{/each}
@@ -253,7 +254,8 @@
 				{/if}
 				<div class="auth-card-top">
 					<!-- There is no site-wide top bar, so the card carries the theme
-					     toggle (and EN|PT) itself at every width. -->
+					     toggle (and EN|PT) itself at every width — which also satisfies
+					     the family login-card spec (theme + language never gated). -->
 					<span class="card-theme"><ThemeToggle /></span>
 					<LocaleSwitcher />
 				</div>
@@ -304,7 +306,7 @@
 
 <style>
 	main {
-		font-family: system-ui, sans-serif;
+		font-family: var(--font-ui);
 		max-width: 1200px;
 		margin: 2rem auto;
 		padding: 0 1.5rem;
@@ -365,7 +367,7 @@
 		text-decoration: none;
 		color: var(--accent-strong);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.35rem 0.8rem;
 	}
 	.new:hover {
@@ -376,7 +378,7 @@
 		text-decoration: none;
 		color: var(--text-muted);
 		border: 1px solid var(--hairline);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		padding: 0.35rem 0.8rem;
 	}
 	.import-btn:hover {
@@ -393,13 +395,6 @@
 		.import-btn:active {
 			transform: scale(0.97);
 		}
-	}
-	.empty {
-		color: var(--text-muted);
-		margin-top: 1.5rem;
-	}
-	.empty p {
-		margin: 0;
 	}
 	.empty-links {
 		margin-top: 0.6rem;
@@ -424,14 +419,14 @@
 		display: block;
 		margin-top: 1.25rem;
 		padding: 1.1rem 1.3rem 1.25rem;
-		border-radius: 16px;
+		border-radius: var(--radius-lg);
 		background: var(--ha-bg, #1a5a34);
 		color: #fff;
 		text-decoration: none;
-		box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
+		box-shadow: var(--elevation-1);
 	}
 	.hero-active:hover {
-		box-shadow: 0 6px 22px rgba(0, 0, 0, 0.2);
+		box-shadow: var(--elevation-2);
 	}
 	@media (prefers-reduced-motion: no-preference) {
 		.hero-active {
@@ -452,7 +447,7 @@
 		margin-bottom: 0.3rem;
 	}
 	.hero-active-title {
-		font-family: 'Playfair Display', Georgia, serif;
+		font-family: 'Source Serif 4', Georgia, serif;
 		font-size: 1.6rem;
 		font-weight: 700;
 		line-height: 1.12;
@@ -492,10 +487,24 @@
 		position: relative;
 		width: 100%;
 		max-width: 400px;
-		background: var(--surface);
+		/* Family login-card spec: subtle diagonal gradient (decision point 5).
+		   Zarparia has no --surface-raised token of its own. LIGHT: --an-surface-raised
+		   (#ECE7DD, same value --surface-sunken resolves to in light) works well as
+		   the raised step — measured contrast against --bg is clearly visible.
+		   DARK: --surface-sunken's own dark branch (color-mix(black 22%, bg)) was
+		   tried first but measures only ~1.04:1 luminance contrast against --bg —
+		   effectively invisible against the already-near-black canon dark bg
+		   (#19150F). Using the task-specified fallback instead — a small mix of
+		   --text into --bg — nearly doubles that delta (~1.09:1), still subtle
+		   (matching the "subtle diagonal gradient" spec) but perceptible. */
+		background: linear-gradient(
+			160deg,
+			light-dark(var(--an-surface-raised), color-mix(in srgb, var(--text) 4%, var(--bg))) 0%,
+			var(--bg) 60%
+		);
 		border: 1px solid var(--hairline);
-		border-radius: 16px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--elevation-2);
 		padding: 2rem;
 	}
 	.auth-card-top {
@@ -509,13 +518,14 @@
 		text-align: center;
 		color: var(--pill-go-fg);
 		background: var(--pill-go-bg);
-		border-radius: 8px;
+		border-radius: var(--radius-md);
 		padding: 0.55rem 0.7rem;
 		margin: 0 0 0.75rem;
 	}
 	/* Card-corner theme toggle at all widths — with no top bar anywhere, the
-	   card is the landing's only chrome. Bumped to a 44px tap target (the old
-	   header sizing, 34px, is too small for the card). */
+	   card is the landing's only chrome (family login-card spec satisfied).
+	   Bumped to a 44px tap target (the old header sizing, 34px, is too small
+	   for the card). */
 	.card-theme :global(.theme-toggle) {
 		width: 44px;
 		height: 44px;
@@ -568,7 +578,7 @@
 		color: var(--text);
 		background: var(--surface);
 		border: 1px solid var(--hairline-strong);
-		border-radius: 10px;
+		border-radius: var(--radius-button);
 		padding: 0.7rem 1rem;
 		box-sizing: border-box;
 	}
@@ -652,7 +662,7 @@
 		}
 		.auth-card {
 			padding: 1.5rem 1.25rem;
-			border-radius: 14px;
+			border-radius: var(--radius-lg);
 		}
 		.auth-lockup-light,
 		.auth-lockup-dark {
@@ -674,8 +684,8 @@
 		max-width: 420px;
 		background: var(--surface);
 		border: 1px solid var(--hairline);
-		border-radius: 16px;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		border-radius: var(--radius-lg);
+		box-shadow: var(--elevation-2);
 		padding: 2rem;
 		text-align: center;
 	}
@@ -699,7 +709,7 @@
 		font-size: 0.85rem;
 		padding: 0.5rem 1.1rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 999px;
+		border-radius: var(--radius-button);
 		background: var(--surface);
 		color: var(--text);
 		cursor: pointer;
@@ -731,7 +741,7 @@
 		}
 		.gate-card {
 			padding: 1.5rem 1.25rem;
-			border-radius: 14px;
+			border-radius: var(--radius-lg);
 		}
 	}
 	.cards {
@@ -762,7 +772,7 @@
 		background: var(--surface);
 		border: 1px solid var(--hairline);
 		border-left: 4px solid var(--card-base, var(--hairline-strong));
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		padding: 0.9rem 1rem;
 		text-decoration: none;
 		color: var(--text);
@@ -781,7 +791,7 @@
 		border-top-color: var(--hairline-strong);
 		border-right-color: var(--hairline-strong);
 		border-bottom-color: var(--hairline-strong);
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+		box-shadow: var(--elevation-1);
 	}
 	@media (prefers-reduced-motion: no-preference) {
 		.card {
@@ -798,7 +808,7 @@
 		font-size: 30px;
 		width: 52px;
 		height: 52px;
-		border-radius: 12px;
+		border-radius: var(--radius-lg);
 		background: var(--surface-sunken);
 		display: flex;
 		align-items: center;
@@ -837,7 +847,7 @@
 		letter-spacing: 0.05em;
 		color: var(--pill-warn-fg);
 		background: var(--pill-warn-bg);
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 		padding: 0.15rem 0.5rem;
 	}
 	.chip {
@@ -846,7 +856,7 @@
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
 		padding: 0.2rem 0.55rem;
-		border-radius: 999px;
+		border-radius: var(--radius-pill);
 	}
 	.chip.past {
 		background: var(--pill-neutral-bg);

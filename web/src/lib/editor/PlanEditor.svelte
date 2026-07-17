@@ -157,7 +157,7 @@
 		color: var(--text);
 		padding: 0.3rem 0.5rem;
 		border: 1px solid var(--hairline-strong);
-		border-radius: 6px;
+		border-radius: var(--radius-md);
 	}
 	.controls {
 		display: flex;
@@ -195,7 +195,7 @@
 		font-size: 0.8rem;
 		border: 1px solid var(--hairline-strong);
 		background: var(--surface);
-		border-radius: 6px;
+		border-radius: var(--radius-button);
 		padding: 0.2rem 0.5rem;
 		cursor: pointer;
 	}
