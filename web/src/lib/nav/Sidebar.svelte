@@ -1,7 +1,8 @@
 <script lang="ts">
-	// Persistent desktop (≥960px) left sidebar. Replaces the top header on app
-	// routes: brand → primary navigation (+ the mounted trip's day rail) → pinned
-	// utilities. Hidden below 960px (the BottomBar takes over there). Rendered by
+	// Persistent desktop (≥960px) left sidebar — the app's only desktop chrome
+	// (there is no top bar): brand → primary navigation (+ the mounted trip's day
+	// rail) → pinned utilities. Hidden below 960px (the BottomBar takes over
+	// there). Rendered by
 	// the root +layout.svelte, so it reads page-provided context (the trip rail and
 	// the demo's About opener) through the tripNav module store rather than props.
 	import { browser } from '$app/environment';
@@ -20,14 +21,17 @@
 
 	let {
 		user = null,
+		admin = false,
 		onFeedback
 	}: {
 		user?: SessionUser | null;
+		admin?: boolean;
 		onFeedback: () => void;
 	} = $props();
 
-	// Approval gate mirrors the header: Feedback + Account are for approved
-	// accounts only; theme/language + sign-out (or sign-in) are always present.
+	// Approval gate mirrors the BottomBar's More sheet: Feedback + Account are
+	// for approved accounts only; theme/language + sign-out (or sign-in) are
+	// always present.
 	const approved = $derived(!!user && user.status === 'approved');
 	const routeId = $derived(page.route.id ?? '');
 
@@ -141,6 +145,25 @@
 				<span class="util-label">{t('header.account')}</span>
 			</a>
 		{/if}
+
+		{#if admin}
+			<!-- Admin-only entry point to the sign-up approval queue. Display-only
+			     gate: /admin/approvals re-checks isAdmin server-side and 404s for
+			     everyone else. -->
+			<a class="util-row" class:active={routeId === '/admin/approvals'} href="/admin/approvals" aria-current={routeId === '/admin/approvals' ? 'page' : undefined}>
+				<svg class="util-glyph" aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<circle cx="9" cy="8" r="4" />
+					<path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" />
+					<path d="m15.5 10.5 2.2 2.2 4.3-4.3" />
+				</svg>
+				<span class="util-label">{t('admin.approvals.heading')}</span>
+			</a>
+		{/if}
+
+		<a class="util-row" class:active={routeId === '/guide'} href="/guide" aria-current={routeId === '/guide' ? 'page' : undefined}>
+			<NavIcon name="guide" size={20} />
+			<span class="util-label">{t('nav.guide')}</span>
+		</a>
 
 		<button
 			type="button"

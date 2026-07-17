@@ -1,4 +1,5 @@
 <script lang="ts">
+	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import { t } from '$lib/i18n/store.svelte';
 	import { locale } from '$lib/i18n/store.svelte';
 	import type { AdminUserRow } from '$lib/server/users';
@@ -112,6 +113,8 @@
 		{/if}
 	</section>
 </main>
+
+<BottomBar user={data.user} items={[{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/' }]} />
 
 <style>
 	main {

@@ -1,12 +1,13 @@
 <script lang="ts">
-	// Mobile-only bottom app bar (variant A). Rendered by each route that wants it
-	// (home signed-in, trip view, demo) and hidden at >=960px via CSS, where the
-	// desktop header + per-page controls take over. The caller passes 1–3 primary
-	// items; the bar appends a "More" item that opens a bottom sheet holding the
-	// chrome that was slimmed out of the header (feedback, theme, language,
+	// Mobile-only bottom app bar (variant A) — the app's only mobile chrome
+	// (there is no top bar). Rendered by each app route and hidden at >=960px
+	// via CSS, where the desktop sidebar takes over. The caller passes 1–3
+	// primary items; the bar appends a "More" item that opens a bottom sheet
+	// holding the rest of the chrome (feedback, account, guide, theme, language,
 	// sign in/out) plus any page-specific rows (e.g. Photos on a trip).
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { page } from '$app/state';
 	import NavIcon, { type IconName } from './NavIcon.svelte';
 	import MoreSheet from './MoreSheet.svelte';
 	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
@@ -44,9 +45,14 @@
 	let moreOpen = $state(false);
 	let feedbackOpen = $state(false);
 
-	// Mirrors the desktop header's approval gate: feedback is for approved
+	// Mirrors the desktop sidebar's approval gate: feedback is for approved
 	// accounts only (pending/rejected users keep sign-out and the toggles).
 	const showFeedback = $derived(!!user && user.status !== 'pending' && user.status !== 'rejected');
+
+	// Admin-only Approvals entry, from the root layout's load data (present on
+	// every page). Display-only gate: /admin/approvals re-checks isAdmin
+	// server-side and 404s for everyone else.
+	const admin = $derived(!!page.data.admin);
 
 	const THEME_LABEL: Record<string, keyof Messages> = {
 		system: 'theme.system',
@@ -178,6 +184,28 @@
 				<path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
 			</svg>
 			<span class="sheet-label">{t('header.account')}</span>
+		</a>
+	{/if}
+
+	{#if admin}
+		<a class="sheet-row" href="/admin/approvals" onclick={() => (moreOpen = false)}>
+			<svg
+				class="mode-icon"
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				width="22"
+				height="22"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<circle cx="9" cy="8" r="4" />
+				<path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5" />
+				<path d="m15.5 10.5 2.2 2.2 4.3-4.3" />
+			</svg>
+			<span class="sheet-label">{t('admin.approvals.heading')}</span>
 		</a>
 	{/if}
 
