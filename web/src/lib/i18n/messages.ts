@@ -561,7 +561,7 @@ const enGB: Messages = {
 	'landing.consentText': 'By signing in you agree to the %TERMS% and %PRIVACY%.',
 	'landing.orDivider': 'or',
 
-	'demo.banner': "You're viewing a sample trip — everything is interactive but nothing is saved.",
+	'demo.banner': 'Demo — a sample trip, fully interactive. Nothing is saved.',
 	'demo.signInCta': 'Continue with Google',
 	'demo.back': '← Back',
 	'demo.about': 'About',
@@ -1046,7 +1046,7 @@ const ptBR: Messages = {
 	'landing.consentText': 'Ao entrar, você concorda com os %TERMS% e a %PRIVACY%.',
 	'landing.orDivider': 'ou',
 
-	'demo.banner': 'Você está vendo uma viagem de exemplo — tudo é interativo, mas nada é salvo.',
+	'demo.banner': 'Demonstração — uma viagem de exemplo, totalmente interativa. Nada é salvo.',
 	'demo.signInCta': 'Continuar com o Google',
 	'demo.back': '← Voltar',
 	'demo.about': 'Sobre',

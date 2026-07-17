@@ -72,8 +72,14 @@
 		position: sticky;
 		top: 0;
 		z-index: 20;
-		background: var(--surface);
-		border-bottom: 1px solid var(--hairline-strong);
+		/* Family anatomy (DESIGN.md "Demo banner"): the raised surface tier.
+		   --surface-sunken is the wrong tier here — in Zarparia's remap it only
+		   equals the canon's raised token in LIGHT mode; DARK mode diverges
+		   (mixes black into bg instead), which would mismatch the shared family
+		   look. --an-surface-raised is used directly since this app has no
+		   local --surface-raised alias (see tokens.css). */
+		background: var(--an-surface-raised);
+		border-bottom: 1px solid var(--hairline);
 	}
 	/* Background stays full-bleed; the content is centered and capped to the trip
 	   shell width so the actions line up with the (up to 1060px) shell instead of
@@ -111,9 +117,10 @@
 		cursor: pointer;
 	}
 	.ghost {
+		/* Family secondary button: hairline border, transparent background. */
 		color: var(--accent-strong);
 		border: 1px solid var(--hairline-strong);
-		background: var(--surface);
+		background: transparent;
 	}
 	.primary {
 		color: #fff;

@@ -259,8 +259,15 @@
 	.brand > :global(svg) {
 		height: 28px;
 	}
+	/* App-chrome brand lockup (DESIGN.md): wordmark at a matching visual cap
+	   height to the ≈28px crest. The wordmark SVG's own viewBox is tightly
+	   cropped around its full glyph extent (ascender tittle to descender),
+	   so its cap height (the "Z"'s baseline-to-top) is only ~55% of the
+	   rendered box height — 16px here previously gave an ~9px cap height,
+	   visibly dwarfed by the crest. 30px brings the cap height to ~16px,
+	   in line with the family's other rails. */
 	.wordmark :global(svg) {
-		height: 16px;
+		height: 30px;
 	}
 
 	/* ── Zone 2: navigation + trip rail (scrolls) ── */
