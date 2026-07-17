@@ -694,13 +694,13 @@
 						{#if routeForDay}
 							<!-- Mobile-only compact stand-in for the (hidden) route stepper:
 							     preserves the one thing the card uniquely offers, the Maps link. -->
-							<a href={routeForDay.url} target="_blank" rel="noreferrer" class="maps-link-btn">
+							<a href={routeForDay.url} target="_blank" rel="noopener noreferrer" class="maps-link-btn">
 								<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
 								{uiText.openRoute}
 							</a>
 
 							<!-- Full Day-Route stepper: desktop only (hidden on mobile). -->
-							<a href={routeForDay.url} target="_blank" rel="noreferrer" class="route-card">
+							<a href={routeForDay.url} target="_blank" rel="noopener noreferrer" class="route-card">
 								<div class="route-hdr">
 									<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8" /><path d="M17 7h4v4" /></svg>
 									{uiText.dayRoute}
@@ -757,7 +757,7 @@
 												class="map-icon-btn"
 												href={safeUrl(b.mapsUrl)}
 												target="_blank"
-												rel="noreferrer"
+												rel="noopener noreferrer"
 												aria-label={uiText.maps}
 												title={uiText.maps}
 											>
@@ -783,7 +783,7 @@
 										<div class="tb-photos">
 											{#each b.photoSpots as sp (sp)}
 												{@const key = spotKey(sp)}
-												<a href={safeUrl(sp.mapsUrl)} target="_blank" rel="noreferrer" class="ps-card">
+												<a href={safeUrl(sp.mapsUrl)} target="_blank" rel="noopener noreferrer" class="ps-card">
 													{#if key && safeUrl(wikiImgs[key] ?? undefined)}
 														<img src={safeUrl(wikiImgs[key] ?? undefined)} class="ps-thumb" alt={sp.name} />
 													{:else}

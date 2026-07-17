@@ -133,7 +133,7 @@
 		<button class="cta" onclick={startPicking}>{t('photos.choose')}</button>
 	{:else if phase === 'picking'}
 		<p class="muted">{t('photos.waiting')}</p>
-		<a class="cta" href={pickerUri} target="_blank" rel="noreferrer">{t('photos.openGoogle')}</a>
+		<a class="cta" href={pickerUri} target="_blank" rel="noopener noreferrer">{t('photos.openGoogle')}</a>
 	{:else if phase === 'importing'}
 		<p class="muted" aria-live="polite">{t('photos.importing', { n: String(imported) })}</p>
 	{:else if phase === 'done'}
