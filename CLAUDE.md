@@ -12,3 +12,7 @@ the source and run `node design/sync-tokens.mjs` from the AriaNobre repo).
 Accent: green; buttons stay pill-shaped (logged voice exception). The repo-root
 static engine is FROZEN and exempt from the family contract. Focus ring:
 gold-600 light / gold-300 dark, family-wide.
+
+Round-2 audit, verification and phased plan: `AriaNobre/UI-UX-AUDIT-2026-07-17-R2.md`,
+`UI-UX-AUDIT-R2-VERIFICATION.md`, `DESIGN-CONSISTENCY-PLAN-R2.md` (decisions
+approved 2026-07-17; Phases 1–4 implemented on this app's `claude/design-r2-p0`).
