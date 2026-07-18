@@ -43,6 +43,20 @@
 					var el = document.documentElement;
 					if (m === 'dark' || m === 'light') el.setAttribute('data-theme', m);
 					else if (m === 'system') el.removeAttribute('data-theme');
+					// theme-color must track the pinned theme (DESIGN.md Conventions):
+					// the media-filtered metas above only cover system mode. SSR stamps
+					// data-theme (hooks.server) but these metas are static, so this
+					// pre-paint stamp is the mechanism: when the reconciled theme is
+					// pinned, overwrite both metas with the pinned canon --an-bg value
+					// (#F5F2EC light / #141B28 dark). On system the static per-media
+					// originals already apply. Runtime twin: src/lib/theme/store.svelte.ts.
+					var pinned = el.getAttribute('data-theme');
+					if (pinned === 'dark' || pinned === 'light') {
+						var c = pinned === 'dark' ? '#141B28' : '#F5F2EC';
+						document.querySelectorAll('meta[name="theme-color"]').forEach(function (t) {
+							t.content = c;
+						});
+					}
 				} catch (e) {}
 			})();
 		</script>

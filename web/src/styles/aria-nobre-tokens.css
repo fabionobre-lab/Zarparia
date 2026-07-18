@@ -1,4 +1,4 @@
-/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ 2bac568 — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
+/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ 38a2419 — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
 
 /* ============================================================================
    Aria Nobre — family design token contract
@@ -55,18 +55,19 @@
      navy+gold crests. The INK stays warm cream and --an-muted stays warm
      grey deliberately — cream-on-navy is the crest/band look; do not swap
      them for blue-greys. Contrast on navy (computed): ink 14.2:1, gold-300
-     7.4:1, oxblood-300 6.1:1, muted 5.4:1 — all AA-clear. */
+     7.4:1, oxblood-300 6.1:1, muted 6.9:1 (#B4A996, adopted from Saldaria
+     2026-07-17 — see the resolved flag below) — all AA-clear. */
   --an-bg: light-dark(#F5F2EC, #141B28);
   --an-surface: light-dark(#FAF7F1, #1A2332);
   --an-surface-raised: light-dark(#ECE7DD, #232E42);
   --an-ink: light-dark(#1A2332, #EDE8DE);
-  /* CONFLICT FLAG: sources disagree on the dark muted value by one hex digit.
-     House site (C:\AI\AriaNobre\style.css:21,30) uses #9A9488; Nobria
-     (C:\AI\Nobria\src\styles\tokens.css:121,163) uses #9A9489. This file
-     adopts Nobria's #9A9489 for consistency with the dark-ink source above —
-     flagging rather than silently picking; verify against a fresh contrast
-     check before Phase 1 adoption and reconcile the house site's value. */
-  --an-muted: light-dark(#6B6660, #9A9489);
+  /* CONFLICT RESOLVED (2026-07-17, round-2 plan decision 3a): the dark muted
+     value is Saldaria's #B4A996 (6.9:1 on the navy bg), superseding the
+     earlier #9A9489/#9A9488 candidates (5.4:1) that this flag used to weigh.
+     Saldaria documented its rejection of the lower-contrast value for exactly
+     this reason (Rachid styles.css:93-99); the canon now agrees, so its local
+     --stone-300 can alias --an-muted in a future sweep. */
+  --an-muted: light-dark(#6B6660, #B4A996);
 
   /* Hairlines derive from ink via color-mix (plan requirement: "use
      color-mix so it derives from ink") rather than a separate literal per
@@ -130,6 +131,14 @@
   --an-accent-nobria: light-dark(var(--an-gold-500), var(--an-gold-300));
   --an-accent-saldaria: light-dark(var(--an-oxblood-700), var(--an-oxblood-300));
   /* --an-accent-zarparia already declared above (single canonical value). */
+
+  /* Text-safe accent tier (added 2026-07-17, round-2 plan Phase 0, lifted from
+     Nobria's --color-accent-strong): when accent-colored SMALL TEXT must pass
+     AA on the cream bg, use this instead of the interactive accent. Light is
+     gold-900 #6B4A1E = 7.16:1 on #F5F2EC (gold-600 is only 4.24:1 — fine for
+     focus rings and large text, short for body-size text); dark reuses
+     gold-300 (7.4:1 on navy). */
+  --an-accent-strong: light-dark(var(--an-gold-900), var(--an-gold-300));
 
   /* --------------------------------------------------------------------
      g) SEMANTIC STATUS — oxblood is the family danger color, forest is
@@ -210,6 +219,18 @@
   --an-focus-ring: 2px solid light-dark(var(--an-gold-600), var(--an-gold-300));
 
   /* --------------------------------------------------------------------
+     l2) TEXT SELECTION (added 2026-07-17, round-2 plan decision 5) — a
+     second gold family signature. Semi-transparent so it works over any
+     surface; text color deliberately untouched. The ::selection rule ships
+     here in the canon file, so every surface inherits it with zero
+     adoption work.
+     -------------------------------------------------------------------- */
+  --an-selection-bg: light-dark(
+    color-mix(in srgb, var(--an-gold-500) 30%, transparent),
+    color-mix(in srgb, var(--an-gold-300) 30%, transparent)
+  );
+
+  /* --------------------------------------------------------------------
      m) TYPOGRAPHY.
      Font stacks: Source Serif 4 (display/headings, and Zarparia trip
      content) + Inter (body/UI chrome), self-hosted family-wide — see
@@ -232,4 +253,9 @@
   --an-type-figure: clamp(1rem, 0.94rem + 0.25vw, 1.125rem); /* 16 → 18px numerals */
   --an-type-small: clamp(0.8125rem, 0.8rem + 0.06vw, 0.875rem); /* 13 → 14px */
   --an-type-micro: 0.6875rem; /* 11px captions, footnotes */
+}
+
+/* Family text-selection signature — see --an-selection-bg above. */
+::selection {
+  background: var(--an-selection-bg);
 }

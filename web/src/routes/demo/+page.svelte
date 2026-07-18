@@ -79,7 +79,10 @@
 			<div class="demo-banner-actions">
 				<button type="button" class="ghost" onclick={() => (aboutOpen = true)}>{t('demo.about')}</button>
 				<a class="ghost" href="/">{t('demo.back')}</a>
-				<a class="primary" href="/auth/login/google">{t('demo.signInCta')}</a>
+				<!-- Sign-in CTA is deliberately the SECONDARY style: DESIGN.md's demo
+				     banner anatomy — "App-specific actions may differ; their styling
+				     may not" (was a filled primary before the round-2 sweep). -->
+				<a class="ghost" href="/auth/login/google">{t('demo.signInCta')}</a>
 			</div>
 		</div>
 	</div>
@@ -159,8 +162,7 @@
 		gap: 0.5rem;
 		flex-shrink: 0;
 	}
-	.ghost,
-	.primary {
+	.ghost {
 		font: inherit;
 		font-size: 0.85rem;
 		text-decoration: none;
@@ -168,18 +170,12 @@
 		padding: 0.4rem 0.9rem;
 		white-space: nowrap;
 		cursor: pointer;
-	}
-	.ghost {
-		/* Family secondary button: hairline border, transparent background. */
+		/* Family secondary button: hairline border, transparent background.
+		   ALL banner actions use this style per the demo-banner anatomy in
+		   DESIGN.md (the former .primary sign-in fill was removed round-2). */
 		color: var(--accent-strong);
 		border: 1px solid var(--hairline-strong);
 		background: transparent;
-	}
-	.primary {
-		color: #fff;
-		background: var(--accent);
-		border: 1px solid var(--accent);
-		font-weight: 600;
 	}
 	/* On mobile the bottom app bar carries Back / About / Sign in, so the banner
 	   sheds its action buttons and keeps just the "nothing is saved" notice. */

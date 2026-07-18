@@ -147,12 +147,12 @@
 	--type-body: clamp(16px, 0.95rem + 0.3vw, 18px);
 	--type-small: clamp(13px, 0.8rem + 0.15vw, 14px);
 
-	/* ── Legacy aliases (kept working during migration; resolve to the tokens
-	   above at use-time, so they flip with the theme automatically) ── */
-	--cream: var(--bg);
-	--ink: var(--text);
-	--stone: var(--text-muted);
-	--border: var(--hairline-strong);
+	/* ── Scrim — the dimming layer behind modal surfaces (dialog ::backdrop,
+	   MoreSheet's tap-to-close layer). Near-black with the app's warm cast at
+	   55% — theme-invariant by design: it dims whatever sits behind it in both
+	   modes. One token so the five consumers (ConfirmDialog, FeedbackDialog,
+	   DemoAboutDialog, account delete-confirm, MoreSheet) can't drift. ── */
+	--scrim: rgba(10, 7, 3, 0.55);
 
 	/* NOTE: no `color-scheme` declaration here — the canon file
 	   (aria-nobre-tokens.css) declares it once, keyed on [data-theme], and is

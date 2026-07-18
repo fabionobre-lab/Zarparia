@@ -117,7 +117,9 @@
 		padding: 0;
 		width: 100%;
 		height: 100%;
-		background: rgba(10, 7, 3, 0.5);
+		/* Family scrim token (was a local .5 literal — the .05 alpha delta to the
+		   token's .55 is visually negligible and kills the drift). */
+		background: var(--scrim);
 		opacity: 0;
 		cursor: default;
 	}

@@ -7,8 +7,13 @@ export { LOCALES, DEFAULT_LOCALE, LOCALE_SHORT } from './messages';
 export type { Locale, Messages } from './messages';
 export { catalogs } from './messages';
 
-/** Cookie holding the chosen UI locale (client-writable, so NOT httpOnly). */
-export const LOCALE_COOKIE = 'ui-locale';
+/** Cookie holding the chosen UI locale (client-writable, so NOT httpOnly).
+    Named per the Aria Nobre storage-key convention — cookie twin naming
+    follows `zarparia-theme` (round-2 sweep, 2026-07-17). */
+export const LOCALE_COOKIE = 'zarparia-lang';
+/** Pre-convention name; read once as a fallback in hooks.server and
+    re-issued under LOCALE_COOKIE, mirroring the theme-cookie migration. */
+export const LEGACY_LOCALE_COOKIE = 'ui-locale';
 /** One year, in seconds. */
 export const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 

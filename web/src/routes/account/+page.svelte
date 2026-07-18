@@ -290,7 +290,7 @@
 		font-family: var(--font-ui);
 	}
 	.confirm-dialog::backdrop {
-		background: rgba(10, 7, 3, 0.55);
+		background: var(--scrim);
 	}
 	.confirm-dialog h2 {
 		font-size: 1.05rem;

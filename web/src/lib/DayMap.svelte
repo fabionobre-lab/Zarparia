@@ -105,6 +105,9 @@
 		if (latlngs.length >= 2) {
 			L.polyline(latlngs, {
 				className: 'daymap-line',
+				// `color` is a no-CSS fallback only — the real, theme-aware stroke
+				// is `.daymap-line { stroke: var(--text-muted) }` below, which
+				// overrides Leaflet's inline stroke attribute.
 				color: '#7a6e5f',
 				weight: 2,
 				opacity: 0.7,
@@ -216,7 +219,7 @@
 	.map-panel {
 		margin: 8px 13px 2px;
 		height: 200px;
-		border: 1px solid var(--border);
+		border: 1px solid var(--hairline-strong);
 		border-radius: var(--radius-lg);
 		overflow: hidden;
 	}
@@ -260,6 +263,13 @@
 		border: 2px solid #fff;
 		box-shadow: var(--elevation-1);
 		box-sizing: border-box;
+	}
+	:global(.daymap-line) {
+		/* Theme-aware route stroke (CSS beats the SVG stroke presentation
+		   attribute Leaflet sets from the `color` option). Replaces the old
+		   #7a6e5f literal with the muted-text token — a hair greyer in light
+		   mode, and it now flips with the theme for free. */
+		stroke: var(--text-muted);
 	}
 	:global(.daymap-popup) {
 		font-family: 'Source Serif 4', Georgia, serif;

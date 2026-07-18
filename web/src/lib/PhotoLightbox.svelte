@@ -2,7 +2,7 @@
 	import { photoUrl, type TripPhoto } from '$lib/photos';
 	import { t } from '$lib/i18n/store.svelte';
 	import ConfirmDialog from '$lib/dialog/ConfirmDialog.svelte';
-	import { toast } from '$lib/toast';
+	import { toast, dismissToast } from '$lib/toast';
 
 	interface DayOption {
 		date: string;
@@ -33,6 +33,59 @@
 	let busy = $state(false);
 	let errMsg = $state('');
 	let deleteConfirmOpen = $state(false);
+	/* Snapshot of the photo the user actually confirmed for deletion. `photo`
+	   is derived from `index`, so without this, arrow-navigating while the
+	   confirm dialog is open would retarget the delete to a different photo. */
+	let deleteTarget: TripPhoto | null = $state(null);
+
+	/* ── Focus management — MoreSheet's hand-rolled pattern (nav/MoreSheet.
+	   svelte). A native <dialog> would give this for free, but the delete
+	   confirm child is ALREADY a native dialog: nesting it inside a second
+	   showModal() layer makes top-layer stacking/inert behavior fiddly, so the
+	   overlay stays a div and traps focus by hand. The component only mounts
+	   while the lightbox is open, so mount == open and unmount == close. */
+	let overlayEl = $state<HTMLDivElement | null>(null);
+	let restoreFocus: HTMLElement | null = null;
+
+	function focusables(): HTMLElement[] {
+		if (!overlayEl) return [];
+		return Array.from(
+			overlayEl.querySelectorAll<HTMLElement>(
+				'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+			)
+		).filter((el) => el.offsetParent !== null);
+	}
+
+	/* Tab/Shift-Tab wrap within the overlay. Runs on the overlay element, so
+	   keystrokes inside the (top-layer) delete confirm never reach it. */
+	function trapTab(e: KeyboardEvent) {
+		if (e.key !== 'Tab') return;
+		const items = focusables();
+		if (items.length === 0) return;
+		const first = items[0];
+		const last = items[items.length - 1];
+		const active = document.activeElement as HTMLElement | null;
+		if (e.shiftKey && active === first) {
+			e.preventDefault();
+			last.focus();
+		} else if (!e.shiftKey && active === last) {
+			e.preventDefault();
+			first.focus();
+		}
+	}
+
+	// On open: remember the opener (a photo thumb button) and move focus into
+	// the dialog; on close: give focus back. If the opener is gone by then
+	// (e.g. the photo was deleted), focus() on the detached node is a no-op.
+	$effect(() => {
+		restoreFocus = document.activeElement as HTMLElement | null;
+		// Wait a frame so the overlay content is rendered/tabbable first.
+		requestAnimationFrame(() => focusables()[0]?.focus());
+		return () => {
+			restoreFocus?.focus?.();
+			restoreFocus = null;
+		};
+	});
 
 	function prev() {
 		if (index > 0) index--;
@@ -41,24 +94,46 @@
 		if (index < photos.length - 1) index++;
 	}
 	function onKeydown(e: KeyboardEvent) {
+		/* While the delete confirm (a native <dialog>) is open it owns the
+		   keyboard: its own Escape closes just the dialog, and that same
+		   keydown must not also reach here and dismiss the whole lightbox;
+		   arrows must not keep navigating underneath it. */
+		if (deleteConfirmOpen) return;
 		if (e.key === 'Escape') onclose();
-		else if (e.key === 'ArrowLeft') prev();
-		else if (e.key === 'ArrowRight') next();
+		else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+			/* When the move-to-day <select> holds focus, arrows change its
+			   options — they must not also flip the photo underneath. */
+			if (document.activeElement instanceof HTMLSelectElement) return;
+			if (e.key === 'ArrowLeft') prev();
+			else next();
+		}
 	}
 
 	async function moveTo(e: Event) {
 		if (!photo) return;
+		// Snapshot the target + its previous day BEFORE the PATCH: `photo` is
+		// derived from `index`, and the Undo closure outlives this component
+		// (onchanged() closes the lightbox).
+		const target = photo;
+		const prevDay = target.dayDate ?? '';
 		const value = (e.currentTarget as HTMLSelectElement).value;
 		busy = true;
 		errMsg = '';
 		try {
-			const res = await fetch(`/api/trips/${tripId}/photos/${photo.id}`, {
+			const res = await fetch(`/api/trips/${tripId}/photos/${target.id}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ dayDate: value || null })
 			});
-			if (res.ok) onchanged();
-			else errMsg = t('photos.errSave');
+			if (res.ok) {
+				// A move is a trivially reversible PATCH → offer Undo (7s duration
+				// comes automatically from the toast store when an action is set).
+				toast(t('toast.photoMoved'), {
+					actionLabel: t('common.undo'),
+					onAction: () => void undoMove(target.id, prevDay)
+				});
+				onchanged();
+			} else errMsg = t('photos.errSave');
 		} catch {
 			errMsg = t('photos.errSave');
 		} finally {
@@ -66,17 +141,37 @@
 		}
 	}
 
+	/** Undo a move-to-day: PATCH the previous dayDate back. Runs from the toast
+	 *  action after the lightbox has closed, so errors surface as a toast. */
+	async function undoMove(photoId: string, prevDay: string) {
+		dismissToast();
+		try {
+			const res = await fetch(`/api/trips/${tripId}/photos/${photoId}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ dayDate: prevDay || null })
+			});
+			if (res.ok) onchanged();
+			else toast.danger(t('photos.errSave'));
+		} catch {
+			toast.danger(t('photos.errSave'));
+		}
+	}
+
 	function remove() {
 		if (!photo) return;
+		deleteTarget = photo;
 		deleteConfirmOpen = true;
 	}
 
 	async function confirmRemove() {
-		if (!photo) return;
+		const target = deleteTarget;
+		deleteTarget = null;
+		if (!target) return;
 		busy = true;
 		errMsg = '';
 		try {
-			const res = await fetch(`/api/trips/${tripId}/photos/${photo.id}`, { method: 'DELETE' });
+			const res = await fetch(`/api/trips/${tripId}/photos/${target.id}`, { method: 'DELETE' });
 			if (res.ok) {
 				onchanged();
 				onclose();
@@ -95,9 +190,19 @@
 <svelte:window onkeydown={onKeydown} />
 
 {#if photo}
-	<div class="overlay" role="dialog" aria-modal="true" aria-label={t('photos.lightboxLabel')}>
-		<!-- Backdrop click closes; the inner frame stops propagation. -->
-		<button class="backdrop" aria-label={t('photos.close')} onclick={onclose}></button>
+	<div
+		bind:this={overlayEl}
+		class="overlay"
+		role="dialog"
+		aria-modal="true"
+		aria-label={t('photos.lightboxLabel')}
+		tabindex="-1"
+		onkeydown={trapTab}
+	>
+		<!-- Backdrop click closes (pointer affordance only — tabindex -1 keeps it
+		     out of the focus trap, like MoreSheet's scrim; keyboard users have
+		     Escape and the visible ✕). The inner frame stops propagation. -->
+		<button class="backdrop" tabindex="-1" aria-label={t('photos.close')} onclick={onclose}></button>
 		<div class="frame">
 			<img class="big" src={photoUrl(tripId, photo.id, 'disp')} alt={captionFor(photo)} />
 			<div class="chrome">
@@ -137,6 +242,11 @@
 />
 
 <style>
+	/* NOTE on the hardcoded colors below: everything in this component renders
+	   over the near-black photo backdrop, never over an app surface — so the
+	   chrome (captions, labels, nav circles, delete button) uses deliberate
+	   theme-INVARIANT over-photo colors (warm creams on translucent near-black),
+	   not the light-dark() tokens. Do not sweep them onto theme tokens. */
 	.overlay {
 		position: fixed;
 		inset: 0;
@@ -148,6 +258,8 @@
 	.backdrop {
 		position: absolute;
 		inset: 0;
+		/* Darker than --scrim on purpose: a photo-viewing surround, not a dialog
+		   scrim — the image needs a near-black field in both themes. */
 		background: rgba(10, 8, 4, 0.82);
 		border: 0;
 		cursor: default;
@@ -174,7 +286,7 @@
 		font-family: var(--font-ui);
 	}
 	.caption {
-		color: #f0ead9;
+		color: #f0ead9; /* warm cream over the photo backdrop — theme-invariant */
 		font-size: 0.82rem;
 	}
 	.edit-row {
@@ -184,7 +296,7 @@
 		flex-wrap: wrap;
 	}
 	.mv-label {
-		color: #cfc7b4;
+		color: #cfc7b4; /* muted cream over the photo backdrop — theme-invariant */
 		font-size: 0.78rem;
 	}
 	.edit-row select {
@@ -195,6 +307,7 @@
 	}
 	.del {
 		font-size: 0.78rem;
+		/* Danger styling tuned for the dark photo surround (not --warn-*) */
 		color: #f3b6ab;
 		background: rgba(200, 64, 64, 0.18);
 		border: 1px solid rgba(220, 120, 110, 0.45);
@@ -203,7 +316,7 @@
 		cursor: pointer;
 	}
 	.err {
-		color: #f3b6ab;
+		color: #f3b6ab; /* danger tint readable on the photo backdrop — theme-invariant */
 		font-size: 0.78rem;
 	}
 	.nav {
@@ -214,6 +327,7 @@
 		height: 38px;
 		border-radius: 50%;
 		border: 0;
+		/* Translucent near-black circle + cream glyph, sits ON the image — theme-invariant */
 		background: rgba(20, 16, 10, 0.65);
 		color: #f0ead9;
 		font-size: 1.5rem;
@@ -234,6 +348,7 @@
 		height: 32px;
 		border-radius: 50%;
 		border: 0;
+		/* Same over-photo circle idiom as .nav, slightly more opaque — theme-invariant */
 		background: rgba(20, 16, 10, 0.75);
 		color: #f0ead9;
 		font-size: 0.95rem;

@@ -9,6 +9,12 @@
 	const doc = $derived(terms[locale()]);
 </script>
 
+<!-- In-app mirror of the family legal, which is canonical on the house site —
+     DESIGN.md Conventions ("Family legal"). Content stays app-specific here. -->
+<svelte:head>
+	<link rel="canonical" href="https://aria-nobre.pages.dev/terms.html" />
+</svelte:head>
+
 <LegalPage {doc} pageTitle={t('terms.pageTitle')} />
 
 <BottomBar user={data.user} items={[{ id: 'trips', label: t('nav.trips'), icon: 'trips', href: '/' }]} />

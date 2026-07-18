@@ -420,6 +420,10 @@
 		margin-top: 1.25rem;
 		padding: 1.1rem 1.3rem 1.25rem;
 		border-radius: var(--radius-lg);
+		/* Fallback #1a5a34 = --pill-go-fg's LIGHT value (tokens.css). Kept as a
+		   literal, not var(--pill-go-fg): this is a fill under fixed white text,
+		   and the token would flip to its pale dark-mode branch (#a9d9bf) and
+		   fail contrast. Same deep green in both themes by design. */
 		background: var(--ha-bg, #1a5a34);
 		color: #fff;
 		text-decoration: none;
@@ -442,6 +446,8 @@
 		font-size: 0.68rem;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
+		/* Fallback pale green pairs with the #1a5a34 fill above (no token
+		   equivalent — an over-fill tint, theme-invariant like the fill). */
 		color: var(--ha-eyebrow, #bfe7cf);
 		opacity: 0.85;
 		margin-bottom: 0.3rem;

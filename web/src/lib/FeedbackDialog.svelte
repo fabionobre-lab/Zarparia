@@ -3,6 +3,7 @@
 	import type { Messages } from '$lib/i18n';
 	import { FEEDBACK_MAX_LEN, type FeedbackType } from '$lib/feedback';
 	import { busyButton } from '$lib/actions/busyButton';
+	import { toast } from '$lib/toast';
 
 	// `open` is bindable so the header button can toggle it. A native <dialog>
 	// gives us the modal focus trap, Escape-to-close, and focus-return-to-trigger
@@ -23,8 +24,6 @@
 	let message = $state('');
 	let busy = $state(false);
 	let error = $state('');
-	let sent = $state(false);
-	let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	const over = $derived(message.length > FEEDBACK_MAX_LEN);
 	const canSubmit = $derived(message.trim().length > 0 && !over && !busy);
@@ -34,8 +33,6 @@
 		message = '';
 		busy = false;
 		error = '';
-		sent = false;
-		clearTimeout(closeTimer);
 	}
 
 	// Drive the native dialog from the `open` prop. Resetting on open gives a
@@ -53,7 +50,6 @@
 	});
 
 	function onClose() {
-		clearTimeout(closeTimer);
 		open = false;
 	}
 
@@ -73,8 +69,10 @@
 				body: JSON.stringify({ type, message: message.trim(), page: location.pathname })
 			});
 			if (res.ok) {
-				sent = true;
-				closeTimer = setTimeout(() => (open = false), 2000);
+				// Family convention (matches Nobria/Saldaria): the dialog closes and
+				// a toast confirms — no in-dialog success state to wait on.
+				open = false;
+				toast(t('feedback.successTitle'));
 			} else {
 				const data = (await res.json().catch(() => ({}))) as { error?: string };
 				if (res.status === 400 && over) error = t('feedback.errTooLong');
@@ -89,54 +87,46 @@
 </script>
 
 <dialog bind:this={dialogEl} class="fb" aria-modal="true" aria-labelledby={titleId} onclose={onClose}>
-	{#if sent}
-		<div class="done">
-			<div class="check" aria-hidden="true">✓</div>
-			<h2 id={titleId}>{t('feedback.successTitle')}</h2>
-			<a class="viewlink" href="/feedback" onclick={() => (open = false)}>{t('feedback.viewYours')}</a>
+	<form onsubmit={submit}>
+		<div class="hd">
+			<h2 id={titleId}>{t('feedback.title')}</h2>
+			<button type="button" class="x" onclick={() => (open = false)} aria-label={t('feedback.close')}>✕</button>
 		</div>
-	{:else}
-		<form onsubmit={submit}>
-			<div class="hd">
-				<h2 id={titleId}>{t('feedback.title')}</h2>
-				<button type="button" class="x" onclick={() => (open = false)} aria-label={t('feedback.close')}>✕</button>
-			</div>
 
-			<div class="types" role="radiogroup" aria-label={t('feedback.typeLabel')}>
-				{#each TYPE_OPTIONS as opt (opt.val)}
-					<button
-						type="button"
-						role="radio"
-						aria-checked={type === opt.val}
-						class="seg"
-						class:active={type === opt.val}
-						onclick={() => (type = opt.val)}
-					>
-						{t(opt.key)}
-					</button>
-				{/each}
-			</div>
-
-			<textarea
-				bind:value={message}
-				rows="5"
-				placeholder={t('feedback.messagePlaceholder')}
-				aria-label={t('feedback.messageLabel')}
-				disabled={busy}
-			></textarea>
-
-			<div class="row">
-				<span class="counter" class:over>{message.length} / {FEEDBACK_MAX_LEN}</span>
-				<button type="submit" class="send" disabled={!canSubmit} use:busyButton={{ busy, disable: false }}>
-					{busy ? t('feedback.sending') : t('feedback.submit')}
+		<div class="types" role="radiogroup" aria-label={t('feedback.typeLabel')}>
+			{#each TYPE_OPTIONS as opt (opt.val)}
+				<button
+					type="button"
+					role="radio"
+					aria-checked={type === opt.val}
+					class="seg"
+					class:active={type === opt.val}
+					onclick={() => (type = opt.val)}
+				>
+					{t(opt.key)}
 				</button>
-			</div>
+			{/each}
+		</div>
 
-			{#if error}<p class="err" role="alert">{error}</p>{/if}
+		<textarea
+			bind:value={message}
+			rows="5"
+			placeholder={t('feedback.messagePlaceholder')}
+			aria-label={t('feedback.messageLabel')}
+			disabled={busy}
+		></textarea>
 
-			<a class="footlink" href="/feedback" onclick={() => (open = false)}>{t('feedback.viewYours')}</a>
-		</form>
-	{/if}
+		<div class="row">
+			<span class="counter" class:over>{message.length} / {FEEDBACK_MAX_LEN}</span>
+			<button type="submit" class="send" disabled={!canSubmit} use:busyButton={{ busy, disable: false }}>
+				{busy ? t('feedback.sending') : t('feedback.submit')}
+			</button>
+		</div>
+
+		{#if error}<p class="err" role="alert">{error}</p>{/if}
+
+		<a class="footlink" href="/feedback" onclick={() => (open = false)}>{t('feedback.viewYours')}</a>
+	</form>
 </dialog>
 
 <style>
@@ -151,7 +141,7 @@
 		font-family: var(--font-ui);
 	}
 	.fb::backdrop {
-		background: rgba(10, 7, 3, 0.55);
+		background: var(--scrim);
 	}
 	.hd {
 		display: flex;
@@ -248,29 +238,5 @@
 		margin-top: 0.9rem;
 		font-size: 0.8rem;
 		color: var(--text-muted);
-	}
-	.done {
-		text-align: center;
-		padding: 1rem 0.5rem;
-	}
-	.check {
-		width: 44px;
-		height: 44px;
-		margin: 0 auto 0.6rem;
-		border-radius: var(--radius-pill);
-		background: var(--pill-go-bg);
-		color: var(--pill-go-fg);
-		font-size: 1.4rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.done h2 {
-		margin-bottom: 0.7rem;
-	}
-	.viewlink {
-		font-size: 0.88rem;
-		color: var(--accent-strong);
-		font-weight: 600;
 	}
 </style>
