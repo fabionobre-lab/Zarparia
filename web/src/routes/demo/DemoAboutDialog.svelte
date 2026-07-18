@@ -60,7 +60,7 @@
 		font-family: var(--font-ui);
 	}
 	.about::backdrop {
-		background: rgba(10, 7, 3, 0.55);
+		background: var(--scrim);
 	}
 	.hd {
 		display: flex;

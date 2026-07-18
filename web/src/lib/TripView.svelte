@@ -29,6 +29,7 @@
 	} from './trip-engine';
 	import DayMap, { type MapStop, type PhotoStop } from './DayMap.svelte';
 	import PhotoLightbox from './PhotoLightbox.svelte';
+	import { tripChrome } from './i18n/tripChrome';
 	import { photoUrl, type TripPhoto } from './photos';
 	import { getNow } from './now';
 	import { setTripNav, type TripNavVM } from './nav/tripNav.svelte';
@@ -262,29 +263,10 @@
 		}
 	});
 
-	const uiText = $derived(
-		lang === 'pt'
-			? {
-					maps: 'Abrir no Maps',
-					dayRoute: 'Rota do Dia',
-					openRoute: 'Abrir rota no Google Maps →',
-					addToCalendar: 'Adicionar ao calendário',
-					now: 'Agora',
-					photos: 'Fotos',
-					unmatchedPhotos: 'Fotos fora do roteiro',
-					openPhoto: 'Abrir foto'
-				}
-			: {
-					maps: 'Open in Maps',
-					dayRoute: 'Day Route',
-					openRoute: 'Open route in Google Maps →',
-					addToCalendar: 'Add to calendar',
-					now: 'Now',
-					photos: 'Photos',
-					unmatchedPhotos: 'Photos not on the itinerary',
-					openPhoto: 'Open photo'
-				}
-	);
+	/* Trip-chrome strings follow the TRIP CONTENT language (the per-trip EN|PT
+	   hero toggle), not the UI locale — hence the typed tripChrome catalog
+	   instead of t(). See lib/i18n/tripChrome.ts. */
+	const uiText = $derived(tripChrome[lang === 'pt' ? 'pt' : 'en']);
 
 	function setLang(l: string) {
 		lang = l;
@@ -745,7 +727,7 @@
 										{/if}
 									</div>
 									<div class="tb-dot-col">
-										<div class="tb-dot" class:tb-dot-next={isNext} style="background:{b.dotColor || 'var(--stone)'}"></div>
+										<div class="tb-dot" class:tb-dot-next={isNext} style="background:{b.dotColor || 'var(--text-muted)'}"></div>
 										{#if bi < day.blocks.length - 1}<div class="tb-line"></div>{/if}
 									</div>
 								</div>
@@ -878,9 +860,9 @@
 		/* Trip theme = ONE base colour + its gold eyebrow. Light values ARE the
 		   current identity. hero-bg/accent derive from the base; --accent-text is
 		   the text-level accent (equals the base in light; lightened via OKLCH in
-		   the dark block below so it reads on dark surfaces). Neutrals (--cream/
-		   --ink/--stone/--border) are intentionally NOT redefined here — they
-		   inherit the global tokens.css aliases so they flip light↔dark. */
+		   the dark block below so it reads on dark surfaces). Neutrals (--text/
+		   --text-muted/--hairline-strong) are intentionally NOT redefined here —
+		   they inherit the global tokens.css definitions so they flip light↔dark. */
 		--theme-base: #2b4a2b;
 		--theme-eyebrow: #e8c84a;
 		--hero-bg: var(--theme-base);
@@ -893,28 +875,33 @@
 		--moss: #3d5a3d;
 		--loch: #1e3a5f;
 		/* Category chips + note strips — light values keep the current identity;
-		   the dark block flips them to translucent fills with lighter text. */
-		--chip-sight-bg: #dce8f5;
-		--chip-sight-fg: var(--loch);
-		--chip-food-bg: #daf0e5;
-		--chip-food-fg: var(--moss);
-		--chip-logistics-bg: #ede8e0;
-		--chip-logistics-fg: var(--stone);
-		--chip-booking-bg: #f5edd5;
-		--chip-booking-fg: #7a5a10;
-		--chip-fullday-bg: #ede0f0;
-		--chip-fullday-fg: var(--heather);
+		   dark flips them to translucent fills with lighter text via light-dark()
+		   (color-scheme is declared in the canon token file, keyed on data-theme,
+		   so these follow explicit AND system dark automatically). Only the four
+		   non-<color> / cache-sensitive tokens still need the dual dark blocks
+		   below. --chip-logistics-fg and --note-fg are single-valued: both modes
+		   resolve to var(--text-muted), which is already theme-aware. */
+		--chip-sight-bg: light-dark(#dce8f5, rgba(120, 160, 210, 0.2));
+		--chip-sight-fg: light-dark(var(--loch), #bcd4f0);
+		--chip-food-bg: light-dark(#daf0e5, rgba(90, 170, 120, 0.2));
+		--chip-food-fg: light-dark(var(--moss), #a9d9bf);
+		--chip-logistics-bg: light-dark(#ede8e0, rgba(180, 168, 148, 0.16));
+		--chip-logistics-fg: var(--text-muted);
+		--chip-booking-bg: light-dark(#f5edd5, rgba(200, 170, 90, 0.18));
+		--chip-booking-fg: light-dark(#7a5a10, #e0c987);
+		--chip-fullday-bg: light-dark(#ede0f0, rgba(160, 120, 170, 0.22));
+		--chip-fullday-fg: light-dark(var(--heather), #d3b0dd);
 		--chip-bday-grad: linear-gradient(120deg, #f2d2f0, #dfd0f2);
-		--chip-bday-fg: #5a2a78;
-		--note-bg: #f0ece4;
-		--note-fg: var(--stone);
-		--warn-bg: #fdf0ee;
-		--warn-fg: #7a2020;
-		--warn-bar: #c84040;
-		--add-bg: #e5f5e8;
-		--add-fg: #1a3a1a;
-		--chg-bg: #fef6de;
-		--chg-fg: #5a3a00;
+		--chip-bday-fg: light-dark(#5a2a78, #e6c8f0);
+		--note-bg: light-dark(#f0ece4, rgba(236, 228, 212, 0.06));
+		--note-fg: var(--text-muted);
+		--warn-bg: light-dark(#fdf0ee, rgba(200, 64, 64, 0.14));
+		--warn-fg: light-dark(#7a2020, #e8a99f);
+		--warn-bar: light-dark(#c84040, #c85a4a);
+		--add-bg: light-dark(#e5f5e8, rgba(90, 170, 110, 0.14));
+		--add-fg: light-dark(#1a3a1a, #a9d9b5);
+		--chg-bg: light-dark(#fef6de, rgba(200, 170, 80, 0.14));
+		--chg-fg: light-dark(#5a3a00, #e0c987);
 		--photo-filter: none;
 		--map-filter: none;
 		font-family: 'Source Serif 4', Georgia, serif;
@@ -948,61 +935,30 @@
 		--theme-base: #5b4a30;
 		--theme-eyebrow: #e8cf8a;
 	}
-	/* ── Dark mode: lift the text-level accent off the (dark) theme base via
-	   OKLCH relative-colour syntax — same hue/chroma, forced light so it reads on
-	   dark surfaces. Applies for explicit dark AND system-dark (no attribute).
-	   The saturated --accent (fills with white text) and --hero-bg stay put:
-	   the hero colours are already dark enough to keep in both modes. ── */
+	/* ── Dark mode — the four tokens light-dark() CANNOT carry (everything else
+	   above collapsed into light-dark() at its definition site):
+	   - --accent-text: lifts the text-level accent off the (dark) theme base via
+	     OKLCH relative-colour syntax (same hue/chroma, forced light). Kept
+	     attribute/media-keyed because Chromium caches relative-colour resolution
+	     and goes stale on live theme flips (see the @property registration in
+	     tokens.css) — the keyed blocks re-trigger it reliably.
+	   - --chip-bday-grad: a gradient — light-dark() only returns <color>, not
+	     an <image>.
+	   - --photo-filter / --map-filter: filter lists, likewise not <color>.
+	   Both blocks (explicit data-theme='dark' + system-dark with no attribute)
+	   must stay byte-identical — same 4 declarations each.
+	   The saturated --accent (fills with white text) and --hero-bg stay put in
+	   both modes: the hero colours are already dark enough to keep. ── */
 	:global(html[data-theme='dark']) .shell {
 		--accent-text: oklch(from var(--theme-base) 0.82 calc(c * 0.9) h);
-		--chip-sight-bg: rgba(120, 160, 210, 0.2);
-		--chip-sight-fg: #bcd4f0;
-		--chip-food-bg: rgba(90, 170, 120, 0.2);
-		--chip-food-fg: #a9d9bf;
-		--chip-logistics-bg: rgba(180, 168, 148, 0.16);
-		--chip-logistics-fg: var(--text-muted);
-		--chip-booking-bg: rgba(200, 170, 90, 0.18);
-		--chip-booking-fg: #e0c987;
-		--chip-fullday-bg: rgba(160, 120, 170, 0.22);
-		--chip-fullday-fg: #d3b0dd;
 		--chip-bday-grad: linear-gradient(120deg, rgba(200, 130, 190, 0.22), rgba(170, 140, 210, 0.22));
-		--chip-bday-fg: #e6c8f0;
-		--note-bg: rgba(236, 228, 212, 0.06);
-		--note-fg: var(--text-muted);
-		--warn-bg: rgba(200, 64, 64, 0.14);
-		--warn-fg: #e8a99f;
-		--warn-bar: #c85a4a;
-		--add-bg: rgba(90, 170, 110, 0.14);
-		--add-fg: #a9d9b5;
-		--chg-bg: rgba(200, 170, 80, 0.14);
-		--chg-fg: #e0c987;
 		--photo-filter: brightness(0.9);
 		--map-filter: brightness(0.72) contrast(1.05) saturate(0.85);
 	}
 	@media (prefers-color-scheme: dark) {
 		:global(html:not([data-theme])) .shell {
 			--accent-text: oklch(from var(--theme-base) 0.82 calc(c * 0.9) h);
-			--chip-sight-bg: rgba(120, 160, 210, 0.2);
-			--chip-sight-fg: #bcd4f0;
-			--chip-food-bg: rgba(90, 170, 120, 0.2);
-			--chip-food-fg: #a9d9bf;
-			--chip-logistics-bg: rgba(180, 168, 148, 0.16);
-			--chip-logistics-fg: var(--text-muted);
-			--chip-booking-bg: rgba(200, 170, 90, 0.18);
-			--chip-booking-fg: #e0c987;
-			--chip-fullday-bg: rgba(160, 120, 170, 0.22);
-			--chip-fullday-fg: #d3b0dd;
 			--chip-bday-grad: linear-gradient(120deg, rgba(200, 130, 190, 0.22), rgba(170, 140, 210, 0.22));
-			--chip-bday-fg: #e6c8f0;
-			--note-bg: rgba(236, 228, 212, 0.06);
-			--note-fg: var(--text-muted);
-			--warn-bg: rgba(200, 64, 64, 0.14);
-			--warn-fg: #e8a99f;
-			--warn-bar: #c85a4a;
-			--add-bg: rgba(90, 170, 110, 0.14);
-			--add-fg: #a9d9b5;
-			--chg-bg: rgba(200, 170, 80, 0.14);
-			--chg-fg: #e0c987;
 			--photo-filter: brightness(0.9);
 			--map-filter: brightness(0.72) contrast(1.05) saturate(0.85);
 		}
@@ -1183,7 +1139,7 @@
 	}
 	.daynav {
 		background: var(--surface);
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--hairline-strong);
 		/* Sticks to the top of the trip shell as the page scrolls; the plan
 		   tabs and hero above it scroll away normally. z-index is set well
 		   above Leaflet's internal panes (tilePane 200 … popupPane 700) so the
@@ -1285,12 +1241,12 @@
 		font-size: 9px;
 		letter-spacing: 0.05em;
 		text-transform: uppercase;
-		color: var(--stone);
+		color: var(--text-muted);
 	}
 	.daybtn .dnum {
 		font-size: 15px;
 		font-weight: 500;
-		color: var(--stone);
+		color: var(--text-muted);
 		font-family: 'Source Serif 4', serif;
 		line-height: 1;
 		font-variant-numeric: tabular-nums;
@@ -1312,7 +1268,7 @@
 	}
 	.daybtn-separator {
 		width: 1px;
-		background: var(--border);
+		background: var(--hairline-strong);
 		margin: 4px 0;
 		flex-shrink: 0;
 	}
@@ -1397,7 +1353,7 @@
 	.tb-time {
 		font-size: 10px;
 		font-weight: 500;
-		color: var(--stone);
+		color: var(--text-muted);
 		text-align: center;
 		line-height: 1.2;
 		font-variant-numeric: tabular-nums;
@@ -1421,7 +1377,7 @@
 		width: 1.5px;
 		flex: 1;
 		min-height: 14px;
-		background: var(--border);
+		background: var(--hairline-strong);
 		margin-top: 2px;
 	}
 	.tb-dot-next {
@@ -1470,7 +1426,7 @@
 	.tb-body {
 		flex: 1;
 		padding: 11px 0 11px 9px;
-		border-bottom: 1px solid var(--border);
+		border-bottom: 1px solid var(--hairline-strong);
 	}
 	.tb:last-child .tb-body {
 		border-bottom: none;
@@ -1485,7 +1441,7 @@
 		font-family: 'Source Serif 4', serif;
 		font-size: 14px;
 		font-weight: 500;
-		color: var(--ink);
+		color: var(--text);
 		line-height: 1.3;
 	}
 	.tb-title-next {
@@ -1502,7 +1458,7 @@
 		width: 44px;
 		height: 44px;
 		flex-shrink: 0;
-		color: var(--stone);
+		color: var(--text-muted);
 		text-decoration: none;
 	}
 	.map-icon-circle {
@@ -1512,7 +1468,7 @@
 		width: 24px;
 		height: 24px;
 		border-radius: 50%;
-		border: 1px solid var(--border);
+		border: 1px solid var(--hairline-strong);
 		background: transparent;
 	}
 	.map-icon-btn:hover .map-icon-circle,
@@ -1572,7 +1528,7 @@
 	}
 	.tb-meta {
 		font-size: 12px;
-		color: var(--stone);
+		color: var(--text-muted);
 		line-height: 1.55;
 		margin-top: 2px;
 	}
@@ -1642,7 +1598,7 @@
 		display: none;
 		margin: 10px 13px 4px;
 		background: var(--surface-sunken);
-		border: 1px solid var(--border);
+		border: 1px solid var(--hairline-strong);
 		border-radius: var(--radius-lg);
 		padding: 12px 14px 10px;
 		text-decoration: none;
@@ -1660,7 +1616,7 @@
 		min-height: 44px;
 		box-sizing: border-box;
 		padding: 6px 12px;
-		border: 1px solid var(--border);
+		border: 1px solid var(--hairline-strong);
 		border-radius: var(--radius-button);
 		background: var(--surface-sunken);
 		color: var(--accent-text);
@@ -1743,7 +1699,7 @@
 	}
 	.route-name {
 		font-size: 9px;
-		color: var(--stone);
+		color: var(--text-muted);
 		text-align: center;
 		width: 70px;
 		line-height: 1.25;
@@ -1758,7 +1714,7 @@
 	.route-connector {
 		width: 20px;
 		height: 2px;
-		background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 4px, transparent 4px, transparent 7px);
+		background: repeating-linear-gradient(90deg, var(--hairline-strong) 0, var(--hairline-strong) 4px, transparent 4px, transparent 7px);
 		margin: 0 1px;
 		flex-shrink: 0;
 		align-self: flex-start;
@@ -1801,7 +1757,7 @@
 		width: 56px;
 		height: 56px;
 		padding: 0;
-		border: 1px solid var(--border);
+		border: 1px solid var(--hairline-strong);
 		border-radius: var(--radius-md);
 		background: var(--surface-sunken);
 		overflow: hidden;
@@ -1817,7 +1773,7 @@
 	.day-photos {
 		margin: 10px 13px 4px;
 		padding: 10px 12px;
-		border: 1px solid var(--border);
+		border: 1px solid var(--hairline-strong);
 		border-radius: var(--radius-lg);
 	}
 	.day-photos-unmatched {

@@ -173,6 +173,7 @@ export interface Messages {
 	// ── Shared editor button/label vocabulary ──
 	'common.add': string;
 	'common.cancel': string;
+	'common.undo': string; // toast action label (family convention — same key as Nobria)
 	'common.daily': string;
 	'common.hourly': string;
 
@@ -227,6 +228,7 @@ export interface Messages {
 	'toast.tripSaved': string;
 	'toast.tripImported': string;
 	'toast.photoDeleted': string;
+	'toast.photoMoved': string;
 	'dialog.discard': string; // danger confirm-button label for the discard-changes dialog
 
 	// ── Segment editor (SegmentEditor.svelte) ──
@@ -669,6 +671,7 @@ const enGB: Messages = {
 
 	'common.add': 'Add',
 	'common.cancel': 'Cancel',
+	'common.undo': 'Undo',
 	'common.daily': 'daily',
 	'common.hourly': 'hourly',
 
@@ -721,6 +724,7 @@ const enGB: Messages = {
 	'toast.tripSaved': 'Trip saved.',
 	'toast.tripImported': 'Trip imported.',
 	'toast.photoDeleted': 'Photo deleted.',
+	'toast.photoMoved': 'Photo moved.',
 	'dialog.discard': 'Discard',
 
 	'seg.dragReorder': 'Drag to reorder segment',
@@ -1154,6 +1158,7 @@ const ptBR: Messages = {
 
 	'common.add': 'Adicionar',
 	'common.cancel': 'Cancelar',
+	'common.undo': 'Desfazer',
 	'common.daily': 'diário',
 	'common.hourly': 'por hora',
 
@@ -1206,6 +1211,7 @@ const ptBR: Messages = {
 	'toast.tripSaved': 'Viagem salva.',
 	'toast.tripImported': 'Viagem importada.',
 	'toast.photoDeleted': 'Foto excluída.',
+	'toast.photoMoved': 'Foto movida.',
 	'dialog.discard': 'Descartar',
 
 	'seg.dragReorder': 'Arraste para reordenar o trecho',

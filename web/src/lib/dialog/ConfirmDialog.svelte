@@ -89,7 +89,7 @@
 		box-shadow: var(--elevation-3);
 	}
 	.confirm::backdrop {
-		background: rgba(10, 7, 3, 0.55);
+		background: var(--scrim);
 	}
 	h2 {
 		font-size: 1.05rem;
