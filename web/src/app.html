@@ -6,23 +6,10 @@
 		<meta name="text-scale" content="scale" />
 		<meta name="theme-color" content="#F5F2EC" media="(prefers-color-scheme: light)" />
 		<meta name="theme-color" content="#141B28" media="(prefers-color-scheme: dark)" />
-		<!-- Static defaults for every route — SvelteKit pages set their own
-		     <title> via <svelte:head>, which does not conflict with these; there
-		     is no per-page Open Graph infrastructure, by design. -->
-		<meta
-			name="description"
-			content="Zarparia — plan and share travel itineraries. Early-access, invite-only beta."
-		/>
-		<meta property="og:type" content="website" />
-		<meta property="og:site_name" content="Zarparia" />
-		<meta property="og:title" content="Zarparia — Chart your journey." />
-		<meta
-			property="og:description"
-			content="Zarparia — plan and share travel itineraries. Early-access, invite-only beta."
-		/>
-		<!-- TODO(Phase 7): swap for the custom domain once it lands. -->
-		<meta property="og:image" content="https://trips.fabionobre-ai.workers.dev/icon-512.png" />
-		<meta name="twitter:card" content="summary" />
+		<!-- description + og:*/twitter:card now live in the root layout's
+		     svelte:head (src/routes/+layout.svelte), with per-route overrides via
+		     $page.data.og — a static tag here couldn't be overridden and would
+		     just emit duplicates. See DESIGN-CONSISTENCY-PLAN-R2.md Phase 6 item 1. -->
 		<script>
 			// Belt-and-braces: reconcile <html data-theme> from localStorage before
 			// first paint, so a cached/prerendered page whose SSR cookie is stale

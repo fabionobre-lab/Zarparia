@@ -41,6 +41,25 @@
 
 	let feedbackOpen = $state(false);
 
+	// Site-wide Open Graph defaults (moved out of the static app.html so a
+	// route's load fn can override them — a static tag can't be overridden,
+	// only duplicated). Override source is `data.og` — { title?, description?,
+	// image?, url? } — returned from any route's load (see routes/demo for the
+	// first per-route override). Routes' own svelte:head blocks only set
+	// <title>; that's untouched, this is og:title/description/image/url +
+	// the plain description meta.
+	const og = $derived({
+		title: page.data.og?.title ?? 'Zarparia — Chart your journey.',
+		description:
+			page.data.og?.description ??
+			'Zarparia — plan and share travel itineraries. Early-access, invite-only beta.',
+		// TODO(Phase 7): swap for the custom domain once it lands.
+		image: page.data.og?.image ?? `${page.url.origin}/icon-512.png`,
+		// Strip query/hash: the canonical URL for a route, not whatever params
+		// happened to be on this particular request.
+		url: page.data.og?.url ?? `${page.url.origin}${page.url.pathname}`
+	});
+
 	// ── App chrome: no top bar, anywhere ──
 	// Desktop (≥960px) gets the persistent left sidebar on the routes below;
 	// mobile gets the BottomBar each page renders itself. The remaining routes
@@ -176,6 +195,14 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<meta name="description" content={og.description} />
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Zarparia" />
+	<meta property="og:title" content={og.title} />
+	<meta property="og:description" content={og.description} />
+	<meta property="og:image" content={og.image} />
+	<meta property="og:url" content={og.url} />
+	<meta name="twitter:card" content="summary" />
 </svelte:head>
 
 <div class="layout" class:sidebar-mode={showSidebar}>
