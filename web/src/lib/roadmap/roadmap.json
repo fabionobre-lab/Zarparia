@@ -79,6 +79,15 @@
 			}
 		},
 		{
+			"id": "booking-links",
+			"title": { "en": "Booking & reservation links on stops", "pt": "Links de reserva nas paradas" },
+			"status": "shipped",
+			"note": {
+				"en": "Add a hotel confirmation, restaurant booking or ticket link to any stop; it shows as a tappable pill in the trip and on the printed itinerary.",
+				"pt": "Adicione a qualquer parada um link de confirmação de hotel, reserva de restaurante ou ingresso; ele aparece como uma pílula clicável na viagem e no roteiro impresso."
+			}
+		},
+		{
 			"id": "trip-budget",
 			"title": { "en": "Trip budget & cost tracking", "pt": "Orçamento da viagem e controle de custos" },
 			"status": "building",
