@@ -64,9 +64,23 @@ function shield(x, y, hpx, tile, gold) {
     `<path d="${GOLD_D}" fill="${gold}" fill-rule="evenodd"/></g>`;
 }
 
+// Palette. 2026-07-20 (Fabio): re-derived from the family canon
+// (AriaNobre/design/aria-nobre-tokens.css). Every value here predated the
+// canon and had drifted:
+//   tile dark  #2b231b -> #232E42  (--an-shield dark; the warm tile was from
+//                                   the pre-navy era. NB: the app-side token
+//                                   had already collapsed to #1A2332 in
+//                                   16f4f06, which made the dark crest
+//                                   invisible against the navy card.)
+//   gold       #c1a374 -> #C4A572  (--an-brand-gold; family-unified)
+//   word dark  #ece4d4 -> #EDE8DE  (--an-ink dark)
+//   tag        #7a6e5f -> #6B6660  (--an-muted light)
+//              #a3957f -> #B4A996  (--an-muted dark)
+// Keep these in step with the canon; do not hand-edit the generated
+// brand/*.svg outputs.
 const PAL = {
-  light: { tile: '#1a2332', gold: '#c1a374', word: '#1a2332', tag: '#7a6e5f' },
-  dark:  { tile: '#2b231b', gold: '#c1a374', word: '#ece4d4', tag: '#a3957f' },
+  light: { tile: '#1A2332', gold: '#C4A572', word: '#1A2332', tag: '#6B6660' },
+  dark:  { tile: '#232E42', gold: '#C4A572', word: '#EDE8DE', tag: '#B4A996' },
 };
 
 // ---- geometry ----
@@ -98,14 +112,14 @@ fs.mkdirSync(OUT, { recursive: true });
 
 fs.writeFileSync(OUT + 'zarparia-mark.svg',
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="178 243 653 762" role="img" aria-label="Zarparia">\n` +
-  `  <path d="${NAVY_D}" fill="#1a2332" fill-rule="evenodd"/>\n` +
-  `  <path d="${GOLD_D}" fill="#c1a374" fill-rule="evenodd"/>\n</svg>\n`);
+  `  <path d="${NAVY_D}" fill="${PAL.light.tile}" fill-rule="evenodd"/>\n` +
+  `  <path d="${GOLD_D}" fill="${PAL.light.gold}" fill-rule="evenodd"/>\n</svg>\n`);
 
 const W_WM = f2(advS + 4);
 fs.writeFileSync(OUT + 'zarparia-wordmark.svg',
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W_WM} 70" role="img" aria-label="Zarparia">\n` +
-  `  <path d="${WM_S}" fill="#1a2332"/>\n` +
-  '  ' + tittle(iCentre(bold, 48, 0), 52 - 0.65 * 48, f2(16 * 48 / 66), '#c1a374') + '\n</svg>\n');
+  `  <path d="${WM_S}" fill="${PAL.light.word}"/>\n` +
+  '  ' + tittle(iCentre(bold, 48, 0), 52 - 0.65 * 48, f2(16 * 48 / 66), PAL.light.gold) + '\n</svg>\n');
 
 for (const mode of ['light', 'dark']) {
   fs.writeFileSync(OUT + `zarparia-lockup-${mode}.svg`, lockup(PAL[mode], false));

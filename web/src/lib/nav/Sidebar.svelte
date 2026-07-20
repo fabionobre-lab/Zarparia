@@ -264,32 +264,34 @@
 	   INK box centre. Not box-centred, not top-aligned.
 
 	   Both SVGs are padded inside their own viewBoxes, so every number below
-	   converts spec px (ink) into layout px (box). Measured extrema:
-	     mark     viewBox "178 243 653 762"; ink y 255.1504..992.7713
-	              -> ink h 737.6209, ink centre y 623.96 (box centre 624.0)
-	              ink x 190.4051..818.5616 -> right pad 831 - 818.5616 = 12.4384
+	   converts spec px (ink) into layout px (box). Measured extrema (mark =
+	   2026-07-20 family shield redesign, exact Bezier extrema):
+	     mark     viewBox "0 0 1000 1176"; ink y 1.7077..1174.2924
+	              -> ink h 1172.5846, ink centre y 588.0 (box centre 588.0)
+	              ink x 0..1000 -> right pad 1000 - 1000 = 0
 	     wordmark viewBox "0 0 155.95 40";  cap "Z" y 7.4424..31.0
 	              -> cap h 23.5576, cap centre y 19.2212 (box centre 20.0)
 	              ink x 1.2822.. -> left pad 1.2822
 	   Arithmetic:
-	     mark box h  = 28.0 * 762 / 737.6209        = 28.9254px
+	     mark box h  = 28.0 * 1176 / 1172.5846      = 28.0816px
 	     word box h  = 15.9 *  40 /  23.5576        = 26.9977px
-	     mark pad R  = 28.9254 * 12.4384 / 762      =  0.4722px
+	     mark pad R  = 28.0816 * 0 / 1000           =  0px
 	     word pad L  = 26.9977 *  1.2822 /  40      =  0.8654px
-	     flex gap    = 7.0 - 0.4722 - 0.8654        =  5.6624px
-	     cap nudge   = 26.9977 * 0.7788 / 40
-	                     - 28.9254 * 0.04 / 762     =  0.5241px
+	     flex gap    = 7.0 - 0 - 0.8654             =  6.1346px
+	     cap nudge   = 26.9977 * 0.7788 / 40        =  0.5257px
 	   align-items:center aligns the two BOXES; the cap box sits 0.7788 units
-	   above the wordmark box centre while the crest ink sits only 0.04 units
-	   above its own, so the wordmark is pushed down by that difference to put
-	   the cap centre on the ink centre. */
+	   above the wordmark box centre. Unlike the old mark (ink centre 0.04
+	   above its box centre), the redesigned crest's ink centre coincides
+	   EXACTLY with its box centre (1176/2 = 588.0), so the mark side needs
+	   ZERO nudge and the wordmark is pushed down by the full cap offset alone
+	   to land the cap centre on the ink centre. */
 	.brand {
 		--rail-shield-px: 28;
 		--rail-cap-px: 15.9;
 		--rail-gap-px: 7;
-		--rail-mark-h: calc(var(--rail-shield-px) * 1px * 762 / 737.6209);
+		--rail-mark-h: calc(var(--rail-shield-px) * 1px * 1176 / 1172.5846);
 		--rail-word-h: calc(var(--rail-cap-px) * 1px * 40 / 23.5576);
-		--rail-mark-pad-r: calc(var(--rail-mark-h) * 12.4384 / 762);
+		--rail-mark-pad-r: 0px;
 		--rail-word-pad-l: calc(var(--rail-word-h) * 1.2822 / 40);
 
 		flex-shrink: 0;
@@ -311,9 +313,7 @@
 	.wordmark {
 		/* Cap-centring nudge — see the arithmetic above. transform, not margin,
 		   so it doesn't disturb the flex box centring it corrects. */
-		transform: translateY(
-			calc(var(--rail-word-h) * 0.7788 / 40 - var(--rail-mark-h) * 0.04 / 762)
-		);
+		transform: translateY(calc(var(--rail-word-h) * 0.7788 / 40));
 	}
 	.wordmark :global(svg) {
 		height: var(--rail-word-h);
