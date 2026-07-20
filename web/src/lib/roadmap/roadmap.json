@@ -90,10 +90,10 @@
 		{
 			"id": "trip-budget",
 			"title": { "en": "Trip budget & cost tracking", "pt": "Orçamento da viagem e controle de custos" },
-			"status": "building",
+			"status": "shipped",
 			"note": {
-				"en": "Estimate a cost per stop, with categories, and watch it against a trip budget bar. Logging what you actually spent comes next.",
-				"pt": "Estime um custo por parada, com categorias, e acompanhe na barra de orçamento da viagem. Registrar o que você realmente gastou vem a seguir."
+				"en": "Live now: estimate a cost per stop (with categories) and track the total against a colour-coded trip budget bar, in the trip and on the printed itinerary. Coming next: logging what you actually spent versus the estimate, then multi-currency and cost-splitting.",
+				"pt": "Já disponível: estime um custo por parada (com categorias) e acompanhe o total em uma barra de orçamento colorida, na viagem e no roteiro impresso. A seguir: registrar o que você realmente gastou em relação à estimativa e, depois, múltiplas moedas e divisão de custos."
 			}
 		},
 		{
