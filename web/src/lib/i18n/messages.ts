@@ -76,6 +76,10 @@ export interface Messages {
 	'demo.startExploring': string;
 	'demo.close': string;
 
+	// ── Public share route (routes/s/[token]/+page.svelte) ──
+	'publicShare.banner': string; // read-only-shared-trip notice, family demo-banner anatomy
+	'publicShare.cta': string; // "Plan your own trip" → '/'
+
 	// ── Home / trip list (+page.svelte) ──
 	'home.pageTitle': string;
 	'home.yourTrips': string;
@@ -128,6 +132,18 @@ export interface Messages {
 	'share.errCopy': string;
 	'share.errShare': string;
 	'share.errRemove': string;
+	// Public link (docs/public-share-route-spec.md) — anonymous, read-only,
+	// deliberately separate from the collaborator link controls above.
+	'share.publicHeading': string;
+	'share.publicHint': string;
+	'share.publicCreate': string;
+	'share.publicShareableLink': string; // aria-label for the readonly URL input
+	'share.publicRevoke': string;
+	'share.publicRevokeConfirmTitle': string;
+	'share.publicRevokeConfirmBody': string;
+	'share.publicErrLoad': string;
+	'share.publicErrCreate': string;
+	'share.publicErrRevoke': string;
 
 	// ── Creation wizard (CreationWizard.svelte) ──
 	'wizard.pageTitle': string;
@@ -229,6 +245,8 @@ export interface Messages {
 	'toast.tripImported': string;
 	'toast.photoDeleted': string;
 	'toast.photoMoved': string;
+	'toast.publicLinkCopied': string;
+	'toast.publicLinkRevoked': string;
 	'dialog.discard': string; // danger confirm-button label for the discard-changes dialog
 
 	// ── Segment editor (SegmentEditor.svelte) ──
@@ -580,6 +598,9 @@ const enGB: Messages = {
 	'demo.startExploring': 'Start exploring',
 	'demo.close': 'Close',
 
+	'publicShare.banner': "You're viewing a shared trip — read-only.",
+	'publicShare.cta': 'Plan your own trip',
+
 	'home.pageTitle': 'Zarparia',
 	'home.yourTrips': 'Your trips',
 	'home.importItinerary': 'Import itinerary',
@@ -628,6 +649,18 @@ const enGB: Messages = {
 	'share.errCopy': 'Could not copy. Select the link and copy manually.',
 	'share.errShare': 'Could not share.',
 	'share.errRemove': 'Could not remove this person.',
+	'share.publicHeading': 'Public link',
+	'share.publicHint':
+		'Anyone with this link can view the trip, read-only — no sign-in required. Good for sharing outside Zarparia.',
+	'share.publicCreate': 'Create public link',
+	'share.publicShareableLink': 'Public shareable link',
+	'share.publicRevoke': 'Revoke',
+	'share.publicRevokeConfirmTitle': 'Revoke public link?',
+	'share.publicRevokeConfirmBody':
+		"Anyone who has this link loses access immediately. This can't be undone — creating a new link later gives a different address.",
+	'share.publicErrLoad': 'Could not load the public link.',
+	'share.publicErrCreate': 'Could not create the public link.',
+	'share.publicErrRevoke': 'Could not revoke the public link.',
 
 	'wizard.pageTitle': 'New trip — Zarparia',
 	'wizard.newTrip': 'New trip',
@@ -725,6 +758,8 @@ const enGB: Messages = {
 	'toast.tripImported': 'Trip imported.',
 	'toast.photoDeleted': 'Photo deleted.',
 	'toast.photoMoved': 'Photo moved.',
+	'toast.publicLinkCopied': 'Public link copied.',
+	'toast.publicLinkRevoked': 'Public link revoked.',
 	'dialog.discard': 'Discard',
 
 	'seg.dragReorder': 'Drag to reorder segment',
@@ -1067,6 +1102,9 @@ const ptBR: Messages = {
 	'demo.startExploring': 'Começar a explorar',
 	'demo.close': 'Fechar',
 
+	'publicShare.banner': 'Você está vendo uma viagem compartilhada — somente leitura.',
+	'publicShare.cta': 'Planeje sua própria viagem',
+
 	'home.pageTitle': 'Viagens',
 	'home.yourTrips': 'Suas viagens',
 	'home.importItinerary': 'Importar roteiro',
@@ -1115,6 +1153,18 @@ const ptBR: Messages = {
 	'share.errCopy': 'Não foi possível copiar. Selecione o link e copie manualmente.',
 	'share.errShare': 'Não foi possível compartilhar.',
 	'share.errRemove': 'Não foi possível remover esta pessoa.',
+	'share.publicHeading': 'Link público',
+	'share.publicHint':
+		'Qualquer pessoa com este link pode ver a viagem, somente leitura — sem necessidade de entrar. Ótimo para compartilhar fora do Zarparia.',
+	'share.publicCreate': 'Criar link público',
+	'share.publicShareableLink': 'Link público compartilhável',
+	'share.publicRevoke': 'Revogar',
+	'share.publicRevokeConfirmTitle': 'Revogar o link público?',
+	'share.publicRevokeConfirmBody':
+		'Quem tiver este link perde o acesso imediatamente. Isso não pode ser desfeito — criar um novo link depois gera um endereço diferente.',
+	'share.publicErrLoad': 'Não foi possível carregar o link público.',
+	'share.publicErrCreate': 'Não foi possível criar o link público.',
+	'share.publicErrRevoke': 'Não foi possível revogar o link público.',
 
 	'wizard.pageTitle': 'Nova viagem — Zarparia',
 	'wizard.newTrip': 'Nova viagem',
@@ -1212,6 +1262,8 @@ const ptBR: Messages = {
 	'toast.tripImported': 'Viagem importada.',
 	'toast.photoDeleted': 'Foto excluída.',
 	'toast.photoMoved': 'Foto movida.',
+	'toast.publicLinkCopied': 'Link público copiado.',
+	'toast.publicLinkRevoked': 'Link público revogado.',
 	'dialog.discard': 'Descartar',
 
 	'seg.dragReorder': 'Arraste para reordenar o trecho',

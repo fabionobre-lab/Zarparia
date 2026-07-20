@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import { requireUser } from '$lib/server/guards';
 import { getDb } from '$lib/server/db';
 import { getTripForUser, roleFor } from '$lib/server/trips';
+import { getTripIdForPublicToken } from '$lib/server/public-links';
 import {
 	getPhotosToken,
 	clearPhotosTokenCookie,
@@ -23,10 +24,18 @@ import { mapPhotoToTrip } from '$lib/photo-mapping';
 import type { Trip } from '$lib/trip-engine';
 import { limit, userKey } from '$lib/server/ratelimit';
 
-/** All photos linked to the trip (any role that can see the trip). */
-export const GET: RequestHandler = async ({ locals, platform, params }) => {
-	const user = requireUser(locals);
+/** All photos linked to the trip: any role that can see the trip (session),
+ *  OR an active public-link token for THIS trip (public-share-route-spec.md —
+ *  the /s/[token] route has no session to authorize with instead). */
+export const GET: RequestHandler = async ({ locals, platform, params, url }) => {
 	const db = getDb(platform);
+	const publicToken = url.searchParams.get('token');
+	if (publicToken) {
+		const tripId = await getTripIdForPublicToken(db, publicToken);
+		if (tripId !== params.id) return json({ error: 'not_found' }, { status: 404 });
+		return json({ photos: await listTripPhotos(db, params.id) });
+	}
+	const user = requireUser(locals);
 	const role = await roleFor(db, user.id, params.id);
 	if (!role) return json({ error: 'not_found' }, { status: 404 });
 	return json({ photos: await listTripPhotos(db, params.id) });

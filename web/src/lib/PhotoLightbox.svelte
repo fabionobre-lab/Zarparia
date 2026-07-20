@@ -14,6 +14,7 @@
 		photos,
 		index = $bindable(0),
 		canEdit = false,
+		photoToken,
 		dayOptions = [],
 		captionFor,
 		onclose,
@@ -23,6 +24,8 @@
 		photos: TripPhoto[];
 		index?: number;
 		canEdit?: boolean;
+		/** Public-link token — see TripView.svelte's `photoToken` doc. */
+		photoToken?: string;
 		dayOptions?: DayOption[];
 		captionFor: (p: TripPhoto) => string;
 		onclose: () => void;
@@ -204,7 +207,7 @@
 		     Escape and the visible ✕). The inner frame stops propagation. -->
 		<button class="backdrop" tabindex="-1" aria-label={t('photos.close')} onclick={onclose}></button>
 		<div class="frame">
-			<img class="big" src={photoUrl(tripId, photo.id, 'disp')} alt={captionFor(photo)} />
+			<img class="big" src={photoUrl(tripId, photo.id, 'disp', photoToken)} alt={captionFor(photo)} />
 			<div class="chrome">
 				<div class="caption">{captionFor(photo)}</div>
 				{#if canEdit}

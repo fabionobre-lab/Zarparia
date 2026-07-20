@@ -262,6 +262,7 @@ async function purgeTrip(db: D1Database, bucket: R2Bucket, tripId: string): Prom
 	await db.prepare('DELETE FROM trip_photos WHERE trip_id = ?').bind(tripId).run();
 	await db.prepare('DELETE FROM trip_shares WHERE trip_id = ?').bind(tripId).run();
 	await db.prepare('DELETE FROM trip_share_links WHERE trip_id = ?').bind(tripId).run();
+	await db.prepare('DELETE FROM trip_public_links WHERE trip_id = ?').bind(tripId).run();
 	await db.prepare('DELETE FROM trips WHERE id = ?').bind(tripId).run();
 }
 

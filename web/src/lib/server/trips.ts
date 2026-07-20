@@ -145,6 +145,15 @@ export async function getTripForUser(
 	return { doc: JSON.parse(row.doc) as TripDoc, role, updatedAt: row.updatedAt };
 }
 
+/** Trip doc by id, with NO access check — for the public /s/[token] route,
+ *  which authorizes via a public-link token (see server/public-links.ts)
+ *  rather than a user id, so roleFor/getTripForUser don't apply. Callers must
+ *  already have verified the token before reaching here. */
+export async function getTripDocById(db: D1Database, tripId: string): Promise<TripDoc | null> {
+	const row = await db.prepare('SELECT doc FROM trips WHERE id = ?').bind(tripId).first<{ doc: string }>();
+	return row ? (JSON.parse(row.doc) as TripDoc) : null;
+}
+
 export async function createTrip(
 	db: D1Database,
 	userId: string,

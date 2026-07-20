@@ -2,6 +2,8 @@
 	import type { ShareRow, SharePermission } from '$lib/server/shares';
 	import { t } from '$lib/i18n/store.svelte';
 	import { busyButton } from '$lib/actions/busyButton';
+	import { toast } from '$lib/toast';
+	import ConfirmDialog from '$lib/dialog/ConfirmDialog.svelte';
 
 	let { tripId }: { tripId: string } = $props();
 
@@ -21,6 +23,16 @@
 	let linkError = $state('');
 	let copied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | undefined;
+
+	// Public link (docs/public-share-route-spec.md) — anonymous, read-only,
+	// a separate control from the collaborator link above (different table,
+	// different grant: never signs the visitor into anything).
+	type PublicLinkInfo = { url: string } | null;
+	let publicLink = $state<PublicLinkInfo>(null);
+	let publicLoading = $state(true);
+	let publicBusy = $state(false);
+	let publicError = $state('');
+	let publicRevokeOpen = $state(false);
 
 	async function load() {
 		loading = true;
@@ -54,7 +66,63 @@
 	$effect(() => {
 		load();
 		loadLink();
+		loadPublicLink();
 	});
+
+	async function loadPublicLink() {
+		publicError = '';
+		try {
+			const res = await fetch(`/api/trips/${tripId}/public-link`);
+			if (res.ok) publicLink = ((await res.json()) as { link: PublicLinkInfo }).link;
+			else publicError = t('share.publicErrLoad');
+		} catch {
+			publicError = t('share.publicErrLoad');
+		} finally {
+			publicLoading = false;
+		}
+	}
+
+	async function createPublicLink() {
+		publicBusy = true;
+		publicError = '';
+		try {
+			const res = await fetch(`/api/trips/${tripId}/public-link`, { method: 'PUT' });
+			if (res.ok) publicLink = ((await res.json()) as { link: PublicLinkInfo }).link;
+			else publicError = t('share.publicErrCreate');
+		} catch {
+			publicError = t('share.errNetwork');
+		} finally {
+			publicBusy = false;
+		}
+	}
+
+	async function copyPublicLink() {
+		if (!publicLink) return;
+		try {
+			await navigator.clipboard.writeText(publicLink.url);
+			toast(t('toast.publicLinkCopied'));
+		} catch {
+			publicError = t('share.errCopy');
+		}
+	}
+
+	async function confirmRevokePublicLink() {
+		publicBusy = true;
+		publicError = '';
+		try {
+			const res = await fetch(`/api/trips/${tripId}/public-link`, { method: 'DELETE' });
+			if (res.ok) {
+				publicLink = null;
+				toast(t('toast.publicLinkRevoked'));
+			} else {
+				publicError = t('share.publicErrRevoke');
+			}
+		} catch {
+			publicError = t('share.errNetwork');
+		} finally {
+			publicBusy = false;
+		}
+	}
 
 	async function changeLink(e: Event) {
 		const next = (e.currentTarget as HTMLSelectElement).value as 'off' | SharePermission;
@@ -164,6 +232,42 @@
 		{/if}
 		{#if linkError}<p class="err">{linkError}</p>{/if}
 	</section>
+
+	<section class="linkshare">
+		<span class="lbl">{t('share.publicHeading')}</span>
+		<p class="hint public-hint">{t('share.publicHint')}</p>
+		{#if publicLink}
+			<div class="linkrow">
+				<input
+					class="linkurl"
+					type="text"
+					readonly
+					value={publicLink.url}
+					aria-label={t('share.publicShareableLink')}
+				/>
+				<button type="button" class="copy" onclick={copyPublicLink} use:busyButton={publicBusy}>
+					{t('share.copy')}
+				</button>
+			</div>
+			<button type="button" class="rm" onclick={() => (publicRevokeOpen = true)} use:busyButton={publicBusy}>
+				{t('share.publicRevoke')}
+			</button>
+		{:else if !publicLoading}
+			<button type="button" onclick={createPublicLink} use:busyButton={publicBusy}>
+				{t('share.publicCreate')}
+			</button>
+		{/if}
+		{#if publicError}<p class="err">{publicError}</p>{/if}
+	</section>
+
+	<ConfirmDialog
+		bind:open={publicRevokeOpen}
+		title={t('share.publicRevokeConfirmTitle')}
+		body={t('share.publicRevokeConfirmBody')}
+		confirmLabel={t('share.publicRevoke')}
+		cancelLabel={t('common.cancel')}
+		onconfirm={confirmRevokePublicLink}
+	/>
 
 	<form onsubmit={add}>
 		<input type="email" bind:value={email} placeholder={t('share.emailPlaceholder')} required />
@@ -342,5 +446,12 @@
 		font-size: 0.72rem;
 		color: var(--text-muted);
 		margin-top: 0.6rem;
+	}
+	.public-hint {
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+	}
+	.linkshare .rm {
+		margin-top: 0.5rem;
 	}
 </style>

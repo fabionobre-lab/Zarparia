@@ -41,6 +41,7 @@
 		lang = $bindable(untrack(() => trip.defaultLanguage || trip.languages[0])),
 		photos = [],
 		photosEditable = false,
+		photoToken,
 		onphotoschanged
 	}: {
 		trip: Trip;
@@ -48,6 +49,10 @@
 		/** Google Photos linked to this trip (omitted in editor previews). */
 		photos?: TripPhoto[];
 		photosEditable?: boolean;
+		/** Public-link token (public-share-route-spec.md) — set only on the
+		 *  /s/[token] route, where photo requests have no session to authorize
+		 *  with instead. Threaded into every photoUrl() call below. */
+		photoToken?: string;
 		/** Called after a photo was moved/deleted from the lightbox, so the
 		 *  owner of `photos` can refetch. */
 		onphotoschanged?: () => void;
@@ -477,7 +482,7 @@
 			out.push({
 				lat: b.coords.lat,
 				lon: b.coords.lon,
-				thumbUrl: photoUrl(trip.id, list[0].id, 'thumb'),
+				thumbUrl: photoUrl(trip.id, list[0].id, 'thumb', photoToken),
 				count: list.length,
 				blockIndex: bi
 			});
@@ -784,7 +789,7 @@
 										<div class="ph-strip">
 											{#each bp as p, pi (p.id)}
 												<button class="ph-thumb" onclick={() => openLightbox(bp, pi)} aria-label={uiText.openPhoto}>
-													<img src={photoUrl(trip.id, p.id, 'thumb')} alt="" loading="lazy" />
+													<img src={photoUrl(trip.id, p.id, 'thumb', photoToken)} alt="" loading="lazy" />
 												</button>
 											{/each}
 										</div>
@@ -809,7 +814,7 @@
 							<div class="ph-strip">
 								{#each dayLevelPhotos as p, pi (p.id)}
 									<button class="ph-thumb" onclick={() => openLightbox(dayLevelPhotos, pi)} aria-label={uiText.openPhoto}>
-										<img src={photoUrl(trip.id, p.id, 'thumb')} alt="" loading="lazy" />
+										<img src={photoUrl(trip.id, p.id, 'thumb', photoToken)} alt="" loading="lazy" />
 									</button>
 								{/each}
 							</div>
@@ -825,7 +830,7 @@
 				<div class="ph-strip">
 					{#each unmatchedPhotos as p, pi (p.id)}
 						<button class="ph-thumb" onclick={() => openLightbox(unmatchedPhotos, pi)} aria-label={uiText.openPhoto}>
-							<img src={photoUrl(trip.id, p.id, 'thumb')} alt="" loading="lazy" />
+							<img src={photoUrl(trip.id, p.id, 'thumb', photoToken)} alt="" loading="lazy" />
 						</button>
 					{/each}
 				</div>
@@ -840,6 +845,7 @@
 		photos={lbList}
 		bind:index={lbIdx}
 		canEdit={photosEditable}
+		{photoToken}
 		dayOptions={lightboxDayOptions}
 		captionFor={photoCaption}
 		onclose={() => (lbList = null)}
