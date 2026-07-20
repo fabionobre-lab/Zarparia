@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { requireUser } from '$lib/server/guards';
 import { getDb } from '$lib/server/db';
 import { getTripForUser } from '$lib/server/trips';
-import { getPhotosBucket, reassignTripPhoto, deleteTripPhoto } from '$lib/server/photos';
+import { getPhotosBucket, reassignTripPhoto, deleteTripPhoto, purgeExpiredPhotos } from '$lib/server/photos';
 import type { PhotoPlacement } from '$lib/photo-mapping';
 import type { Trip } from '$lib/trip-engine';
 
@@ -49,8 +49,18 @@ export const DELETE: RequestHandler = async ({ locals, platform, params }) => {
 	if (!trip) return json({ error: 'not_found' }, { status: 404 });
 	if (trip.role === 'viewer') return json({ error: 'forbidden' }, { status: 403 });
 
-	const ok = await deleteTripPhoto(db, getPhotosBucket(platform), params.id, params.photoId);
+	// Soft-delete only — no R2 purge here (see photos.ts for why). This is
+	// what lets the caller offer Undo.
+	const ok = await deleteTripPhoto(db, params.id, params.photoId);
 	if (!ok) return json({ error: 'not_found' }, { status: 404 });
+
+	// Sweep AFTER the delete, not before: the primary job of this handler is
+	// to soft-delete the target photo and return promptly, so the response
+	// isn't gated on an unrelated cleanup of *other*, already-old rows.
+	// Best-effort — a sweep failure must not turn a successful delete into an
+	// error response.
+	await purgeExpiredPhotos(db, getPhotosBucket(platform), params.id).catch(() => {});
+
 	return json({ ok: true });
 };
 

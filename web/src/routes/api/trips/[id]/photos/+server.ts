@@ -18,7 +18,8 @@ import {
 	photoExists,
 	insertTripPhoto,
 	photoR2Key,
-	PHOTO_SIZES
+	PHOTO_SIZES,
+	purgeExpiredPhotos
 } from '$lib/server/photos';
 import { mapPhotoToTrip } from '$lib/photo-mapping';
 import type { Trip } from '$lib/trip-engine';
@@ -69,6 +70,16 @@ export const POST: RequestHandler = async ({ locals, platform, params, cookies, 
 	const trip = await getTripForUser(db, user.id, params.id);
 	if (!trip) return json({ error: 'not_found' }, { status: 404 });
 	if (trip.role === 'viewer') return json({ error: 'forbidden' }, { status: 403 });
+
+	// Sweep BEFORE importing, not after: a photo soft-deleted >7 days ago
+	// still occupies its (trip_id, media_item_id) UNIQUE slot (photoExists is
+	// deliberately unfiltered by deleted_at — see photos.ts) until purged, so
+	// clearing expired rows first is what lets re-picking that same photo
+	// insert cleanly instead of racing/conflicting with the stale row. This
+	// is also the routine "already-here" moment to tidy up storage, ahead of
+	// this call adding more of it. Best-effort — a sweep failure must not
+	// block a legitimate import.
+	await purgeExpiredPhotos(db, bucket, params.id).catch(() => {});
 
 	const token = getPhotosToken(cookies, user.id);
 	if (!token) return json({ reason: 'reconnect' }, { status: 401 });

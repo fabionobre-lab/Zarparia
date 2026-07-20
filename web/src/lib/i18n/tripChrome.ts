@@ -17,6 +17,11 @@ export interface TripChromeMessages {
 	photos: string;
 	unmatchedPhotos: string;
 	openPhoto: string;
+	/** Small muted suffix on a weather badge when offline + showing
+	 *  cached/static data (Phase 6 item 5, audit weakest-point 10). */
+	wxOffline: string;
+	/** Tooltip on that same badge, spelling out why. */
+	wxOfflineHint: string;
 }
 
 export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
@@ -28,7 +33,9 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		now: 'Now',
 		photos: 'Photos',
 		unmatchedPhotos: 'Photos not on the itinerary',
-		openPhoto: 'Open photo'
+		openPhoto: 'Open photo',
+		wxOffline: '(offline)',
+		wxOfflineHint: 'Showing weather saved before you went offline.'
 	},
 	pt: {
 		maps: 'Abrir no Maps',
@@ -38,7 +45,9 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		now: 'Agora',
 		photos: 'Fotos',
 		unmatchedPhotos: 'Fotos fora do roteiro',
-		openPhoto: 'Abrir foto'
+		openPhoto: 'Abrir foto',
+		wxOffline: '(offline)',
+		wxOfflineHint: 'Mostrando o clima salvo antes de você ficar offline.'
 	}
 };
 

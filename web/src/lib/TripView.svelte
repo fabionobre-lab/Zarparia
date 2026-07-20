@@ -32,6 +32,8 @@
 	import { tripChrome } from './i18n/tripChrome';
 	import { photoUrl, type TripPhoto } from './photos';
 	import { getNow } from './now';
+	import { formatTemp } from './format';
+	import { isOnline } from './online.svelte';
 	import { setTripNav, type TripNavVM } from './nav/tripNav.svelte';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
@@ -272,6 +274,14 @@
 	   hero toggle), not the UI locale — hence the typed tripChrome catalog
 	   instead of t(). See lib/i18n/tripChrome.ts. */
 	const uiText = $derived(tripChrome[lang === 'pt' ? 'pt' : 'en']);
+
+	// Offline-stale-weather hint (Phase 6 item 5, audit weakest-point 10):
+	// weather has no persistent cache (see SegWeather.fetchedAt's doc comment
+	// in trip-engine.ts) — while offline, a fetch can't have just succeeded,
+	// so any badge rendered at all is necessarily held-over/static data. The
+	// gate is simply "are we offline right now", checked alongside the
+	// existing wx/badge presence checks at each render site.
+	const offline = $derived(!isOnline());
 
 	function setLang(l: string) {
 		lang = l;
@@ -658,8 +668,13 @@
 								<div class="wx-hdr">
 									{#if wx}
 										<div class="wx-hdr-item" aria-hidden="true">{wx.emoji}</div>
-										<div class="wx-hdr-item">↑{wx.hi}°C</div>
-										<div class="wx-hdr-item">↓{wx.lo}°C</div>
+										<div class="wx-hdr-item">↑{formatTemp(wx.hi)}</div>
+										<div class="wx-hdr-item">↓{formatTemp(wx.lo)}</div>
+										{#if offline}
+											<div class="wx-hdr-item wx-hdr-offline" title={uiText.wxOfflineHint}>
+												{uiText.wxOffline}
+											</div>
+										{/if}
 									{/if}
 									{#if km}<div class="wx-hdr-item wx-km">🦶 ~{km.toFixed(1)} km</div>{/if}
 								</div>
@@ -728,7 +743,10 @@
 									<div class="tb-time">
 										{b.time}
 										{#if badge && !isPast}
-											<div class="wx"><span aria-hidden="true">{badge.emoji}</span> {badge.temp}°C</div>
+											<div class="wx" title={offline ? uiText.wxOfflineHint : undefined}>
+												<span aria-hidden="true">{badge.emoji}</span> {formatTemp(badge.temp)}
+												{#if offline}<span class="wx-offline">{uiText.wxOffline}</span>{/if}
+											</div>
 										{/if}
 									</div>
 									<div class="tb-dot-col">
@@ -1342,6 +1360,11 @@
 		padding-left: 8px;
 		border-left: 1px solid rgba(255, 255, 255, 0.25);
 	}
+	/* Offline-stale-weather hint (Phase 6 item 5): same muted white already
+	   used for .dh-note in this hero-photo context, not a new token. */
+	.wx-hdr-offline {
+		color: rgba(255, 255, 255, 0.55);
+	}
 	.tl {
 		padding: 2px 13px 0;
 	}
@@ -1833,6 +1856,12 @@
 		margin-top: 3px;
 		line-height: 1.2;
 		text-align: center;
+	}
+	/* Offline-stale-weather hint (Phase 6 item 5): .wx is already the muted
+	   token; this just de-emphasizes the suffix a touch further, matching the
+	   .dh-eye opacity-on-top-of-muted-color pattern used elsewhere in this file. */
+	.wx-offline {
+		opacity: 0.7;
 	}
 
 	/* ── Desktop: two-pane layout ──

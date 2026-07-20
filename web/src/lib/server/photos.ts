@@ -57,7 +57,7 @@ export async function listTripPhotos(db: D1Database, tripId: string): Promise<Tr
 		.prepare(
 			`SELECT id, trip_id, creation_time, width, height, content_type,
 			        segment_id, plan_id, day_date, block_index, manual_override
-			 FROM trip_photos WHERE trip_id = ? ORDER BY creation_time, id`
+			 FROM trip_photos WHERE trip_id = ? AND deleted_at IS NULL ORDER BY creation_time, id`
 		)
 		.bind(tripId)
 		.all<PhotoRow>();
@@ -73,7 +73,7 @@ export async function getTripPhoto(
 		.prepare(
 			`SELECT id, trip_id, creation_time, width, height, content_type,
 			        segment_id, plan_id, day_date, block_index, manual_override
-			 FROM trip_photos WHERE id = ? AND trip_id = ?`
+			 FROM trip_photos WHERE id = ? AND trip_id = ? AND deleted_at IS NULL`
 		)
 		.bind(photoId, tripId)
 		.first<PhotoRow>();
@@ -81,7 +81,18 @@ export async function getTripPhoto(
 }
 
 /** True when this media item is already linked to the trip (re-picking the
- *  same photo must be a cheap no-op, before any bytes are downloaded). */
+ *  same photo must be a cheap no-op, before any bytes are downloaded).
+ *
+ *  Deliberately NOT filtered by deleted_at: (trip_id, media_item_id) is
+ *  UNIQUE, so a soft-deleted row for this media item still occupies that
+ *  slot until the lazy purge removes it. If this counted only *visible*
+ *  rows as "existing", re-picking a photo deleted less than 7 days ago
+ *  would re-download its bytes and then fail on that UNIQUE constraint (or,
+ *  worse, resurrect it under a fresh id/R2 keys and orphan the original R2
+ *  objects, since the purge sweep finds rows by id). Treating any row —
+ *  deleted or not — as "existing" keeps re-picking a cheap no-op either way;
+ *  once the purge clears the old row (see purgeExpiredPhotos), re-picking
+ *  the same photo naturally goes through as a fresh import again. */
 export async function photoExists(db: D1Database, tripId: string, mediaItemId: string): Promise<boolean> {
 	const row = await db
 		.prepare('SELECT 1 FROM trip_photos WHERE trip_id = ? AND media_item_id = ?')
@@ -155,17 +166,70 @@ export async function reassignTripPhoto(
 	return res.meta.changes > 0;
 }
 
-export async function deleteTripPhoto(
-	db: D1Database,
-	bucket: R2Bucket,
-	tripId: string,
-	photoId: string
-): Promise<boolean> {
+/** Soft-delete: stamp deleted_at instead of removing the row, and leave the
+ *  R2 objects in place. This is what makes Undo possible — the row (and its
+ *  cached bytes) still exist for up to 7 days, until purgeExpiredPhotos
+ *  reaps it. Guarded by `deleted_at IS NULL` so deleting an already-deleted
+ *  photo is a no-op (false), not a clock reset. */
+export async function deleteTripPhoto(db: D1Database, tripId: string, photoId: string): Promise<boolean> {
 	const res = await db
-		.prepare('DELETE FROM trip_photos WHERE id = ? AND trip_id = ?')
+		.prepare(`UPDATE trip_photos SET deleted_at = datetime('now') WHERE id = ? AND trip_id = ? AND deleted_at IS NULL`)
 		.bind(photoId, tripId)
 		.run();
-	if (res.meta.changes === 0) return false;
-	await bucket.delete([photoR2Key(tripId, photoId, 'thumb'), photoR2Key(tripId, photoId, 'disp')]);
-	return true;
+	return res.meta.changes > 0;
+}
+
+/** Undo a soft delete: clear deleted_at so the photo is visible/servable
+ *  again. Idempotent — restoring an already-active photo is a harmless
+ *  no-op change, matching this codebase's other soft-delete restores
+ *  (e.g. public-links.ts's enable/revoke). Returns false only when no row
+ *  matches this id/tripId at all (e.g. it was already purged). */
+export async function restoreTripPhoto(db: D1Database, tripId: string, photoId: string): Promise<boolean> {
+	const res = await db
+		.prepare('UPDATE trip_photos SET deleted_at = NULL WHERE id = ? AND trip_id = ?')
+		.bind(photoId, tripId)
+		.run();
+	return res.meta.changes > 0;
+}
+
+/**
+ * Lazy/on-mutation purge for soft-deleted photos older than 7 days.
+ *
+ * There is deliberately no wrangler cron trigger for this: adapter-cloudflare
+ * builds this SvelteKit app down to a `_worker.js` that only exports
+ * `{ fetch }` — there's no clean `scheduled` event hook to wire a cron
+ * handler into without invasive build changes. Instead, this runs as a
+ * best-effort sweep on paths that already touch a trip's photos (the photo
+ * import POST and the photo DELETE handler): find this trip's photos
+ * soft-deleted more than 7 days ago, delete both their R2 renditions, then
+ * delete their D1 rows. A trip that never gets touched again after a delete
+ * will keep an ephemeral R2/D1 tail past 7 days, but any further activity on
+ * it — including the next delete — sweeps it.
+ */
+export async function purgeExpiredPhotos(db: D1Database, bucket: R2Bucket, tripId: string): Promise<void> {
+	const expired = await db
+		.prepare(
+			`SELECT id FROM trip_photos
+			 WHERE trip_id = ? AND deleted_at IS NOT NULL AND deleted_at < datetime('now', '-7 days')`
+		)
+		.bind(tripId)
+		.all<{ id: string }>();
+	if (expired.results.length === 0) return;
+
+	const keys = expired.results.flatMap((p) => [
+		photoR2Key(tripId, p.id, 'thumb'),
+		photoR2Key(tripId, p.id, 'disp')
+	]);
+	// R2 delete() caps a single call's key list; this trip's expired batch is
+	// small in practice (per-mutation sweep, not a global cron), but chunk
+	// defensively the same way account.ts's purgeTrip does.
+	for (let i = 0; i < keys.length; i += 1000) {
+		await bucket.delete(keys.slice(i, i + 1000));
+	}
+
+	const placeholders = expired.results.map(() => '?').join(',');
+	await db
+		.prepare(`DELETE FROM trip_photos WHERE trip_id = ? AND id IN (${placeholders})`)
+		.bind(tripId, ...expired.results.map((p) => p.id))
+		.run();
 }

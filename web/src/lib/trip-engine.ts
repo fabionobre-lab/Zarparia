@@ -283,6 +283,12 @@ export function dayKmTotal(day: Day): number {
 export interface SegWeather {
 	hourly?: Record<string, { temp: number; code: number }>;
 	daily?: Record<string, { hi: number; lo: number; emoji: string }>;
+	/** `Date.now()` when this result was fetched. There is no persistent
+	 *  (localStorage/SW) cache for weather today — this only survives for the
+	 *  lifetime of the in-memory rune it's stored in (see `wxBySeg` in
+	 *  TripView.svelte) — but it's enough to tell "just fetched" apart from
+	 *  "held over from before we went offline" for the offline-stale hint. */
+	fetchedAt?: number;
 }
 
 interface HourlyResponse {
@@ -313,7 +319,7 @@ export async function fetchSegmentWeather(seg: Segment): Promise<SegWeather | nu
 					code: d.hourly.weathercode[i]
 				};
 			});
-			return { hourly };
+			return { hourly, fetchedAt: Date.now() };
 		}
 		const r = await fetch(
 			`https://api.open-meteo.com/v1/forecast?latitude=${w.lat}&longitude=${w.lon}&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=${tz}&start_date=${start}&end_date=${end}`
@@ -327,7 +333,7 @@ export async function fetchSegmentWeather(seg: Segment): Promise<SegWeather | nu
 				emoji: wxEmoji(d.daily.weathercode[i])
 			};
 		});
-		return { daily };
+		return { daily, fetchedAt: Date.now() };
 	} catch {
 		return null; // offline / out of range → staticWeather fallback applies
 	}

@@ -176,9 +176,16 @@
 		try {
 			const res = await fetch(`/api/trips/${tripId}/photos/${target.id}`, { method: 'DELETE' });
 			if (res.ok) {
+				// Unlike moveTo, delete closes the lightbox immediately (there's
+				// nothing left to show once the current photo is gone) — the
+				// toast's Undo action is what gives the user a way back, same
+				// trivially-reversible-action idiom as the move-to-day flow.
 				onchanged();
 				onclose();
-				toast(t('toast.photoDeleted'));
+				toast(t('toast.photoDeleted'), {
+					actionLabel: t('common.undo'),
+					onAction: () => void undoDelete(target.id)
+				});
 			} else {
 				errMsg = t('photos.errSave');
 			}
@@ -186,6 +193,21 @@
 			errMsg = t('photos.errSave');
 		} finally {
 			busy = false;
+		}
+	}
+
+	/** Undo a delete: restore the soft-deleted row (clears deleted_at) so it
+	 *  reappears everywhere it was filtered out of. Runs from the toast
+	 *  action after the lightbox has already closed, so errors surface as a
+	 *  toast — same shape as undoMove. */
+	async function undoDelete(photoId: string) {
+		dismissToast();
+		try {
+			const res = await fetch(`/api/trips/${tripId}/photos/${photoId}/restore`, { method: 'POST' });
+			if (res.ok) onchanged();
+			else toast.danger(t('photos.errSave'));
+		} catch {
+			toast.danger(t('photos.errSave'));
 		}
 	}
 </script>
