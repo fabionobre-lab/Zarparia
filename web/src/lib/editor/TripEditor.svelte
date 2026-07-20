@@ -174,6 +174,14 @@
 		);
 	});
 
+	// Currency is stored as an upper-case ISO 4217 code (schema pattern
+	// ^[A-Z]{3}$); normalise as the user types and clear on empty so a blank
+	// field prunes away rather than failing validation.
+	function setCurrency(raw: string) {
+		const v = raw.trim().toUpperCase();
+		draft.currency = v === '' ? undefined : v;
+	}
+
 	const hasHome = $derived(!!draft.home);
 	function toggleHome(on: boolean) {
 		draft.home = on ? { name: '', postcode: '', lat: 0, lon: 0 } : undefined;
@@ -325,6 +333,11 @@
 				</div>
 
 				<LocalizedInput bind:value={draft.locales as never} {langs} label={t('editor.locale')} placeholder="en-GB" />
+
+				<div class="grid2 money">
+					<label class="f">{t('editor.currency')}<input type="text" maxlength="3" placeholder="GBP" value={draft.currency ?? ''} oninput={(e) => setCurrency(e.currentTarget.value)} /></label>
+					<label class="f">{t('editor.budget')}<input type="number" min="0" step="any" placeholder="0" bind:value={draft.budget} /></label>
+				</div>
 
 				<div class="homebase">
 					<label class="check"><input type="checkbox" checked={hasHome} onchange={(e) => toggleHome(e.currentTarget.checked)} /> {t('editor.homeBase')}</label>
@@ -564,6 +577,16 @@
 		display: grid;
 		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: 0.5rem;
+	}
+	.grid2 {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0.5rem;
+	}
+	.money {
+		margin-top: 0.75rem;
+		padding-top: 0.5rem;
+		border-top: 1px dashed var(--hairline);
 	}
 	select {
 		font: inherit;

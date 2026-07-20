@@ -155,6 +155,22 @@ export const guide: GuideCatalog = {
 						]
 					},
 					{
+						id: 'trip-budget',
+						title: 'Set a budget and track costs',
+						body: [
+							'Give a trip a currency and a total budget in Trip settings, then add an estimated cost — with an optional category (lodging, food, transport, activities, shopping or other) — to any stop in the block editor. Zarparia sums those into a per-day subtotal and a whole-trip total, shown against your budget as a colour-coded bar at the top of the trip: green while you have room, amber as you approach the limit, red once the estimate goes over.',
+							"Because each alternative plan has its own stops, the total re-calculates when you switch plans — so you can compare what two versions of the same days would cost. If you set no budget but still add costs, the bar just shows the running total."
+						]
+					},
+					{
+						id: 'booking-links',
+						title: 'Link to a hotel or reservation confirmation',
+						body: [
+							'In the block editor, any stop can carry one or more booking links — paste the URL of a hotel confirmation (Booking.com, Expedia, Airbnb, Hotels.com and others), a restaurant reservation, or a ticket. Leave the label blank and Zarparia names the pill from the link itself (for example a booking.com URL shows as "Booking.com"); set a label to override it.',
+							'The links show up as tappable pills on the stop in the trip view, and are listed in full — label and URL — on the printed/PDF itinerary. They travel with the trip, so anyone you share it with sees them too; only add links you\'re happy for those people to open.'
+						]
+					},
+					{
 						id: 'delete-account',
 						title: 'Delete my account',
 						body: [
@@ -372,6 +388,22 @@ export const guide: GuideCatalog = {
 						title: 'Imprimir ou salvar o roteiro em PDF',
 						body: [
 							'Abra a viagem e use o botão "Imprimir / Salvar PDF" perto do topo. Ele abre um documento limpo, formatado para A4, com a viagem inteira — cada dia e cada parada dispostos de forma corrida — e a janela de impressão do navegador aparece automaticamente. Escolha sua impressora para imprimir, ou selecione "Salvar como PDF" como destino para guardar um arquivo. Viagens compartilhadas podem ser impressas da mesma forma pelo link público.'
+						]
+					},
+					{
+						id: 'trip-budget',
+						title: 'Definir um orçamento e acompanhar os custos',
+						body: [
+							'Dê à viagem uma moeda e um orçamento total nas configurações da viagem e, em seguida, adicione um custo estimado — com uma categoria opcional (hospedagem, alimentação, transporte, atividades, compras ou outros) — a qualquer parada no editor de blocos. O Zarparia soma tudo em um subtotal por dia e um total da viagem inteira, mostrados em relação ao seu orçamento como uma barra colorida no topo da viagem: verde enquanto há folga, âmbar ao se aproximar do limite, vermelho quando a estimativa passa.',
+							'Como cada plano alternativo tem suas próprias paradas, o total é recalculado ao trocar de plano — assim você compara quanto custariam duas versões dos mesmos dias. Se você não definir um orçamento mas ainda adicionar custos, a barra apenas mostra o total acumulado.'
+						]
+					},
+					{
+						id: 'booking-links',
+						title: 'Vincular à confirmação de um hotel ou reserva',
+						body: [
+							'No editor de blocos, qualquer parada pode ter um ou mais links de reserva — cole a URL de uma confirmação de hotel (Booking.com, Expedia, Airbnb, Hotels.com e outros), de uma reserva em restaurante ou de um ingresso. Deixe o rótulo em branco e o Zarparia nomeia a pílula a partir do próprio link (por exemplo, uma URL do booking.com aparece como "Booking.com"); defina um rótulo para substituí-lo.',
+							'Os links aparecem como pílulas clicáveis na parada, na visualização da viagem, e são listados por completo — rótulo e URL — no roteiro impresso/PDF. Eles acompanham a viagem, então quem você compartilhá-la também os vê; adicione apenas links que você não se importe que essas pessoas abram.'
 						]
 					},
 					{

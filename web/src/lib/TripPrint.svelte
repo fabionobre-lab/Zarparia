@@ -5,13 +5,18 @@
 		type Segment,
 		type Plan,
 		type Day,
+		type CostCategory,
 		loc,
 		localeFor,
 		dayLabel,
-		dayKmTotal
+		dayKmTotal,
+		dayCostTotal,
+		tripCostTotal,
+		linkLabel,
+		safeUrl
 	} from './trip-engine';
 	import { tripChrome } from './i18n/tripChrome';
-	import { walkMinutes } from './format';
+	import { walkMinutes, formatMoney } from './format';
 
 	// A standalone, print-optimised document that lays out the WHOLE trip — every
 	// segment (its default plan), every day, every block — on A4 paper. Unlike
@@ -93,6 +98,23 @@
 		return tag ? L(tag.label) : null;
 	}
 
+	// ── Budget (Phase 6 budget) ── static, computed once. Uses each segment's
+	// default plan (empty planBySeg → tripCostTotal falls back to default/first),
+	// matching this document's own planOf() selection.
+	const money = (n: number) => formatMoney(n, trip.currency, locale);
+	const CATEGORY_EMOJI: Record<CostCategory, string> = {
+		lodging: '🛏️',
+		food: '🍽️',
+		transport: '🚕',
+		activities: '🎟️',
+		shopping: '🛍️',
+		other: '💷'
+	};
+	const estTotal = untrack(() => tripCostTotal(trip, {}));
+	const showBudget = untrack(() => (trip.budget ?? 0) > 0 || estTotal > 0);
+	const overBudget = untrack(() => (trip.budget ? estTotal > trip.budget : false));
+	const budgetDelta = untrack(() => (trip.budget ? Math.abs(trip.budget - estTotal) : 0));
+
 	onMount(() => {
 		if (!autoPrint) return;
 		// `?noauto` opens the document without the print dialog popping — handy for
@@ -128,6 +150,15 @@
 			{#if L(trip.eyebrow)}<div class="eyebrow">{L(trip.eyebrow)}</div>{/if}
 			<h1 class="doc-title">{L(trip.title)}</h1>
 			{#if metaLine}<div class="doc-range">{metaLine}</div>{/if}
+			{#if showBudget}
+				<div class="doc-budget" class:over={overBudget}>
+					<span class="db-label">{ui.budget}</span>
+					<span class="db-figs">{money(estTotal)}{#if trip.budget} {ui.budgetOf} {money(trip.budget)}{/if}</span>
+					{#if trip.budget}
+						<span class="db-remain">· {money(budgetDelta)} {overBudget ? ui.budgetOver : ui.budgetLeft}</span>
+					{/if}
+				</div>
+			{/if}
 		</header>
 
 		{#each segViews as { seg, plan } (seg.id)}
@@ -139,6 +170,7 @@
 
 				{#each plan.days as day (day.date)}
 					{@const km = dayKmTotal(day)}
+					{@const dayCost = dayCostTotal(day)}
 					{@const wx = day.staticWeather}
 					<div class="day">
 						<div class="day-hdr">
@@ -151,6 +183,9 @@
 								{#if km}
 									{@const wm = walkMinutes(km)}
 									<span class="fact">🦶 ~{km.toFixed(1)} km{#if wm} · ~{wm} {ui.walkSuffix}{/if}</span>
+								{/if}
+								{#if dayCost}
+									<span class="fact fact-cost">💷 {money(dayCost)}</span>
 								{/if}
 							</div>
 						</div>
@@ -176,6 +211,10 @@
 											{@const wm = walkMinutes(b.km)}
 											<div class="b-km">🚶 ~{b.km} km{#if wm} · ~{wm} {ui.walkSuffix}{/if}</div>
 										{/if}
+										{#if b.cost}
+											{@const cat = b.cost.category}
+											<div class="b-cost">{cat ? CATEGORY_EMOJI[cat] : '💷'} {money(b.cost.amount)}{#if cat} · {ui.costCat[cat]}{/if}</div>
+										{/if}
 										{#if L(b.warning)}<div class="b-warn">{L(b.warning)}</div>{/if}
 										{#if L(b.note)}<div class="b-note">{L(b.note)}</div>{/if}
 										{#if b.checklist}
@@ -195,6 +234,14 @@
 											<div class="b-spots">
 												<span class="b-spots-lbl">{ui.photos}:</span>
 												{b.photoSpots.map((sp) => sp.name).join(' · ')}
+											</div>
+										{/if}
+										{#if b.links?.length}
+											<div class="b-links">
+												{#each b.links as lk, li (li)}
+													{@const href = safeUrl(lk.url)}
+													{#if href}<div class="b-link">{linkLabel(lk)}: {href}</div>{/if}
+												{/each}
 											</div>
 										{/if}
 									</div>
@@ -301,6 +348,33 @@
 		font-size: 12px;
 		color: var(--doc-muted);
 		margin-top: 5px;
+	}
+	.doc-budget {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 7px;
+		margin-top: 7px;
+		font-size: 12px;
+	}
+	.db-label {
+		font-family: var(--font-ui, system-ui, sans-serif);
+		font-size: 9px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--doc-accent);
+		font-weight: 600;
+	}
+	.db-figs {
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+	}
+	.db-remain {
+		color: var(--doc-muted);
+		font-variant-numeric: tabular-nums;
+	}
+	.doc-budget.over .db-remain {
+		color: #7a2020;
 	}
 
 	.seg {
@@ -418,6 +492,18 @@
 		color: var(--doc-muted);
 		margin-top: 3px;
 	}
+	.b-cost {
+		font-size: 10px;
+		font-weight: 600;
+		color: var(--doc-accent);
+		margin-top: 3px;
+		font-variant-numeric: tabular-nums;
+	}
+	.fact-cost {
+		font-weight: 600;
+		color: var(--doc-accent);
+		font-variant-numeric: tabular-nums;
+	}
 	.b-warn {
 		font-size: 10.5px;
 		color: #7a2020;
@@ -468,6 +554,15 @@
 		text-transform: uppercase;
 		letter-spacing: 0.04em;
 		font-size: 8.5px;
+	}
+	.b-links {
+		font-size: 9.5px;
+		color: var(--doc-muted);
+		margin-top: 4px;
+		line-height: 1.45;
+	}
+	.b-link {
+		word-break: break-all;
 	}
 
 	.seg-footer {

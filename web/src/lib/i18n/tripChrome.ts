@@ -8,6 +8,8 @@
 // The single Messages-style interface below gives them the same compile-time
 // safety as the main catalog: a key missing from either language is a type
 // error.
+import type { CostCategory } from '../trip-engine';
+
 export interface TripChromeMessages {
 	maps: string;
 	dayRoute: string;
@@ -30,6 +32,15 @@ export interface TripChromeMessages {
 	/** Suffix after the estimated minutes on a walking-time hint, e.g.
 	 *  "~15 min {walkSuffix}" (Phase 6 item 3). */
 	walkSuffix: string;
+	/** Budget bar (Phase 6 budget): label, the "{spent} of {budget}" joiner,
+	 *  and the remaining/over-spend suffixes. */
+	budget: string;
+	budgetOf: string;
+	budgetLeft: string;
+	budgetOver: string;
+	/** Localized names for the six cost categories, used as the cost chip's
+	 *  accessible label/tooltip (the chip itself shows an emoji + amount). */
+	costCat: Record<CostCategory, string>;
 }
 
 export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
@@ -46,7 +57,19 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		openPhoto: 'Open photo',
 		wxOffline: '(offline)',
 		wxOfflineHint: 'Showing weather saved before you went offline.',
-		walkSuffix: 'min walk'
+		walkSuffix: 'min walk',
+		budget: 'Trip budget',
+		budgetOf: 'of',
+		budgetLeft: 'left',
+		budgetOver: 'over',
+		costCat: {
+			lodging: 'Lodging',
+			food: 'Food',
+			transport: 'Transport',
+			activities: 'Activities',
+			shopping: 'Shopping',
+			other: 'Other'
+		}
 	},
 	pt: {
 		maps: 'Abrir no Maps',
@@ -61,13 +84,31 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		openPhoto: 'Abrir foto',
 		wxOffline: '(offline)',
 		wxOfflineHint: 'Mostrando o clima salvo antes de você ficar offline.',
-		walkSuffix: 'min a pé'
+		walkSuffix: 'min a pé',
+		budget: 'Orçamento da viagem',
+		budgetOf: 'de',
+		budgetLeft: 'restante',
+		budgetOver: 'acima',
+		costCat: {
+			lodging: 'Hospedagem',
+			food: 'Alimentação',
+			transport: 'Transporte',
+			activities: 'Atividades',
+			shopping: 'Compras',
+			other: 'Outros'
+		}
 	}
 };
+
+/** String-valued trip-chrome keys (i.e. every key except the nested `costCat`
+ *  record, which callers read directly off the resolved catalog). */
+type TripChromeStringKey = {
+	[K in keyof TripChromeMessages]: TripChromeMessages[K] extends string ? K : never;
+}[keyof TripChromeMessages];
 
 /** Translate a trip-chrome key for the trip content language. Trips can carry
  *  arbitrary language codes; anything that isn't 'pt' falls back to English
  *  (matching TripView's original `lang === 'pt' ? … : …` behavior). */
-export function tripT(lang: string, key: keyof TripChromeMessages): string {
+export function tripT(lang: string, key: TripChromeStringKey): string {
 	return tripChrome[lang === 'pt' ? 'pt' : 'en'][key];
 }

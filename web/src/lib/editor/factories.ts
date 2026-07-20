@@ -115,6 +115,19 @@ export function pruneEmpty(value: unknown, keepEmptyStr = false): unknown {
 			const c = out.coords as Record<string, unknown>;
 			if (typeof c.lat !== 'number' || typeof c.lon !== 'number') delete out.coords;
 		}
+		// Block cost requires a positive amount (schema); a category-only or
+		// cleared cost can't validate, so drop the whole object rather than emit
+		// a confusing schema error.
+		if (out.cost && typeof out.cost === 'object') {
+			const c = out.cost as Record<string, unknown>;
+			if (typeof c.amount !== 'number' || !(c.amount > 0)) delete out.cost;
+		}
+		// A booking link requires a url (schema); an entry left with only a label
+		// can't validate, so drop those — and the whole array if none survive.
+		if (Array.isArray(out.links)) {
+			out.links = (out.links as Record<string, unknown>[]).filter((l) => typeof l.url === 'string');
+			if (!(out.links as unknown[]).length) delete out.links;
+		}
 		return Object.keys(out).length ? out : undefined;
 	}
 	if (value === '') return keepEmptyStr ? '' : undefined;

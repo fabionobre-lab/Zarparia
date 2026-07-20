@@ -15,6 +15,32 @@ export function formatTemp(celsius: number): string {
 	return (v < 0 ? MINUS : '') + Math.abs(v) + '°C';
 }
 
+/** Format a money amount for display. With a valid ISO 4217 `currency`, uses
+ *  the locale's currency style (e.g. "£45", "R$ 1.240"); whole amounts drop the
+ *  minor units, fractional amounts keep two. Falls back to a plain grouped
+ *  number when `currency` is absent or `Intl` rejects the code, so a
+ *  half-configured trip still shows sensible figures rather than throwing.
+ *  Display-only: never feed the formatted string back into storage. */
+export function formatMoney(amount: number, currency?: string, locale?: string): string {
+	const fraction = Number.isInteger(amount) ? 0 : 2;
+	if (currency) {
+		try {
+			return new Intl.NumberFormat(locale || undefined, {
+				style: 'currency',
+				currency,
+				minimumFractionDigits: fraction,
+				maximumFractionDigits: fraction
+			}).format(amount);
+		} catch {
+			// Invalid currency code — fall through to the plain number below.
+		}
+	}
+	return new Intl.NumberFormat(locale || undefined, {
+		minimumFractionDigits: fraction,
+		maximumFractionDigits: fraction
+	}).format(amount);
+}
+
 /** Average walking speed (km/h) used for the timeline's inter-stop
  *  walking-time hints (Phase 6 item 3, first half — hint only, no route
  *  optimization). */

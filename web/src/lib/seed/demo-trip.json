@@ -14,6 +14,8 @@
   ],
   "defaultLanguage": "en",
   "cover": "🏰",
+  "currency": "GBP",
+  "budget": 1200,
   "locales": {
     "en": "en-GB",
     "pt": "pt-BR"
@@ -201,6 +203,13 @@
                     "pt": "Táxi da Waverley até o hotel na Royal Mile. Deixar as malas, sem maratona de desfazer."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Edinburgh+Waverley+Station",
+                  "links": [
+                    { "url": "https://www.booking.com/hotel/gb/royal-mile-example.html" }
+                  ],
+                  "cost": {
+                    "amount": 480,
+                    "category": "lodging"
+                  },
                   "coords": {
                     "lat": 55.952,
                     "lon": -3.1883
@@ -222,6 +231,10 @@
                     "pt": "Joias da Coroa · Great Hall · Canhão da Uma Hora · vista sobre a New Town."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Edinburgh+Castle",
+                  "cost": {
+                    "amount": 19.5,
+                    "category": "activities"
+                  },
                   "warning": {
                     "en": "Timed-entry tickets sell out by mid-morning in April — book online the day before.",
                     "pt": "Ingressos com horário marcado esgotam no meio da manhã em abril — reserve online no dia anterior."
@@ -274,7 +287,11 @@
                     "pt": "Almoço rápido no pub — haggis, neeps and tatties para os corajosos."
                   },
                   "mapsUrl": "https://maps.google.com/?q=Royal+Mile+Edinburgh",
-                  "km": 0.8
+                  "km": 0.8,
+                  "cost": {
+                    "amount": 16,
+                    "category": "food"
+                  }
                 },
                 {
                   "time": "15:00",
@@ -1232,6 +1249,10 @@
                   },
                   "mapsUrl": "https://maps.google.com/?q=Dalwhinnie+Distillery",
                   "km": 0.2,
+                  "cost": {
+                    "amount": 22,
+                    "category": "activities"
+                  },
                   "coords": {
                     "lat": 56.9336,
                     "lon": -4.2333

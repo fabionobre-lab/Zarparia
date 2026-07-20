@@ -208,6 +208,8 @@ export interface Messages {
 	'editor.newLangCodeAria': string;
 	'editor.default': string;
 	'editor.locale': string;
+	'editor.currency': string;
+	'editor.budget': string;
 	'editor.homeBase': string;
 	'editor.findPlace': string;
 	'editor.name': string;
@@ -347,6 +349,11 @@ export interface Messages {
 	'block.wikiAria': string;
 	'block.fallbackImgPlaceholder': string;
 	'block.fallbackImgAria': string;
+	'block.links': string;
+	'block.linkUrlPlaceholder': string;
+	'block.linkUrlAria': string;
+	'block.linkLabelPlaceholder': string;
+	'block.linkLabelAria': string;
 	'block.planDiff': string;
 	'block.diffNone': string;
 	'block.diffAdded': string;
@@ -358,6 +365,15 @@ export interface Messages {
 	'block.checklistItem': string;
 	'block.checklistAddItem': string;
 	'block.checklistRemove': string;
+	'block.costAmount': string;
+	'block.costCategory': string;
+	'block.costCatNone': string;
+	'block.cat.lodging': string;
+	'block.cat.food': string;
+	'block.cat.transport': string;
+	'block.cat.activities': string;
+	'block.cat.shopping': string;
+	'block.cat.other': string;
 
 	// ── Place search (PlaceSearch.svelte) ──
 	'place.findPlace': string;
@@ -727,6 +743,8 @@ const enGB: Messages = {
 	'editor.newLangCodeAria': 'New language code',
 	'editor.default': 'Default',
 	'editor.locale': 'Locale (date format, e.g. en-GB)',
+	'editor.currency': 'Currency (ISO, e.g. GBP)',
+	'editor.budget': 'Budget (total)',
 	'editor.homeBase': 'Home base',
 	'editor.findPlace': 'Find place',
 	'editor.name': 'Name',
@@ -861,6 +879,11 @@ const enGB: Messages = {
 	'block.wikiAria': 'Photo spot Wikipedia page title',
 	'block.fallbackImgPlaceholder': 'Fallback image URL (optional)',
 	'block.fallbackImgAria': 'Photo spot fallback image URL',
+	'block.links': 'Booking links',
+	'block.linkUrlPlaceholder': 'https://booking.com/...',
+	'block.linkUrlAria': 'Booking link URL',
+	'block.linkLabelPlaceholder': 'Label (optional — auto-detected)',
+	'block.linkLabelAria': 'Booking link label',
 	'block.planDiff': 'Plan diff',
 	'block.diffNone': 'none',
 	'block.diffAdded': 'added',
@@ -872,6 +895,15 @@ const enGB: Messages = {
 	'block.checklistItem': 'Item',
 	'block.checklistAddItem': '+ Add item',
 	'block.checklistRemove': 'Remove checklist',
+	'block.costAmount': 'Cost',
+	'block.costCategory': 'Category',
+	'block.costCatNone': '— none —',
+	'block.cat.lodging': 'Lodging',
+	'block.cat.food': 'Food',
+	'block.cat.transport': 'Transport',
+	'block.cat.activities': 'Activities',
+	'block.cat.shopping': 'Shopping',
+	'block.cat.other': 'Other',
 
 	'place.findPlace': 'Find place',
 	'place.searchPlaceholder': 'Search for a place…',
@@ -1236,6 +1268,8 @@ const ptBR: Messages = {
 	'editor.newLangCodeAria': 'Novo código de idioma',
 	'editor.default': 'Padrão',
 	'editor.locale': 'Localidade (formato de data, ex.: en-GB)',
+	'editor.currency': 'Moeda (ISO, ex.: GBP)',
+	'editor.budget': 'Orçamento (total)',
 	'editor.homeBase': 'Base de origem',
 	'editor.findPlace': 'Buscar lugar',
 	'editor.name': 'Nome',
@@ -1370,6 +1404,11 @@ const ptBR: Messages = {
 	'block.wikiAria': 'Título da página da Wikipédia do ponto de foto',
 	'block.fallbackImgPlaceholder': 'URL de imagem alternativa (opcional)',
 	'block.fallbackImgAria': 'URL de imagem alternativa do ponto de foto',
+	'block.links': 'Links de reserva',
+	'block.linkUrlPlaceholder': 'https://booking.com/...',
+	'block.linkUrlAria': 'URL do link de reserva',
+	'block.linkLabelPlaceholder': 'Rótulo (opcional — detectado automaticamente)',
+	'block.linkLabelAria': 'Rótulo do link de reserva',
 	'block.planDiff': 'Diferença de plano',
 	'block.diffNone': 'nenhuma',
 	'block.diffAdded': 'adicionado',
@@ -1381,6 +1420,15 @@ const ptBR: Messages = {
 	'block.checklistItem': 'Item',
 	'block.checklistAddItem': '+ Adicionar item',
 	'block.checklistRemove': 'Remover lista',
+	'block.costAmount': 'Custo',
+	'block.costCategory': 'Categoria',
+	'block.costCatNone': '— nenhuma —',
+	'block.cat.lodging': 'Hospedagem',
+	'block.cat.food': 'Alimentação',
+	'block.cat.transport': 'Transporte',
+	'block.cat.activities': 'Atividades',
+	'block.cat.shopping': 'Compras',
+	'block.cat.other': 'Outros',
 
 	'place.findPlace': 'Buscar lugar',
 	'place.searchPlaceholder': 'Buscar um lugar…',

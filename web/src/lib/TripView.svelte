@@ -19,8 +19,12 @@
 		routePlaces,
 		routeUrl,
 		dayKmTotal,
+		dayCostTotal,
+		tripCostTotal,
+		type CostCategory,
 		fetchSegmentWeather,
 		safeUrl,
+		linkLabel,
 		buildIcs,
 		tripTimezone,
 		isoDateInTZ,
@@ -33,7 +37,7 @@
 	import { tripChrome } from './i18n/tripChrome';
 	import { photoUrl, type TripPhoto } from './photos';
 	import { getNow } from './now';
-	import { formatTemp, walkMinutes } from './format';
+	import { formatTemp, walkMinutes, formatMoney } from './format';
 	import { isOnline } from './online.svelte';
 	import { setTripNav, type TripNavVM } from './nav/tripNav.svelte';
 	import Tip from './Tip.svelte';
@@ -144,6 +148,31 @@
 	const L = (obj: Parameters<typeof loc>[1]) => loc(trip, obj, lang);
 	const planOf = (seg: Segment): Plan =>
 		seg.plans.find((p) => p.id === planBySeg[seg.id]) ?? seg.plans[0];
+
+	// ── Budget (Phase 6 budget) ──
+	// Money helper bound to the trip's currency + the content-language locale.
+	const money = (n: number) => formatMoney(n, trip.currency, localeFor(trip, lang));
+	const CATEGORY_EMOJI: Record<CostCategory, string> = {
+		lodging: '🛏️',
+		food: '🍽️',
+		transport: '🚕',
+		activities: '🎟️',
+		shopping: '🛍️',
+		other: '💷'
+	};
+	// Whole-trip estimate, plan-aware so switching plans re-totals (see
+	// tripCostTotal). Recomputes on plan changes via the planBySeg dependency.
+	const estTotal = $derived(tripCostTotal(trip, planBySeg));
+	// Show the budget bar when a target is set OR any stop carries a cost, so a
+	// trip that only estimates (no target yet) still surfaces its running total.
+	const showBudget = $derived((trip.budget ?? 0) > 0 || estTotal > 0);
+	// Bar fill is clamped to 100%; the numbers still show the true overspend.
+	const budgetRatio = $derived(trip.budget ? estTotal / trip.budget : null);
+	const budgetPct = $derived(budgetRatio === null ? 0 : Math.min(100, Math.round(budgetRatio * 100)));
+	// green ≤80% · amber ≤100% · red over — the universal traffic-light pattern.
+	const budgetState = $derived(
+		budgetRatio === null ? 'none' : budgetRatio > 1 ? 'over' : budgetRatio > 0.8 ? 'warn' : 'ok'
+	);
 
 	interface FlatDay {
 		seg: Segment;
@@ -680,6 +709,36 @@
 					{/each}
 				</div>
 			{/if}
+			{#if showBudget}
+				<div class="budget budget-{budgetState}">
+					<div class="budget-top">
+						<span class="budget-label">{uiText.budget}</span>
+						<span class="budget-figs">
+							<span class="budget-spent">{money(estTotal)}</span>
+							{#if trip.budget}
+								<span class="budget-of">{uiText.budgetOf} {money(trip.budget)}</span>
+							{/if}
+						</span>
+					</div>
+					{#if trip.budget}
+						<div
+							class="budget-track"
+							role="progressbar"
+							aria-valuemin="0"
+							aria-valuemax={trip.budget}
+							aria-valuenow={estTotal}
+							aria-label={uiText.budget}
+						>
+							<div class="budget-fill" style="width:{budgetPct}%"></div>
+						</div>
+						{@const delta = Math.abs((trip.budget ?? 0) - estTotal)}
+						<div class="budget-remain">
+							{money(delta)}
+							{budgetState === 'over' ? uiText.budgetOver : uiText.budgetLeft}
+						</div>
+					{/if}
+				</div>
+			{/if}
 		</div>
 	</div>
 
@@ -732,6 +791,7 @@
 			{@const day = current.day}
 			{@const wx = daySummary(seg, day)}
 			{@const km = dayKmTotal(day)}
+			{@const dayCost = dayCostTotal(day)}
 			{#key clampedIdx}
 				<div
 					class="day-content"
@@ -745,7 +805,7 @@
 							<div class="dh-eye">{dayLabel(day.date, localeFor(trip, lang))}</div>
 							<div class="dh-title">{L(day.title)}</div>
 							{#if L(day.note)}<div class="dh-note">{L(day.note)}</div>{/if}
-							{#if wx || km}
+							{#if wx || km || dayCost}
 								{@const dayWalkMin = km ? walkMinutes(km) : null}
 								<div class="wx-hdr">
 									{#if wx}
@@ -764,6 +824,9 @@
 										<div class="wx-hdr-item wx-km">
 											🦶 ~{km.toFixed(1)} km{#if dayWalkMin} · ~{dayWalkMin} {uiText.walkSuffix}{/if}
 										</div>
+									{/if}
+									{#if dayCost}
+										<div class="wx-hdr-item wx-cost">💷 {money(dayCost)}</div>
 									{/if}
 								</div>
 							{/if}
@@ -880,6 +943,26 @@
 									{#if b.km}
 										{@const blockWalkMin = walkMinutes(b.km)}
 										<div class="km-tag">🚶 ~{b.km} km{#if blockWalkMin} · ~{blockWalkMin} {uiText.walkSuffix}{/if}</div>
+									{/if}
+									{#if b.cost}
+										{@const cat = b.cost.category}
+										<div class="cost-tag">
+											<span aria-hidden="true">{cat ? CATEGORY_EMOJI[cat] : '💷'}</span>
+											{money(b.cost.amount)}{#if cat}<span class="cost-cat"> · {uiText.costCat[cat]}</span>{/if}
+										</div>
+									{/if}
+									{#if b.links?.length}
+										<div class="tb-links">
+											{#each b.links as lk, i (i)}
+												{@const href = safeUrl(lk.url)}
+												{#if href}
+													<a class="tb-link" {href} target="_blank" rel="noopener noreferrer">
+														<svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></svg>
+														{linkLabel(lk)}
+													</a>
+												{/if}
+											{/each}
+										</div>
 									{/if}
 									{#if L(b.warning)}<div class="tb-warn">{L(b.warning)}</div>{/if}
 									{#if L(b.note)}<div class="tb-note">{L(b.note)}</div>{/if}
@@ -1282,6 +1365,77 @@
 			transform: scale(0.97);
 		}
 	}
+	/* Budget bar (Phase 6 budget) — lives in the hero, so it inherits the
+	   white-on-dark hero palette (translucent white surfaces, a colour-coded
+	   fill). The traffic-light fill colour is driven by --budget-color, set by
+	   the state modifier class. */
+	.budget {
+		margin-top: 10px;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: var(--radius-md);
+		padding: 8px 11px;
+		color: #fff;
+	}
+	.budget-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 8px;
+	}
+	.budget-label {
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		font-size: 10px;
+		color: rgba(255, 255, 255, 0.7);
+	}
+	.budget-figs {
+		display: flex;
+		gap: 6px;
+		align-items: baseline;
+		font-size: 12px;
+		font-variant-numeric: tabular-nums;
+	}
+	.budget-spent {
+		font-weight: 700;
+	}
+	.budget-of {
+		color: rgba(255, 255, 255, 0.7);
+	}
+	.budget-track {
+		margin-top: 7px;
+		height: 6px;
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.18);
+		overflow: hidden;
+	}
+	.budget-fill {
+		height: 100%;
+		border-radius: inherit;
+		background: var(--budget-color, #86c98a);
+	}
+	@media (prefers-reduced-motion: no-preference) {
+		.budget-fill {
+			transition: width 0.35s ease;
+		}
+	}
+	.budget-remain {
+		margin-top: 5px;
+		font-size: 10.5px;
+		color: rgba(255, 255, 255, 0.8);
+		font-variant-numeric: tabular-nums;
+	}
+	.budget-ok {
+		--budget-color: #86c98a;
+	}
+	.budget-warn {
+		--budget-color: #e9c15f;
+	}
+	.budget-over {
+		--budget-color: #e58f7d;
+	}
+	.budget-over .budget-spent {
+		color: #f2b3a5;
+	}
 	.daynav-sentinel {
 		/* Zero footprint (height cancelled by the negative margin) — exists only
 		   so an IntersectionObserver can detect the moment the day nav below it
@@ -1487,6 +1641,13 @@
 		font-weight: 600;
 		padding-left: 8px;
 		border-left: 1px solid rgba(255, 255, 255, 0.25);
+	}
+	.wx-cost {
+		color: #f0d692;
+		font-weight: 600;
+		padding-left: 8px;
+		border-left: 1px solid rgba(255, 255, 255, 0.25);
+		font-variant-numeric: tabular-nums;
 	}
 	/* Offline-stale-weather hint (Phase 6 item 5): same muted white already
 	   used for .dh-note in this hero-photo context, not a new token. */
@@ -1896,6 +2057,49 @@
 		background: var(--surface-sunken);
 		border-radius: var(--radius-md);
 		padding: 1px 7px;
+	}
+	.cost-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		margin-top: 5px;
+		margin-left: 5px;
+		font-size: 10px;
+		font-weight: 600;
+		color: var(--accent-strong);
+		background: var(--surface-sunken);
+		border-radius: var(--radius-md);
+		padding: 1px 7px;
+		font-variant-numeric: tabular-nums;
+	}
+	.cost-cat {
+		font-weight: 400;
+		color: var(--text-muted);
+	}
+	.tb-links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 5px;
+		margin-top: 7px;
+	}
+	.tb-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		font-size: 11px;
+		font-weight: 600;
+		text-decoration: none;
+		color: var(--chip-booking-fg);
+		background: var(--chip-booking-bg);
+		border-radius: var(--radius-md);
+		padding: 3px 9px;
+	}
+	.tb-link:hover {
+		text-decoration: underline;
+	}
+	.tb-link svg {
+		flex-shrink: 0;
+		opacity: 0.85;
 	}
 	.tb-checklist {
 		margin-top: 8px;

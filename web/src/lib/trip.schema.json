@@ -29,6 +29,16 @@
       "type": "string",
       "description": "Optional emoji shown on the trip picker card, e.g. \"🏛️\""
     },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "ISO 4217 code for the trip's single currency (e.g. \"GBP\"), used to format every block cost and the budget. When absent, money figures render as plain numbers."
+    },
+    "budget": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "description": "Optional total spending target for the trip, in `currency`; drives the header budget progress bar (Phase 6 budget)."
+    },
     "locales": {
       "type": "object",
       "additionalProperties": { "type": "string" },
@@ -198,7 +208,33 @@
         },
         "description": { "$ref": "#/$defs/localized" },
         "mapsUrl": { "type": "string", "format": "uri", "pattern": "^https?://" },
+        "links": {
+          "description": "External booking/reservation links (hotel confirmations, restaurant reservations, tickets). Rendered as provider-labelled pills; the label is auto-derived from the URL host when omitted.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["url"],
+            "additionalProperties": false,
+            "properties": {
+              "url": { "type": "string", "format": "uri", "pattern": "^https?://" },
+              "label": { "type": "string", "description": "Optional display label; falls back to the provider name derived from the URL host." }
+            }
+          }
+        },
         "km": { "type": "number", "exclusiveMinimum": 0 },
+        "cost": {
+          "description": "Optional estimated cost of this stop, in the trip's `currency`. Summed into day, plan and whole-trip totals for the budget bar (Phase 6 budget).",
+          "type": "object",
+          "required": ["amount"],
+          "additionalProperties": false,
+          "properties": {
+            "amount": { "type": "number", "exclusiveMinimum": 0 },
+            "category": {
+              "enum": ["lodging", "food", "transport", "activities", "shopping", "other"],
+              "description": "Optional spend category, used for the cost chip's icon (and, later, a per-category breakdown)"
+            }
+          }
+        },
         "warning": { "$ref": "#/$defs/localized" },
         "note": { "$ref": "#/$defs/localized" },
         "coords": {

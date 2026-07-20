@@ -24,6 +24,21 @@ export interface Checklist {
 	title: Localized;
 	items: ChecklistItem[];
 }
+/** An external booking/reservation link on a block (hotel confirmation, etc.).
+ *  `label` is optional; when absent the UI derives a provider name from the
+ *  URL host via `linkLabel()`. */
+export interface BookingLink {
+	url: string;
+	label?: string;
+}
+/** Spend categories for a block cost — kept small (best-in-class apps use
+ *  ~5–7) so the per-category breakdown stays legible. */
+export type CostCategory = 'lodging' | 'food' | 'transport' | 'activities' | 'shopping' | 'other';
+export interface Cost {
+	/** Amount in the trip's single `currency` (positive). */
+	amount: number;
+	category?: CostCategory;
+}
 export interface Block {
 	time: string;
 	dotColor?: string;
@@ -31,9 +46,12 @@ export interface Block {
 	tags?: string[];
 	description?: Localized;
 	mapsUrl?: string;
+	/** External booking/reservation links (hotel confirmations, etc.). */
+	links?: BookingLink[];
 	km?: number;
 	warning?: Localized;
 	note?: Localized;
+	cost?: Cost;
 	coords?: { lat: number; lon: number };
 	waypoints?: Waypoint[];
 	photoSpots?: PhotoSpot[];
@@ -81,6 +99,10 @@ export interface Trip {
 	languages: string[];
 	defaultLanguage: string;
 	locales?: Record<string, string>;
+	/** ISO 4217 code (e.g. "GBP") for every block cost and the budget. */
+	currency?: string;
+	/** Total spending target for the trip, in `currency`. */
+	budget?: number;
 	home?: { name: string; postcode?: string; lat?: number; lon?: number };
 	tags?: Record<string, { label: Localized; style?: string }>;
 	/** Optional emoji shown on the trip picker card (parity with the static app's manifest "cover"). */
@@ -93,6 +115,38 @@ export interface Trip {
  *  slipped past schema validation. */
 export function safeUrl(u: string | undefined): string | undefined {
 	return u && /^https?:\/\//i.test(u) ? u : undefined;
+}
+
+/** Known booking providers, matched as a substring of the URL host (cosmetic
+ *  only — `safeUrl` is the security boundary). More-specific hosts first. */
+const LINK_PROVIDERS: ReadonlyArray<readonly [string, string]> = [
+	['booking.com', 'Booking.com'],
+	['hotels.com', 'Hotels.com'],
+	['expedia', 'Expedia'],
+	['airbnb', 'Airbnb'],
+	['agoda', 'Agoda'],
+	['vrbo', 'Vrbo'],
+	['hostelworld', 'Hostelworld'],
+	['tripadvisor', 'Tripadvisor'],
+	['trip.com', 'Trip.com'],
+	['marriott', 'Marriott'],
+	['hilton', 'Hilton'],
+	['accor', 'Accor'],
+	['ihg', 'IHG']
+];
+
+/** Display label for a booking link: an explicit `label` wins; otherwise the
+ *  provider name derived from the URL host, falling back to the bare host. */
+export function linkLabel(link: BookingLink): string {
+	if (link.label && link.label.trim()) return link.label.trim();
+	let host: string;
+	try {
+		host = new URL(link.url).hostname.toLowerCase().replace(/^www\./, '');
+	} catch {
+		return link.url;
+	}
+	for (const [needle, name] of LINK_PROVIDERS) if (host.includes(needle)) return name;
+	return host;
 }
 
 export function loc(trip: Trip, obj: Localized | undefined, lang: string): string {
@@ -288,6 +342,29 @@ export function routeUrl(places: RoutePlace[], routeMode?: string): string {
 
 export function dayKmTotal(day: Day): number {
 	return day.kmTotal || day.blocks.reduce((s, b) => s + (b.km || 0), 0);
+}
+
+/** Sum of every block's estimated cost on a day (0 when none carry a cost). */
+export function dayCostTotal(day: Day): number {
+	return day.blocks.reduce((s, b) => s + (b.cost?.amount || 0), 0);
+}
+
+/** Whole-trip estimated cost using each segment's currently-selected plan, so
+ *  the total tracks the itinerary the viewer is actually looking at (and shifts
+ *  when they switch between alternative plans). `planBySeg` mirrors TripView's
+ *  own selection map; a segment absent from it falls back to its default/first
+ *  plan. */
+export function tripCostTotal(trip: Trip, planBySeg: Record<string, string>): number {
+	let total = 0;
+	for (const seg of trip.segments) {
+		const plan =
+			seg.plans.find((p) => p.id === planBySeg[seg.id]) ??
+			seg.plans.find((p) => p.id === seg.defaultPlan) ??
+			seg.plans[0];
+		if (!plan) continue;
+		for (const day of plan.days) total += dayCostTotal(day);
+	}
+	return total;
 }
 
 // ── Weather fetch (client-side; network-first) ────────────────────────────

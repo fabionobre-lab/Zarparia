@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
-	import type { Block, Trip } from '$lib/trip-engine';
+	import type { Block, Trip, CostCategory } from '$lib/trip-engine';
 	import { move, removeAt, emptyLocalized } from './factories';
 	import LocalizedInput from './LocalizedInput.svelte';
 	import PlaceSearch from './PlaceSearch.svelte';
@@ -78,11 +78,40 @@
 		}
 	}
 
+	// ── Cost (Phase 6 budget) ──
+	// A cost is valid only with a positive amount; clearing the amount drops the
+	// whole object (category alone can't validate). Category is meaningless
+	// without an amount, so its <select> stays disabled until one is entered.
+	const COST_CATEGORIES: CostCategory[] = ['lodging', 'food', 'transport', 'activities', 'shopping', 'other'];
+	const catLabels = $derived<Record<CostCategory, string>>({
+		lodging: t('block.cat.lodging'),
+		food: t('block.cat.food'),
+		transport: t('block.cat.transport'),
+		activities: t('block.cat.activities'),
+		shopping: t('block.cat.shopping'),
+		other: t('block.cat.other')
+	});
+	function setCostAmount(raw: string) {
+		const v = raw === '' ? NaN : Number(raw);
+		if (!(v > 0)) {
+			block.cost = undefined;
+			return;
+		}
+		block.cost = { amount: v, category: block.cost?.category };
+	}
+	function setCostCategory(raw: string) {
+		if (!block.cost) return;
+		block.cost = { amount: block.cost.amount, category: raw === '' ? undefined : (raw as CostCategory) };
+	}
+
 	function addWaypoint() {
 		(block.waypoints ??= []).push({ query: '', name: emptyLocalized(langs) });
 	}
 	function addPhoto() {
 		(block.photoSpots ??= []).push({ name: '', mapsUrl: '' });
+	}
+	function addLink() {
+		(block.links ??= []).push({ url: '' });
 	}
 	function addChecklist() {
 		block.checklist = { title: emptyLocalized(langs), items: [{ text: emptyLocalized(langs), done: false }] };
@@ -147,6 +176,16 @@
 		</div>
 
 		<div class="grid2">
+			<label class="f">{t('block.costAmount')}<input type="number" step="0.01" min="0" value={block.cost?.amount ?? ''} oninput={(e) => setCostAmount(e.currentTarget.value)} /></label>
+			<label class="f">{t('block.costCategory')}
+				<select value={block.cost?.category ?? ''} onchange={(e) => setCostCategory(e.currentTarget.value)} disabled={!block.cost}>
+					<option value="">{t('block.costCatNone')}</option>
+					{#each COST_CATEGORIES as c (c)}<option value={c}>{catLabels[c]}</option>{/each}
+				</select>
+			</label>
+		</div>
+
+		<div class="grid2">
 			<label class="f">{t('block.lat')}<input type="number" step="any" value={block.coords?.lat ?? ''} oninput={(e) => setCoord('lat', e.currentTarget.value)} /></label>
 			<label class="f">{t('block.lon')}<input type="number" step="any" value={block.coords?.lon ?? ''} oninput={(e) => setCoord('lon', e.currentTarget.value)} /></label>
 		</div>
@@ -174,6 +213,17 @@
 					<input type="text" bind:value={ps.wiki} placeholder={t('block.wikiPlaceholder')} aria-label={t('block.wikiAria')} />
 					<input type="text" bind:value={ps.fallbackImg} placeholder={t('block.fallbackImgPlaceholder')} aria-label={t('block.fallbackImgAria')} />
 					<button type="button" class="del" onclick={() => removeAt(block.photoSpots!, i)}>✕</button>
+				</div>
+			{/each}
+		</div>
+
+		<div class="sub">
+			<div class="sub-hd"><span class="lbl">{t('block.links')}</span><button type="button" onclick={addLink}>+ {t('common.add')}</button></div>
+			{#each block.links ?? [] as lk, i (i)}
+				<div class="rowline">
+					<input type="url" bind:value={lk.url} placeholder={t('block.linkUrlPlaceholder')} aria-label={t('block.linkUrlAria')} />
+					<input type="text" bind:value={lk.label} placeholder={t('block.linkLabelPlaceholder')} aria-label={t('block.linkLabelAria')} />
+					<button type="button" class="del" onclick={() => removeAt(block.links!, i)}>✕</button>
 				</div>
 			{/each}
 		</div>
