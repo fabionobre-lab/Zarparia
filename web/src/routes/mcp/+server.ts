@@ -23,30 +23,123 @@ const DEFAULT_PROTOCOL = '2025-06-18';
 
 const INSTRUCTIONS =
 	'Manage the user\'s Zarparia travel itineraries. A trip is a single JSON document. ' +
-	'Before writing, call get_trip_schema to learn the document shape and see a minimal example. ' +
+	'Before writing, call get_trip_schema — it returns the document shape, authoring guidance, and a fully worked RICH example. ' +
+	'Always build the richest trip the source supports: a maps link (mapsUrl) on every real place, per-segment weather, photo spots, ' +
+	'per-block costs, booking links, tags and a cover emoji — the bare minimum (time + title only) renders a sparse, mostly empty trip. ' +
 	'To edit an existing trip, call get_trip first, modify the returned doc, then call update_trip ' +
 	'passing the same updatedAt back as base_updated_at so concurrent edits are detected. ' +
 	'create_trip and update_trip return validation details when the doc is rejected — fix the doc and retry.';
 
-// A minimal valid trip document, handed to the model alongside the schema so it
-// has a concrete, working starting point.
-const MINIMAL_EXAMPLE: TripDoc = {
-	id: 'sample-trip',
-	title: { en: 'Sample Trip' },
+// Handed to the model alongside the schema so a trip is built with EVERY
+// enrichment the renderer supports. Only `time` + `title` are strictly required
+// per block, but a doc with just those renders a sparse trip (no maps, no
+// weather, no photos, no budget) — hence this guidance nudges toward the rich
+// fields, and RICH_EXAMPLE below shows each one in context.
+const AUTHORING_GUIDANCE = [
+	'Aim for the RICHEST trip the source supports. Only `time` and `title` are required, but a doc with only those renders sparse — no map pins, no weather, no photos, no budget bar. Populate the enrichment fields below.',
+	'Maps: add `mapsUrl` to EVERY block that is a real place. Use a name-based search URL — `https://maps.google.com/?q=<Place+Name+City>` (spaces as +). This is always safe; never fabricate a precise address.',
+	'Coords: add block `coords` {lat, lon} ONLY when you know accurate coordinates (well-known landmarks). If unsure, omit them and rely on `mapsUrl` — do not guess lat/lon.',
+	'Weather: give each segment a `weather` {lat, lon, granularity:"daily", timezone} using the segment city\'s well-known coordinates and IANA timezone (e.g. "Europe/Rome"). This powers the live forecast strip.',
+	'Photo spots: add `photoSpots` [{name, mapsUrl, wiki?}] for scenic stops; `wiki` is the Wikipedia page title for a thumbnail.',
+	'Budget: set the trip `currency` (ISO 4217, e.g. "EUR") and a per-block `cost` {amount, category} so the budget bar works; optionally a trip `budget` total.',
+	'Tags: define a trip-level `tags` vocabulary and reference its keys from each block\'s `tags` for colored chips (styles: sight, food, booking, logistics, birthday, fullday).',
+	'Links: add block `links` [{url, label?}] for hotel/restaurant/ticket bookings.',
+	'Alternative plans: when a segment has a genuine fork (a rainy-day option, a with-kids vs without version, a longer vs shorter route), give it more than one entry in `plans` — each with its own `id`, a `label` (e.g. {"en":"Rainy day"}) and its full `days` — and set the segment `defaultPlan` to the primary plan\'s id. To flag how a plan differs, add `diffLabels` {added, changed, kept} to that plan and mark the relevant blocks with `diff` {kind, reason}. Only do this for a real choice — most segments have exactly one plan.',
+	'Finishing touches: a trip `cover` emoji, an `eyebrow` (e.g. the month), day `note`/`routeMode`/`banner`, `waypoints` for multi-stop days, and a `checklist` where useful.'
+];
+
+const RICH_EXAMPLE: TripDoc = {
+	id: 'sample-rome-weekend',
+	title: { en: 'A Weekend in Rome' },
+	eyebrow: { en: 'September 2026' },
+	cover: '🏛️',
 	languages: ['en'],
 	defaultLanguage: 'en',
+	currency: 'EUR',
+	budget: 600,
+	home: { name: 'London', postcode: 'SW1A 1AA', lat: 51.5014, lon: -0.1419 },
+	// Tag vocabulary — block `tags` reference these keys for colored chips.
+	tags: {
+		sight: { label: { en: 'Sightseeing' }, style: 'sight' },
+		food: { label: { en: 'Food' }, style: 'food' },
+		booking: { label: { en: 'Booked' }, style: 'booking' }
+	},
 	segments: [
 		{
-			id: 'main',
-			title: { en: 'Main' },
+			id: 'rome',
+			title: { en: 'Rome' },
+			subtitle: { en: 'Centro Storico' },
+			theme: 'navy',
+			// Enables the live weather strip — city lat/lon + IANA timezone.
+			weather: { lat: 41.9028, lon: 12.4964, granularity: 'daily', timezone: 'Europe/Rome' },
+			footer: { en: 'Buon viaggio!' },
+			defaultPlan: 'main',
 			plans: [
 				{
-					id: 'plan-a',
+					id: 'main',
 					days: [
 						{
-							date: '2026-05-01',
-							title: { en: 'Arrival' },
-							blocks: [{ time: '09:00', title: { en: 'Land at the airport' } }]
+							date: '2026-09-12',
+							title: { en: 'Rome — Day 1' },
+							note: { en: 'Comfortable shoes — lots of cobblestones.' },
+							routeMode: 'walking',
+							kmTotal: 4.5,
+							blocks: [
+								{
+									time: '09:30',
+									title: { en: 'Colosseum' },
+									tags: ['sight', 'booking'],
+									description: { en: 'Skip-the-line entry; arrive 15 min early.' },
+									mapsUrl: 'https://maps.google.com/?q=Colosseum+Rome',
+									coords: { lat: 41.8902, lon: 12.4922 },
+									links: [{ url: 'https://www.coopculture.it/en/colosseo-e-shop.cfm', label: 'Tickets' }],
+									cost: { amount: 18, category: 'activities' },
+									photoSpots: [
+										{
+											name: 'Arch of Constantine',
+											mapsUrl: 'https://maps.google.com/?q=Arch+of+Constantine+Rome',
+											wiki: 'Arch of Constantine'
+										}
+									]
+								},
+								{
+									time: '13:00',
+									title: { en: 'Lunch at Roscioli' },
+									tags: ['food'],
+									description: { en: 'Famous for cacio e pepe — reservation recommended.' },
+									mapsUrl: 'https://maps.google.com/?q=Roscioli+Rome',
+									coords: { lat: 41.8942, lon: 12.4736 },
+									km: 1.2,
+									cost: { amount: 45, category: 'food' },
+									warning: { en: 'Cash preferred for small tabs.' }
+								}
+							]
+						},
+						{
+							date: '2026-09-13',
+							title: { en: 'Rome — Day 2' },
+							banner: { en: '🎂 Birthday celebration!' },
+							routeMode: 'walking',
+							blocks: [
+								{
+									time: '10:00',
+									title: { en: 'Vatican Museums & Sistine Chapel' },
+									tags: ['sight', 'booking'],
+									description: { en: 'Enter via the Musei Vaticani entrance on Viale Vaticano.' },
+									mapsUrl: 'https://maps.google.com/?q=Vatican+Museums',
+									coords: { lat: 41.9065, lon: 12.4536 },
+									cost: { amount: 25, category: 'activities' },
+									// Intermediate stops folded into the day's Google Maps route.
+									waypoints: [{ query: 'St+Peters+Basilica+Rome', name: { en: "St Peter's Basilica" } }],
+									checklist: {
+										title: { en: 'Dress code' },
+										items: [
+											{ text: { en: 'Cover shoulders' }, done: false },
+											{ text: { en: 'Cover knees' }, done: false }
+										]
+									}
+								}
+							]
 						}
 					]
 				}
@@ -102,13 +195,14 @@ const TOOLS = [
 	},
 	{
 		name: 'get_trip_schema',
-		description: 'Return the JSON Schema for a trip document plus a minimal working example. Call before create_trip / update_trip.',
+		description:
+			'Return the JSON Schema for a trip document, authoring guidance for building a rich trip, and a fully worked rich example. Call before create_trip / update_trip.',
 		inputSchema: { type: 'object', properties: {}, additionalProperties: false }
 	},
 	{
 		name: 'create_trip',
 		description:
-			'Create a new trip. `doc` is a trip document (see get_trip_schema). Optional `id` sets the slug. On validation failure the errors are returned so you can fix the doc.',
+			'Create a new trip. `doc` is a trip document (see get_trip_schema). Build it as RICH as the source allows — a mapsUrl on every place, per-segment weather, photoSpots, per-block cost, booking links, tags and a cover emoji (get_trip_schema returns the full guidance and a worked example); a bare time+title doc renders a sparse trip. Optional `id` sets the slug. On validation failure the errors are returned so you can fix the doc.',
 		inputSchema: {
 			type: 'object',
 			properties: {
@@ -180,7 +274,7 @@ async function callTool(
 			return textContent({ doc: trip.doc, role: trip.role, updatedAt: trip.updatedAt });
 		}
 		case 'get_trip_schema': {
-			return textContent({ schema: tripSchema, minimalExample: MINIMAL_EXAMPLE });
+			return textContent({ schema: tripSchema, authoringGuidance: AUTHORING_GUIDANCE, example: RICH_EXAMPLE });
 		}
 		case 'create_trip': {
 			if (!args.doc || typeof args.doc !== 'object' || Array.isArray(args.doc))

@@ -188,7 +188,8 @@ export const guide: GuideCatalog = {
 						id: 'mcp',
 						title: 'Connect an AI assistant',
 						body: [
-							'Advanced/optional: Zarparia has an MCP connector that lets an AI assistant (for example, Claude) read and edit your trips on your behalf, once you approve the connection through a standard OAuth screen. Access tokens are stored hashed, and a pending account cannot use this even with a valid connection.'
+							'Advanced/optional: Zarparia has an MCP connector that lets an AI assistant (for example, Claude) read and edit your trips on your behalf, once you approve the connection through a standard OAuth screen. Access tokens are stored hashed, and a pending account cannot use this even with a valid connection.',
+							'Trips the assistant creates come fully built out — maps links, a live weather strip, photo spots, per-stop costs and booking links — not a bare skeleton. One thing to know: the connector acts as whichever account you approved it with, so sign in to Zarparia with that same account to see those trips in your list.'
 						]
 					},
 					{
@@ -424,7 +425,8 @@ export const guide: GuideCatalog = {
 						id: 'mcp',
 						title: 'Conectar um assistente de IA',
 						body: [
-							'Avançado/opcional: o Zarparia tem um conector MCP que permite a um assistente de IA (por exemplo, o Claude) ler e editar suas viagens em seu nome, depois que você aprova a conexão em uma tela padrão de OAuth. Os tokens de acesso são armazenados com hash, e uma conta pendente não consegue usar isso mesmo com uma conexão válida.'
+							'Avançado/opcional: o Zarparia tem um conector MCP que permite a um assistente de IA (por exemplo, o Claude) ler e editar suas viagens em seu nome, depois que você aprova a conexão em uma tela padrão de OAuth. Os tokens de acesso são armazenados com hash, e uma conta pendente não consegue usar isso mesmo com uma conexão válida.',
+							'As viagens que o assistente cria já vêm completas — links de mapas, faixa de previsão do tempo, pontos para fotos, custos por parada e links de reserva — e não um esqueleto vazio. Um detalhe importante: o conector age como a conta com que você o aprovou, então entre no Zarparia com essa mesma conta para ver essas viagens na sua lista.'
 						]
 					},
 					{
