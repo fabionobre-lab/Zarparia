@@ -1,4 +1,4 @@
-/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ 38a2419 — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
+/* GENERATED from AriaNobre/design/aria-nobre-tokens.css @ c363d1c — do not edit. Edit the source file and re-run design/sync-tokens.mjs. */
 
 /* ============================================================================
    Aria Nobre — family design token contract
@@ -78,11 +78,29 @@
   --an-hairline-strong: color-mix(in srgb, var(--an-ink) 32%, transparent);
 
   /* --------------------------------------------------------------------
-     b) BRAND CONSTANTS — never theme-swapped (crests/logos only).
+     b) BRAND CONSTANTS — crests/logos only.
      Source: DESIGN-CONSISTENCY-PLAN.md §Phase 0, "Brand constants."
+
+     CORRECTION (2026-07-20, Fabio): this block used to assert that crest
+     colours are "never theme-swapped". That rule did not survive the
+     2026-07-17 move to navy dark surfaces, because --an-navy-tile (#1A2332)
+     is byte-identical to --an-surface's dark branch (line 59) — a navy shield
+     on a navy card is invisible. Nobria and Saldaria each discovered this
+     independently and each overrode locally to #232E42 (Nobria tokens.css
+     :152-157, Rachid styles.css:2037-2041). Zarparia followed the stated rule
+     literally and shipped an invisible dark crest (regression in TravelApp
+     16f4f06, which deleted its working #2b231b dark tile).
+
+     The shield therefore DOES theme-swap, and now says so here rather than
+     being re-derived per app. The gold genuinely does not swap.
      -------------------------------------------------------------------- */
-  --an-navy-tile: #1A2332;
+  --an-shield: light-dark(#1A2332, #232E42);
   --an-brand-gold: #C4A572;
+
+  /* DEPRECATED for crest fills — use --an-shield. Retained only because the
+     light-mode shield value happens to equal it; any new use of this token on
+     a shield will vanish in dark mode. */
+  --an-navy-tile: #1A2332;
 
   /* --------------------------------------------------------------------
      c) GOLD SCALE — copied exactly from Saldaria's tier-1 primitives.

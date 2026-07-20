@@ -252,11 +252,50 @@
 	}
 
 	/* ── Zone 1: brand ── */
+	/* Family rail brand-lockup spec ("B1 cap-centered"), identical in Nobria
+	   (Logo.tsx) and Saldaria (Lockup.jsx). Change these three only in lockstep
+	   with those two — the point is that all three sidebars hit the same
+	   optical metrics.
+	     --rail-shield-px  the crest's INK height (not its viewBox height)
+	     --rail-cap-px     the wordmark's cap height (the "Z", flat top to
+	                       flat baseline — not its viewBox height either)
+	     --rail-gap-px     crest ink right edge -> wordmark ink left edge
+	   Vertical model: the wordmark's CAP BOX centre is aligned to the crest's
+	   INK box centre. Not box-centred, not top-aligned.
+
+	   Both SVGs are padded inside their own viewBoxes, so every number below
+	   converts spec px (ink) into layout px (box). Measured extrema:
+	     mark     viewBox "178 243 653 762"; ink y 255.1504..992.7713
+	              -> ink h 737.6209, ink centre y 623.96 (box centre 624.0)
+	              ink x 190.4051..818.5616 -> right pad 831 - 818.5616 = 12.4384
+	     wordmark viewBox "0 0 155.95 40";  cap "Z" y 7.4424..31.0
+	              -> cap h 23.5576, cap centre y 19.2212 (box centre 20.0)
+	              ink x 1.2822.. -> left pad 1.2822
+	   Arithmetic:
+	     mark box h  = 28.0 * 762 / 737.6209        = 28.9254px
+	     word box h  = 15.9 *  40 /  23.5576        = 26.9977px
+	     mark pad R  = 28.9254 * 12.4384 / 762      =  0.4722px
+	     word pad L  = 26.9977 *  1.2822 /  40      =  0.8654px
+	     flex gap    = 7.0 - 0.4722 - 0.8654        =  5.6624px
+	     cap nudge   = 26.9977 * 0.7788 / 40
+	                     - 28.9254 * 0.04 / 762     =  0.5241px
+	   align-items:center aligns the two BOXES; the cap box sits 0.7788 units
+	   above the wordmark box centre while the crest ink sits only 0.04 units
+	   above its own, so the wordmark is pushed down by that difference to put
+	   the cap centre on the ink centre. */
 	.brand {
+		--rail-shield-px: 28;
+		--rail-cap-px: 15.9;
+		--rail-gap-px: 7;
+		--rail-mark-h: calc(var(--rail-shield-px) * 1px * 762 / 737.6209);
+		--rail-word-h: calc(var(--rail-cap-px) * 1px * 40 / 23.5576);
+		--rail-mark-pad-r: calc(var(--rail-mark-h) * 12.4384 / 762);
+		--rail-word-pad-l: calc(var(--rail-word-h) * 1.2822 / 40);
+
 		flex-shrink: 0;
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: calc(var(--rail-gap-px) * 1px - var(--rail-mark-pad-r) - var(--rail-word-pad-l));
 		text-decoration: none;
 		color: var(--text);
 		padding: 1.1rem 1rem 0.9rem;
@@ -267,17 +306,17 @@
 		width: auto;
 	}
 	.brand > :global(svg) {
-		height: 28px;
+		height: var(--rail-mark-h);
 	}
-	/* App-chrome brand lockup (DESIGN.md): wordmark at a matching visual cap
-	   height to the ≈28px crest. The wordmark SVG's own viewBox is tightly
-	   cropped around its full glyph extent (ascender tittle to descender),
-	   so its cap height (the "Z"'s baseline-to-top) is only ~55% of the
-	   rendered box height — 16px here previously gave an ~9px cap height,
-	   visibly dwarfed by the crest. 30px brings the cap height to ~16px,
-	   in line with the family's other rails. */
+	.wordmark {
+		/* Cap-centring nudge — see the arithmetic above. transform, not margin,
+		   so it doesn't disturb the flex box centring it corrects. */
+		transform: translateY(
+			calc(var(--rail-word-h) * 0.7788 / 40 - var(--rail-mark-h) * 0.04 / 762)
+		);
+	}
 	.wordmark :global(svg) {
-		height: 30px;
+		height: var(--rail-word-h);
 	}
 
 	/* ── Zone 2: navigation + trip rail (scrolls) ── */

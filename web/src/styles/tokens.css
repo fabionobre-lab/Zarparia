@@ -68,7 +68,7 @@
 	   accent-assignments section for the canon source. */
 	--accent: #2b4a2b; /* saturated brand green — fills with light text, constant across themes */
 	--accent-strong: var(--an-accent-zarparia); /* text-level accent; light-dark() already matches prior values exactly */
-	--brand-tile: var(--an-navy-tile); /* Zarparia crest shield fill — canon: brand constants never theme-swap */
+	--brand-tile: var(--an-shield); /* Zarparia crest shield fill — the shield DOES theme-swap (canon aria-nobre-tokens.css §b correction, 2026-07-20); this restores the dark tile Zarparia lost in commit 16f4f06, which followed the old "never theme-swap" claim literally and shipped an invisible dark crest */
 	--brand-gold: var(--an-brand-gold); /* Zarparia crest Z + border — constant across themes */
 
 	/* ── Status pills (home cards + feedback list; outside the trip shell) ──
