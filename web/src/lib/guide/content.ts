@@ -148,6 +148,13 @@ export const guide: GuideCatalog = {
 						]
 					},
 					{
+						id: 'print-itinerary',
+						title: 'Print or save the itinerary as a PDF',
+						body: [
+							'Open a trip and use the "Print / Save as PDF" button near the top. It opens a clean, A4-formatted document with the whole trip — every day and every stop laid out flat — and your browser\'s print dialog appears automatically. Choose your printer to print it, or pick "Save as PDF" as the destination to keep a file. Shared trips can be printed the same way from their public link.'
+						]
+					},
+					{
 						id: 'delete-account',
 						title: 'Delete my account',
 						body: [
@@ -358,6 +365,13 @@ export const guide: GuideCatalog = {
 						title: 'Adicionar uma viagem ao seu calendário',
 						body: [
 							'Abra a viagem e use o botão "Adicionar ao calendário", sempre visível perto do topo — ele baixa um único arquivo .ics com a viagem inteira. Importe esse arquivo no Google Agenda, no Calendário da Apple, no Outlook ou em qualquer outro aplicativo de calendário que aceite arquivos .ics, e cada evento leva os horários locais da viagem.'
+						]
+					},
+					{
+						id: 'print-itinerary',
+						title: 'Imprimir ou salvar o roteiro em PDF',
+						body: [
+							'Abra a viagem e use o botão "Imprimir / Salvar PDF" perto do topo. Ele abre um documento limpo, formatado para A4, com a viagem inteira — cada dia e cada parada dispostos de forma corrida — e a janela de impressão do navegador aparece automaticamente. Escolha sua impressora para imprimir, ou selecione "Salvar como PDF" como destino para guardar um arquivo. Viagens compartilhadas podem ser impressas da mesma forma pelo link público.'
 						]
 					},
 					{

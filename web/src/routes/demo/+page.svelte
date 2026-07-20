@@ -89,7 +89,7 @@
 
 	<DemoAboutDialog bind:open={aboutOpen} />
 
-	<TripView {trip} bind:lang photos={data.photos} photosEditable={false} />
+	<TripView {trip} bind:lang photos={data.photos} photosEditable={false} printHref={`/demo/print?lang=${lang}`} />
 
 	<BottomBar
 		user={data.user}

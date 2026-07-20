@@ -48,7 +48,8 @@
 		photoToken,
 		onphotoschanged,
 		checklistEditable = false,
-		tripUpdatedAt
+		tripUpdatedAt,
+		printHref
 	}: {
 		trip: Trip;
 		lang?: string;
@@ -72,6 +73,10 @@
 		 *  concurrency on checklist-toggle PUTs. Irrelevant when
 		 *  `checklistEditable` is false. */
 		tripUpdatedAt?: string;
+		/** Link to the standalone print/PDF document for this trip (e.g.
+		 *  `/trips/[id]/print?lang=…`). Renders a "Print / Save as PDF" action in
+		 *  the hero when set; omitted where no such route exists (editor preview). */
+		printHref?: string;
 	} = $props();
 	let planBySeg = $state<Record<string, string>>(
 		untrack(() => Object.fromEntries(trip.segments.map((s) => [s.id, s.defaultPlan ?? s.plans[0].id])))
@@ -642,6 +647,12 @@
 			<div class="hero-row1">
 				<div class="trip-eyebrow">{L(trip.eyebrow)}</div>
 				<div class="hero-actions">
+					{#if printHref}
+						<a class="ics-btn" href={printHref} aria-label={uiText.printPdf}>
+							<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7" /><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="12" height="8" rx="1" /></svg>
+							{uiText.printPdf}
+						</a>
+					{/if}
 					<button class="ics-btn" onclick={downloadIcs} aria-label={uiText.addToCalendar}>
 						<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
 						{uiText.addToCalendar}
@@ -1162,6 +1173,7 @@
 		font-family: inherit;
 		letter-spacing: 0.02em;
 		cursor: pointer;
+		text-decoration: none;
 	}
 	@media (hover: hover) {
 		.ics-btn:hover {

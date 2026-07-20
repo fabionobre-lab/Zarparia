@@ -49,7 +49,14 @@
 		</div>
 	</div>
 
-	<TripView {trip} bind:lang {photos} photosEditable={false} photoToken={data.token} />
+	<TripView
+		{trip}
+		bind:lang
+		{photos}
+		photosEditable={false}
+		photoToken={data.token}
+		printHref={`/s/${data.token}/print?lang=${lang}`}
+	/>
 </div>
 
 <style>

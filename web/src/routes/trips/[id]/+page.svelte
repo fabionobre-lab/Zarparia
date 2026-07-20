@@ -122,6 +122,7 @@
 			onphotoschanged={refreshPhotos}
 			checklistEditable={canEdit}
 			tripUpdatedAt={data.updatedAt}
+			printHref={`/trips/${data.trip.id}/print?lang=${lang}`}
 		/>
 	{/key}
 

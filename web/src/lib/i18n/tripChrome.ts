@@ -13,6 +13,11 @@ export interface TripChromeMessages {
 	dayRoute: string;
 	openRoute: string;
 	addToCalendar: string;
+	/** Hero action + print-page button: open the printable, A4-formatted
+	 *  whole-trip document (Save as PDF via the browser's print dialog). */
+	printPdf: string;
+	/** Back link on the standalone print page, returning to the trip. */
+	printBack: string;
 	now: string;
 	photos: string;
 	unmatchedPhotos: string;
@@ -33,6 +38,8 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		dayRoute: 'Day Route',
 		openRoute: 'Open route in Google Maps →',
 		addToCalendar: 'Add to calendar',
+		printPdf: 'Print / Save as PDF',
+		printBack: 'Back to trip',
 		now: 'Now',
 		photos: 'Photos',
 		unmatchedPhotos: 'Photos not on the itinerary',
@@ -46,6 +53,8 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		dayRoute: 'Rota do Dia',
 		openRoute: 'Abrir rota no Google Maps →',
 		addToCalendar: 'Adicionar ao calendário',
+		printPdf: 'Imprimir / Salvar PDF',
+		printBack: 'Voltar à viagem',
 		now: 'Agora',
 		photos: 'Fotos',
 		unmatchedPhotos: 'Fotos fora do roteiro',

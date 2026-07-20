@@ -1,5 +1,5 @@
 {
-	"updated": "2026-07-17",
+	"updated": "2026-07-20",
 	"items": [
 		{
 			"id": "trips-editor",
@@ -45,6 +45,15 @@
 			"id": "data-rights",
 			"title": { "en": "Export & delete your data", "pt": "Exportar e excluir seus dados" },
 			"status": "shipped"
+		},
+		{
+			"id": "print-pdf",
+			"title": { "en": "Print / save a trip as PDF", "pt": "Imprimir / salvar uma viagem em PDF" },
+			"status": "shipped",
+			"note": {
+				"en": "An A4-formatted document of the whole itinerary, from the button near the top of any trip.",
+				"pt": "Um documento em A4 do roteiro inteiro, pelo botão perto do topo de qualquer viagem."
+			}
 		},
 		{
 			"id": "mcp",
