@@ -204,7 +204,7 @@
                   },
                   "mapsUrl": "https://maps.google.com/?q=Edinburgh+Waverley+Station",
                   "links": [
-                    { "url": "https://www.booking.com/hotel/gb/royal-mile-example.html" }
+                    { "url": "https://www.booking.com/searchresults.html?ss=Royal+Mile%2C+Edinburgh" }
                   ],
                   "cost": {
                     "amount": 480,
