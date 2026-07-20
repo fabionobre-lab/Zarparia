@@ -14,5 +14,7 @@ export const load: PageServerLoad = async ({ locals, platform, params }) => {
 	// Photos are deliberately NOT loaded here: server-rendering hundreds of
 	// photo strips blew the Workers free-plan CPU limit (error 1102) on a
 	// 700-photo trip. The client fetches /api/trips/[id]/photos after mount.
-	return { trip: trip.doc, role: trip.role };
+	// updatedAt is threaded into TripView so an editor's in-place checklist
+	// toggles (Phase 6 item 2) can PUT with optimistic concurrency.
+	return { trip: trip.doc, role: trip.role, updatedAt: trip.updatedAt };
 };

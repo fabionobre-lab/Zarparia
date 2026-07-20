@@ -22,6 +22,9 @@ export interface TripChromeMessages {
 	wxOffline: string;
 	/** Tooltip on that same badge, spelling out why. */
 	wxOfflineHint: string;
+	/** Suffix after the estimated minutes on a walking-time hint, e.g.
+	 *  "~15 min {walkSuffix}" (Phase 6 item 3). */
+	walkSuffix: string;
 }
 
 export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
@@ -35,7 +38,8 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		unmatchedPhotos: 'Photos not on the itinerary',
 		openPhoto: 'Open photo',
 		wxOffline: '(offline)',
-		wxOfflineHint: 'Showing weather saved before you went offline.'
+		wxOfflineHint: 'Showing weather saved before you went offline.',
+		walkSuffix: 'min walk'
 	},
 	pt: {
 		maps: 'Abrir no Maps',
@@ -47,7 +51,8 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		unmatchedPhotos: 'Fotos fora do roteiro',
 		openPhoto: 'Abrir foto',
 		wxOffline: '(offline)',
-		wxOfflineHint: 'Mostrando o clima salvo antes de você ficar offline.'
+		wxOfflineHint: 'Mostrando o clima salvo antes de você ficar offline.',
+		walkSuffix: 'min a pé'
 	}
 };
 

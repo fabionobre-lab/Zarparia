@@ -84,6 +84,15 @@
 	function addPhoto() {
 		(block.photoSpots ??= []).push({ name: '', mapsUrl: '' });
 	}
+	function addChecklist() {
+		block.checklist = { title: emptyLocalized(langs), items: [{ text: emptyLocalized(langs), done: false }] };
+	}
+	function addChecklistItem() {
+		(block.checklist ??= { title: emptyLocalized(langs), items: [] }).items.push({
+			text: emptyLocalized(langs),
+			done: false
+		});
+	}
 </script>
 
 <details class="block" bind:open>
@@ -167,6 +176,30 @@
 					<button type="button" class="del" onclick={() => removeAt(block.photoSpots!, i)}>✕</button>
 				</div>
 			{/each}
+		</div>
+
+		<div class="sub">
+			<div class="sub-hd">
+				<span class="lbl">{t('block.checklist')}</span>
+				{#if block.checklist}
+					<button type="button" class="del" onclick={() => (block.checklist = undefined)}
+						>✕ {t('block.checklistRemove')}</button
+					>
+				{:else}
+					<button type="button" onclick={addChecklist}>+ {t('common.add')}</button>
+				{/if}
+			</div>
+			{#if block.checklist}
+				<LocalizedInput bind:value={block.checklist.title} {langs} label={t('block.checklistTitle')} />
+				{#each block.checklist.items as item, i (i)}
+					<div class="rowline">
+						<label class="chk"><input type="checkbox" bind:checked={item.done} /></label>
+						<LocalizedInput bind:value={item.text} {langs} label={t('block.checklistItem')} />
+						<button type="button" class="del" onclick={() => removeAt(block.checklist!.items, i)}>✕</button>
+					</div>
+				{/each}
+				<button type="button" onclick={addChecklistItem}>+ {t('block.checklistAddItem')}</button>
+			{/if}
 		</div>
 
 		<div class="sub">
@@ -313,6 +346,11 @@
 		gap: 0.35rem;
 		align-items: center;
 		margin-bottom: 0.4rem;
+	}
+	.chk {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
 	}
 	.rowline input,
 	.photo input {

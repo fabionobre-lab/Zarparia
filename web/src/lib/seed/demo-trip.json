@@ -133,6 +133,60 @@
               },
               "blocks": [
                 {
+                  "time": "08:00",
+                  "dotColor": "#7a6e5f",
+                  "title": {
+                    "en": "Final pack check",
+                    "pt": "Conferência final da mala"
+                  },
+                  "tags": [
+                    "log"
+                  ],
+                  "checklist": {
+                    "title": {
+                      "en": "Before you leave the hotel",
+                      "pt": "Antes de sair do hotel"
+                    },
+                    "items": [
+                      {
+                        "text": {
+                          "en": "Passport & boarding pass",
+                          "pt": "Passaporte e cartão de embarque"
+                        },
+                        "done": true
+                      },
+                      {
+                        "text": {
+                          "en": "Phone charger & adapter",
+                          "pt": "Carregador de celular e adaptador"
+                        },
+                        "done": true
+                      },
+                      {
+                        "text": {
+                          "en": "Comfortable walking shoes",
+                          "pt": "Sapatos confortáveis para caminhar"
+                        },
+                        "done": false
+                      },
+                      {
+                        "text": {
+                          "en": "Rain layer (April in Scotland)",
+                          "pt": "Capa de chuva (abril na Escócia)"
+                        },
+                        "done": false
+                      },
+                      {
+                        "text": {
+                          "en": "Castle tickets printed or downloaded",
+                          "pt": "Ingressos do castelo impressos ou baixados"
+                        },
+                        "done": false
+                      }
+                    ]
+                  }
+                },
+                {
                   "time": "09:30",
                   "dotColor": "#7a6e5f",
                   "title": {

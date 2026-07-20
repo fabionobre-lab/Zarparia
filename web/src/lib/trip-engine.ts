@@ -16,6 +16,14 @@ export interface Waypoint {
 	query: string;
 	name: Localized;
 }
+export interface ChecklistItem {
+	text: Localized;
+	done: boolean;
+}
+export interface Checklist {
+	title: Localized;
+	items: ChecklistItem[];
+}
 export interface Block {
 	time: string;
 	dotColor?: string;
@@ -30,6 +38,9 @@ export interface Block {
 	waypoints?: Waypoint[];
 	photoSpots?: PhotoSpot[];
 	diff?: { kind: 'added' | 'changed' | 'kept'; reason: Localized };
+	/** Packing/pre-trip checklist (Phase 6 item 2, Tripsy pattern). Usable on
+	 *  any day's block, including a dedicated pre-trip block. */
+	checklist?: Checklist;
 }
 export interface Day {
 	date: string;

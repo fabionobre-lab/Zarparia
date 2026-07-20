@@ -247,6 +247,28 @@
             "kind": { "enum": ["added", "changed", "kept"] },
             "reason": { "$ref": "#/$defs/localized" }
           }
+        },
+        "checklist": {
+          "description": "Packing/pre-trip checklist rendered as a checkbox list with a done/total progress count (Phase 6 item 2, Tripsy pattern)",
+          "type": "object",
+          "required": ["title", "items"],
+          "additionalProperties": false,
+          "properties": {
+            "title": { "$ref": "#/$defs/localized" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["text", "done"],
+                "additionalProperties": false,
+                "properties": {
+                  "text": { "$ref": "#/$defs/localized" },
+                  "done": { "type": "boolean" }
+                }
+              }
+            }
+          }
         }
       }
     }

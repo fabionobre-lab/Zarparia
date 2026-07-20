@@ -8,6 +8,7 @@
 		type Plan,
 		type Day,
 		type SegWeather,
+		type ChecklistItem,
 		loc,
 		localeFor,
 		dayLabel,
@@ -32,9 +33,10 @@
 	import { tripChrome } from './i18n/tripChrome';
 	import { photoUrl, type TripPhoto } from './photos';
 	import { getNow } from './now';
-	import { formatTemp } from './format';
+	import { formatTemp, walkMinutes } from './format';
 	import { isOnline } from './online.svelte';
 	import { setTripNav, type TripNavVM } from './nav/tripNav.svelte';
+	import Tip from './Tip.svelte';
 
 	// trip is fixed for the lifetime of a mounted TripView (the page remounts
 	// per trip id), so these initial reads are intentionally non-reactive.
@@ -44,7 +46,9 @@
 		photos = [],
 		photosEditable = false,
 		photoToken,
-		onphotoschanged
+		onphotoschanged,
+		checklistEditable = false,
+		tripUpdatedAt
 	}: {
 		trip: Trip;
 		lang?: string;
@@ -58,12 +62,78 @@
 		/** Called after a photo was moved/deleted from the lightbox, so the
 		 *  owner of `photos` can refetch. */
 		onphotoschanged?: () => void;
+		/** Whether checklist checkbox toggles persist to the server (true only
+		 *  for a real trip's owner/editor, via /trips/[id]). When false — the
+		 *  /demo route, public /s/[token] share links, viewers, and the editor's
+		 *  live preview — toggles are visual-only local state that resets on
+		 *  reload (Phase 6 item 2). */
+		checklistEditable?: boolean;
+		/** The trip's `updated_at` as loaded by the page, for optimistic
+		 *  concurrency on checklist-toggle PUTs. Irrelevant when
+		 *  `checklistEditable` is false. */
+		tripUpdatedAt?: string;
 	} = $props();
 	let planBySeg = $state<Record<string, string>>(
 		untrack(() => Object.fromEntries(trip.segments.map((s) => [s.id, s.defaultPlan ?? s.plans[0].id])))
 	);
 	let wxBySeg = $state<Record<string, SegWeather | null>>({});
 	let wikiImgs = $state<Record<string, string | null>>({});
+
+	// ── Packing/pre-trip checklist toggles (Phase 6 item 2) ──
+	// Rendered `done` state is `checklistOverrides[key] ?? item.done` so a
+	// toggle is instant regardless of whether it persists. Real editors' PUTs
+	// send the whole trip doc (the only mutation mechanism the API has), keyed
+	// by (segment id, plan id, day date, block index, item index) since blocks
+	// have no id of their own.
+	let checklistOverrides = $state<Record<string, boolean>>({});
+	let checklistSaving = $state<Record<string, boolean>>({});
+	let checklistBaseUpdatedAt = $state(untrack(() => tripUpdatedAt));
+	function checklistKey(seg: Segment, plan: Plan, day: Day, bi: number, ii: number): string {
+		return `${seg.id}|${plan.id}|${day.date}|${bi}|${ii}`;
+	}
+	function checklistDone(seg: Segment, plan: Plan, day: Day, bi: number, ii: number, item: ChecklistItem): boolean {
+		return checklistOverrides[checklistKey(seg, plan, day, bi, ii)] ?? item.done;
+	}
+	async function toggleChecklistItem(
+		seg: Segment,
+		plan: Plan,
+		day: Day,
+		bi: number,
+		item: ChecklistItem,
+		ii: number
+	) {
+		const key = checklistKey(seg, plan, day, bi, ii);
+		const next = !checklistDone(seg, plan, day, bi, ii, item);
+		checklistOverrides = { ...checklistOverrides, [key]: next };
+		if (!checklistEditable) return; // demo / share link / viewer / editor preview: local only
+		checklistSaving = { ...checklistSaving, [key]: true };
+		try {
+			const clone = structuredClone($state.snapshot(trip)) as Trip;
+			const targetItem = clone.segments
+				.find((s) => s.id === seg.id)
+				?.plans.find((p) => p.id === plan.id)
+				?.days.find((d) => d.date === day.date)?.blocks[bi]?.checklist?.items[ii];
+			if (!targetItem) return;
+			targetItem.done = next;
+			const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+			if (checklistBaseUpdatedAt) headers['x-base-updated-at'] = checklistBaseUpdatedAt;
+			const res = await fetch(`/api/trips/${trip.id}`, {
+				method: 'PUT',
+				headers,
+				body: JSON.stringify(clone)
+			});
+			if (res.ok) {
+				const data = (await res.json()) as { updatedAt?: string };
+				if (data.updatedAt) checklistBaseUpdatedAt = data.updatedAt;
+			} else {
+				checklistOverrides = { ...checklistOverrides, [key]: !next };
+			}
+		} catch {
+			checklistOverrides = { ...checklistOverrides, [key]: !next };
+		} finally {
+			checklistSaving = { ...checklistSaving, [key]: false };
+		}
+	}
 
 	const isPast = untrack(() => tripIsPast(trip));
 	const L = (obj: Parameters<typeof loc>[1]) => loc(trip, obj, lang);
@@ -665,18 +735,25 @@
 							<div class="dh-title">{L(day.title)}</div>
 							{#if L(day.note)}<div class="dh-note">{L(day.note)}</div>{/if}
 							{#if wx || km}
+								{@const dayWalkMin = km ? walkMinutes(km) : null}
 								<div class="wx-hdr">
 									{#if wx}
 										<div class="wx-hdr-item" aria-hidden="true">{wx.emoji}</div>
 										<div class="wx-hdr-item">↑{formatTemp(wx.hi)}</div>
 										<div class="wx-hdr-item">↓{formatTemp(wx.lo)}</div>
 										{#if offline}
-											<div class="wx-hdr-item wx-hdr-offline" title={uiText.wxOfflineHint}>
-												{uiText.wxOffline}
-											</div>
+											<Tip text={uiText.wxOfflineHint}>
+												<div class="wx-hdr-item wx-hdr-offline">
+													{uiText.wxOffline}
+												</div>
+											</Tip>
 										{/if}
 									{/if}
-									{#if km}<div class="wx-hdr-item wx-km">🦶 ~{km.toFixed(1)} km</div>{/if}
+									{#if km}
+										<div class="wx-hdr-item wx-km">
+											🦶 ~{km.toFixed(1)} km{#if dayWalkMin} · ~{dayWalkMin} {uiText.walkSuffix}{/if}
+										</div>
+									{/if}
 								</div>
 							{/if}
 							{#if L(day.banner)}<div class="bday-strip">{L(day.banner)}</div>{/if}
@@ -743,10 +820,18 @@
 									<div class="tb-time">
 										{b.time}
 										{#if badge && !isPast}
-											<div class="wx" title={offline ? uiText.wxOfflineHint : undefined}>
-												<span aria-hidden="true">{badge.emoji}</span> {formatTemp(badge.temp)}
-												{#if offline}<span class="wx-offline">{uiText.wxOffline}</span>{/if}
-											</div>
+											{#if offline}
+												<Tip text={uiText.wxOfflineHint}>
+													<div class="wx">
+														<span aria-hidden="true">{badge.emoji}</span> {formatTemp(badge.temp)}
+														<span class="wx-offline">{uiText.wxOffline}</span>
+													</div>
+												</Tip>
+											{:else}
+												<div class="wx">
+													<span aria-hidden="true">{badge.emoji}</span> {formatTemp(badge.temp)}
+												</div>
+											{/if}
 										{/if}
 									</div>
 									<div class="tb-dot-col">
@@ -781,9 +866,40 @@
 										</div>
 									{/if}
 									{#if L(b.description)}<div class="tb-meta">{L(b.description)}</div>{/if}
-									{#if b.km}<div class="km-tag">🚶 ~{b.km} km</div>{/if}
+									{#if b.km}
+										{@const blockWalkMin = walkMinutes(b.km)}
+										<div class="km-tag">🚶 ~{b.km} km{#if blockWalkMin} · ~{blockWalkMin} {uiText.walkSuffix}{/if}</div>
+									{/if}
 									{#if L(b.warning)}<div class="tb-warn">{L(b.warning)}</div>{/if}
 									{#if L(b.note)}<div class="tb-note">{L(b.note)}</div>{/if}
+									{#if b.checklist}
+										{@const doneCount = b.checklist.items.filter((it, ii) =>
+											checklistDone(seg, plan, day, bi, ii, it)
+										).length}
+										<div class="tb-checklist">
+											<div class="tb-checklist-hdr">
+												<span class="tb-checklist-title">{L(b.checklist.title)}</span>
+												<span class="tb-checklist-progress">{doneCount}/{b.checklist.items.length}</span>
+											</div>
+											<ul class="tb-checklist-items">
+												{#each b.checklist.items as item, ii (ii)}
+													{@const itemDone = checklistDone(seg, plan, day, bi, ii, item)}
+													{@const itemKey = checklistKey(seg, plan, day, bi, ii)}
+													<li class="tb-checklist-item" class:done={itemDone}>
+														<label>
+															<input
+																type="checkbox"
+																checked={itemDone}
+																disabled={checklistSaving[itemKey]}
+																onchange={() => toggleChecklistItem(seg, plan, day, bi, item, ii)}
+															/>
+															<span class="tb-checklist-text">{L(item.text)}</span>
+														</label>
+													</li>
+												{/each}
+											</ul>
+										</div>
+									{/if}
 									{#if b.photoSpots?.length}
 										<div class="tb-photos">
 											{#each b.photoSpots as sp (sp)}
@@ -1768,6 +1884,49 @@
 		background: var(--surface-sunken);
 		border-radius: var(--radius-md);
 		padding: 1px 7px;
+	}
+	.tb-checklist {
+		margin-top: 8px;
+		background: var(--surface-sunken);
+		border-radius: var(--radius-md);
+		padding: 7px 10px;
+	}
+	.tb-checklist-hdr {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 8px;
+		font-size: 12px;
+		font-weight: 600;
+	}
+	.tb-checklist-progress {
+		font-size: 10px;
+		font-weight: 500;
+		color: var(--text-muted);
+		flex-shrink: 0;
+	}
+	.tb-checklist-items {
+		list-style: none;
+		margin: 5px 0 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 3px;
+	}
+	.tb-checklist-item label {
+		display: flex;
+		align-items: flex-start;
+		gap: 6px;
+		font-size: 12px;
+		cursor: pointer;
+	}
+	.tb-checklist-item input[type='checkbox'] {
+		margin-top: 2px;
+		flex-shrink: 0;
+	}
+	.tb-checklist-item.done .tb-checklist-text {
+		color: var(--text-muted);
+		text-decoration: line-through;
 	}
 	.tb-photos {
 		margin-top: 8px;

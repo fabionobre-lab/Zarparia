@@ -353,6 +353,11 @@ export interface Messages {
 	'block.diffChanged': string;
 	'block.diffKept': string;
 	'block.diffReason': string;
+	'block.checklist': string;
+	'block.checklistTitle': string;
+	'block.checklistItem': string;
+	'block.checklistAddItem': string;
+	'block.checklistRemove': string;
 
 	// ── Place search (PlaceSearch.svelte) ──
 	'place.findPlace': string;
@@ -862,6 +867,11 @@ const enGB: Messages = {
 	'block.diffChanged': 'changed',
 	'block.diffKept': 'kept',
 	'block.diffReason': 'Diff reason',
+	'block.checklist': 'Checklist',
+	'block.checklistTitle': 'Checklist title',
+	'block.checklistItem': 'Item',
+	'block.checklistAddItem': '+ Add item',
+	'block.checklistRemove': 'Remove checklist',
 
 	'place.findPlace': 'Find place',
 	'place.searchPlaceholder': 'Search for a place…',
@@ -1366,6 +1376,11 @@ const ptBR: Messages = {
 	'block.diffChanged': 'alterado',
 	'block.diffKept': 'mantido',
 	'block.diffReason': 'Motivo da diferença',
+	'block.checklist': 'Lista de itens',
+	'block.checklistTitle': 'Título da lista',
+	'block.checklistItem': 'Item',
+	'block.checklistAddItem': '+ Adicionar item',
+	'block.checklistRemove': 'Remover lista',
 
 	'place.findPlace': 'Buscar lugar',
 	'place.searchPlaceholder': 'Buscar um lugar…',

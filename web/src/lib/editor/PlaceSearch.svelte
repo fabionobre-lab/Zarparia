@@ -3,12 +3,22 @@
 	// Debounced (400ms), min 3 chars, at most one request/second (stale requests
 	// are dropped via a sequence guard). Emits the picked place to the parent.
 	import { t } from '$lib/i18n/store.svelte';
+	import { safeUrl } from '../trip-engine';
 
 	interface NominatimResult {
 		display_name: string;
 		lat: string;
 		lon: string;
 	}
+
+	interface WikiEnrichment {
+		thumb: string | null;
+		extract: string | null;
+	}
+
+	// Cap how many of the (short, Nominatim-limited) result list get an
+	// enrichment lookup — keeps things sane if that limit is ever raised.
+	const MAX_ENRICH = 8;
 
 	let {
 		onPick,
@@ -34,6 +44,63 @@
 	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 	let lastFetchAt = 0;
 	let seq = 0; // increments per request; late responses whose seq != current are dropped
+
+	// ── Wikipedia enrichment (thumbnail + one-line extract) for result cards ──
+	// Session-lifetime, per-coordinate cache: undefined = not requested yet,
+	// null = looked and found nothing, object = enrichment found. Mirrors the
+	// wikiImgs pattern in TripView.svelte, but resolves via geosearch first
+	// since Nominatim results only give us lat/lon, not a Wikipedia title.
+	let wikiCache = $state<Record<string, WikiEnrichment | null>>({});
+
+	function enrichKey(r: NominatimResult): string {
+		const lat = parseFloat(r.lat).toFixed(4);
+		const lon = parseFloat(r.lon).toFixed(4);
+		return `${lat},${lon}`;
+	}
+
+	function truncate(s: string, max = 120): string {
+		const oneLine = s.replace(/\s+/g, ' ').trim();
+		return oneLine.length > max ? oneLine.slice(0, max - 1).trimEnd() + '…' : oneLine;
+	}
+
+	// Fire-and-forget: geosearch the nearest Wikipedia article to (lat, lon),
+	// then fetch its summary for a thumbnail + short extract. Never throws —
+	// a Wikipedia hiccup must never block or break the place picker. `key` is
+	// marked pending (null) by the caller before this runs, same as
+	// TripView's wikiImgs placeholder-then-overwrite pattern.
+	async function enrich(key: string, lat: number, lon: number) {
+		try {
+			const gs = await fetch(
+				`https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}|${lon}&gsradius=300&gslimit=1&format=json&origin=*`
+			);
+			const gsData = (await gs.json()) as { query?: { geosearch?: { title?: string }[] } };
+			const title = gsData?.query?.geosearch?.[0]?.title;
+			if (!title) return; // already null from the pending write
+			const sum = await fetch(
+				'https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(title)
+			);
+			const d = (await sum.json()) as { thumbnail?: { source?: string }; extract?: string };
+			const thumb = d?.thumbnail?.source ?? null;
+			const extract = d?.extract ? truncate(d.extract) : null;
+			if (!thumb && !extract) return; // nothing useful — leave as "found nothing"
+			wikiCache = { ...wikiCache, [key]: { thumb, extract } };
+		} catch {
+			// leave as null (already written) — a hiccup shows the plain-text row
+		}
+	}
+
+	// Kick off enrichment for newly seen results, without blocking render.
+	$effect(() => {
+		for (const r of results.slice(0, MAX_ENRICH)) {
+			const key = enrichKey(r);
+			if (key in wikiCache) continue; // already requested (or resolved) this session
+			const lat = parseFloat(r.lat);
+			const lon = parseFloat(r.lon);
+			if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+			wikiCache = { ...wikiCache, [key]: null }; // mark pending
+			void enrich(key, lat, lon);
+		}
+	});
 
 	// Stable ids for aria wiring (unique per instance).
 	const uid = Math.random().toString(36).slice(2, 8);
@@ -167,6 +234,7 @@
 			<ul class="menu" role="listbox" id={listId} aria-label={label}>
 				{#if results.length}
 					{#each results as r, i (r.display_name + i)}
+						{@const enr = wikiCache[enrichKey(r)]}
 						<!-- svelte-ignore a11y_click_events_have_key_events -- keyboard is handled on the combobox input per the ARIA listbox pattern -->
 						<li
 							id={optId(i)}
@@ -178,7 +246,15 @@
 							onclick={() => pick(r)}
 							onmouseenter={() => (active = i)}
 						>
-							{trimName(r.display_name)}
+							{#if enr && safeUrl(enr.thumb ?? undefined)}
+								<img src={safeUrl(enr.thumb ?? undefined)} class="opt-thumb" alt="" aria-hidden="true" />
+							{/if}
+							<span class="opt-text">
+								<span class="opt-name">{trimName(r.display_name)}</span>
+								{#if enr?.extract}
+									<span class="opt-extract">{enr.extract}</span>
+								{/if}
+							</span>
 						</li>
 					{/each}
 				{:else if searched}
@@ -237,14 +313,15 @@
 		overflow-y: auto;
 	}
 	.opt {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
 		padding: 0.35rem 0.45rem;
 		border-radius: var(--radius-sm);
 		font-size: 0.8rem;
 		color: var(--text);
 		cursor: pointer;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		min-width: 0;
 	}
 	.opt.active {
 		background: var(--pill-info-bg);
@@ -252,6 +329,32 @@
 	.opt.empty {
 		color: var(--text-muted);
 		cursor: default;
+	}
+	.opt-thumb {
+		width: 34px;
+		height: 34px;
+		flex-shrink: 0;
+		object-fit: cover;
+		border-radius: var(--radius-sm);
+		display: block;
+	}
+	.opt-text {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
+		flex: 1;
+	}
+	.opt-name {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	.opt-extract {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: 0.68rem;
+		color: var(--text-muted);
 	}
 	.attr {
 		padding: 0.25rem 0.45rem 0.1rem;

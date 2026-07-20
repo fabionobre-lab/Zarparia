@@ -120,6 +120,8 @@
 			{photos}
 			photosEditable={canEdit}
 			onphotoschanged={refreshPhotos}
+			checklistEditable={canEdit}
+			tripUpdatedAt={data.updatedAt}
 		/>
 	{/key}
 
