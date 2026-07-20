@@ -56,6 +56,33 @@
 			}
 		},
 		{
+			"id": "add-to-calendar",
+			"title": { "en": "Add a trip to your calendar", "pt": "Adicionar uma viagem ao seu calendário" },
+			"status": "shipped",
+			"note": {
+				"en": "Export any trip as a calendar (.ics) file and open its stops in Apple, Google or Outlook calendar.",
+				"pt": "Exporte qualquer viagem como um arquivo de calendário (.ics) e abra suas paradas no calendário da Apple, Google ou Outlook."
+			}
+		},
+		{
+			"id": "weather",
+			"title": { "en": "Weather forecast per day", "pt": "Previsão do tempo por dia" },
+			"status": "shipped",
+			"note": {
+				"en": "Each day shows a weather forecast for where you'll be.",
+				"pt": "Cada dia mostra uma previsão do tempo para onde você estará."
+			}
+		},
+		{
+			"id": "multi-plan",
+			"title": { "en": "Alternate plans per stop", "pt": "Planos alternativos por parada" },
+			"status": "shipped",
+			"note": {
+				"en": "A stop can hold more than one plan, so you can compare options and switch between them.",
+				"pt": "Uma parada pode conter mais de um plano, para você comparar opções e alternar entre elas."
+			}
+		},
+		{
 			"id": "mcp",
 			"title": { "en": "Connect an AI assistant (MCP)", "pt": "Conectar um assistente de IA (MCP)" },
 			"status": "shipped"
@@ -92,8 +119,8 @@
 			"title": { "en": "Trip budget & cost tracking", "pt": "Orçamento da viagem e controle de custos" },
 			"status": "shipped",
 			"note": {
-				"en": "Live now: estimate a cost per stop (with categories) and track the total against a colour-coded trip budget bar, in the trip and on the printed itinerary. Coming next: logging what you actually spent versus the estimate, then multi-currency and cost-splitting.",
-				"pt": "Já disponível: estime um custo por parada (com categorias) e acompanhe o total em uma barra de orçamento colorida, na viagem e no roteiro impresso. A seguir: registrar o que você realmente gastou em relação à estimativa e, depois, múltiplas moedas e divisão de custos."
+				"en": "Live now: estimate a cost per stop (with categories) and track the total against a colour-coded trip budget bar, in the trip and on the printed itinerary. Coming next: link a trip to Saldaria — the family's bill-splitter — to log what you actually spent against the estimate, split with your group and settle up across currencies.",
+				"pt": "Já disponível: estime um custo por parada (com categorias) e acompanhe o total em uma barra de orçamento colorida, na viagem e no roteiro impresso. A seguir: conecte uma viagem ao Saldaria — o divisor de contas da família — para registrar o que você realmente gastou em relação à estimativa, dividir com seu grupo e acertar as contas entre moedas."
 			}
 		},
 		{
