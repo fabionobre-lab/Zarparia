@@ -109,7 +109,7 @@ export const guide: GuideCatalog = {
 						id: 'share-trip',
 						title: 'Share a trip',
 						body: [
-							"Open the trip and use Share. You can invite someone by email as a viewer or editor — they need to have signed in to Zarparia once before you can add them — or turn on a shareable link that grants view or edit access to anyone who has it, no sign-in required for viewing."
+							"Open the trip and use Share. You can invite someone by email as a viewer or editor — if they don't have a Zarparia account yet, the invite is held as “Pending sign-in” and turns into real access the first time they sign in with that email — or turn on a shareable link that grants view or edit access to anyone who has it, no sign-in required for viewing."
 						]
 					},
 					{
@@ -346,7 +346,7 @@ export const guide: GuideCatalog = {
 						id: 'share-trip',
 						title: 'Compartilhar uma viagem',
 						body: [
-							'Abra a viagem e use Compartilhar. Você pode convidar alguém por e-mail como visualizador ou editor — a pessoa precisa já ter entrado no Zarparia uma vez antes de você conseguir adicioná-la — ou ativar um link compartilhável que dá acesso de visualização ou edição a qualquer pessoa que o tenha, sem exigir login para visualizar.'
+							'Abra a viagem e use Compartilhar. Você pode convidar alguém por e-mail como visualizador ou editor — se a pessoa ainda não tiver conta no Zarparia, o convite fica como “Aguardando entrar” e vira acesso de verdade assim que ela entrar com esse e-mail — ou ativar um link compartilhável que dá acesso de visualização ou edição a qualquer pessoa que o tenha, sem exigir login para visualizar.'
 						]
 					},
 					{

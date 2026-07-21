@@ -157,6 +157,36 @@ export async function upsertFirebaseUser(
 	return { id, email, name, avatarUrl: null, status };
 }
 
+/** Convert any pending trip invites addressed to this (verified) email into
+ *  real trip_shares rows, then delete them. Called on every successful sign-in
+ *  so an invite created before the person had an account takes effect the
+ *  first time they log in. A no-op (single indexed lookup) when there are none.
+ *
+ *  Safe to run on every login: invites only exist for emails with no account,
+ *  so once claimed here they're gone. The INSERT is idempotent (ON CONFLICT) in
+ *  case a share already exists, and skips the trip the user now owns via the
+ *  WHERE guard so an owner never gets a redundant self-share. */
+export async function claimInvites(db: D1Database, userId: string, email: string): Promise<void> {
+	const normalizedEmail = email.trim().toLowerCase();
+	const pending = await db
+		.prepare('SELECT trip_id AS tripId, permission FROM trip_invites WHERE email = ?')
+		.bind(normalizedEmail)
+		.all<{ tripId: string; permission: string }>();
+	if (pending.results.length === 0) return;
+
+	const statements = pending.results.map((invite) =>
+		db
+			.prepare(
+				`INSERT INTO trip_shares (trip_id, user_id, permission)
+				 SELECT ?1, ?2, ?3 WHERE NOT EXISTS (SELECT 1 FROM trips WHERE id = ?1 AND owner_id = ?2)
+				 ON CONFLICT (trip_id, user_id) DO UPDATE SET permission = excluded.permission`
+			)
+			.bind(invite.tripId, userId, invite.permission)
+	);
+	statements.push(db.prepare('DELETE FROM trip_invites WHERE email = ?').bind(normalizedEmail));
+	await db.batch(statements);
+}
+
 // ── Admin: approval queue (web/src/routes/admin/approvals) ────────────────
 
 export interface AdminUserRow {

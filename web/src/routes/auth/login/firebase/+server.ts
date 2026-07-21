@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { getAuthEnv } from '$lib/server/authenv';
 import { verifyFirebaseIdToken } from '$lib/server/firebase';
-import { upsertFirebaseUser } from '$lib/server/users';
+import { upsertFirebaseUser, claimInvites } from '$lib/server/users';
 import { generateSessionToken, createSession, setSessionCookie } from '$lib/server/session';
 import { limit, clientIp, ipKey } from '$lib/server/ratelimit';
 
@@ -32,6 +32,8 @@ export const POST: RequestHandler = async ({ request, platform, cookies }) => {
 	if (!claims.email) return json({ error: 'invalid_token' }, { status: 401 });
 
 	const user = await upsertFirebaseUser(db, { uid: claims.uid, email: claims.email, name: null }, platform);
+	// email_verified was asserted above, so pending invites for it are now theirs.
+	await claimInvites(db, user.id, user.email);
 	const token = generateSessionToken();
 	await createSession(db, token, user.id);
 	setSessionCookie(cookies, token);

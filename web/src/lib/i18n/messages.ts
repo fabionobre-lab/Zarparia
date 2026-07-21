@@ -124,6 +124,8 @@ export interface Messages {
 	'share.notSharedYet': string;
 	'share.remove': string;
 	'share.hint': string;
+	'share.pending': string;
+	'share.invited': string;
 	'share.errLoad': string;
 	'share.errLoadLink': string;
 	'share.errTurnOff': string;
@@ -661,7 +663,9 @@ const enGB: Messages = {
 	'share.loading': 'Loading…',
 	'share.notSharedYet': 'Not shared with anyone yet.',
 	'share.remove': 'Remove',
-	'share.hint': 'People must sign in once before you can share with them.',
+	'share.hint': 'Invite anyone by email — if they don’t have an account yet, they’ll get access the first time they sign in.',
+	'share.pending': 'Pending sign-in',
+	'share.invited': 'Invited. They’ll get access the first time they sign in.',
 	'share.errLoad': 'Could not load sharing info.',
 	'share.errLoadLink': 'Could not load link info.',
 	'share.errTurnOff': 'Could not turn off the link.',
@@ -1186,7 +1190,9 @@ const ptBR: Messages = {
 	'share.loading': 'Carregando…',
 	'share.notSharedYet': 'Ainda não compartilhada com ninguém.',
 	'share.remove': 'Remover',
-	'share.hint': 'As pessoas precisam entrar uma vez antes de você poder compartilhar com elas.',
+	'share.hint': 'Convide qualquer pessoa por e-mail — se ainda não tiver conta, ela terá acesso assim que entrar pela primeira vez.',
+	'share.pending': 'Aguardando entrar',
+	'share.invited': 'Convite enviado. A pessoa terá acesso assim que entrar pela primeira vez.',
 	'share.errLoad': 'Não foi possível carregar as informações de compartilhamento.',
 	'share.errLoadLink': 'Não foi possível carregar as informações do link.',
 	'share.errTurnOff': 'Não foi possível desativar o link.',

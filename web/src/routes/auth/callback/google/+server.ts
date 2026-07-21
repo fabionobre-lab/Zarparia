@@ -3,7 +3,7 @@ import { OAuth2RequestError } from 'arctic';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { getGoogle, fetchGoogleProfile } from '$lib/server/oauth';
-import { upsertGoogleUser } from '$lib/server/users';
+import { upsertGoogleUser, claimInvites } from '$lib/server/users';
 import { createSession, generateSessionToken, setSessionCookie } from '$lib/server/session';
 import { takeReturnTo } from '$lib/server/returnto';
 import { setPhotosTokenCookie } from '$lib/server/googlephotos';
@@ -63,6 +63,8 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies, requ
 		throw error(403, 'Your Google account email is unverified. Verify it with Google and try again.');
 
 	const user = await upsertGoogleUser(db, profile, platform);
+	// Google verifies email ownership, so any invites addressed to it are now theirs.
+	await claimInvites(db, user.id, user.email);
 	const token = generateSessionToken();
 	await createSession(db, token, user.id);
 	setSessionCookie(cookies, token);

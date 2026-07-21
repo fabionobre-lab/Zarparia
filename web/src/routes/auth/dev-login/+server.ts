@@ -2,7 +2,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getDb } from '$lib/server/db';
 import { getAuthEnv } from '$lib/server/authenv';
-import { upsertGoogleUser } from '$lib/server/users';
+import { upsertGoogleUser, claimInvites } from '$lib/server/users';
 import { createSession, generateSessionToken, setSessionCookie } from '$lib/server/session';
 import { isSafeReturnTo } from '$lib/server/returnto';
 
@@ -26,6 +26,7 @@ export const GET: RequestHandler = async ({ platform, cookies, url }) => {
 		},
 		platform
 	);
+	await claimInvites(db, user.id, user.email);
 	const token = generateSessionToken();
 	await createSession(db, token, user.id);
 	setSessionCookie(cookies, token);

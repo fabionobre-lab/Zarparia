@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ShareRow, SharePermission } from '$lib/server/shares';
+	import type { ShareRow, InviteRow, SharePermission } from '$lib/server/shares';
 	import { t } from '$lib/i18n/store.svelte';
 	import { busyButton } from '$lib/actions/busyButton';
 	import { toast } from '$lib/toast';
@@ -10,6 +10,7 @@
 	type LinkInfo = { url: string; role: SharePermission } | null;
 
 	let shares = $state<ShareRow[]>([]);
+	let invites = $state<InviteRow[]>([]);
 	let email = $state('');
 	let permission = $state<SharePermission>('viewer');
 	let loading = $state(true);
@@ -39,8 +40,11 @@
 		error = '';
 		try {
 			const res = await fetch(`/api/trips/${tripId}/shares`);
-			if (res.ok) shares = ((await res.json()) as { shares: ShareRow[] }).shares;
-			else error = t('share.errLoad');
+			if (res.ok) {
+				const data = (await res.json()) as { shares: ShareRow[]; invites?: InviteRow[] };
+				shares = data.shares;
+				invites = data.invites ?? [];
+			} else error = t('share.errLoad');
 		} catch {
 			error = t('share.errLoad');
 		} finally {
@@ -184,7 +188,9 @@
 				body: JSON.stringify({ email: email.trim(), permission })
 			});
 			if (res.ok) {
+				const data = (await res.json()) as { invite?: unknown };
 				email = '';
+				if (data.invite) toast(t('share.invited'));
 				await load();
 			} else {
 				error = ((await res.json()) as { error?: string }).error ?? t('share.errShare');
@@ -201,6 +207,22 @@
 		error = '';
 		try {
 			const res = await fetch(`/api/trips/${tripId}/shares/${userId}`, { method: 'DELETE' });
+			if (res.ok) await load();
+			else error = t('share.errRemove');
+		} catch {
+			error = t('share.errRemove');
+		} finally {
+			busy = false;
+		}
+	}
+
+	async function removeInvite(inviteEmail: string) {
+		busy = true;
+		error = '';
+		try {
+			const res = await fetch(`/api/trips/${tripId}/invites/${encodeURIComponent(inviteEmail)}`, {
+				method: 'DELETE'
+			});
 			if (res.ok) await load();
 			else error = t('share.errRemove');
 		} catch {
@@ -281,7 +303,7 @@
 
 	{#if loading}
 		<p class="muted">{t('share.loading')}</p>
-	{:else if shares.length === 0}
+	{:else if shares.length === 0 && invites.length === 0}
 		<p class="muted">{t('share.notSharedYet')}</p>
 	{:else}
 		<ul>
@@ -290,6 +312,14 @@
 					<span class="who">{s.name ?? s.email}</span>
 					<span class="perm">{s.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
 					<button type="button" class="rm" onclick={() => remove(s.userId)} use:busyButton={busy}>{t('share.remove')}</button>
+				</li>
+			{/each}
+			{#each invites as inv (inv.email)}
+				<li>
+					<span class="who">{inv.email}</span>
+					<span class="perm pending">{t('share.pending')}</span>
+					<span class="perm">{inv.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
+					<button type="button" class="rm" onclick={() => removeInvite(inv.email)} use:busyButton={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
 		</ul>
@@ -435,6 +465,10 @@
 		background: var(--surface-sunken);
 		border-radius: var(--radius-pill);
 		padding: 0.15rem 0.5rem;
+	}
+	.perm.pending {
+		color: var(--pill-fullday-fg, var(--text-muted));
+		background: var(--pill-fullday-bg, var(--surface-sunken));
 	}
 	.rm {
 		background: none;
