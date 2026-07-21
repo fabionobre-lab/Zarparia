@@ -135,6 +135,13 @@ export interface Messages {
 	'share.emailShareSubject': string;
 	'share.emailShareBody': string;
 	'share.emailLanguage': string;
+	'share.emailDraftHeading': string;
+	'share.emailTo': string;
+	'share.emailSubjectLabel': string;
+	'share.emailOpen': string;
+	'share.emailCopy': string;
+	'share.emailCopied': string;
+	'share.emailClose': string;
 	'share.errLoad': string;
 	'share.errLoadLink': string;
 	'share.errTurnOff': string;
@@ -686,6 +693,13 @@ const enGB: Messages = {
 	'share.emailShareBody':
 		'Hi,\r\n\r\nI’ve shared my trip “{trip}” with you on Zarparia, where you have {role} access. It’s already in your account — open it here:\r\n{url}\r\n\r\nEnjoy!',
 	'share.emailLanguage': 'Email language',
+	'share.emailDraftHeading': 'Ready to send',
+	'share.emailTo': 'To',
+	'share.emailSubjectLabel': 'Subject',
+	'share.emailOpen': 'Open in email app',
+	'share.emailCopy': 'Copy message',
+	'share.emailCopied': 'Message copied to clipboard.',
+	'share.emailClose': 'Close',
 	'share.errLoad': 'Could not load sharing info.',
 	'share.errLoadLink': 'Could not load link info.',
 	'share.errTurnOff': 'Could not turn off the link.',
@@ -1224,6 +1238,13 @@ const ptBR: Messages = {
 	'share.emailShareBody':
 		'Olá,\r\n\r\nCompartilhei minha viagem “{trip}” com você no Zarparia, onde você tem acesso de {role}. Já está na sua conta — abra aqui:\r\n{url}\r\n\r\nAproveite!',
 	'share.emailLanguage': 'Idioma do e-mail',
+	'share.emailDraftHeading': 'Pronto para enviar',
+	'share.emailTo': 'Para',
+	'share.emailSubjectLabel': 'Assunto',
+	'share.emailOpen': 'Abrir no app de e-mail',
+	'share.emailCopy': 'Copiar mensagem',
+	'share.emailCopied': 'Mensagem copiada.',
+	'share.emailClose': 'Fechar',
 	'share.errLoad': 'Não foi possível carregar as informações de compartilhamento.',
 	'share.errLoadLink': 'Não foi possível carregar as informações do link.',
 	'share.errTurnOff': 'Não foi possível desativar o link.',

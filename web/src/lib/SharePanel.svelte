@@ -15,12 +15,15 @@
 	// to the current UI locale.
 	let emailLang = $state<Locale>(locale());
 
-	/** Open the owner's own mail client with a prefilled invite/notice, tailored
-	 *  to whether the recipient already has access (a real share) or will get it
-	 *  on first sign-in (a pending invite), and written in the chosen emailLang.
-	 *  Sending from the owner's own address keeps deliverability trustworthy and
-	 *  needs no email infrastructure. */
-	function openMail(kind: 'invite' | 'share', toEmail: string, perm: SharePermission) {
+	// The message to send is surfaced as a visible, copyable draft rather than
+	// only firing a mailto: link — mailto often silently no-ops in embedded/in-app
+	// browsers, which read to the user as "nothing happened". The draft is shown
+	// automatically right after a share, and reopenable per row.
+	let draft = $state<{ kind: 'invite' | 'share'; email: string; permission: SharePermission } | null>(null);
+
+	/** Build the tailored subject/body for a recipient in the chosen emailLang.
+	 *  Reads emailLang so the preview updates live when the picker changes. */
+	function emailContent(kind: 'invite' | 'share', toEmail: string, perm: SharePermission) {
 		const url = `${location.origin}/trips/${tripId}`;
 		const role = translateIn(emailLang, perm === 'editor' ? 'share.emailRoleEditor' : 'share.emailRoleViewer');
 		const subject = translateIn(emailLang, kind === 'invite' ? 'share.emailInviteSubject' : 'share.emailShareSubject', {
@@ -32,7 +35,26 @@
 			url,
 			email: toEmail
 		});
-		location.href = `mailto:${encodeURIComponent(toEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+		return { subject, body };
+	}
+
+	const draftContent = $derived(draft ? emailContent(draft.kind, draft.email, draft.permission) : null);
+
+	/** Fire a mailto: (opens the owner's mail app where one is registered).
+	 *  Best-effort — the Copy button is the reliable path everywhere. */
+	function openMailApp() {
+		if (!draft || !draftContent) return;
+		location.href = `mailto:${encodeURIComponent(draft.email)}?subject=${encodeURIComponent(draftContent.subject)}&body=${encodeURIComponent(draftContent.body)}`;
+	}
+
+	async function copyDraft() {
+		if (!draftContent) return;
+		try {
+			await navigator.clipboard.writeText(`${draftContent.subject}\n\n${draftContent.body}`);
+			toast(t('share.emailCopied'));
+		} catch {
+			error = t('share.errCopy');
+		}
 	}
 
 	type LinkInfo = { url: string; role: SharePermission } | null;
@@ -217,8 +239,12 @@
 			});
 			if (res.ok) {
 				const data = (await res.json()) as { invite?: unknown };
+				const sharedEmail = email.trim();
+				const sharedPermission = permission;
 				email = '';
-				if (data.invite) toast(t('share.invited'));
+				// Surface the ready-to-send message immediately so the owner can
+				// actually notify the person — sharing alone doesn't email anyone.
+				draft = { kind: data.invite ? 'invite' : 'share', email: sharedEmail, permission: sharedPermission };
 				await load();
 			} else {
 				error = ((await res.json()) as { error?: string }).error ?? t('share.errShare');
@@ -342,12 +368,25 @@
 				{/each}
 			</select>
 		</div>
+		{#if draft && draftContent}
+			<div class="draft">
+				<p class="draft-h">{t('share.emailDraftHeading')}</p>
+				<p class="draft-meta"><span class="draft-k">{t('share.emailTo')}:</span> {draft.email}</p>
+				<p class="draft-meta"><span class="draft-k">{t('share.emailSubjectLabel')}:</span> {draftContent.subject}</p>
+				<pre class="draft-body">{draftContent.body.replace(/\r\n/g, '\n')}</pre>
+				<div class="draft-actions">
+					<button type="button" onclick={openMailApp}>{t('share.emailOpen')}</button>
+					<button type="button" class="mail" onclick={copyDraft}>{t('share.emailCopy')}</button>
+					<button type="button" class="rm" onclick={() => (draft = null)}>{t('share.emailClose')}</button>
+				</div>
+			</div>
+		{/if}
 		<ul>
 			{#each shares as s (s.userId)}
 				<li>
 					<span class="who">{s.name ?? s.email}</span>
 					<span class="perm">{s.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
-					<button type="button" class="mail" onclick={() => openMail('share', s.email, s.permission)}>{t('share.emailNotify')}</button>
+					<button type="button" class="mail" onclick={() => (draft = { kind: 'share', email: s.email, permission: s.permission })}>{t('share.emailNotify')}</button>
 					<button type="button" class="rm" onclick={() => remove(s.userId)} use:busyButton={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
@@ -356,7 +395,7 @@
 					<span class="who">{inv.email}</span>
 					<span class="perm pending">{t('share.pending')}</span>
 					<span class="perm">{inv.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
-					<button type="button" class="mail" onclick={() => openMail('invite', inv.email, inv.permission)}>{t('share.emailInvite')}</button>
+					<button type="button" class="mail" onclick={() => (draft = { kind: 'invite', email: inv.email, permission: inv.permission })}>{t('share.emailInvite')}</button>
 					<button type="button" class="rm" onclick={() => removeInvite(inv.email)} use:busyButton={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
@@ -533,6 +572,44 @@
 	.emaillang select {
 		font-size: 0.8rem;
 		padding: 0.25rem 0.4rem;
+	}
+	.draft {
+		margin-top: 0.7rem;
+		padding: 0.7rem 0.8rem;
+		background: var(--surface-sunken);
+		border: 1px solid var(--hairline-strong);
+		border-radius: var(--radius-md);
+	}
+	.draft-h {
+		font-size: 0.85rem;
+		font-weight: 600;
+		margin-bottom: 0.4rem;
+	}
+	.draft-meta {
+		font-size: 0.8rem;
+		margin-bottom: 0.2rem;
+		overflow-wrap: anywhere;
+	}
+	.draft-k {
+		color: var(--text-muted);
+	}
+	.draft-body {
+		font: inherit;
+		font-size: 0.8rem;
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
+		margin: 0.4rem 0;
+		padding: 0.5rem 0.6rem;
+		background: var(--surface);
+		border: 1px solid var(--hairline);
+		border-radius: var(--radius-md);
+		max-height: 12rem;
+		overflow-y: auto;
+	}
+	.draft-actions {
+		display: flex;
+		gap: 0.4rem;
+		flex-wrap: wrap;
 	}
 	.hint {
 		font-size: 0.72rem;
