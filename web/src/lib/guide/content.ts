@@ -109,7 +109,8 @@ export const guide: GuideCatalog = {
 						id: 'share-trip',
 						title: 'Share a trip',
 						body: [
-							"Open the trip and use Share. You can invite someone by email as a viewer or editor — if they don't have a Zarparia account yet, the invite is held as “Pending sign-in” and turns into real access the first time they sign in with that email — or turn on a shareable link that grants view or edit access to anyone who has it, no sign-in required for viewing."
+							"Open the trip and use Share. You can invite someone by email as a viewer or editor — if they don't have a Zarparia account yet, the invite is held as “Pending sign-in” and turns into real access the first time they sign in with that email — or turn on a shareable link that grants view or edit access to anyone who has it, no sign-in required for viewing.",
+							"Each person in the list has an Email button that opens a ready-to-send message in your own mail app, worded for their case: someone still pending is told to sign in with that email to get access, while someone who already has access just gets a link to open the trip. Pick the email's language with the selector (it defaults to your app language). Nothing is sent automatically — you send it yourself, from your own address."
 						]
 					},
 					{
@@ -346,7 +347,8 @@ export const guide: GuideCatalog = {
 						id: 'share-trip',
 						title: 'Compartilhar uma viagem',
 						body: [
-							'Abra a viagem e use Compartilhar. Você pode convidar alguém por e-mail como visualizador ou editor — se a pessoa ainda não tiver conta no Zarparia, o convite fica como “Aguardando entrar” e vira acesso de verdade assim que ela entrar com esse e-mail — ou ativar um link compartilhável que dá acesso de visualização ou edição a qualquer pessoa que o tenha, sem exigir login para visualizar.'
+							'Abra a viagem e use Compartilhar. Você pode convidar alguém por e-mail como visualizador ou editor — se a pessoa ainda não tiver conta no Zarparia, o convite fica como “Aguardando entrar” e vira acesso de verdade assim que ela entrar com esse e-mail — ou ativar um link compartilhável que dá acesso de visualização ou edição a qualquer pessoa que o tenha, sem exigir login para visualizar.',
+							'Cada pessoa na lista tem um botão de e-mail que abre uma mensagem pronta para enviar no seu próprio aplicativo de e-mail, com o texto certo para cada caso: quem ainda está aguardando é orientado a entrar com aquele e-mail para ter acesso, enquanto quem já tem acesso recebe apenas um link para abrir a viagem. Escolha o idioma do e-mail no seletor (o padrão é o idioma do app). Nada é enviado automaticamente — você mesmo envia, do seu endereço.'
 						]
 					},
 					{

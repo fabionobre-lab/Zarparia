@@ -106,7 +106,7 @@
 	</div>
 
 	{#if showShare && data.role === 'owner'}
-		<SharePanel tripId={data.trip.id} />
+		<SharePanel tripId={data.trip.id} tripTitle={loc(data.trip as unknown as Trip, (data.trip as unknown as Trip).title, lang)} />
 	{/if}
 
 	{#if showPhotos && canEdit}

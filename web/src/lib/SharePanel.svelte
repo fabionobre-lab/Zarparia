@@ -1,11 +1,39 @@
 <script lang="ts">
 	import type { ShareRow, InviteRow, SharePermission } from '$lib/server/shares';
-	import { t } from '$lib/i18n/store.svelte';
+	import { t, translateIn, locale } from '$lib/i18n/store.svelte';
+	import { LOCALES, LOCALE_SHORT } from '$lib/i18n';
+	import type { Locale } from '$lib/i18n/messages';
 	import { busyButton } from '$lib/actions/busyButton';
 	import { toast } from '$lib/toast';
 	import ConfirmDialog from '$lib/dialog/ConfirmDialog.svelte';
 
-	let { tripId }: { tripId: string } = $props();
+	let { tripId, tripTitle }: { tripId: string; tripTitle: string } = $props();
+
+	// Language of the composed email, chosen independently of the app's UI
+	// language: the owner knows the recipient's language, and for a pending
+	// invitee (no account) there's no stored preference to auto-detect. Defaults
+	// to the current UI locale.
+	let emailLang = $state<Locale>(locale());
+
+	/** Open the owner's own mail client with a prefilled invite/notice, tailored
+	 *  to whether the recipient already has access (a real share) or will get it
+	 *  on first sign-in (a pending invite), and written in the chosen emailLang.
+	 *  Sending from the owner's own address keeps deliverability trustworthy and
+	 *  needs no email infrastructure. */
+	function openMail(kind: 'invite' | 'share', toEmail: string, perm: SharePermission) {
+		const url = `${location.origin}/trips/${tripId}`;
+		const role = translateIn(emailLang, perm === 'editor' ? 'share.emailRoleEditor' : 'share.emailRoleViewer');
+		const subject = translateIn(emailLang, kind === 'invite' ? 'share.emailInviteSubject' : 'share.emailShareSubject', {
+			trip: tripTitle
+		});
+		const body = translateIn(emailLang, kind === 'invite' ? 'share.emailInviteBody' : 'share.emailShareBody', {
+			trip: tripTitle,
+			role,
+			url,
+			email: toEmail
+		});
+		location.href = `mailto:${encodeURIComponent(toEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+	}
 
 	type LinkInfo = { url: string; role: SharePermission } | null;
 
@@ -306,11 +334,20 @@
 	{:else if shares.length === 0 && invites.length === 0}
 		<p class="muted">{t('share.notSharedYet')}</p>
 	{:else}
+		<div class="emaillang">
+			<label for="email-lang">{t('share.emailLanguage')}</label>
+			<select id="email-lang" bind:value={emailLang}>
+				{#each LOCALES as l (l)}
+					<option value={l}>{LOCALE_SHORT[l]}</option>
+				{/each}
+			</select>
+		</div>
 		<ul>
 			{#each shares as s (s.userId)}
 				<li>
 					<span class="who">{s.name ?? s.email}</span>
 					<span class="perm">{s.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
+					<button type="button" class="mail" onclick={() => openMail('share', s.email, s.permission)}>{t('share.emailNotify')}</button>
 					<button type="button" class="rm" onclick={() => remove(s.userId)} use:busyButton={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
@@ -319,6 +356,7 @@
 					<span class="who">{inv.email}</span>
 					<span class="perm pending">{t('share.pending')}</span>
 					<span class="perm">{inv.permission === 'editor' ? t('share.optionCanEdit') : t('share.optionCanView')}</span>
+					<button type="button" class="mail" onclick={() => openMail('invite', inv.email, inv.permission)}>{t('share.emailInvite')}</button>
 					<button type="button" class="rm" onclick={() => removeInvite(inv.email)} use:busyButton={busy}>{t('share.remove')}</button>
 				</li>
 			{/each}
@@ -475,6 +513,26 @@
 		color: var(--pill-bug-fg);
 		border-color: var(--hairline-strong);
 		padding: 0.25rem 0.5rem;
+	}
+	.mail {
+		background: none;
+		color: var(--text);
+		border-color: var(--hairline-strong);
+		padding: 0.25rem 0.5rem;
+	}
+	.emaillang {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-top: 0.7rem;
+	}
+	.emaillang label {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+	}
+	.emaillang select {
+		font-size: 0.8rem;
+		padding: 0.25rem 0.4rem;
 	}
 	.hint {
 		font-size: 0.72rem;

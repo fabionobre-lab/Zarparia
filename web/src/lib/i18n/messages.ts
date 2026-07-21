@@ -126,6 +126,15 @@ export interface Messages {
 	'share.hint': string;
 	'share.pending': string;
 	'share.invited': string;
+	'share.emailInvite': string;
+	'share.emailNotify': string;
+	'share.emailRoleViewer': string;
+	'share.emailRoleEditor': string;
+	'share.emailInviteSubject': string;
+	'share.emailInviteBody': string;
+	'share.emailShareSubject': string;
+	'share.emailShareBody': string;
+	'share.emailLanguage': string;
 	'share.errLoad': string;
 	'share.errLoadLink': string;
 	'share.errTurnOff': string;
@@ -666,6 +675,17 @@ const enGB: Messages = {
 	'share.hint': 'Invite anyone by email — if they don’t have an account yet, they’ll get access the first time they sign in.',
 	'share.pending': 'Pending sign-in',
 	'share.invited': 'Invited. They’ll get access the first time they sign in.',
+	'share.emailInvite': 'Email invite',
+	'share.emailNotify': 'Email',
+	'share.emailRoleViewer': 'view',
+	'share.emailRoleEditor': 'edit',
+	'share.emailInviteSubject': 'You’re invited to “{trip}” on Zarparia',
+	'share.emailInviteBody':
+		'Hi,\r\n\r\nI’d like to share my trip “{trip}” with you on Zarparia, where you’ll have {role} access.\r\n\r\nYou don’t have an account yet — just sign in once with this email address ({email}) and the trip will appear automatically:\r\n{url}\r\n\r\nSee you there!',
+	'share.emailShareSubject': 'I’ve shared “{trip}” with you on Zarparia',
+	'share.emailShareBody':
+		'Hi,\r\n\r\nI’ve shared my trip “{trip}” with you on Zarparia, where you have {role} access. It’s already in your account — open it here:\r\n{url}\r\n\r\nEnjoy!',
+	'share.emailLanguage': 'Email language',
 	'share.errLoad': 'Could not load sharing info.',
 	'share.errLoadLink': 'Could not load link info.',
 	'share.errTurnOff': 'Could not turn off the link.',
@@ -1193,6 +1213,17 @@ const ptBR: Messages = {
 	'share.hint': 'Convide qualquer pessoa por e-mail — se ainda não tiver conta, ela terá acesso assim que entrar pela primeira vez.',
 	'share.pending': 'Aguardando entrar',
 	'share.invited': 'Convite enviado. A pessoa terá acesso assim que entrar pela primeira vez.',
+	'share.emailInvite': 'Enviar convite',
+	'share.emailNotify': 'Avisar',
+	'share.emailRoleViewer': 'visualização',
+	'share.emailRoleEditor': 'edição',
+	'share.emailInviteSubject': 'Você foi convidado para “{trip}” no Zarparia',
+	'share.emailInviteBody':
+		'Olá,\r\n\r\nQuero compartilhar minha viagem “{trip}” com você no Zarparia, onde você terá acesso de {role}.\r\n\r\nVocê ainda não tem conta — basta entrar uma vez com este e-mail ({email}) e a viagem aparecerá automaticamente:\r\n{url}\r\n\r\nAté lá!',
+	'share.emailShareSubject': 'Compartilhei “{trip}” com você no Zarparia',
+	'share.emailShareBody':
+		'Olá,\r\n\r\nCompartilhei minha viagem “{trip}” com você no Zarparia, onde você tem acesso de {role}. Já está na sua conta — abra aqui:\r\n{url}\r\n\r\nAproveite!',
+	'share.emailLanguage': 'Idioma do e-mail',
 	'share.errLoad': 'Não foi possível carregar as informações de compartilhamento.',
 	'share.errLoadLink': 'Não foi possível carregar as informações do link.',
 	'share.errTurnOff': 'Não foi possível desativar o link.',

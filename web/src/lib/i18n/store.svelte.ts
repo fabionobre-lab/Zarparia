@@ -37,7 +37,14 @@ type Params = Record<string, string | number>;
 
 /** Translate a key with optional {placeholder} interpolation. */
 export function t(key: keyof Messages, params?: Params): string {
-	let out: string = catalogs[active][key];
+	return translateIn(active, key, params);
+}
+
+/** Like t(), but in an explicit locale rather than the active UI one — used for
+ *  content whose language is chosen independently of the UI (e.g. the invite
+ *  email the owner composes for a recipient in the recipient's language). */
+export function translateIn(loc: Locale, key: keyof Messages, params?: Params): string {
+	let out: string = catalogs[loc][key];
 	if (params) {
 		for (const name in params) {
 			out = out.replaceAll(`{${name}}`, String(params[name]));
