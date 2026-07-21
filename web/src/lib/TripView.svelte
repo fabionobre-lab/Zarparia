@@ -2247,7 +2247,12 @@
 	   applies to the whole .day-content grid. */
 	@media (min-width: 960px) {
 		.shell {
-			max-width: 1060px;
+			/* Full-bleed: fill the fluid content track beside the 240px sidebar
+			   rather than centring in a 1060px column. The extra width is routed to
+			   the map (the right grid track below is `1fr`); the timeline's left
+			   track is capped at a readable measure so line length stays sane while
+			   the map — and the route it shows — grow with the viewport. */
+			max-width: none;
 		}
 		/* The horizontal day nav + hero variant tabs are superseded by the desktop
 		   sidebar's day rail at every width ≥960px; hide them here (they return
@@ -2257,11 +2262,19 @@
 		.vtabs {
 			display: none;
 		}
+		/* Align the hero's horizontal padding to the day body's 24px so the eyebrow/
+		   title/budget bar line up with the timeline below at full bleed. */
+		.hero {
+			padding-left: 24px;
+			padding-right: 24px;
+		}
 		.day-content {
 			display: grid;
-			/* Map narrows on the 960–1199 tier so the timeline keeps its width next
-			   to the 240px sidebar; it returns to a fixed 420px at ≥1200 (below). */
-			grid-template-columns: minmax(0, 1fr) clamp(320px, 30vw, 420px);
+			/* Left track (timeline) capped at a readable line length; the map track
+			   is `1fr`, so all extra viewport width flows to the map. Map keeps a
+			   320px floor on the tight 960–1199 tier (240px sidebar present) and a
+			   420px floor at ≥1200 (below). */
+			grid-template-columns: minmax(0, 760px) minmax(320px, 1fr);
 			gap: 0 24px;
 			padding: 0 24px 8px;
 			align-items: start;
@@ -2318,7 +2331,7 @@
 	   persistent sidebar now carries the day rail at every width ≥960px. */
 	@media (min-width: 1200px) {
 		.day-content {
-			grid-template-columns: minmax(0, 1fr) 420px;
+			grid-template-columns: minmax(0, 760px) minmax(420px, 1fr);
 		}
 	}
 </style>

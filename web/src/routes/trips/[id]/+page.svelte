@@ -150,11 +150,12 @@
 			display: none;
 		}
 	}
-	/* Match the widened trip shell so the control bar doesn't sit 430px-wide
-	   above a 1060px shell. */
+	/* Match the full-bleed trip shell so the control bar spans the same width as
+	   the itinerary below it (was capped at 1060px alongside the old centred
+	   shell). */
 	@media (min-width: 960px) {
 		.bar {
-			max-width: 1060px;
+			max-width: none;
 		}
 	}
 	.actions {
