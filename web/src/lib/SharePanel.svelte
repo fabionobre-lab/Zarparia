@@ -40,11 +40,13 @@
 
 	const draftContent = $derived(draft ? emailContent(draft.kind, draft.email, draft.permission) : null);
 
-	/** Fire a mailto: (opens the owner's mail app where one is registered).
-	 *  Best-effort — the Copy button is the reliable path everywhere. */
+	/** Fire a mailto: in a new window/tab rather than navigating the current page
+	 *  (which in an embedded browser would replace the app). Best-effort — the
+	 *  Copy button is the reliable path everywhere. */
 	function openMailApp() {
 		if (!draft || !draftContent) return;
-		location.href = `mailto:${encodeURIComponent(draft.email)}?subject=${encodeURIComponent(draftContent.subject)}&body=${encodeURIComponent(draftContent.body)}`;
+		const href = `mailto:${encodeURIComponent(draft.email)}?subject=${encodeURIComponent(draftContent.subject)}&body=${encodeURIComponent(draftContent.body)}`;
+		window.open(href, '_blank');
 	}
 
 	async function copyDraft() {
