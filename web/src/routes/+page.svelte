@@ -1,11 +1,11 @@
 <script lang="ts">
-	import LocaleSwitcher from '$lib/i18n/LocaleSwitcher.svelte';
-	import ThemeToggle from '$lib/theme/ThemeToggle.svelte';
 	import BottomBar from '$lib/nav/BottomBar.svelte';
 	import AuthEmailForm from './AuthEmailForm.svelte';
 	import EmptyState from '$lib/ui/empty/EmptyState.svelte';
 	import { firebaseEnabled } from '$lib/firebase';
-	import { t, formatDateRange } from '$lib/i18n/store.svelte';
+	import { t, formatDateRange, locale, setLocale } from '$lib/i18n/store.svelte';
+	import { LOCALES, LOCALE_SHORT } from '$lib/i18n';
+	import { theme, setTheme } from '$lib/theme/store.svelte';
 	import type { Messages } from '$lib/i18n';
 	import { page } from '$app/state';
 	import { getNow } from '$lib/now';
@@ -104,6 +104,24 @@
 	// bottom of the card — matching Nobria/Saldaria — while the form lives in
 	// <AuthEmailForm bind:mode>.
 	let authMode = $state<'signin' | 'signup' | 'reset'>('signin');
+
+	// Login theme toggle: a clean 2-way sun/moon like Nobria (the in-app header
+	// keeps the full 3-way control). The icon itself is CSS-driven off <html>'s
+	// data-theme / prefers-color-scheme (SSR-safe, no hydration flash); the click
+	// resolves the effective theme and flips to the opposite explicit value.
+	function toggleTheme() {
+		const attr = document.documentElement.getAttribute('data-theme');
+		const isDark = attr ? attr === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+		setTheme(isDark ? 'light' : 'dark');
+	}
+	// Client-resolved effective theme, for the button's a11y label only.
+	let themeIsDark = $state(false);
+	$effect(() => {
+		theme(); // re-run when the stored preference changes
+		const attr = document.documentElement.getAttribute('data-theme');
+		themeIsDark = attr ? attr === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+	});
+	const themeLabel = $derived(themeIsDark ? t('theme.light') : t('theme.dark'));
 
 	$effect(() => {
 		const id = activeTrip?.id;
@@ -259,11 +277,59 @@
 					<p class="deleted-notice" role="status">{t('account.deletedNotice')}</p>
 				{/if}
 				<div class="auth-card-top">
-					<!-- There is no site-wide top bar, so the card carries the theme
-					     toggle (and EN|PT) itself at every width — which also satisfies
-					     the family login-card spec (theme + language never gated). -->
-					<span class="card-theme"><ThemeToggle /></span>
-					<LocaleSwitcher />
+					<!-- No site-wide top bar, so the card carries language + theme
+					     itself at every width (family login-card spec: never gated).
+					     Clean style shared with Nobria/Saldaria: plain "EN · PT" text
+					     on the left, a single borderless sun/moon toggle on the right. -->
+					<div class="auth-lang" role="group" aria-label={t('header.language')}>
+						{#each LOCALES as l, i (l)}
+							{#if i > 0}<span aria-hidden="true">·</span>{/if}
+							<button
+								type="button"
+								class:on={locale() === l}
+								aria-pressed={locale() === l}
+								onclick={() => setLocale(l)}
+							>
+								{LOCALE_SHORT[l]}
+							</button>
+						{/each}
+					</div>
+					<button
+						type="button"
+						class="auth-theme-btn"
+						onclick={toggleTheme}
+						aria-label={themeLabel}
+						title={themeLabel}
+					>
+						<!-- sun shown when dark is active, moon when light — CSS-driven
+						     off data-theme / prefers-color-scheme (mirrors the lockup). -->
+						<svg
+							class="theme-ico theme-ico-sun"
+							aria-hidden="true"
+							viewBox="0 0 24 24"
+							width="18"
+							height="18"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+						>
+							<circle cx="12" cy="12" r="4.2" />
+							<path
+								d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"
+							/>
+						</svg>
+						<svg
+							class="theme-ico theme-ico-moon"
+							aria-hidden="true"
+							viewBox="0 0 24 24"
+							width="18"
+							height="18"
+							fill="currentColor"
+						>
+							<path d="M20 14.6A8 8 0 0 1 9.4 4a1 1 0 0 0-1.3-1.3A9.5 9.5 0 1 0 21.3 15.9 1 1 0 0 0 20 14.6z" />
+						</svg>
+					</button>
 				</div>
 				<!-- Canonical lockup-with-tagline brand assets, verbatim (tagline is part
 				     of the artwork, so it stays English in both locales). Colors are baked
@@ -320,15 +386,6 @@
 							>{:else}{part}{/if}
 					{/each}
 				</p>
-				<div class="auth-legal-footer">
-					<a href="/guide">{t('nav.guide')}</a>
-					<span aria-hidden="true">·</span>
-					<a href="/roadmap">{t('nav.roadmap')}</a>
-					<span aria-hidden="true">·</span>
-					<a href="/privacy">{t('legal.privacy')}</a>
-					<span aria-hidden="true">·</span>
-					<a href="/terms">{t('legal.terms')}</a>
-				</div>
 			</div>
 		</div>
 	{/if}
@@ -564,10 +621,70 @@
 	   card is the landing's only chrome (family login-card spec satisfied).
 	   Bumped to a 44px tap target (the old header sizing, 34px, is too small
 	   for the card). */
-	.card-theme :global(.theme-toggle) {
-		width: 44px;
-		height: 44px;
-		min-height: 44px;
+	/* Clean login top-controls shared with Nobria/Saldaria: plain "EN · PT"
+	   text on the left, a single borderless sun/moon toggle on the right. */
+	.auth-lang {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+	}
+	.auth-lang button {
+		font: inherit;
+		background: none;
+		border: none;
+		padding: 0.25rem 0.15rem;
+		color: var(--text-muted);
+		cursor: pointer;
+	}
+	.auth-lang button:hover {
+		color: var(--text);
+		text-decoration: underline;
+	}
+	.auth-lang button.on {
+		color: var(--text);
+	}
+	.auth-lang span {
+		color: var(--text-muted);
+	}
+	.auth-theme-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border: none;
+		background: none;
+		color: var(--text-muted);
+		cursor: pointer;
+		border-radius: var(--radius-button);
+	}
+	.auth-theme-btn:hover {
+		color: var(--accent-strong);
+	}
+	/* Icon swap mirrors the lockup: moon by default (light), sun when dark is
+	   active — driven by data-theme / prefers-color-scheme, so it's SSR-safe. */
+	.theme-ico {
+		display: block;
+	}
+	.theme-ico-sun {
+		display: none;
+	}
+	:global(html[data-theme='dark']) .theme-ico-moon {
+		display: none;
+	}
+	:global(html[data-theme='dark']) .theme-ico-sun {
+		display: block;
+	}
+	@media (prefers-color-scheme: dark) {
+		:global(html:not([data-theme='light'])) .theme-ico-moon {
+			display: none;
+		}
+		:global(html:not([data-theme='light'])) .theme-ico-sun {
+			display: block;
+		}
 	}
 	.auth-lockup {
 		display: flex;
@@ -663,24 +780,6 @@
 		color: var(--accent-strong);
 	}
 	/* Unobtrusive legal footer at the very bottom of the signed-out card. */
-	.auth-legal-footer {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: center;
-		gap: 0.4rem;
-		margin-top: 1.25rem;
-		font-size: 0.72rem;
-		color: var(--text-muted);
-	}
-	.auth-legal-footer a {
-		color: var(--text-muted);
-		text-decoration: none;
-	}
-	.auth-legal-footer a:hover {
-		color: var(--accent-strong);
-		text-decoration: underline;
-	}
 	.auth-demo-callout {
 		display: flex;
 		flex-direction: column;
