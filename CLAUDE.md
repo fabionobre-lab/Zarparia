@@ -1,6 +1,12 @@
 ## House rules
 
 - A user-visible feature is not done until its /guide entry is updated (and /roadmap if it changes the public plan).
+- Deploy ONLY via `cd web && npm run deploy` as a single command. The Bash shell
+  resets to the repo root on every call (no config there), so the `cd web` must
+  ride along each time. Never run a bare `npx wrangler deploy` — from the root it
+  finds no config and drops into wrangler's setup wizard, which auto-answers "yes"
+  non-interactively and scaffolds junk (root `wrangler.jsonc`, `.gitignore` edits)
+  while trying to deploy the whole repo as static assets.
 
 ## Aria Nobre family design contract
 

@@ -1,5 +1,5 @@
 {
-	"updated": "2026-07-20",
+	"updated": "2026-07-21",
 	"items": [
 		{
 			"id": "trips-editor",
@@ -135,7 +135,11 @@
 		{
 			"id": "share-invite-emails",
 			"title": { "en": "Email when someone shares a trip with you", "pt": "E-mail quando alguém compartilhar uma viagem com você" },
-			"status": "planned"
+			"status": "shipped",
+			"note": {
+				"en": "When someone invites you to a trip, they send you an invite email from the Share panel, and the trip is waiting for you in the app the moment you sign in.",
+				"pt": "Quando alguém convida você para uma viagem, envia um e-mail de convite pelo painel de Compartilhar, e a viagem já fica esperando por você no aplicativo assim que você entra."
+			}
 		},
 		{
 			"id": "ownership-transfer",

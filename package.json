@@ -1,0 +1,14 @@
+{
+  "name": "uk-spring-2026-root",
+  "private": true,
+  "description": "Convenience wrapper: delegates deploy/build/dev/migrate to the SvelteKit app in web/. The real project lives in web/. This exists so `npm run <script>` from the repo root always runs in the right place (the Bash shell resets cwd to root each call), instead of misfiring wrangler from a config-less root.",
+  "scripts": {
+    "deploy": "npm --prefix web run deploy",
+    "build": "npm --prefix web run build",
+    "dev": "npm --prefix web run dev",
+    "preview": "npm --prefix web run preview",
+    "test": "npm --prefix web run test",
+    "db:migrate:local": "npm --prefix web run db:migrate:local",
+    "db:migrate:remote": "npm --prefix web run db:migrate:remote"
+  }
+}
