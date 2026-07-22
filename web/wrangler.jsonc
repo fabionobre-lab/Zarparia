@@ -16,8 +16,8 @@
 	// — this is a config-explicitness change, not a behaviour change.
 	"vars": {
 		"ADMIN_EMAIL": "fabionobre.ai@gmail.com",
-		// TODO: set after Firebase provisioning
-		"FIREBASE_PROJECT_ID": ""
+		// Firebase project id — public value (verifies ID-token aud/iss), not a secret.
+		"FIREBASE_PROJECT_ID": "zarparia"
 	},
 	"d1_databases": [
 		{

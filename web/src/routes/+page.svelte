@@ -99,6 +99,12 @@
 	// /terms and /privacy below, instead of injecting raw HTML.
 	const consentParts = $derived(t('landing.consentText').split(/(%TERMS%|%PRIVACY%)/));
 
+	// Sign-in vs request-access (vs reset) mode for the email form. Owned here so
+	// the "New here? Request access / Back to sign in" toggle can sit at the very
+	// bottom of the card — matching Nobria/Saldaria — while the form lives in
+	// <AuthEmailForm bind:mode>.
+	let authMode = $state<'signin' | 'signup' | 'reset'>('signin');
+
 	$effect(() => {
 		const id = activeTrip?.id;
 		activeDetail = null;
@@ -267,6 +273,18 @@
 					<span class="auth-lockup-light">{@html lockupLightSvg}</span>
 					<span class="auth-lockup-dark">{@html lockupDarkSvg}</span>
 				</div>
+				<!-- Email/password is the primary path (family login spec: email
+				     first, Google second). AuthEmailForm renders the form and its
+				     own sign-in/request-access/forgot links; the OR divider below
+				     separates it from the Google button. When Firebase isn't
+				     provisioned the form (and its divider) drop out and Google
+				     stands alone. -->
+				{#if firebaseEnabled}
+					<AuthEmailForm bind:mode={authMode} />
+					<div class="auth-or" role="separator" aria-hidden="true">
+						<span>{t('landing.orDivider')}</span>
+					</div>
+				{/if}
 				<a class="auth-google-btn" href="/auth/login/google">
 					<svg class="google-g" aria-hidden="true" viewBox="0 0 18 18" width="18" height="18">
 						<path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.62z" />
@@ -276,8 +294,24 @@
 					</svg>
 					{t('header.signInGoogle')}
 				</a>
+				<a class="auth-demo-callout" href="/demo">
+					<span class="auth-demo-title">{t('landing.tryDemo')}</span>
+					<span class="auth-demo-sub">{t('landing.tryDemoSub')}</span>
+				</a>
 				{#if firebaseEnabled}
-					<AuthEmailForm />
+					<!-- Invite-only mode toggle at the foot of the card (matches
+					     Nobria/Saldaria): flips the email form above into
+					     request-access mode, or back to sign-in from request/reset. -->
+					<div class="auth-mode-switch">
+						<button
+							type="button"
+							onclick={() => (authMode = authMode === 'signin' ? 'signup' : 'signin')}
+						>
+							{authMode === 'signin'
+								? t('authEmail.linkCreateAccount')
+								: t('authEmail.linkBackToSignIn')}
+						</button>
+					</div>
 				{/if}
 				<p class="auth-consent">
 					{#each consentParts as part, i (i)}
@@ -286,10 +320,6 @@
 							>{:else}{part}{/if}
 					{/each}
 				</p>
-				<a class="auth-demo-callout" href="/demo">
-					<span class="auth-demo-title">{t('landing.tryDemo')}</span>
-					<span class="auth-demo-sub">{t('landing.tryDemoSub')}</span>
-				</a>
 				<div class="auth-legal-footer">
 					<a href="/guide">{t('nav.guide')}</a>
 					<span aria-hidden="true">·</span>
@@ -542,7 +572,9 @@
 	.auth-lockup {
 		display: flex;
 		justify-content: center;
-		margin-bottom: 1.75rem;
+		/* Shared family login brand-block bottom margin: --an-space-4 (20px),
+		   identical across Nobria/Saldaria/Zarparia (was 1.75rem). */
+		margin-bottom: var(--an-space-4);
 	}
 	/* Width lives on the span (the flex item) — sizing the svg by percentage
 	   would be circular, since the span's own width comes from its content. */
@@ -573,6 +605,23 @@
 		:global(html:not([data-theme='light'])) .auth-lockup-dark {
 			display: block;
 		}
+	}
+	/* OR divider between the email form and the Google button (email-first
+	   family login spec). Mirrors the rule AuthEmailForm used to carry. */
+	.auth-or {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		margin: 0.9rem 0;
+		color: var(--text-muted);
+		font-size: 0.8rem;
+	}
+	.auth-or::before,
+	.auth-or::after {
+		content: '';
+		flex: 1;
+		height: 1px;
+		background: var(--hairline);
 	}
 	.auth-google-btn {
 		display: flex;
@@ -653,6 +702,26 @@
 	}
 	.auth-demo-callout:hover .auth-demo-title {
 		text-decoration: underline;
+	}
+	/* Invite-only mode toggle at the foot of the card (mirrors Nobria's
+	   login-links / Saldaria's auth-mode-switch). */
+	.auth-mode-switch {
+		margin-top: 1rem;
+		text-align: center;
+	}
+	.auth-mode-switch button {
+		font: inherit;
+		font-size: 0.78rem;
+		color: var(--text-muted);
+		background: none;
+		border: none;
+		padding: 0;
+		text-decoration: underline;
+		text-underline-offset: 0.15em;
+		cursor: pointer;
+	}
+	.auth-mode-switch button:hover {
+		color: var(--accent-strong);
 	}
 	@media (prefers-reduced-motion: no-preference) {
 		.auth-google-btn {

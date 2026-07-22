@@ -6,12 +6,13 @@
 // the dynamic import() in getFirebaseAuth() below, so the SDK never lands in
 // the main bundle for the (majority of) signed-out visitors who use Google
 // sign-in instead.
-// TODO: paste Firebase web-app config after provisioning
+// Public web-app config (these values ship in every client bundle — not secret).
+// Firebase project "zarparia", provisioned 2026-07-21.
 const firebaseConfig = {
-	apiKey: '',
-	authDomain: '',
-	projectId: '',
-	appId: ''
+	apiKey: 'AIzaSyDb0vuDZ2KPyPOkrmM6LD_lhILLw9VKbO4',
+	authDomain: 'zarparia.firebaseapp.com',
+	projectId: 'zarparia',
+	appId: '1:121048535951:web:700bf2f8b6a03e0b45b1fa'
 };
 
 /** False until firebaseConfig is filled in — gates the email/password UI so a

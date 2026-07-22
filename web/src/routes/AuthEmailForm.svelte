@@ -12,7 +12,11 @@
 	type Mode = 'signin' | 'signup' | 'reset';
 	type ErrorKey = Extract<keyof Messages, `authEmail.err${string}`>;
 
-	let mode = $state<Mode>('signin');
+	// `mode` is owned by the parent card (+page.svelte) so the "Request access /
+	// Back to sign in" toggle can live at the very bottom of the card — matching
+	// Nobria/Saldaria — while the form itself stays here. The in-form "Forgot
+	// password?" link still flips to reset mode locally.
+	let { mode = $bindable<Mode>('signin') } = $props();
 	let email = $state('');
 	let password = $state('');
 	let busy = $state(false);
@@ -23,7 +27,6 @@
 	let signupSuccess = $state(false);
 	let resetSent = $state(false);
 
-	const showForm = $derived(!verifyNotice && !signupSuccess && !resetSent);
 	const errorMessage = $derived(errorKey ? t(errorKey) : '');
 
 	/** Maps a Firebase Auth error code (or an unknown/absent one) to an i18n key. */
@@ -55,11 +58,18 @@
 		resetSent = false;
 	}
 
-	function switchMode(next: Mode) {
-		mode = next;
-		password = '';
-		resetTransientState();
-	}
+	// Reset the password field and any transient notice/error whenever the mode
+	// changes — driven either by the in-form "Forgot password?" link (mode =
+	// 'reset') or the parent card's bottom toggle (which mutates the bound
+	// `mode`). Guarded so the initial mount doesn't count as a change.
+	let lastMode: Mode = mode;
+	$effect(() => {
+		if (mode !== lastMode) {
+			lastMode = mode;
+			password = '';
+			resetTransientState();
+		}
+	});
 
 	async function handleSignin(e: Event) {
 		e.preventDefault();
@@ -167,8 +177,6 @@
 	);
 </script>
 
-<div class="divider" role="separator"><span>{t('landing.orDivider')}</span></div>
-
 <form class="email-form" onsubmit={onSubmit}>
 	{#if verifyNotice}
 		<p class="notice">{t('authEmail.verifyNotice')}</p>
@@ -196,6 +204,17 @@
 				/>
 				{#if mode === 'signup'}<span class="field-hint">{t('authEmail.passwordHint')}</span>{/if}
 			</label>
+			{#if mode === 'signin'}
+				<!-- Forgot-password sits inside the form, right-aligned under the
+				     inputs (matching Nobria/Saldaria); it flips to reset mode. The
+				     sign-in/request-access toggle lives at the card bottom, in
+				     +page.svelte. -->
+				<div class="forgot-row">
+					<button type="button" class="forgot-link" onclick={() => (mode = 'reset')}>
+						{t('authEmail.linkForgotPassword')}
+					</button>
+				</div>
+			{/if}
 		{/if}
 		{#if errorMessage}<p class="err">{errorMessage}</p>{/if}
 		<button type="submit" class="submit-btn" disabled={busy}>
@@ -204,34 +223,7 @@
 	{/if}
 </form>
 
-<div class="mode-links">
-	{#if showForm && mode === 'signin'}
-		<button type="button" onclick={() => switchMode('signup')}>{t('authEmail.linkCreateAccount')}</button>
-		<span aria-hidden="true">·</span>
-		<button type="button" onclick={() => switchMode('reset')}>{t('authEmail.linkForgotPassword')}</button>
-	{:else}
-		<button type="button" onclick={() => switchMode('signin')}>{t('authEmail.linkBackToSignIn')}</button>
-	{/if}
-</div>
-
 <style>
-	.divider {
-		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		margin: 0.9rem 0;
-		color: var(--text-muted);
-		font-size: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-	}
-	.divider::before,
-	.divider::after {
-		content: '';
-		flex: 1;
-		height: 1px;
-		background: var(--hairline);
-	}
 	.email-form {
 		display: flex;
 		flex-direction: column;
@@ -315,18 +307,16 @@
 		opacity: 0.6;
 		cursor: default;
 	}
-	.mode-links {
+	/* In-form forgot-password link, right-aligned directly under the inputs
+	   (matches Nobria's .login-forgot / Saldaria's inline link). */
+	.forgot-row {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		justify-content: center;
-		gap: 0.4rem;
-		margin-top: 0.75rem;
-		font-size: 0.78rem;
+		justify-content: flex-end;
+		margin-top: -0.1rem;
 	}
-	.mode-links button {
+	.forgot-link {
 		font: inherit;
-		font-size: inherit;
+		font-size: 0.78rem;
 		color: var(--text-muted);
 		background: none;
 		border: none;
@@ -335,10 +325,7 @@
 		text-underline-offset: 0.15em;
 		cursor: pointer;
 	}
-	.mode-links button:hover {
+	.forgot-link:hover {
 		color: var(--accent-strong);
-	}
-	.mode-links span {
-		color: var(--text-muted);
 	}
 </style>
