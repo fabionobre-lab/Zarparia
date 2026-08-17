@@ -5,6 +5,12 @@
 
 App orientation (stack, commands, architecture, data/backups): `web/CLAUDE.md`.
 
+**Session rule (Fabio, 2026-08-17): load the `/simple-english` skill (STE
+pragmatic mode) at session start.** Its rules bind every reply to Fabio and
+every user-facing string in this app. A SessionStart hook in
+`.claude/settings.json` injects a reminder; the rule holds even when the hook
+fails.
+
 ## Who this is for — read before any design decision
 
 Zarparia is a **multi-user public product, not a personal tool**. Open

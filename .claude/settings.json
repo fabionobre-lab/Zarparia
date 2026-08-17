@@ -1,5 +1,15 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"House rule (Fabio, 2026-08-17): load the /simple-english skill (simple-english:simple-english, STE pragmatic mode) with the Skill tool before you write any reply to Fabio or any user-facing app copy. Its rules bind all session output.\"},\"suppressOutput\":true}'"
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
