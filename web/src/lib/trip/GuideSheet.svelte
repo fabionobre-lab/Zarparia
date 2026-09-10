@@ -84,6 +84,17 @@
 		}
 	});
 
+	/** Move the overlay to <body>. Inside TripBlock it would be a direct child
+	 *  of TripDay's timeline, where `.tl > *` applies the day-switch entry
+	 *  animation and overrides this sheet's own fade-in (opacity stuck at 0 with
+	 *  the scroll lock on). Body-level also keeps position: fixed honest while a
+	 *  stop card is mid-animation. Svelte removes the node on unmount wherever it
+	 *  lives; the explicit remove is belt and braces. */
+	function portal(node: HTMLElement) {
+		document.body.appendChild(node);
+		return { destroy: () => node.remove() };
+	}
+
 	function focusables(): HTMLElement[] {
 		if (!panelEl) return [];
 		return Array.from(
@@ -131,6 +142,7 @@
 
 <div
 	bind:this={panelEl}
+	use:portal
 	class="gs-overlay"
 	role="dialog"
 	aria-modal="true"
