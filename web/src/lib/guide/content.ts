@@ -195,6 +195,15 @@ export const guide: GuideCatalog = {
 						]
 					},
 					{
+						id: 'stop-guide',
+						title: 'Read a stop guide',
+						body: [
+							'A stop with a guide shows a small (i) button next to its title. Tap it to open the guide in full screen.',
+							'The guide has five parts: why the stop matters, what to know before you go in, what not to miss, the story, and details to look for.',
+							'Close the guide with the X, the Escape key, or the Back gesture. The guide is read-only. For now, you add a guide through the connector or in the trip document.'
+						]
+					},
+					{
 						id: 'delete-account',
 						title: 'Delete my account',
 						body: [
@@ -462,6 +471,15 @@ export const guide: GuideCatalog = {
 						body: [
 							'No editor de blocos, qualquer parada pode ter um ou mais links de reserva — cole a URL de uma confirmação de hotel (Booking.com, Expedia, Airbnb, Hotels.com e outros), de uma reserva em restaurante ou de um ingresso. Deixe o rótulo em branco e o Zarparia nomeia a pílula a partir do próprio link (por exemplo, uma URL do booking.com aparece como "Booking.com"); defina um rótulo para substituí-lo.',
 							'Os links aparecem como pílulas clicáveis na parada, na visualização da viagem, e são listados por completo — rótulo e URL — no roteiro impresso/PDF. Eles acompanham a viagem, então quem você compartilhá-la também os vê; adicione apenas links que você não se importe que essas pessoas abram.'
+						]
+					},
+					{
+						id: 'stop-guide',
+						title: 'Ler o guia de uma parada',
+						body: [
+							'Uma parada com guia mostra um pequeno botão (i) ao lado do título. Toque nele para abrir o guia em tela cheia.',
+							'O guia tem cinco partes: por que a parada importa, o que saber antes de entrar, o que não perder, a história e detalhes para observar.',
+							'Feche o guia com o X, a tecla Esc ou o gesto de voltar. O guia é só de leitura. Por enquanto, você adiciona um guia pelo conector ou no documento da viagem.'
 						]
 					},
 					{

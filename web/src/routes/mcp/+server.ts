@@ -45,7 +45,8 @@ const AUTHORING_GUIDANCE = [
 	'Tags: define a trip-level `tags` vocabulary and reference its keys from each block\'s `tags` for colored chips (styles: sight, food, booking, logistics, birthday, fullday).',
 	'Links: add block `links` [{url, label?}] for hotel/restaurant/ticket bookings.',
 	'Alternative plans: when a segment has a genuine fork (a rainy-day option, a with-kids vs without version, a longer vs shorter route), give it more than one entry in `plans` — each with its own `id`, a `label` (e.g. {"en":"Rainy day"}) and its full `days` — and set the segment `defaultPlan` to the primary plan\'s id. To flag how a plan differs, add `diffLabels` {added, changed, kept} to that plan and mark the relevant blocks with `diff` {kind, reason}. Only do this for a real choice — most segments have exactly one plan.',
-	'Finishing touches: a trip `cover` emoji, an `eyebrow` (e.g. the month), day `note`/`routeMode`/`banner`, `waypoints` for multi-stop days, and a `checklist` where useful.'
+	'Finishing touches: a trip `cover` emoji, an `eyebrow` (e.g. the month), day `note`/`routeMode`/`banner`, `waypoints` for multi-stop days, and a `checklist` where useful.',
+	'Stop guide: a block `guide` {why?, before?, dontMiss?[{name, text}], story?, closer?} holds a per-stop reading guide, shown in a full-screen overlay from an (i) button; every field is optional and all are localized.'
 ];
 
 const RICH_EXAMPLE: TripDoc = {

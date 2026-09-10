@@ -146,6 +146,50 @@ describe('validateTripDoc — photoSpot name (Localized | string back-compat)', 
 	});
 });
 
+describe('validateTripDoc — block guide (stop guide)', () => {
+	it('accepts a block with an empty guide object', () => {
+		const doc = baseTrip({ guide: {} });
+		const result = validateTripDoc(doc);
+		expect(result.errors).toEqual([]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('accepts a block with a full guide', () => {
+		const doc = baseTrip({
+			guide: {
+				why: { en: 'Why this stop matters.' },
+				before: { en: 'Book ahead; queues form early.' },
+				dontMiss: [
+					{ name: { en: 'The nave' }, text: { en: 'Look up at the ceiling.' } },
+					{ name: { en: 'The cloister' }, text: { en: 'Quiet corner, few visitors.' } }
+				],
+				story: { en: 'Built in the 12th century.\n\nRestored after the fire.' },
+				closer: { en: 'The worn step by the north door.' }
+			}
+		});
+		const result = validateTripDoc(doc);
+		expect(result.errors).toEqual([]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('rejects a guide with an unknown key', () => {
+		const doc = baseTrip({ guide: { why: { en: 'Why' }, extra: 'nope' } });
+		expect(validateTripDoc(doc).valid).toBe(false);
+	});
+
+	it('rejects a dontMiss item missing text', () => {
+		const doc = baseTrip({ guide: { dontMiss: [{ name: { en: 'The nave' } }] } });
+		expect(validateTripDoc(doc).valid).toBe(false);
+	});
+
+	it('rejects a dontMiss item with an unknown extra property', () => {
+		const doc = baseTrip({
+			guide: { dontMiss: [{ name: { en: 'N' }, text: { en: 'T' }, extra: 'nope' }] }
+		});
+		expect(validateTripDoc(doc).valid).toBe(false);
+	});
+});
+
 describe('loc() — plain-string passthrough', () => {
 	const trip: Trip = {
 		id: 't',

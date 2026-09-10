@@ -28,6 +28,26 @@ export interface Checklist {
 	title: Localized;
 	items: ChecklistItem[];
 }
+/** One "don't miss" item inside a block's reading guide, in walking order. */
+export interface GuideDontMissItem {
+	name: Localized;
+	text: Localized;
+}
+/** Optional per-stop reading guide, shown in a full-screen overlay from the
+ *  (i) button on the block title row (GuideSheet.svelte). Every field is
+ *  optional; the button only renders once at least one is non-empty. */
+export interface Guide {
+	/** One or two sentences on why this stop matters. */
+	why?: Localized;
+	/** Practical must-knows before going in. */
+	before?: Localized;
+	/** Items in walking order. */
+	dontMiss?: GuideDontMissItem[];
+	/** Brief history and context, several short paragraphs ("\n\n" separated). */
+	story?: Localized;
+	/** Details most people walk past. */
+	closer?: Localized;
+}
 /** An external booking/reservation link on a block (hotel confirmation, etc.).
  *  `label` is optional; when absent the UI derives a provider name from the
  *  URL host via `linkLabel()`. */
@@ -63,6 +83,8 @@ export interface Block {
 	/** Packing/pre-trip checklist (Phase 6 item 2, Tripsy pattern). Usable on
 	 *  any day's block, including a dedicated pre-trip block. */
 	checklist?: Checklist;
+	/** Optional per-stop reading guide. */
+	guide?: Guide;
 }
 export interface Day {
 	date: string;

@@ -29,6 +29,7 @@
 	import PhotoStrip from './PhotoStrip.svelte';
 	import EditableText from './EditableText.svelte';
 	import BlockInspector from './BlockInspector.svelte';
+	import GuideSheet from './GuideSheet.svelte';
 	import Tip from '$lib/Tip.svelte';
 
 	let {
@@ -139,6 +140,17 @@
 		shopping: '🛍️',
 		other: '💷'
 	};
+
+	// ── Stop guide (i) button + full-screen overlay ──
+	// The button only renders once the guide has at least one non-empty
+	// section — an empty `guide: {}` object (or one whose only populated
+	// field resolves to "" in this language) shouldn't add a dead button.
+	const hasGuide = $derived.by(() => {
+		const g = block.guide;
+		if (!g) return false;
+		return !!(L(g.why) || L(g.before) || g.dontMiss?.length || L(g.story) || L(g.closer));
+	});
+	let guideOpen = $state(false);
 </script>
 
 <div class="tb" class:tb-edit={edit}>
@@ -211,6 +223,19 @@
 						<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" /><circle cx="12" cy="9" r="2.5" /></svg>
 					</span>
 				</a>
+			{/if}
+			{#if hasGuide}
+				<button
+					type="button"
+					class="map-icon-btn"
+					onclick={() => (guideOpen = true)}
+					aria-label={t('block.guideOpen')}
+					title={t('block.guideOpen')}
+				>
+					<span class="map-icon-circle">
+						<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9.5" /><path d="M12 11v5.5" stroke-linecap="round" /><circle cx="12" cy="8" r="0.6" fill="currentColor" stroke="none" /></svg>
+					</span>
+				</button>
 			{/if}
 			{#if edit}
 				<BlockInspector
@@ -344,6 +369,10 @@
 		{/if}
 	</div>
 </div>
+
+{#if guideOpen}
+	<GuideSheet {trip} {lang} {block} mapsLabel={uiText.maps} onclose={() => (guideOpen = false)} />
+{/if}
 
 <style>
 	.tb {
@@ -524,6 +553,15 @@
 		flex-shrink: 0;
 		color: var(--text-muted);
 		text-decoration: none;
+	}
+	/* The guide button reuses .map-icon-btn but is a <button>, not an <a> —
+	   reset the native button chrome the anchor never had. */
+	button.map-icon-btn {
+		border: none;
+		background: transparent;
+		padding: 0;
+		font: inherit;
+		cursor: pointer;
 	}
 	.map-icon-circle {
 		display: inline-flex;

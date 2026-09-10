@@ -12,6 +12,11 @@ import type { CostCategory } from '../trip-engine';
 
 export interface TripChromeMessages {
 	maps: string;
+	/** Section headings of the per-stop guide sheet. */
+	guideBefore: string;
+	guideDontMiss: string;
+	guideStory: string;
+	guideCloser: string;
 	dayRoute: string;
 	/** Screen-reader label for the numbered timeline dot ("Stop 5"), tying the
 	 *  block to its map pin and its place in the Day Route. */
@@ -67,6 +72,10 @@ export interface TripChromeMessages {
 export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 	en: {
 		maps: 'Open in Maps',
+		guideBefore: 'Before you go in',
+		guideDontMiss: "Don't miss",
+		guideStory: 'The story',
+		guideCloser: 'Look closer',
 		dayRoute: 'Day Route',
 		stop: 'Stop',
 		openRoute: 'Open route in Google Maps →',
@@ -108,6 +117,10 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 	},
 	pt: {
 		maps: 'Abrir no Maps',
+		guideBefore: 'Antes de entrar',
+		guideDontMiss: 'Não perca',
+		guideStory: 'A história',
+		guideCloser: 'Olhe de perto',
 		dayRoute: 'Rota do Dia',
 		stop: 'Parada',
 		openRoute: 'Abrir rota no Google Maps →',

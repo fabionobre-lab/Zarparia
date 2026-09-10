@@ -413,6 +413,10 @@ export interface Messages {
 	'block.cat.activities': string;
 	'block.cat.shopping': string;
 	'block.cat.other': string;
+	'block.guideOpen': string;
+
+	// ── Stop guide (trip/GuideSheet.svelte) ──
+	'guide.close': string;
 
 	// ── Place search (PlaceSearch.svelte) ──
 	'place.findPlace': string;
@@ -1005,6 +1009,9 @@ const enGB: Messages = {
 	'block.cat.activities': 'Activities',
 	'block.cat.shopping': 'Shopping',
 	'block.cat.other': 'Other',
+	'block.guideOpen': 'Open stop guide',
+
+	'guide.close': 'Close guide',
 
 	'place.findPlace': 'Find place',
 	'place.searchPlaceholder': 'Search for a place…',
@@ -1594,6 +1601,9 @@ const ptBR: Messages = {
 	'block.cat.activities': 'Atividades',
 	'block.cat.shopping': 'Compras',
 	'block.cat.other': 'Outros',
+	'block.guideOpen': 'Abrir guia da parada',
+
+	'guide.close': 'Fechar guia',
 
 	'place.findPlace': 'Buscar lugar',
 	'place.searchPlaceholder': 'Buscar um lugar…',

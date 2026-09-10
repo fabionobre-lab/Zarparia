@@ -315,6 +315,42 @@
               }
             }
           }
+        },
+        "guide": {
+          "description": "Optional per-stop reading guide, shown in a full-screen overlay from a small (i) button on the block title row. Every field is optional.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "why": {
+              "$ref": "#/$defs/localized",
+              "description": "One or two sentences on why this stop matters"
+            },
+            "before": {
+              "$ref": "#/$defs/localized",
+              "description": "Practical must-knows before going in"
+            },
+            "dontMiss": {
+              "description": "Items in walking order",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["name", "text"],
+                "additionalProperties": false,
+                "properties": {
+                  "name": { "$ref": "#/$defs/localized" },
+                  "text": { "$ref": "#/$defs/localized" }
+                }
+              }
+            },
+            "story": {
+              "$ref": "#/$defs/localized",
+              "description": "Brief history and context, several short paragraphs (\\n\\n separated)"
+            },
+            "closer": {
+              "$ref": "#/$defs/localized",
+              "description": "Details most people walk past"
+            }
+          }
         }
       }
     }
