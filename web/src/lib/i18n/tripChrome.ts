@@ -17,6 +17,8 @@ export interface TripChromeMessages {
 	guideDontMiss: string;
 	guideStory: string;
 	guideCloser: string;
+	/** Credit-line label for a guide reference photo. */
+	guidePhoto: string;
 	dayRoute: string;
 	/** Screen-reader label for the numbered timeline dot ("Stop 5"), tying the
 	 *  block to its map pin and its place in the Day Route. */
@@ -76,6 +78,7 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		guideDontMiss: "Don't miss",
 		guideStory: 'The story',
 		guideCloser: 'Look closer',
+		guidePhoto: 'Photo',
 		dayRoute: 'Day Route',
 		stop: 'Stop',
 		openRoute: 'Open route in Google Maps →',
@@ -121,6 +124,7 @@ export const tripChrome: Record<'en' | 'pt', TripChromeMessages> = {
 		guideDontMiss: 'Não perca',
 		guideStory: 'A história',
 		guideCloser: 'Olhe de perto',
+		guidePhoto: 'Foto',
 		dayRoute: 'Rota do Dia',
 		stop: 'Parada',
 		openRoute: 'Abrir rota no Google Maps →',

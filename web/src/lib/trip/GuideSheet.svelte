@@ -9,7 +9,7 @@
 	import { untrack, onDestroy } from 'svelte';
 	import { pushState, beforeNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { type Trip, type Block, loc, safeUrl } from '$lib/trip-engine';
+	import { type Trip, type Block, type GuideImage, loc, safeUrl, guideImageUrl } from '$lib/trip-engine';
 	import { t } from '$lib/i18n/store.svelte';
 	import { tripT } from '$lib/i18n/tripChrome';
 
@@ -47,6 +47,27 @@
 	const story = $derived(L(guide?.story));
 	const closer = $derived(L(guide?.closer));
 	const titleId = 'guide-sheet-title';
+
+	const photoLabel = $derived(tripT(lang, 'guidePhoto'));
+	const heroUrl = $derived(guideImageUrl(guide?.image, 960));
+	let heroImgError = $state(false);
+	/** Keyed by the dontMiss item's index; true once that item's image has
+	 *  failed to load and its whole figure should be hidden. */
+	let itemImgError = $state<Record<number, boolean>>({});
+
+	/** Wikimedia Commons file page for `file`, used as the credit-line link
+	 *  target for a Commons-sourced image. */
+	function commonsFileUrl(file: string): string {
+		return 'https://commons.wikimedia.org/wiki/File:' + encodeURIComponent(file);
+	}
+
+	/** Build the "Photo: credit, license" credit line, omitting whichever of
+	 *  credit/license is absent (and the label alone when both are absent). */
+	function creditText(img: GuideImage | undefined): string {
+		if (!img) return '';
+		const bits = [img.credit, img.license].filter((b): b is string => !!b);
+		return bits.length ? `${photoLabel}: ${bits.join(', ')}` : photoLabel;
+	}
 
 	let panelEl = $state<HTMLDivElement | null>(null);
 	let restoreFocus: HTMLElement | null = null;
@@ -166,6 +187,26 @@
 	</div>
 	<div class="gs-body">
 		<div class="gs-content">
+			{#if heroUrl && !heroImgError}
+				<figure class="gs-hero">
+					<img
+						src={heroUrl}
+						alt={L(block.title)}
+						loading="lazy"
+						decoding="async"
+						onerror={() => (heroImgError = true)}
+					/>
+					<figcaption>
+						{#if guide?.image?.file}
+							<a href={commonsFileUrl(guide.image.file)} target="_blank" rel="noopener noreferrer"
+								>{creditText(guide.image)}</a
+							>
+						{:else}
+							{creditText(guide?.image)}
+						{/if}
+					</figcaption>
+				</figure>
+			{/if}
 			{#if why}
 				<p class="gs-why">{why}</p>
 			{/if}
@@ -182,11 +223,36 @@
 					<h3>{tripT(lang, 'guideDontMiss')}</h3>
 					<ol class="gs-dont-miss">
 						{#each dontMiss as item, i (i)}
+							{@const itemUrl = guideImageUrl(item.image, 330)}
 							<li>
-								<strong>{L(item.name)}</strong>
-								{#each paras(L(item.text)) as p, j (j)}
-									<p>{p}</p>
-								{/each}
+								<div class="gs-dm-item">
+									{#if itemUrl && !itemImgError[i]}
+										<figure class="gs-dm-figure">
+											<img
+												src={itemUrl}
+												alt={L(item.name)}
+												loading="lazy"
+												decoding="async"
+												onerror={() => (itemImgError[i] = true)}
+											/>
+											<figcaption>
+												{#if item.image?.file}
+													<a href={commonsFileUrl(item.image.file)} target="_blank" rel="noopener noreferrer"
+														>{creditText(item.image)}</a
+													>
+												{:else}
+													{creditText(item.image)}
+												{/if}
+											</figcaption>
+										</figure>
+									{/if}
+									<div class="gs-dm-text">
+										<strong>{L(item.name)}</strong>
+										{#each paras(L(item.text)) as p, j (j)}
+											<p>{p}</p>
+										{/each}
+									</div>
+								</div>
 							</li>
 						{/each}
 					</ol>
@@ -352,13 +418,66 @@
 		line-height: 1.55;
 		color: var(--text);
 	}
-	.gs-dont-miss strong {
+	.gs-dm-item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.gs-dm-text strong {
 		display: block;
 		font-weight: 700;
 		margin-bottom: 0.15rem;
 	}
-	.gs-dont-miss p {
+	.gs-dm-text p {
 		margin: 0;
 		color: var(--text);
+	}
+	.gs-hero,
+	.gs-dm-figure {
+		margin: 0;
+	}
+	.gs-hero {
+		margin-bottom: 1.4rem;
+	}
+	.gs-hero img,
+	.gs-dm-figure img {
+		display: block;
+		width: 100%;
+		height: auto;
+		border-radius: var(--radius-lg);
+		border: 1px solid var(--hairline);
+		filter: var(--photo-filter, none);
+	}
+	.gs-dm-figure img {
+		border-radius: var(--radius-md);
+	}
+	.gs-hero figcaption,
+	.gs-dm-figure figcaption {
+		margin-top: 0.35rem;
+		font-size: 0.72rem;
+		line-height: 1.4;
+		color: var(--text-muted);
+	}
+	.gs-hero figcaption a,
+	.gs-dm-figure figcaption a {
+		color: var(--text-muted);
+		text-decoration: underline;
+	}
+	.gs-dm-figure {
+		flex-shrink: 0;
+	}
+	@media (min-width: 560px) {
+		.gs-dm-item {
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 0.85rem;
+		}
+		.gs-dm-figure {
+			width: 120px;
+		}
+		.gs-dm-text {
+			flex: 1;
+			min-width: 0;
+		}
 	}
 </style>

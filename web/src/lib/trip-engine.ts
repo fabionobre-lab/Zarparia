@@ -28,10 +28,25 @@ export interface Checklist {
 	title: Localized;
 	items: ChecklistItem[];
 }
+/** A reference photo attached to a guide or a "don't miss" item. Either
+ *  `file` (a Wikimedia Commons file) or `url` (a licensed image the owner
+ *  supplies directly) must be set; `guideImageUrl()` resolves the one to
+ *  render. */
+export interface GuideImage {
+	/** Wikimedia Commons file name without the "File:" prefix. */
+	file?: string;
+	/** Direct https image URL, used when `file` is absent (licensed image supplied by the owner). */
+	url?: string;
+	/** Photographer or author, shown as a credit line. */
+	credit?: string;
+	/** License short name, e.g. "CC BY-SA 4.0". */
+	license?: string;
+}
 /** One "don't miss" item inside a block's reading guide, in walking order. */
 export interface GuideDontMissItem {
 	name: Localized;
 	text: Localized;
+	image?: GuideImage;
 }
 /** Optional per-stop reading guide, shown in a full-screen overlay from the
  *  (i) button on the block title row (GuideSheet.svelte). Every field is
@@ -47,6 +62,33 @@ export interface Guide {
 	story?: Localized;
 	/** Details most people walk past. */
 	closer?: Localized;
+	/** Hero image, shown under the title. */
+	image?: GuideImage;
+}
+
+/** Wikimedia's standard thumbnail widths for the Special:Redirect/file
+ *  endpoint. Do not pass any other width. */
+export type GuideImageWidth = 330 | 500 | 960;
+
+/** Resolve a `GuideImage` to a renderable https URL, or undefined when the
+ *  image has neither a usable `url` nor a `file`. `url` wins when both are
+ *  set; only an https `url` is accepted (a non-https `url` is rejected, not
+ *  silently allowed). */
+export function guideImageUrl(
+	img: GuideImage | undefined,
+	width: GuideImageWidth
+): string | undefined {
+	if (!img) return undefined;
+	if (img.url) return /^https:\/\//i.test(img.url) ? img.url : undefined;
+	if (img.file) {
+		return (
+			'https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/' +
+			encodeURIComponent(img.file) +
+			'&width=' +
+			width
+		);
+	}
+	return undefined;
 }
 /** An external booking/reservation link on a block (hotel confirmation, etc.).
  *  `label` is optional; when absent the UI derives a provider name from the

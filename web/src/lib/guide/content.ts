@@ -200,6 +200,7 @@ export const guide: GuideCatalog = {
 						body: [
 							'A stop with a guide shows a small (i) button next to its title. Tap it to open the guide in full screen.',
 							'The guide has five parts: why the stop matters, what to know before you go in, what not to miss, the story, and details to look for.',
+							'A guide can also show a reference photo under the title, and beside a "don\'t miss" item, with the photographer\'s credit.',
 							'Close the guide with the X, the Escape key, or the Back gesture. The guide is read-only. For now, you add a guide through the connector or in the trip document.'
 						]
 					},
@@ -479,6 +480,7 @@ export const guide: GuideCatalog = {
 						body: [
 							'Uma parada com guia mostra um pequeno botão (i) ao lado do título. Toque nele para abrir o guia em tela cheia.',
 							'O guia tem cinco partes: por que a parada importa, o que saber antes de entrar, o que não perder, a história e detalhes para observar.',
+							'Um guia também pode mostrar uma foto de referência abaixo do título, e ao lado de um item "não perca", com o crédito do fotógrafo.',
 							'Feche o guia com o X, a tecla Esc ou o gesto de voltar. O guia é só de leitura. Por enquanto, você adiciona um guia pelo conector ou no documento da viagem.'
 						]
 					},

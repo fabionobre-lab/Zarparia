@@ -188,6 +188,56 @@ describe('validateTripDoc — block guide (stop guide)', () => {
 		});
 		expect(validateTripDoc(doc).valid).toBe(false);
 	});
+
+	it('accepts a guide with an image {file, credit, license}', () => {
+		const doc = baseTrip({
+			guide: {
+				why: { en: 'Why this stop matters.' },
+				image: { file: 'Example.jpg', credit: 'Jane Doe', license: 'CC BY-SA 4.0' }
+			}
+		});
+		const result = validateTripDoc(doc);
+		expect(result.errors).toEqual([]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('accepts a dontMiss item with an image {url}', () => {
+		const doc = baseTrip({
+			guide: {
+				dontMiss: [
+					{
+						name: { en: 'The nave' },
+						text: { en: 'Look up at the ceiling.' },
+						image: { url: 'https://example.com/nave.jpg' }
+					}
+				]
+			}
+		});
+		const result = validateTripDoc(doc);
+		expect(result.errors).toEqual([]);
+		expect(result.valid).toBe(true);
+	});
+
+	it('rejects an image with neither file nor url', () => {
+		const doc = baseTrip({
+			guide: { image: { credit: 'Jane Doe' } }
+		});
+		expect(validateTripDoc(doc).valid).toBe(false);
+	});
+
+	it('rejects an image url that is not https', () => {
+		const doc = baseTrip({
+			guide: { image: { url: 'http://example.com/nave.jpg' } }
+		});
+		expect(validateTripDoc(doc).valid).toBe(false);
+	});
+
+	it('rejects an image with an unknown key', () => {
+		const doc = baseTrip({
+			guide: { image: { file: 'Example.jpg', caption: 'nope' } }
+		});
+		expect(validateTripDoc(doc).valid).toBe(false);
+	});
 });
 
 describe('loc() — plain-string passthrough', () => {

@@ -46,7 +46,7 @@ const AUTHORING_GUIDANCE = [
 	'Links: add block `links` [{url, label?}] for hotel/restaurant/ticket bookings.',
 	'Alternative plans: when a segment has a genuine fork (a rainy-day option, a with-kids vs without version, a longer vs shorter route), give it more than one entry in `plans` — each with its own `id`, a `label` (e.g. {"en":"Rainy day"}) and its full `days` — and set the segment `defaultPlan` to the primary plan\'s id. To flag how a plan differs, add `diffLabels` {added, changed, kept} to that plan and mark the relevant blocks with `diff` {kind, reason}. Only do this for a real choice — most segments have exactly one plan.',
 	'Finishing touches: a trip `cover` emoji, an `eyebrow` (e.g. the month), day `note`/`routeMode`/`banner`, `waypoints` for multi-stop days, and a `checklist` where useful.',
-	'Stop guide: a block `guide` {why?, before?, dontMiss?[{name, text}], story?, closer?} holds a per-stop reading guide, shown in a full-screen overlay from an (i) button; every field is optional and all are localized.'
+	'Stop guide: a block `guide` {why?, before?, dontMiss?[{name, text, image?}], story?, closer?, image?} holds a per-stop reading guide, shown in a full-screen overlay from an (i) button; every field is optional and all are localized. `image` {file|url, credit?, license?} attaches a reference photo to the guide (shown under the title) or to a dontMiss item (shown beside it); set `file` (a Wikimedia Commons file name) or `url` (a direct https image URL).'
 ];
 
 const RICH_EXAMPLE: TripDoc = {

@@ -84,6 +84,26 @@
       "additionalProperties": { "type": "string" },
       "description": "Map of language code to string, e.g. {\"en\": ..., \"pt\": ...}"
     },
+    "guideImage": {
+      "description": "A reference photo attached to a guide or a don't-miss item. Set file or url (or both; url wins).",
+      "type": "object",
+      "additionalProperties": false,
+      "anyOf": [{ "required": ["file"] }, { "required": ["url"] }],
+      "properties": {
+        "file": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Wikimedia Commons file name without the 'File:' prefix"
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://",
+          "description": "Direct https image URL, used when file is absent"
+        },
+        "credit": { "type": "string", "description": "Photographer or author" },
+        "license": { "type": "string", "description": "License short name, e.g. 'CC BY-SA 4.0'" }
+      }
+    },
     "segment": {
       "type": "object",
       "required": ["id", "title", "plans"],
@@ -338,7 +358,8 @@
                 "additionalProperties": false,
                 "properties": {
                   "name": { "$ref": "#/$defs/localized" },
-                  "text": { "$ref": "#/$defs/localized" }
+                  "text": { "$ref": "#/$defs/localized" },
+                  "image": { "$ref": "#/$defs/guideImage" }
                 }
               }
             },
@@ -349,7 +370,8 @@
             "closer": {
               "$ref": "#/$defs/localized",
               "description": "Details most people walk past"
-            }
+            },
+            "image": { "$ref": "#/$defs/guideImage" }
           }
         }
       }
