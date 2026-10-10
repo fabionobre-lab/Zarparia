@@ -40,3 +40,21 @@ export function resolveTheme(cookieValue: string | null | undefined): ThemeMode 
 export function themeAttr(mode: ThemeMode): string {
 	return mode === 'light' || mode === 'dark' ? ` data-theme="${mode}"` : '';
 }
+
+/** Manifest files. Android 3-button navigation paints the system bar from the
+ *  manifest colour, and a manifest holds ONE colour. So there are two files,
+ *  identical except theme_color and background_color (test/dark-manifest.test.ts
+ *  pins that), and the `<link rel="manifest">` points at the one that matches
+ *  the theme in use. Both carry `"id": "/"`, so they are one app. */
+export const MANIFEST_LIGHT = '/manifest.webmanifest';
+export const MANIFEST_DARK = '/manifest-dark.webmanifest';
+
+/** True when the theme in use is dark. A pinned mode wins. `system` follows the OS. */
+export function isDarkTheme(mode: ThemeMode, systemDark: boolean): boolean {
+	return mode === 'dark' || (mode === 'system' && systemDark);
+}
+
+/** The manifest URL for the theme in use. */
+export function manifestHref(dark: boolean): string {
+	return dark ? MANIFEST_DARK : MANIFEST_LIGHT;
+}
