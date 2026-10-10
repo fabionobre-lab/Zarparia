@@ -15,6 +15,8 @@ import {
 	THEME_COOKIE,
 	THEME_COOKIE_MAX_AGE,
 	THEME_STORAGE_KEY,
+	isDarkTheme,
+	manifestHref,
 	type ThemeMode
 } from './index';
 
@@ -40,10 +42,31 @@ function applyThemeColor(mode: ThemeMode): void {
 	}
 }
 
+/**
+ * Point `<link rel="manifest">` at the light or dark manifest. Android 3-button
+ * navigation takes the system bar colour from the manifest, and a manifest
+ * holds one colour, so the link must follow the theme in use. Chrome reads the
+ * manifest at install and at its update checks. A no-op when there is no link
+ * (or no document). app.html's pre-paint script does the same before first
+ * paint.
+ */
+function syncManifestLink(mode: ThemeMode): void {
+	if (typeof document === 'undefined') return;
+	const link = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
+	if (!link) return;
+	const systemDark =
+		typeof window !== 'undefined' &&
+		typeof window.matchMedia === 'function' &&
+		window.matchMedia('(prefers-color-scheme: dark)').matches;
+	const href = manifestHref(isDarkTheme(mode, systemDark));
+	if (link.getAttribute('href') !== href) link.setAttribute('href', href);
+}
+
 /** Seed the active mode (called once from the root layout, both SSR + client). */
 export function initTheme(mode: ThemeMode): void {
 	active = mode;
 	registerSystemModeRepair();
+	syncManifestLink(mode);
 }
 
 /**
@@ -98,6 +121,7 @@ function registerSystemModeRepair(): void {
 	const mql = window.matchMedia('(prefers-color-scheme: dark)');
 	mql.addEventListener('change', () => {
 		if (active !== 'system') return;
+		syncManifestLink(active);
 		swapColorScheme(() => {});
 		if (typeof requestAnimationFrame === 'function') {
 			requestAnimationFrame(() => {
@@ -129,6 +153,7 @@ export function setTheme(mode: ThemeMode): void {
 		else el.removeAttribute('data-theme');
 	});
 	applyThemeColor(mode);
+	syncManifestLink(mode);
 }
 
 /** Cycle order shown in the header toggle: system → dark → light → system. */
