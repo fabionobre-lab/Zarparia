@@ -201,7 +201,7 @@ export const guide: GuideCatalog = {
 							'A stop with a guide shows a small (i) button next to its title. Tap it to open the guide in full screen.',
 							'The guide has five parts: why the stop matters, what to know before you go in, what not to miss, the story, and details to look for.',
 							'A guide can also show a reference photo under the title, and beside a "don\'t miss" item, with the photographer\'s credit.',
-							'Close the guide with the X, the Escape key, or the Back gesture. The guide is read-only. For now, you add a guide through the connector or in the trip document.'
+							'Close the guide with the X, the Escape key, or the Back gesture. The guide is read-only. For now, you add a guide through the connector or in the trip document. The connector can add guides to stops one at a time, so a trip with many guides stays easy to update.'
 						]
 					},
 					{

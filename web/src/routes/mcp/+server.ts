@@ -15,6 +15,7 @@ import {
 	deleteTrip
 } from '$lib/server/trips';
 import type { TripDoc } from '$lib/validateTrip';
+import { applyStopGuides, type StopGuidePatch } from '$lib/server/mcp/stopGuides';
 import tripSchema from '$lib/trip.schema.json';
 
 const SERVER_INFO = { name: 'zarparia-trips', version: '1.0.0' };
@@ -28,7 +29,8 @@ const INSTRUCTIONS =
 	'per-block costs, booking links, tags and a cover emoji — the bare minimum (time + title only) renders a sparse, mostly empty trip. ' +
 	'To edit an existing trip, call get_trip first, modify the returned doc, then call update_trip ' +
 	'passing the same updatedAt back as base_updated_at so concurrent edits are detected. ' +
-	'create_trip and update_trip return validation details when the doc is rejected — fix the doc and retry.';
+	'create_trip and update_trip return validation details when the doc is rejected — fix the doc and retry. ' +
+	'To add or change stop guides, use set_stop_guides (a few guides per call) instead of resending the whole trip with update_trip.';
 
 // Handed to the model alongside the schema so a trip is built with EVERY
 // enrichment the renderer supports. Only `time` + `title` are strictly required
@@ -46,7 +48,7 @@ const AUTHORING_GUIDANCE = [
 	'Links: add block `links` [{url, label?}] for hotel/restaurant/ticket bookings.',
 	'Alternative plans: when a segment has a genuine fork (a rainy-day option, a with-kids vs without version, a longer vs shorter route), give it more than one entry in `plans` — each with its own `id`, a `label` (e.g. {"en":"Rainy day"}) and its full `days` — and set the segment `defaultPlan` to the primary plan\'s id. To flag how a plan differs, add `diffLabels` {added, changed, kept} to that plan and mark the relevant blocks with `diff` {kind, reason}. Only do this for a real choice — most segments have exactly one plan.',
 	'Finishing touches: a trip `cover` emoji, an `eyebrow` (e.g. the month), day `note`/`routeMode`/`banner`, `waypoints` for multi-stop days, and a `checklist` where useful.',
-	'Stop guide: a block `guide` {why?, before?, dontMiss?[{name, text, image?}], story?, closer?, image?} holds a per-stop reading guide, shown in a full-screen overlay from an (i) button; every field is optional and all are localized. `image` {file|url, credit?, license?} attaches a reference photo to the guide (shown under the title) or to a dontMiss item (shown beside it); set `file` (a Wikimedia Commons file name) or `url` (a direct https image URL).'
+	'Stop guide: a block `guide` {why?, before?, dontMiss?[{name, text, image?}], story?, closer?, image?} holds a per-stop reading guide, shown in a full-screen overlay from an (i) button; every field is optional and all are localized. `image` {file|url, credit?, license?} attaches a reference photo to the guide (shown under the title) or to a dontMiss item (shown beside it); set `file` (a Wikimedia Commons file name) or `url` (a direct https image URL). To add guides to an existing trip, call set_stop_guides with a few guides per call rather than update_trip.'
 ];
 
 const RICH_EXAMPLE: TripDoc = {
@@ -233,6 +235,30 @@ const TOOLS = [
 		}
 	},
 	{
+		name: 'set_stop_guides',
+		description:
+			'Set or remove the reading guide (block `guide`, see get_trip_schema) on one or more stops, by block id, without resending the whole trip. Use this instead of update_trip to add guides: a trip with many guides is too large to resend. `guides` maps block id → guide object, or null to remove it. Nothing is written if any id is not found or the result fails validation. Send a few guides per call. Editors and owners only.',
+		inputSchema: {
+			type: 'object',
+			properties: {
+				trip_id: { type: 'string', description: 'The trip id (slug).' },
+				guides: {
+					type: 'object',
+					description:
+						'Map of block id (the block `id` from get_trip) → guide object {why?, before?, dontMiss?, story?, closer?, image?}, or null to remove the guide.',
+					additionalProperties: { type: ['object', 'null'] }
+				},
+				base_updated_at: {
+					type: 'string',
+					description:
+						'Optional updatedAt from get_trip or the previous write. When set, a newer trip version is a conflict.'
+				}
+			},
+			required: ['trip_id', 'guides'],
+			additionalProperties: false
+		}
+	},
+	{
 		name: 'delete_trip',
 		description: 'Permanently delete a trip. DESTRUCTIVE and owner-only. Requires confirm=true.',
 		inputSchema: {
@@ -312,6 +338,48 @@ async function callTool(
 				}
 			}
 			return textContent({ ok: true, id: result.id, updatedAt: result.updatedAt });
+		}
+		case 'set_stop_guides': {
+			const tripId = typeof args.trip_id === 'string' ? args.trip_id : '';
+			if (!tripId) return textContent('trip_id is required.', true);
+			const guides = args.guides;
+			if (!guides || typeof guides !== 'object' || Array.isArray(guides) || !Object.keys(guides).length)
+				return textContent('`guides` must be a non-empty object: block id → guide object or null.', true);
+			const trip = await getTripForUser(db, userId, tripId);
+			if (!trip) return textContent(`No trip "${tripId}" found, or you do not have access to it.`, true);
+			const base = typeof args.base_updated_at === 'string' ? args.base_updated_at : trip.updatedAt;
+			if (base !== trip.updatedAt)
+				return textContent(
+					'Conflict: the trip was modified since you fetched it. Re-fetch with get_trip and reapply your changes.',
+					true
+				);
+			const applied = applyStopGuides(trip.doc, guides as StopGuidePatch);
+			if (!applied.ok)
+				return textContent(
+					{
+						error: 'No guides were written.',
+						...(applied.missing.length ? { unknownBlockIds: applied.missing } : {}),
+						...(applied.invalid.length ? { notAnObjectOrNull: applied.invalid } : {})
+					},
+					true
+				);
+			const result = await updateTrip(db, userId, tripId, applied.doc, base);
+			if (!result.ok) {
+				switch (result.reason) {
+					case 'invalid':
+						return textContent({ error: 'A guide failed validation. No guides were written.', details: result.errors }, true);
+					case 'conflict':
+						return textContent(
+							'Conflict: the trip was modified since you fetched it. Re-fetch with get_trip and reapply your changes.',
+							true
+						);
+					case 'not_found':
+						return textContent(`No trip "${tripId}" found, or you do not have access to it.`, true);
+					case 'forbidden':
+						return textContent('You have view-only access to this trip and cannot edit it.', true);
+				}
+			}
+			return textContent({ ok: true, id: result.id, updatedAt: result.updatedAt, updated: applied.applied });
 		}
 		case 'delete_trip': {
 			const tripId = typeof args.trip_id === 'string' ? args.trip_id : '';

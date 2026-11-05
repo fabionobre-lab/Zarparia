@@ -31,6 +31,7 @@ on the web app; Claude only ever acts as you, on your own trips.
 | `get_trip_schema` | Returns the trip JSON Schema plus a minimal working example. |
 | `create_trip` | Creates a trip from a document. Returns validation errors if the doc is invalid. |
 | `update_trip` | Replaces a trip document. Pass `base_updated_at` (from `get_trip`) for conflict detection. |
+| `set_stop_guides` | Sets or removes the reading guide on stops by block id, without resending the whole trip. Writes nothing if any id is unknown or a guide fails validation. |
 | `delete_trip` | Permanently deletes a trip. Owner-only; requires `confirm: true`. |
 
 A trip is a single JSON document validated against `src/lib/trip.schema.json`.
