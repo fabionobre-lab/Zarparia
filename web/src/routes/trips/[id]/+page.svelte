@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
-	import { beforeNavigate, goto } from '$app/navigation';
+	import { onDestroy, untrack } from 'svelte';
+	import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import TripView from '$lib/TripView.svelte';
 	import SharePanel from '$lib/SharePanel.svelte';
@@ -14,6 +14,10 @@
 	import { tripActions } from '$lib/nav/tripNav.svelte';
 	import TripSettingsDrawer from '$lib/trip/TripSettingsDrawer.svelte';
 	import { t } from '$lib/i18n/store.svelte';
+	import ConfirmDialog from '$lib/dialog/ConfirmDialog.svelte';
+	import OfflineBar from '$lib/trip/OfflineBar.svelte';
+	import { isOnline } from '$lib/online.svelte';
+	import { chipKey, createReconnectRetry } from '$lib/trip/saveGuards';
 	let { data } = $props();
 
 	let showShare = $state(false);
@@ -60,7 +64,8 @@
 		const incoming = data.trip as unknown as Trip;
 		untrack(() => {
 			if (incoming.id === draft.id) return;
-			autosave.cancel();
+			reconnect.cancel();
+			autosave.dispose();
 			draft = structuredClone(incoming) as Trip;
 			autosave = createAutosave(incoming.id, () => draft, data.updatedAt);
 			history = createHistory(
@@ -111,8 +116,44 @@
 		editing = !editing;
 	}
 
-	// Don't leave a debounced edit unsaved on the way out.
-	beforeNavigate(() => autosave.flush());
+	// Bounded retry when the browser reports a connection. It reads the CURRENT
+	// `autosave` (the page replaces that variable) and never uses an $effect on
+	// the status: a device that says "online" while the PUT keeps failing would
+	// loop without end. See saveGuards.ts.
+	const reconnect = createReconnectRetry(() => autosave);
+	function onReconnectSignal() {
+		if (canEdit && isOnline()) reconnect.trigger();
+	}
+	function onVisibility() {
+		if (document.visibilityState === 'visible') onReconnectSignal();
+	}
+	onDestroy(() => {
+		reconnect.cancel();
+		autosave.dispose();
+	});
+
+	// Don't leave a debounced edit unsaved on the way out. If the edit is still
+	// unsaved after that (the save failed, or the draft is invalid), ask first:
+	// `flush()` has nothing to send in those states, so the edit would be lost
+	// with no sign. Leaving the site is covered by `beforeunload` below.
+	let leaveOpen = $state(false);
+	let leaveTo: URL | null = null;
+	let leaveConfirmed = false;
+	beforeNavigate(({ cancel, willUnload, to }) => {
+		autosave.flush();
+		if (leaveConfirmed || willUnload || !to) return;
+		if (to.url.pathname === page.url.pathname) return;
+		if (autosave.status === 'error' || autosave.status === 'invalid') {
+			cancel();
+			leaveTo = to.url;
+			leaveOpen = true;
+		}
+	});
+	afterNavigate(() => (leaveConfirmed = false));
+	function confirmLeave() {
+		leaveConfirmed = true;
+		if (leaveTo) void goto(leaveTo);
+	}
 	$effect(() => {
 		if (!autosave.busy) return;
 		const handler = (e: BeforeUnloadEvent) => e.preventDefault();
@@ -120,17 +161,12 @@
 		return () => window.removeEventListener('beforeunload', handler);
 	});
 
-	const saveLabel = $derived(
-		{
-			clean: '',
-			pending: t('save.pending'),
-			saving: t('save.saving'),
-			saved: t('save.saved'),
-			invalid: t('save.invalid'),
-			error: t('save.error'),
-			conflict: t('save.conflict')
-		}[autosave.status]
-	);
+	const saveLabel = $derived.by(() => {
+		const key = chipKey(autosave.status, isOnline());
+		return key ? t(key) : '';
+	});
+	// Height of the sticky status block, so the day strip can sit below it.
+	let statusH = $state(0);
 
 	// Mobile bottom bar: Trips · (Share if owner) · (Edit if canEdit) · More.
 	// The More sheet carries every secondary per-trip action: Print and Add to
@@ -247,9 +283,10 @@
 	<title>{pageTitle}</title>
 </svelte:head>
 
-<svelte:window onkeydown={onWindowKeydown} />
+<svelte:window onkeydown={onWindowKeydown} ononline={onReconnectSignal} />
+<svelte:document onvisibilitychange={onVisibility} />
 
-<div class="page" class:editing>
+<div class="page" class:editing style:--status-h="{statusH}px">
 	<div class="bar">
 		<a class="back" href="/">{t('tripbar.allTrips')}</a>
 		<div class="actions">
@@ -269,39 +306,55 @@
 	</div>
 
 	{#if canEdit && (editing || autosave.status !== 'clean')}
-		<div class="editbar">
-			{#if saveLabel}
-				<span class="save-chip s-{autosave.status}" aria-live="polite">{saveLabel}</span>
+		<!-- Sticky, so the save chip, Retry and the banners stay in view while the
+		     user edits far down a long trip (audit U4-02). -->
+		<div class="status-stack" bind:clientHeight={statusH}>
+			{#if editing && !isOnline()}
+				<OfflineBar />
 			{/if}
-			{#if autosave.status === 'error'}
-				<button class="retry" onclick={() => autosave.retry()}>{t('save.retry')}</button>
+			<div class="editbar">
+				{#if saveLabel}
+					<span class="save-chip s-{autosave.status}" aria-live="polite">{saveLabel}</span>
+				{/if}
+				{#if autosave.status === 'error'}
+					<button class="retry" onclick={() => autosave.retry()}>{t('save.retry')}</button>
+				{/if}
+				{#if editing}
+					<!-- Also reachable with Ctrl/⌘Z, but touch has no keyboard and the
+					     shortcut is invisible — so the buttons are the real affordance. -->
+					<span class="undo-group">
+						<button class="undo-btn" onclick={doUndo} disabled={!history.canUndo} title={t('common.undo')} aria-label={t('common.undo')}>↶</button>
+						<button class="undo-btn" onclick={doRedo} disabled={!history.canRedo} title={t('common.redo')} aria-label={t('common.redo')}>↷</button>
+					</span>
+					<span class="edit-hint">{t('edit.hint')}</span>
+				{/if}
+			</div>
+
+			{#if autosave.status === 'conflict'}
+				<div class="banner banner-conflict" role="alert">
+					<strong>{t('save.conflict')}</strong>
+					<p>{t('save.conflictBody')}</p>
+					<button class="btn" onclick={() => window.location.reload()}>{t('save.reload')}</button>
+				</div>
 			{/if}
-			{#if editing}
-				<!-- Also reachable with Ctrl/⌘Z, but touch has no keyboard and the
-				     shortcut is invisible — so the buttons are the real affordance. -->
-				<span class="undo-group">
-					<button class="undo-btn" onclick={doUndo} disabled={!history.canUndo} title={t('common.undo')} aria-label={t('common.undo')}>↶</button>
-					<button class="undo-btn" onclick={doRedo} disabled={!history.canRedo} title={t('common.redo')} aria-label={t('common.redo')}>↷</button>
-				</span>
-				<span class="edit-hint">{t('edit.hint')}</span>
+
+			{#if autosave.status === 'invalid' && autosave.errors.length}
+				<div class="banner banner-invalid" role="alert">
+					<strong>{t('save.invalidBody')}</strong>
+					<ul>{#each autosave.errors as e (e)}<li>{e}</li>{/each}</ul>
+				</div>
 			{/if}
 		</div>
 	{/if}
 
-	{#if autosave.status === 'conflict'}
-		<div class="banner banner-conflict" role="alert">
-			<strong>{t('save.conflict')}</strong>
-			<p>{t('save.conflictBody')}</p>
-			<button class="btn" onclick={() => window.location.reload()}>{t('save.reload')}</button>
-		</div>
-	{/if}
-
-	{#if autosave.status === 'invalid' && autosave.errors.length}
-		<div class="banner banner-invalid" role="alert">
-			<strong>{t('save.invalidBody')}</strong>
-			<ul>{#each autosave.errors as e (e)}<li>{e}</li>{/each}</ul>
-		</div>
-	{/if}
+	<ConfirmDialog
+		bind:open={leaveOpen}
+		title={t('leave.title')}
+		body={t('leave.body')}
+		confirmLabel={t('leave.confirm')}
+		cancelLabel={t('leave.stay')}
+		onconfirm={confirmLeave}
+	/>
 
 	{#if showShare && data.role === 'owner'}
 		<SharePanel tripId={data.trip.id} tripTitle={loc(draft, draft.title, lang)} />
@@ -398,6 +451,7 @@
 	/* ── Edit-mode status row ──
 	   Lives outside .bar because .bar is desktop-only: on mobile the edit toggle
 	   is in the bottom app bar, but the save state still has to be visible. */
+	.status-stack,
 	.editbar,
 	.banner {
 		max-width: 430px;
@@ -405,10 +459,29 @@
 		font-family: var(--font-ui);
 	}
 	@media (min-width: 960px) {
+		.status-stack,
 		.editbar,
 		.banner {
 			max-width: none;
 		}
+	}
+	/* Pinned to the top while the page scrolls. Its height is published as
+	   --status-h; the day strip in TripView sits below it. The z-index is above
+	   the day strip (1000) so the two never overlap. */
+	.status-stack {
+		position: sticky;
+		top: 0;
+		z-index: 1001;
+		background: var(--surface-sunken);
+		padding: 0.3rem 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+	.status-stack > .editbar,
+	.status-stack > .banner {
+		margin: 0;
+		max-width: none;
 	}
 	.editbar {
 		display: flex;

@@ -1793,7 +1793,9 @@
 		   above Leaflet's internal panes (tilePane 200 … popupPane 700) so the
 		   day-map never paints over it. */
 		position: sticky;
-		top: 0;
+		/* The trip page publishes the height of its sticky save-status block as
+		   --status-h; stay below it. Other pages leave it unset. */
+		top: var(--status-h, 0px);
 		z-index: 1000;
 		transition: box-shadow 0.15s ease;
 	}

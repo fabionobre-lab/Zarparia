@@ -125,6 +125,12 @@ export interface Messages {
 	'save.conflict': string;
 	'save.conflictBody': string;
 	'save.reload': string;
+	'save.offline': string;
+	'offline.bar': string;
+	'leave.title': string;
+	'leave.body': string;
+	'leave.confirm': string;
+	'leave.stay': string;
 
 	// ── Share panel (SharePanel.svelte) ──
 	'share.heading': string;
@@ -736,6 +742,12 @@ const enGB: Messages = {
 	'save.conflictBody':
 		'Someone else edited this trip while you had it open, so saving is paused to avoid overwriting their changes. Copy anything you just wrote, then reload to continue from the latest version.',
 	'save.reload': 'Reload',
+	'save.offline': 'Offline',
+	'offline.bar': 'Offline. Edits are not saved.',
+	'leave.title': 'Leave without saving?',
+	'leave.body': 'Your latest edits are not saved. If you leave this page, you lose them.',
+	'leave.confirm': 'Leave',
+	'leave.stay': 'Stay on this page',
 
 	'share.heading': 'Share this trip',
 	'share.linkSharing': 'Link sharing',
@@ -1328,6 +1340,12 @@ const ptBR: Messages = {
 	'save.conflictBody':
 		'Outra pessoa editou esta viagem enquanto você a mantinha aberta, então o salvamento foi pausado para não sobrescrever as alterações dela. Copie o que você acabou de escrever e recarregue para continuar a partir da versão mais recente.',
 	'save.reload': 'Recarregar',
+	'save.offline': 'Offline',
+	'offline.bar': 'Offline. As edições não são salvas.',
+	'leave.title': 'Sair sem salvar?',
+	'leave.body': 'Suas últimas edições não foram salvas. Se você sair desta página, vai perdê-las.',
+	'leave.confirm': 'Sair',
+	'leave.stay': 'Ficar nesta página',
 
 	'share.heading': 'Compartilhar esta viagem',
 	'share.linkSharing': 'Compartilhar por link',

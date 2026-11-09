@@ -153,7 +153,7 @@ export const guide: GuideCatalog = {
 						id: 'offline',
 						title: 'Use Zarparia offline',
 						body: [
-							'Install Zarparia as an app (from your browser\'s "install" or "add to home screen" option) and it keeps a copy of your trips available without a connection. Visit a trip once while online to make sure it\'s cached; changes made offline sync once you\'re back online.'
+							'Install Zarparia as an app (from your browser\'s "install" or "add to home screen" option) and it keeps a copy of your trips available without a connection. Visit a trip once while online. Then you can read it with no connection. Edits need a connection.'
 						]
 					},
 					{
@@ -433,7 +433,7 @@ export const guide: GuideCatalog = {
 						id: 'offline',
 						title: 'Usar o Zarparia offline',
 						body: [
-							'Instale o Zarparia como aplicativo (pela opção "instalar" ou "adicionar à tela inicial" do seu navegador) e ele mantém uma cópia das suas viagens disponível sem conexão. Visite uma viagem uma vez estando online para garantir que ela fique salva; alterações feitas offline são sincronizadas assim que a conexão voltar.'
+							'Instale o Zarparia como aplicativo (pela opção "instalar" ou "adicionar à tela inicial" do seu navegador) e ele mantém uma cópia das suas viagens disponível sem conexão. Abra a viagem uma vez com internet. Depois você pode lê-la sem conexão. Para editar, é preciso ter conexão.'
 						]
 					},
 					{

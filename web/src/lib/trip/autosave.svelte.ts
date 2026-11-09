@@ -13,20 +13,15 @@
 import { pruneEmpty } from '$lib/editor/factories';
 import { validateTripDoc, type TripDoc } from '$lib/validateTrip';
 import type { Trip } from '$lib/trip-engine';
+import {
+	clearUnsaved,
+	isUnsaved,
+	markUnsaved,
+	sameDocIgnoringIds,
+	type SaveStatus
+} from './saveGuards';
 
-export type SaveStatus =
-	/** No edits since the last successful save (or since load). */
-	| 'clean'
-	/** Edited; a save is scheduled but hasn't fired. */
-	| 'pending'
-	| 'saving'
-	| 'saved'
-	/** The draft doesn't satisfy the trip schema — nothing was sent. */
-	| 'invalid'
-	/** Network/server failure; retryable. */
-	| 'error'
-	/** Someone else wrote to this trip; writing is halted until reload. */
-	| 'conflict';
+export type { SaveStatus };
 
 const DEBOUNCE_MS = 800;
 
@@ -65,7 +60,13 @@ export function createAutosave(
 	getTrip: () => Trip,
 	initialUpdatedAt: string | undefined
 ) {
-	let status = $state<SaveStatus>('clean');
+	let statusState = $state<SaveStatus>('clean');
+	// Identity for the module-level "unsaved edits" flag (see saveGuards.ts).
+	const token = {};
+	const setStatus = (s: SaveStatus) => {
+		statusState = s;
+		markUnsaved(token, s);
+	};
 	let errors = $state<string[]>([]);
 	let base = initialUpdatedAt;
 	let timer: ReturnType<typeof setTimeout> | null = null;
@@ -78,6 +79,33 @@ export function createAutosave(
 	// An edit landed while a PUT was in flight — save again once it settles, so
 	// the last keystroke is never the one that gets dropped.
 	let rerun = false;
+	// Body of the last PUT that failed with a network error. That PUT may still
+	// have committed on the server while its response was lost. If the next PUT
+	// then gets a 409, `adoptIfCommitted` tells that case from a real conflict.
+	let maybeLost: string | null = null;
+
+	/** After a 409: did one of our own bodies already land? If so, adopt its baseline. */
+	async function adoptIfCommitted(current: string): Promise<'current' | 'lost' | null> {
+		if (!maybeLost) return null;
+		try {
+			const res = await fetch(`/api/trips/${tripId}`);
+			if (!res.ok) return null;
+			const data = (await res.json()) as { doc?: Trip; updatedAt?: string };
+			if (!data.doc || !data.updatedAt) return null;
+			const which = sameDocIgnoringIds(data.doc, current)
+				? 'current'
+				: sameDocIgnoringIds(data.doc, maybeLost)
+					? 'lost'
+					: null;
+			if (!which) return null;
+			base = data.updatedAt;
+			adoptEntityIds(getTrip(), data.doc);
+			lastSentBody = which === 'current' ? current : maybeLost;
+			return which;
+		} catch {
+			return null;
+		}
+	}
 
 	async function put(): Promise<void> {
 		if (inFlight) {
@@ -86,7 +114,7 @@ export function createAutosave(
 		}
 		const clean = pruneEmpty($state.snapshot(getTrip())) as TripDoc | undefined;
 		if (!clean) {
-			status = 'invalid';
+			setStatus('invalid');
 			errors = ['The trip is empty.'];
 			return;
 		}
@@ -94,17 +122,17 @@ export function createAutosave(
 		if (!check.valid) {
 			// Keep the edits in the draft — the user is mid-thought (an emptied
 			// required title, say). The next valid keystroke saves everything.
-			status = 'invalid';
+			setStatus('invalid');
 			errors = check.errors;
 			return;
 		}
 		const body = JSON.stringify(clean);
 		if (body === lastSentBody) {
-			status = 'saved';
+			setStatus('saved');
 			return;
 		}
 		inFlight = true;
-		status = 'saving';
+		setStatus('saving');
 		errors = [];
 		try {
 			const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -124,24 +152,39 @@ export function createAutosave(
 				// keep stable.
 				if (data.doc) adoptEntityIds(getTrip(), data.doc);
 				lastSentBody = body;
-				status = 'saved';
+				maybeLost = null;
+				setStatus('saved');
 			} else if (res.status === 409) {
-				status = 'conflict';
-				rerun = false;
+				const adopted = await adoptIfCommitted(body);
+				if (adopted === 'current') {
+					maybeLost = null;
+					setStatus('saved');
+				} else if (adopted === 'lost') {
+					// Our earlier PUT landed; the draft has newer edits. Send them
+					// again on the new baseline.
+					maybeLost = null;
+					rerun = true;
+				} else {
+					setStatus('conflict');
+					rerun = false;
+				}
 			} else {
 				const body = (await res.json().catch(() => ({}))) as {
 					error?: string;
 					details?: string[];
 				};
-				status = 'error';
+				setStatus('error');
 				errors = body.details ?? [body.error ?? `Save failed (${res.status}).`];
 			}
 		} catch {
-			status = 'error';
-			errors = ['Could not reach the server. Your edits are still here — retrying will save them.'];
+			setStatus('error');
+			maybeLost = body;
+			// No text here. The page does not render `errors` for this status, and
+			// a promise like "your edits are still here" is not backed by storage.
+			errors = [];
 		} finally {
 			inFlight = false;
-			if (rerun && status !== 'conflict') {
+			if (rerun && statusState !== 'conflict') {
 				rerun = false;
 				schedule(0);
 			}
@@ -150,8 +193,8 @@ export function createAutosave(
 
 	/** Note an edit; (re)start the debounce window. */
 	function schedule(delay: number = DEBOUNCE_MS): void {
-		if (status === 'conflict') return; // halted until the user reloads
-		status = 'pending';
+		if (statusState === 'conflict') return; // halted until the user reloads
+		setStatus('pending');
 		if (timer) clearTimeout(timer);
 		timer = setTimeout(() => {
 			timer = null;
@@ -169,7 +212,7 @@ export function createAutosave(
 	}
 
 	function retry(): void {
-		if (status === 'conflict') return;
+		if (statusState === 'conflict') return;
 		schedule(0);
 	}
 
@@ -178,21 +221,28 @@ export function createAutosave(
 		timer = null;
 	}
 
+	/** The page drops this autosave (replaced or destroyed): stop it and clear the unsaved flag. */
+	function dispose(): void {
+		cancel();
+		clearUnsaved(token);
+	}
+
 	return {
 		get status() {
-			return status;
+			return statusState;
 		},
 		get errors() {
 			return errors;
 		},
 		/** Work is outstanding — used to guard navigation away from the page. */
 		get busy() {
-			return status === 'pending' || status === 'saving';
+			return isUnsaved(statusState);
 		},
 		schedule,
 		flush,
 		retry,
-		cancel
+		cancel,
+		dispose
 	};
 }
 
