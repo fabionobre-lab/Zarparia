@@ -175,6 +175,40 @@ describe('autosave core', () => {
 			expect((trip.segments[0].plans[0].days[0] as { id?: string }).id).toBeUndefined();
 		});
 
+		it('does not write ids into the draft when disposed during the 409 check', async () => {
+			let releaseJson!: (v: unknown) => void;
+			const sent: string[] = [];
+			const { core, trip } = setup(async (call, n) => {
+				if (call.init?.method === 'PUT') {
+					sent.push(call.init.body as string);
+					if (n === 1) throw new TypeError('response lost');
+					return json({ error: 'changed' }, 409);
+				}
+				return {
+					ok: true,
+					json: () => new Promise((r) => (releaseJson = r))
+				} as unknown as Response;
+			});
+			core.schedule(0);
+			await tick();
+			core.retry();
+			await tick(); // PUT2 got 409; the GET is waiting for its body
+			const stored = JSON.parse(sent[0]);
+			stored.segments[0].plans[0].days[0].id = 'minted';
+			core.dispose();
+			releaseJson({ doc: stored, updatedAt: 'U2' });
+			await tick();
+			expect((trip.segments[0].plans[0].days[0] as { id?: string }).id).toBeUndefined();
+		});
+
+		it('settled() on a disposed instance resolves at once', async () => {
+			const { core } = setup(() => new Promise(() => {}));
+			core.schedule(0);
+			await tick();
+			core.dispose();
+			await expect(core.settled()).resolves.toBe('saving');
+		});
+
 		it('resolves waiters when disposed', async () => {
 			const { core } = setup(() => new Promise(() => {}));
 			core.schedule(0);
@@ -183,6 +217,20 @@ describe('autosave core', () => {
 			core.dispose();
 			await expect(p).resolves.toBe('saving');
 		});
+	});
+
+	it('ends as error, and settles, when the save throws before the request', async () => {
+		const core = createAutosaveCore('test-trip', () => makeTrip(), 'U0', {
+			fetch: async () => json({}),
+			snapshot: () => {
+				throw new Error('snapshot failed');
+			}
+		});
+		core.schedule(0);
+		await tick();
+		expect(core.status).toBe('error');
+		await expect(core.settled()).resolves.toBe('error');
+		core.dispose();
 	});
 
 	describe('409 after a lost response', () => {

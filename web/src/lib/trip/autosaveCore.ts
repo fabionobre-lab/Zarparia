@@ -123,6 +123,9 @@ export function createAutosaveCore(
 			const res = await env.fetch(`/api/trips/${tripId}`, { signal });
 			if (!res.ok || disposed) return null;
 			const data = (await res.json()) as { doc?: Trip; updatedAt?: string };
+			// The page may have dropped this instance while the body was read: its
+			// `getTrip` can now return another trip's draft.
+			if (disposed) return null;
 			if (!data.doc || !data.updatedAt) return null;
 			const which = sameDocIgnoringIds(data.doc, current)
 				? 'current'
@@ -233,6 +236,10 @@ export function createAutosaveCore(
 	async function run(): Promise<void> {
 		try {
 			await put();
+		} catch {
+			// A throw before the request (snapshot, validation) must not leave the
+			// status at `pending`: `settled()` waiters would wait for ever.
+			setStatus('error', []);
 		} finally {
 			notify();
 		}
@@ -283,7 +290,7 @@ export function createAutosaveCore(
 	 * for the outcome of a save that `flush()` just started.
 	 */
 	function settled(): Promise<SaveStatus> {
-		if (status !== 'pending' && status !== 'saving') return Promise.resolve(status);
+		if (disposed || (status !== 'pending' && status !== 'saving')) return Promise.resolve(status);
 		return new Promise((resolve) => waiters.push(resolve));
 	}
 

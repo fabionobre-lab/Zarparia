@@ -346,7 +346,7 @@
 						<button class="undo-btn" onclick={doUndo} disabled={!history.canUndo} title={t('common.undo')} aria-label={t('common.undo')}>↶</button>
 						<button class="undo-btn" onclick={doRedo} disabled={!history.canRedo} title={t('common.redo')} aria-label={t('common.redo')}>↷</button>
 					</span>
-					{#if isOnline() && autosave.status !== 'error'}
+					{#if isOnline() && autosave.status !== 'error' && autosave.status !== 'conflict'}
 						<span class="edit-hint">{t('edit.hint')}</span>
 					{/if}
 				{/if}
