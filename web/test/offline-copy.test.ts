@@ -7,9 +7,6 @@ import { tripChrome } from '../src/lib/i18n/tripChrome';
 
 const BANNED =
 	/sync|sincroniz|will save|still here|nothing (was )?lost|nada (foi )?perdido|são salvas quando/i;
-// Strings that match BANNED but are true: the draft saves by itself once a
-// validation error is fixed, while the page stays open.
-const ALLOWED = new Set(['Finish this edit and it will save automatically:']);
 
 function texts(): string[] {
 	const out: string[] = [];
@@ -33,8 +30,31 @@ describe('offline copy', () => {
 		expect(pt?.body.join(' ')).toContain('Para editar, é preciso ter conexão.');
 	});
 
+	it('guide entry "editing" names the offline states, in both languages', () => {
+		const find = (l: 'en-GB' | 'pt-BR') =>
+			guide[l].groups
+				.flatMap((g) => g.entries)
+				.flatMap((e) => e.body)
+				.join(' ');
+		const en = find('en-GB');
+		for (const w of ['Offline', 'Not saved', 'Retry', 'tries again by itself', 'asks first']) {
+			expect(en).toContain(w);
+		}
+		const pt = find('pt-BR');
+		for (const w of ['Offline', 'Não salvo', 'Tentar de novo', 'tenta de novo sozinha', 'pergunta antes']) {
+			expect(pt).toContain(w);
+		}
+	});
+
+	it('save.invalidBody uses the approved text', () => {
+		expect(catalogs['en-GB']['save.invalidBody']).toBe('Finish this edit. Then it saves when you are online:');
+		expect(catalogs['pt-BR']['save.invalidBody']).toBe(
+			'Termine esta edição. Depois ela é salva quando você estiver online:'
+		);
+	});
+
 	it('no guide or catalog text promises offline sync or saved edits', () => {
-		const hits = texts().filter((s) => BANNED.test(s) && !ALLOWED.has(s));
+		const hits = texts().filter((s) => BANNED.test(s));
 		expect(hits).toEqual([]);
 	});
 

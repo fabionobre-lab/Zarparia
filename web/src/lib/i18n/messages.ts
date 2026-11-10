@@ -736,7 +736,7 @@ const enGB: Messages = {
 	'save.saved': 'Saved',
 	'save.error': 'Not saved',
 	'save.invalid': 'Not saved yet',
-	'save.invalidBody': 'Finish this edit and it will save automatically:',
+	'save.invalidBody': 'Finish this edit. Then it saves when you are online:',
 	'save.retry': 'Retry',
 	'save.conflict': 'Changed elsewhere',
 	'save.conflictBody':
@@ -1334,7 +1334,7 @@ const ptBR: Messages = {
 	'save.saved': 'Salvo',
 	'save.error': 'Não salvo',
 	'save.invalid': 'Ainda não salvo',
-	'save.invalidBody': 'Conclua esta edição e ela será salva automaticamente:',
+	'save.invalidBody': 'Termine esta edição. Depois ela é salva quando você estiver online:',
 	'save.retry': 'Tentar de novo',
 	'save.conflict': 'Alterada em outro lugar',
 	'save.conflictBody':

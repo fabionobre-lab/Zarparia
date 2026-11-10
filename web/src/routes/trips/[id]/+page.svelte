@@ -139,14 +139,34 @@
 	let leaveOpen = $state(false);
 	let leaveTo: URL | null = null;
 	let leaveConfirmed = false;
+	let leaveWaiting = false;
 	beforeNavigate(({ cancel, willUnload, to }) => {
 		autosave.flush();
 		if (leaveConfirmed || willUnload || !to) return;
 		if (to.url.pathname === page.url.pathname) return;
-		if (autosave.status === 'error' || autosave.status === 'invalid') {
+		const status = autosave.status;
+		if (status === 'error' || status === 'invalid') {
 			cancel();
 			leaveTo = to.url;
 			leaveOpen = true;
+		} else if (status === 'pending' || status === 'saving') {
+			// The save that `flush()` just started has not finished. Leaving now
+			// would drop the edit if that save fails. Wait for the result (a hung
+			// request ends as `error` after the time limit), then go on or ask.
+			cancel();
+			if (leaveWaiting) return;
+			leaveWaiting = true;
+			const target = to.url;
+			void autosave.settled().then((result) => {
+				leaveWaiting = false;
+				if (result === 'saved' || result === 'clean') {
+					leaveConfirmed = true;
+					void goto(target);
+				} else {
+					leaveTo = target;
+					leaveOpen = true;
+				}
+			});
 		}
 	});
 	afterNavigate(() => (leaveConfirmed = false));
@@ -326,7 +346,9 @@
 						<button class="undo-btn" onclick={doUndo} disabled={!history.canUndo} title={t('common.undo')} aria-label={t('common.undo')}>↶</button>
 						<button class="undo-btn" onclick={doRedo} disabled={!history.canRedo} title={t('common.redo')} aria-label={t('common.redo')}>↷</button>
 					</span>
-					<span class="edit-hint">{t('edit.hint')}</span>
+					{#if isOnline() && autosave.status !== 'error'}
+						<span class="edit-hint">{t('edit.hint')}</span>
+					{/if}
 				{/if}
 			</div>
 

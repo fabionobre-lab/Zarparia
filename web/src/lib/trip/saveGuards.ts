@@ -50,6 +50,9 @@ export function chipKey(status: SaveStatus, online: boolean): SaveChipKey | null
 /** Delays (ms after the reconnect signal) of the bounded retry. The list ends: no loop. */
 export const retryDelays: readonly number[] = [0, 3000, 15000];
 
+/** Time limit for one save request. A hung request then ends as `error`, with Retry. */
+export const PUT_TIMEOUT_MS = 15000;
+
 /** Only a network or server error is worth an automatic retry. */
 export function shouldRetryOnReconnect(status: SaveStatus): boolean {
 	return status === 'error';
