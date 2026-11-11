@@ -35,6 +35,7 @@
 	import { initTheme } from '$lib/theme/store.svelte';
 	import { syncUserMarker, safeLocalStorage } from '$lib/client/userCacheReset';
 	import { initSentryIfConfigured } from '$lib/client/sentry';
+	import { hasUnsavedEdits } from '$lib/trip/saveGuards';
 
 	let { children, data } = $props();
 
@@ -140,7 +141,9 @@
 		// first install doesn't trigger a reload loop.
 		const hadController = !!navigator.serviceWorker.controller;
 		const onChange = () => {
-			if (hadController) location.reload();
+			// A reload would throw away edits that are not saved yet. Skip it then.
+			// The old build keeps running until the next visit.
+			if (hadController && !hasUnsavedEdits()) location.reload();
 		};
 		navigator.serviceWorker.addEventListener('controllerchange', onChange);
 

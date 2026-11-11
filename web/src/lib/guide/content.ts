@@ -92,6 +92,7 @@ export const guide: GuideCatalog = {
 							"Plan variants live on the tabs under the segment name. While editing, that row is always shown — even on a segment with a single plan, since it's where the second one is created. + adds a variant as a copy of the one you're on, and the ⋮ beside it renames the tab, chooses which variant opens by default, sets the prefixes used on per-stop comparison notes, and duplicates or deletes the variant. When a segment has more than one, each stop's ⋮ gains a control marking it added, changed or kept versus the other plan, with a short reason.",
 							"The segment — the run of days in one place, whose name sits at the top of the trip — has a ⋮ of its own beside that name. It holds the colour theme and any custom colours overriding it, the location and timezone used for weather forecasts, which plan variant opens by default, and the segment's internal id, plus Add segment, Duplicate and Delete.",
 							'Changes save on their own about a second after you stop typing; a small label near the top shows Unsaved, Saving… and then Saved, so you never have to hunt for a save button. Undo and redo buttons sit beside that label, and Ctrl+Z / ⌘Z works too — inside a text field it undoes your typing, as in any text box; anywhere else it steps back through changes like adding or deleting a stop. Deleting always offers an Undo on the message it shows.',
+							'Saving needs a connection. If you edit with no connection, a bar says that your edits are not saved, and the label shows Offline. If a save fails while you are online, the label shows Not saved. In both cases a Retry button appears. While the page stays open, it tries again by itself, up to three times, when the connection returns. If you try to leave the page with unsaved edits, Zarparia asks first.',
 							'If a change leaves the trip incomplete — emptying a day of all its stops, say — saving pauses and says so rather than storing something broken. Your edits stay on screen; put a stop back and it saves immediately.',
 							'You are always editing the language you are currently reading. Switch the EN/PT toggle in the trip header and you edit that language instead, leaving the other one untouched.',
 							'If someone else changes the same trip while you have it open, saving pauses and a notice appears rather than overwriting their work — copy anything you have just written, then reload to carry on from the latest version. Press Done to leave edit mode.'
@@ -153,7 +154,7 @@ export const guide: GuideCatalog = {
 						id: 'offline',
 						title: 'Use Zarparia offline',
 						body: [
-							'Install Zarparia as an app (from your browser\'s "install" or "add to home screen" option) and it keeps a copy of your trips available without a connection. Visit a trip once while online to make sure it\'s cached; changes made offline sync once you\'re back online.'
+							'Install Zarparia as an app (from your browser\'s "install" or "add to home screen" option) and it keeps a copy of your trips available without a connection. Visit a trip once while online. Then you can read it with no connection. Edits need a connection.'
 						]
 					},
 					{
@@ -372,6 +373,7 @@ export const guide: GuideCatalog = {
 							'As variantes de plano ficam nas abas abaixo do nome do trecho. Durante a edição essa linha aparece sempre — mesmo em um trecho com um único plano, já que é ali que se cria o segundo. O + adiciona uma variante como cópia daquela em que você está, e o ⋮ ao lado renomeia a aba, escolhe qual variante abre por padrão, define os prefixos usados nas notas de comparação por parada e duplica ou exclui a variante. Quando um trecho tem mais de uma, o ⋮ de cada parada ganha um controle para marcá-la como adicionada, alterada ou mantida em relação ao outro plano, com um motivo curto.',
 							'O trecho — a sequência de dias em um mesmo lugar, cujo nome aparece no topo da viagem — tem um ⋮ próprio ao lado desse nome. Ele reúne o tema de cores e as cores personalizadas que o substituem, o local e o fuso usados na previsão do tempo, qual variante de plano abre por padrão e o id interno do trecho, além de Adicionar trecho, Duplicar e Excluir.',
 							'As alterações são salvas sozinhas cerca de um segundo depois que você para de digitar; uma etiqueta pequena no topo mostra Não salvo, Salvando… e depois Salvo, então você nunca precisa procurar um botão de salvar. Os botões de desfazer e refazer ficam ao lado dessa etiqueta, e Ctrl+Z / ⌘Z também funciona — dentro de um campo de texto ele desfaz a digitação, como em qualquer caixa de texto; fora dele, volta um passo em mudanças como adicionar ou excluir uma parada. Excluir sempre oferece Desfazer na mensagem que aparece.',
+							'Para salvar, é preciso ter conexão. Se você editar sem conexão, uma barra avisa que as edições não são salvas, e a etiqueta mostra Offline. Se um salvamento falhar com conexão, a etiqueta mostra Não salvo. Nos dois casos aparece um botão Tentar de novo. Enquanto a página estiver aberta, ela tenta de novo sozinha, até três vezes, quando a conexão volta. Se você tentar sair da página com edições não salvas, o Zarparia pergunta antes.',
 							'Se uma alteração deixar a viagem incompleta — esvaziar um dia de todas as paradas, por exemplo — o salvamento é pausado e avisa, em vez de guardar algo quebrado. Suas edições continuam na tela; devolva uma parada e ela é salva na hora.',
 							'Você sempre edita o idioma que está lendo no momento. Troque o botão EN/PT no cabeçalho da viagem e passa a editar aquele idioma, sem mexer no outro.',
 							'Se outra pessoa alterar a mesma viagem enquanto você a mantém aberta, o salvamento é pausado e aparece um aviso em vez de sobrescrever o trabalho dela — copie o que você acabou de escrever e recarregue para continuar a partir da versão mais recente. Toque em Concluir para sair do modo de edição.'
@@ -433,7 +435,7 @@ export const guide: GuideCatalog = {
 						id: 'offline',
 						title: 'Usar o Zarparia offline',
 						body: [
-							'Instale o Zarparia como aplicativo (pela opção "instalar" ou "adicionar à tela inicial" do seu navegador) e ele mantém uma cópia das suas viagens disponível sem conexão. Visite uma viagem uma vez estando online para garantir que ela fique salva; alterações feitas offline são sincronizadas assim que a conexão voltar.'
+							'Instale o Zarparia como aplicativo (pela opção "instalar" ou "adicionar à tela inicial" do seu navegador) e ele mantém uma cópia das suas viagens disponível sem conexão. Abra a viagem uma vez com internet. Depois você pode lê-la sem conexão. Para editar, é preciso ter conexão.'
 						]
 					},
 					{
